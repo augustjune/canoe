@@ -1,4 +1,4 @@
-package com.canoe.telegram.methods.messages
+package com.canoe.telegram.methods.chats
 
 import com.canoe.telegram.methods.JsonRequest
 import com.canoe.telegram.models.ChatAction.ChatAction

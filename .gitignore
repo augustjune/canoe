@@ -1,2 +1,6 @@
 target
 .idea
+
+
+src/main/scala/Run.scala
+src/main/resources

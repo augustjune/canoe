@@ -31,7 +31,7 @@ object marshalling extends CirceEncoders with CirceDecoders with CaseConversions
 
   val printer = Printer.noSpaces.copy(dropNullValues = true)
 
-  def toJson[T: Encoder](t: T): String = printer.pretty(t.asJson)
+  def toJson[T: Encoder](t: T): String = printer.pretty(snakeKeys(t.asJson))
 
   def fromJson[T: Decoder](s: String): T = {
     parse(s).fold(throw _,

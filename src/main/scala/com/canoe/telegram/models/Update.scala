@@ -27,7 +27,8 @@ case class Update(
                    chosenInlineResult : Option[ChosenInlineResult] = None,
                    callbackQuery      : Option[CallbackQuery] = None,
                    shippingQuery      : Option[ShippingQuery] = None,
-                   preCheckoutQuery   : Option[PreCheckoutQuery] = None
+                   preCheckoutQuery   : Option[PreCheckoutQuery] = None,
+                   poll               : Option[Poll] = None
                  ) {
 
   require(
@@ -40,8 +41,22 @@ case class Update(
       chosenInlineResult,
       callbackQuery,
       shippingQuery,
-      preCheckoutQuery
+      preCheckoutQuery,
+      poll
     ).count(_.isDefined) == 1,
-    "Exactly one of the optional fields should be used"
+    s"""
+       |Exactly one of the optional fields should be used.
+       |  message: $message
+       |  editedMessage: $editedMessage
+       |  channelPost: $channelPost
+       |  editedChannelPost: $editedChannelPost
+       |  inlineQuery: $inlineQuery
+       |  chosenInlineResult: $chosenInlineResult
+       |  callbackQuery: $callbackQuery
+       |  shippingQuery: $shippingQuery
+       |  preCheckoutQuery: $preCheckoutQuery
+       |  poll: $poll
+     """.stripMargin
+
   )
 }

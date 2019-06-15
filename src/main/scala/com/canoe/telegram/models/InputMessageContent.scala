@@ -16,15 +16,14 @@ sealed trait InputMessageContent
 
 /** Represents the content of a text message to be sent as the result of an inline query.
   *
-  * @param messageText            String Text of the message to be sent, 1-4096 characters
+  * @param message_text            String Text of the message to be sent, 1-4096 characters
   * @param parseMode              String Optional Send Markdown or HTML, if you want Telegram apps to show bold,
   *                               italic, fixed-width text or inline URLs in your bot's message.
   * @param disableWebPagePreview  Boolean Optional Disables link previews for links in the sent message
   */
-case class InputTextMessageContent(
-                                  messageText           : String,
-                                  parseMode             : Option[ParseMode] = None,
-                                  disableWebPagePreview : Option[Boolean] = None
+case class InputTextMessageContent(message_text: String,
+                                   parseMode: Option[ParseMode] = None,
+                                   disableWebPagePreview: Option[Boolean] = None
                                   ) extends InputMessageContent
 
 /** Represents the content of a location message to be sent as the result of an inline query.

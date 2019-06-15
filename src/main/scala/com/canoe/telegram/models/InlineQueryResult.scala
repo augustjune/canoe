@@ -37,7 +37,7 @@ sealed trait InlineQueryResult {
   * @param type                 String Type of the result, must be article
   * @param id                   String Unique identifier for this result, 1-64 Bytes
   * @param title                String Title of the result
-  * @param inputMessageContent  InputMessageContent Content of the message to be sent
+  * @param input_message_content  InputMessageContent Content of the message to be sent
   * @param replyMarkup          InlineKeyboardMarkup Optional Inline keyboard attached to the message
   * @param url                  String Optional URL of the result
   * @param hideUrl              Boolean Optional Pass True, if you don't want the URL to be shown in the message
@@ -49,7 +49,7 @@ sealed trait InlineQueryResult {
 case class InlineQueryResultArticle(
                                    id                  : String,
                                    title               : String,
-                                   inputMessageContent : InputMessageContent,
+                                   input_message_content : InputMessageContent,
                                    replyMarkup         : Option[InlineKeyboardMarkup] = None,
                                    url                 : Option[String] = None,
                                    hideUrl             : Option[Boolean] = None,

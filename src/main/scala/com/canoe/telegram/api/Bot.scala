@@ -4,13 +4,18 @@ import cats.Functor
 import cats.implicits._
 import com.canoe.telegram.clients.RequestHandler
 import com.canoe.telegram.methods.updates.GetUpdates
-import com.canoe.telegram.models.{Message, Update}
+import com.canoe.telegram.models.{InlineQuery, Message, Update}
 import fs2.Stream
 
 class Bot[F[_] : Functor](implicit client: RequestHandler[F]) {
   def messages: Stream[F, Message] =
     updates.map(_.message).collect {
       case Some(message) => message
+    }
+
+  def inlineQueries: Stream[F, InlineQuery] =
+    updates.map(_.inlineQuery).collect {
+      case Some(v) => v
     }
 
   def updates: Stream[F, Update] = pollUpdates(0)
@@ -24,7 +29,7 @@ class Bot[F[_] : Functor](implicit client: RequestHandler[F]) {
     client
       .execute(GetUpdates(Some(offset)))
       .map(_.toList)
-      .map(updates => (lastOffset(updates).getOrElse(offset) + 1,  updates))
+      .map(updates => (lastOffset(updates).map(_ + 1).getOrElse(offset),  updates))
 
 
   private def lastOffset(updates: List[Update]): Option[Long] =

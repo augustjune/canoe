@@ -1,8 +1,7 @@
-package com.canoe.telegram.methods.updates
+package com.canoe.telegram.methods.chats
 
 import com.canoe.telegram.methods.JsonRequest
 import com.canoe.telegram.models.{ChatId, Poll, ReplyMarkup}
-
 
 /**
   * Use this method to stop a poll which was sent by the bot.
@@ -13,6 +12,6 @@ import com.canoe.telegram.models.{ChatId, Poll, ReplyMarkup}
   * @param replyMarkup  A JSON-serialized object for a new message inline keyboard.
   */
 case class StopPoll(chatId      : ChatId,
-                    messageId   : Option[Int] = None,
+                    messageId   : Int,
                     replyMarkup : Option[ReplyMarkup] = None
                    ) extends JsonRequest[Poll]

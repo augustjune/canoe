@@ -121,4 +121,10 @@ final class ChatApi[F[_]](chat: Chat)
                   silent: Option[Boolean] = None,
                   markup: Option[ReplyMarkup] = None): F[Message] =
     client.execute(SendSticker(chat.id, sticker, silent, replyMarkup = markup))
+
+  def sendPoll(question: String,
+               options: List[String],
+               silent: Option[Boolean] = None,
+               markup: Option[ReplyMarkup] = None): F[Message] =
+    client.execute(SendPoll(chat.id, question, options.toArray, silent, replyMarkup = markup))
 }

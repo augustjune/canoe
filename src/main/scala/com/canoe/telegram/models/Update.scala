@@ -31,32 +31,30 @@ case class Update(
                    poll               : Option[Poll] = None
                  ) {
 
-  require(
-    Seq[Option[_]](
-      message,
-      editedMessage,
-      channelPost,
-      editedChannelPost,
-      inlineQuery,
-      chosenInlineResult,
-      callbackQuery,
-      shippingQuery,
-      preCheckoutQuery,
-      poll
-    ).count(_.isDefined) == 1,
-    s"""
-       |Exactly one of the optional fields should be used.
-       |  message: $message
-       |  editedMessage: $editedMessage
-       |  channelPost: $channelPost
-       |  editedChannelPost: $editedChannelPost
-       |  inlineQuery: $inlineQuery
-       |  chosenInlineResult: $chosenInlineResult
-       |  callbackQuery: $callbackQuery
-       |  shippingQuery: $shippingQuery
-       |  preCheckoutQuery: $preCheckoutQuery
-       |  poll: $poll
-     """.stripMargin
-
-  )
+//  require(
+//    Seq[Option[_]](
+//      message,
+//      editedMessage,
+//      channelPost,
+//      editedChannelPost,
+//      inlineQuery,
+//      chosenInlineResult,
+//      callbackQuery,
+//      shippingQuery,
+//      preCheckoutQuery,
+//      poll
+//    ).count(_.isDefined) == 1,
+//    s"""
+//       |Exactly one of the optional fields should be used.
+//       |  message: $message
+//       |  editedMessage: $editedMessage
+//       |  channelPost: $channelPost
+//       |  editedChannelPost: $editedChannelPost
+//       |  inlineQuery: $inlineQuery
+//       |  chosenInlineResult: $chosenInlineResult
+//       |  callbackQuery: $callbackQuery
+//       |  shippingQuery: $shippingQuery
+//       |  preCheckoutQuery: $preCheckoutQuery
+//       |  poll: $poll
+//     """.stripMargin)
 }

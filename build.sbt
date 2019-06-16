@@ -10,7 +10,8 @@ libraryDependencies += "org.typelevel" %% "cats-effect" % "1.3.0"
 
 libraryDependencies += "co.fs2" %% "fs2-core" % "1.0.4"
 
-libraryDependencies += "com.softwaremill.sttp" %% "core" % "1.5.17"
+libraryDependencies += "com.softwaremill.sttp" %% "core" % "1.5.19"
+libraryDependencies += "com.softwaremill.sttp" %% "async-http-client-backend-cats" % "1.5.19"
 
 libraryDependencies += "com.typesafe" % "config" % "1.3.4"
 

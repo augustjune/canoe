@@ -6,13 +6,13 @@ import fs2.Stream
 trait UpdateTopic[F[_]] {
 
   /**
-    * Forks a stream of ongoing updates
+    * Forks a new stream of ongoing updates
+    * Doesn't require any additional work for new forks
     */
   def fork: Stream[F, Update]
 
   /**
-    * Starts populating the topic
-    * BLOCKING STUFF
+    * Starts populating the topic with updates
     */
-  def start: F[Unit]
+  def start: Stream[F, Unit]
 }

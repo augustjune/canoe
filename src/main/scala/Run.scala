@@ -23,13 +23,11 @@ object Run extends IOApp {
 
   def run(args: List[String]): IO[ExitCode] =
     for {
-      polling <- UpdatePolling[IO]()
-      bot = new Bot(polling)
-      _ <- Stream(
-        polling.start,
+      bot <- Bot.polling[IO]
+      _ <- bot.start.concurrently(Stream(
         bot.messages.map(m => println(s"message: ${m.messageId}")),
         bot.messages.map(m => println(s"MESSAGE: ${m.messageId}")),
-        bot.inlineQueries.map(q => println(s"INLINE query: ${q.id}"))).parJoinUnbounded
+        bot.inlineQueries.map(q => println(s"INLINE query: ${q.id}"))).parJoinUnbounded)
         .compile.drain
     } yield ExitCode.Success
 }

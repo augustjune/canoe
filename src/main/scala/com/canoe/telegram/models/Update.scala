@@ -17,44 +17,18 @@ package com.canoe.telegram.models
   * @param shippingQuery       ShippingQuery Optional. New incoming shipping query. Only for invoices with flexible price
   * @param preCheckoutQuery    PreCheckoutQuery Optional. New incoming pre-checkout query. Contains full information about checkout
   */
-case class Update(
-                   updateId           : Long,
-                   message            : Option[Message] = None,
-                   editedMessage      : Option[Message] = None,
-                   channelPost        : Option[Message] = None,
-                   editedChannelPost  : Option[Message] = None,
-                   inlineQuery        : Option[InlineQuery] = None,
-                   chosenInlineResult : Option[ChosenInlineResult] = None,
-                   callbackQuery      : Option[CallbackQuery] = None,
-                   shippingQuery      : Option[ShippingQuery] = None,
-                   preCheckoutQuery   : Option[PreCheckoutQuery] = None,
-                   poll               : Option[Poll] = None
-                 ) {
+case class Update(updateId: Long,
+                  message: Option[Message] = None,
+                  editedMessage: Option[Message] = None,
+                  channelPost: Option[Message] = None,
+                  editedChannelPost: Option[Message] = None,
+                  inlineQuery: Option[InlineQuery] = None,
+                  chosenInlineResult: Option[ChosenInlineResult] = None,
+                  callbackQuery: Option[CallbackQuery] = None,
+                  shippingQuery: Option[ShippingQuery] = None,
+                  preCheckoutQuery: Option[PreCheckoutQuery] = None,
+                  poll: Option[Poll] = None)
 
-//  require(
-//    Seq[Option[_]](
-//      message,
-//      editedMessage,
-//      channelPost,
-//      editedChannelPost,
-//      inlineQuery,
-//      chosenInlineResult,
-//      callbackQuery,
-//      shippingQuery,
-//      preCheckoutQuery,
-//      poll
-//    ).count(_.isDefined) == 1,
-//    s"""
-//       |Exactly one of the optional fields should be used.
-//       |  message: $message
-//       |  editedMessage: $editedMessage
-//       |  channelPost: $channelPost
-//       |  editedChannelPost: $editedChannelPost
-//       |  inlineQuery: $inlineQuery
-//       |  chosenInlineResult: $chosenInlineResult
-//       |  callbackQuery: $callbackQuery
-//       |  shippingQuery: $shippingQuery
-//       |  preCheckoutQuery: $preCheckoutQuery
-//       |  poll: $poll
-//     """.stripMargin)
+object Update {
+  def empty: Update = Update(-1)
 }

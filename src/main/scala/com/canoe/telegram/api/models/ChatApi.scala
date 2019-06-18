@@ -2,10 +2,9 @@ package com.canoe.telegram.api.models
 
 import com.canoe.telegram.clients.RequestHandler
 import com.canoe.telegram.methods.chats._
-import com.canoe.telegram.methods.messages._
-import com.canoe.telegram.models._
 import com.canoe.telegram.models.ChatAction.ChatAction
-import com.canoe.telegram.models.ParseMode.ParseMode
+import com.canoe.telegram.models._
+import com.canoe.telegram.models.outgoing._
 
 final class ChatApi[F[_]](chat: Chat)
                          (implicit client: RequestHandler[F]) {
@@ -65,68 +64,7 @@ final class ChatApi[F[_]](chat: Chat)
   def reread: F[Chat] =
     client.execute(GetChat(chat.id))
 
-  ///////////////////
-  //        Messages
-  ///////////////////
+  def sendMessage(message: BotMessage): F[Message] =
+    client.execute(message.toRequest(chat.id))
 
-  // ToDo - fun-models - create abstraction(-s) over outgoing message
-
-  def sendMessage(text: String,
-                  parseMode: Option[ParseMode] = None,
-                  disableLinkPreview: Option[Boolean] = None,
-                  silent: Option[Boolean] = None,
-                  markup: Option[ReplyMarkup] = None): F[Message] =
-    client.execute(SendMessage(chat.id, text, parseMode, disableLinkPreview, silent, replyMarkup = markup))
-
-  def sendAnimation(animation: InputFile,
-                    caption: Option[String] = None): F[Message] =
-    client.execute(SendAnimation(chat.id, animation, caption = caption))
-
-  // ToDo - add parameters
-  def sendAudio(audio: InputFile,
-                caption: Option[String] = None): F[Message] =
-    client.execute(SendAudio(chat.id, audio, caption = caption))
-
-  // ToDo - add parameters
-  def sendContact(phoneNumber: String,
-                  firstName: String,
-                  lastName: Option[String] = None): F[Message] =
-    client.execute(SendContact(chat.id, phoneNumber, firstName, lastName))
-
-  def sendDocument(document: InputFile,
-                   caption: Option[String] = None): F[Message] =
-    client.execute(SendDocument(chat.id, document, caption = caption))
-
-  def sendGame(game: String,
-               silent: Option[Boolean] = None,
-               markup: Option[ReplyMarkup] = None): F[Message] =
-    client.execute(SendGame(chat.id, game, silent, replyMarkup = markup))
-
-
-  //  def sendInvoice(title: String)
-
-  def sendLocation(lat: Double,
-                   lon: Double,
-                   livePeriod: Option[Int],
-                   silent: Option[Boolean] = None,
-                   markup: Option[ReplyMarkup] = None): F[Message] =
-    client.execute(SendLocation(chat.id, lat, lon, livePeriod, silent, replyMarkup = markup))
-
-  def sendPhoto(photo: InputFile,
-                caption: Option[String] = None,
-                parseMode: Option[ParseMode],
-                silent: Option[Boolean] = None,
-                markup: Option[ReplyMarkup] = None): F[Message] =
-    client.execute(SendPhoto(chat.id, photo, caption, parseMode, silent, replyMarkup = markup))
-
-  def sendSticker(sticker: InputFile,
-                  silent: Option[Boolean] = None,
-                  markup: Option[ReplyMarkup] = None): F[Message] =
-    client.execute(SendSticker(chat.id, sticker, silent, replyMarkup = markup))
-
-  def sendPoll(question: String,
-               options: List[String],
-               silent: Option[Boolean] = None,
-               markup: Option[ReplyMarkup] = None): F[Message] =
-    client.execute(SendPoll(chat.id, question, options.toArray, silent, replyMarkup = markup))
 }

@@ -26,7 +26,7 @@ case class SendDocument(chatId: ChatId,
                         caption: Option[String] = None,
                         parseMode: Option[ParseMode] = None,
                         disableNotification: Option[Boolean] = None,
-                        replyToMessageId: Option[Long] = None,
+                        replyToMessageId: Option[Int] = None,
                         replyMarkup: Option[ReplyMarkup] = None
                        ) extends MultipartRequest[Message] {
   override def getFiles: List[(String, InputFile)] = List("document" -> document)

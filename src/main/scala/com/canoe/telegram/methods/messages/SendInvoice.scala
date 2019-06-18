@@ -2,7 +2,7 @@ package com.canoe.telegram.methods.messages
 
 import com.canoe.telegram.methods.JsonRequest
 import com.canoe.telegram.models.Currency.Currency
-import com.canoe.telegram.models.{InlineKeyboardMarkup, LabeledPrice, Message}
+import com.canoe.telegram.models.{InlineKeyboardMarkup, LabeledPrice, Message, ReplyMarkup}
 
 /**
   * Use this method to send invoices.
@@ -53,7 +53,7 @@ case class SendInvoice(chatId: Long,
                        needEmail: Option[Boolean] = None,
                        needShippingAddress: Option[Boolean] = None,
                        isFlexible: Option[Boolean] = None,
-                       disableNotification: Option[Int] = None,
-                       replyToMessageId: Option[Long] = None,
-                       replyMarkup: Option[InlineKeyboardMarkup] = None
+                       disableNotification: Option[Boolean] = None,
+                       replyToMessageId: Option[Int] = None,
+                       replyMarkup: Option[ReplyMarkup] = None
                       ) extends JsonRequest[Message]

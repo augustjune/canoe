@@ -3,6 +3,7 @@ import cats.effect.{ExitCode, IO, IOApp}
 import cats.implicits._
 import com.canoe.telegram.api._
 import com.canoe.telegram.clients.SttpClient
+import com.canoe.telegram.models.outgoing._
 import com.softwaremill.sttp.asynchttpclient.cats.AsyncHttpClientCatsBackend
 import com.typesafe.config.ConfigFactory
 import fs2.Stream
@@ -24,10 +25,8 @@ object Run extends IOApp {
   def run(args: List[String]): IO[ExitCode] =
     for {
       bot <- Bot.polling[IO]
-      _ <- bot.start.concurrently(Stream(
-        bot.messages.map(m => println(s"message: ${m.messageId}")),
-        bot.messages.map(m => println(s"MESSAGE: ${m.messageId}")),
-        bot.inlineQueries.map(q => println(s"INLINE query: ${q.id}"))).parJoinUnbounded)
-        .compile.drain
+      _ <- bot.start.concurrently(
+        bot.messages.evalMap(_.reply(BotMessage(TextContent("Hello biatch!"))))
+      ).compile.drain
     } yield ExitCode.Success
 }

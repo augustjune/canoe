@@ -57,6 +57,8 @@ package com.canoe.telegram.models
   * @param connectedWebsite       String Optional. The domain name of the website on which the user has logged in.
   *                               [[https://core.telegram.org/widgets/login More about Telegram Login »]]
   */
+
+// ToDo - fun-models - divide options into subclasses
 case class  Message(
                messageId             : Int,
                from                  : Option[User] = None,

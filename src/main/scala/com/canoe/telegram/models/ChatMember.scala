@@ -21,6 +21,7 @@ import MemberStatus.MemberStatus
   * @param canSendOtherMessages   Boolean	Optional. Restricted only. True, if the user can send animations, games, stickers and use inline bots, implies can_send_media_messages
   * @param canAddWebPagePreviews  Boolean	Optional. Restricted only. True, if user may add web page previews to his messages, implies can_send_media_messages
   */
+// ToDo - fun-models - check optional parameters
 case class ChatMember(
                      user                  : User,
                      status                : MemberStatus,

@@ -4,7 +4,7 @@ import cats.Functor
 import cats.effect.{Concurrent, Timer}
 import cats.implicits._
 import com.canoe.telegram.clients.RequestHandler
-import com.canoe.telegram.models.{InlineQuery, Message, Update}
+import com.canoe.telegram.models._
 import fs2.Stream
 import fs2.concurrent.Topic
 
@@ -15,14 +15,15 @@ class Bot[F[_] : Functor](topic: UpdateTopic[F]) {
     */
   def start: Stream[F, Unit] = topic.start
 
-  def messages: Stream[F, Message] = collectUpdates(_.message)
+  def messages: Stream[F, Message] = updates.collect {
+    case u: ReceivedMessage => u.message
+  }
 
-  def inlineQueries: Stream[F, InlineQuery] = collectUpdates(_.inlineQuery)
+  def inlineQueries: Stream[F, InlineQuery] = updates.collect {
+    case u: ReceivedInlineQuery => u.inlineQuery
+  }
 
   def updates: Stream[F, Update] = topic.fork
-
-  private def collectUpdates[A](f: Update => Option[A]): Stream[F, A] =
-    updates.map(f).collect { case Some(v) => v }
 }
 
 object Bot {

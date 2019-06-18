@@ -27,4 +27,3 @@ final case class ReceivedCallbackQuery(updateId: Long, callbackQuery: CallbackQu
 final case class ReceivedShippingQuery(updateId: Long, shippingQuery: ShippingQuery) extends Update
 
 final case class ReceivedPreCheckoutQuery(updateId: Long, preCheckoutQuery: PreCheckoutQuery) extends Update
-

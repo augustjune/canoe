@@ -69,6 +69,8 @@ final class ChatApi[F[_]](chat: Chat)
   //        Messages
   ///////////////////
 
+  // ToDo - fun-models - create abstraction(-s) over outgoing message
+
   def sendMessage(text: String,
                   parseMode: Option[ParseMode] = None,
                   disableLinkPreview: Option[Boolean] = None,

@@ -19,6 +19,7 @@ package com.canoe.telegram.models
   *   It is, therefore, necessary to react by calling answerCallbackQuery even if no notification to the user
   *   is needed (e.g., without specifying any of the optional parameters).
   */
+// ToDo - fun-models - received from message/inline message
 case class CallbackQuery(
                         id              : String,
                         from            : User,

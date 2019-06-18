@@ -34,7 +34,7 @@ case class SendVideo(chatId: ChatId,
                      parseMode: Option[ParseMode] = None,
                      supportsStreaming: Option[Boolean] = None,
                      disableNotification: Option[Boolean] = None,
-                     replyToMessageId: Option[Long] = None,
+                     replyToMessageId: Option[Int] = None,
                      replyMarkup: Option[ReplyMarkup] = None
                     ) extends MultipartRequest[Message] {
   override def getFiles: List[(String, InputFile)] = List("video" -> video)

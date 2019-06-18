@@ -36,7 +36,7 @@ case class SendAudio(chatId: ChatId,
                      performer: Option[String] = None,
                      title: Option[String] = None,
                      disableNotification: Option[Boolean] = None,
-                     replyToMessageId: Option[Long] = None,
+                     replyToMessageId: Option[Int] = None,
                      replyMarkup: Option[ReplyMarkup] = None
                     ) extends MultipartRequest[Message] {
   override def getFiles: List[(String, InputFile)] = List("audio" -> audio)

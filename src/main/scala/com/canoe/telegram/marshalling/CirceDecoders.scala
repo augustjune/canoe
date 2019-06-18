@@ -2,6 +2,7 @@ package com.canoe.telegram.marshalling
 
 import java.util.NoSuchElementException
 
+import cats.syntax.functor._
 import com.canoe.telegram.models.ChatAction.ChatAction
 import com.canoe.telegram.models.ChatType.ChatType
 import com.canoe.telegram.models.CountryCode.CountryCode
@@ -127,7 +128,19 @@ trait CirceDecoders  {
 
   implicit val responseParametersDecoder: Decoder[ResponseParameters] = deriveDecoder[ResponseParameters]
 
-  implicit val updateDecoder: Decoder[Update] = deriveDecoder[Update]
+  implicit val updateDecoder: Decoder[Update] =
+    List[Decoder[Update]](
+      deriveDecoder[ReceivedMessage].widen,
+      deriveDecoder[EditedMessage].widen,
+      deriveDecoder[ChannelPost].widen,
+      deriveDecoder[EditedChannelPost].widen,
+      deriveDecoder[PollUpdate].widen,
+      deriveDecoder[ReceivedInlineQuery].widen,
+      deriveDecoder[ReceivedChosenInlineResult].widen,
+      deriveDecoder[ReceivedCallbackQuery].widen,
+      deriveDecoder[ReceivedShippingQuery].widen,
+      deriveDecoder[ReceivedPreCheckoutQuery].widen
+    ).reduceLeft(_ or _)
 
   implicit def responseDecoder[T](implicit decT: Decoder[T]): Decoder[Response[T]] = deriveDecoder[Response[T]]
 

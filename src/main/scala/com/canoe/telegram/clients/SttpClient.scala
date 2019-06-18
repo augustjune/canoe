@@ -13,14 +13,14 @@ import scala.concurrent.duration._
 
 class SttpClient[F[_]](token: String, telegramHost: String = "api.telegram.org")
                       (implicit backend: SttpBackend[F, Nothing], monadError: MonadError[F, Throwable])
-  extends RequestHandler[F]()(monadError)  {
+  extends RequestHandler[F] {
 
   val readTimeout: Duration = 50.seconds
 
-  private implicit def circeBodySerializer[B : Encoder]: BodySerializer[B] =
+  private implicit def circeBodySerializer[B: Encoder]: BodySerializer[B] =
     b => StringBody(marshalling.toJson[B](b), "utf-8", Some(MediaTypes.Json))
 
-  private def asJson[B : Decoder]: ResponseAs[B, Nothing] =
+  private def asJson[B: Decoder]: ResponseAs[B, Nothing] =
     asString("utf-8").map(s => marshalling.fromJson[B](s))
 
   private val apiBaseUrl = s"https://$telegramHost/bot$token/"

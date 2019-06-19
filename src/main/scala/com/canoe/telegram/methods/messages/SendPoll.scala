@@ -1,7 +1,8 @@
 package com.canoe.telegram.methods.messages
 
 import com.canoe.telegram.methods.JsonRequest
-import com.canoe.telegram.models.{ChatId, Message, ReplyMarkup}
+import com.canoe.telegram.models.messages.TelegramMessage
+import com.canoe.telegram.models.{ChatId, ReplyMarkup}
 
 /**
   * Use this method to send a native poll.
@@ -20,4 +21,4 @@ case class SendPoll(chatId              : ChatId,
                     disableNotification : Option[Boolean] = None,
                     replyToMessageId    : Option[Int] = None,
                     replyMarkup         : Option[ReplyMarkup] = None
-                   ) extends JsonRequest[Message]
+                   ) extends JsonRequest[TelegramMessage]

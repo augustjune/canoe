@@ -5,6 +5,7 @@ import cats.effect.{Concurrent, Timer}
 import cats.implicits._
 import com.canoe.telegram.clients.RequestHandler
 import com.canoe.telegram.models._
+import com.canoe.telegram.models.messages.TelegramMessage
 import fs2.Stream
 import fs2.concurrent.Topic
 
@@ -15,7 +16,7 @@ class Bot[F[_] : Functor](topic: UpdateTopic[F]) {
     */
   def start: Stream[F, Unit] = topic.start
 
-  def messages: Stream[F, Message] = updates.collect {
+  def messages: Stream[F, TelegramMessage] = updates.collect {
     case u: ReceivedMessage => u.message
   }
 

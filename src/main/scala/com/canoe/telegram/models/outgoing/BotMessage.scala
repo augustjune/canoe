@@ -2,7 +2,8 @@ package com.canoe.telegram.models.outgoing
 
 import com.canoe.telegram.methods.Request
 import com.canoe.telegram.methods.messages._
-import com.canoe.telegram.models.{Message, ReplyMarkup}
+import com.canoe.telegram.models.ReplyMarkup
+import com.canoe.telegram.models.messages.TelegramMessage
 
 /**
   * Outgoing message, which is going to be sent by the bot
@@ -22,7 +23,7 @@ case class BotMessage(content: MessageContent,
     copy(replyToMessageId = Some(messageId))
 
   // ToDo - think about other way of mapping BotMessage to send request (e.g.: optics?)
-  def toRequest(chatId: Long): Request[Message] = content match {
+  def toRequest(chatId: Long): Request[TelegramMessage] = content match {
     case AnimationContent(animation, duration, width, height, thumb, caption, parseMode) =>
       SendAnimation(chatId, animation, duration, width, height, thumb, caption, parseMode, disableNotification, replyToMessageId, replyMarkup)
 

@@ -4,6 +4,7 @@ import com.canoe.telegram.clients.RequestHandler
 import com.canoe.telegram.methods.chats._
 import com.canoe.telegram.models.ChatAction.ChatAction
 import com.canoe.telegram.models._
+import com.canoe.telegram.models.messages.TelegramMessage
 import com.canoe.telegram.models.outgoing._
 
 final class ChatApi[F[_]](chat: Chat)
@@ -38,7 +39,7 @@ final class ChatApi[F[_]](chat: Chat)
     client.execute(LeaveChat(chat.id))
 
   // ToDo - add parameters
-  def pinMessage(message: Message): F[Boolean] =
+  def pinMessage(message: TelegramMessage): F[Boolean] =
     client.execute(PinChatMessage(chat.id, message.messageId))
 
   // ToDo - add parameters
@@ -64,7 +65,7 @@ final class ChatApi[F[_]](chat: Chat)
   def reread: F[Chat] =
     client.execute(GetChat(chat.id))
 
-  def sendMessage(message: BotMessage): F[Message] =
+  def sendMessage(message: BotMessage): F[TelegramMessage] =
     client.execute(message.toRequest(chat.id))
 
 }

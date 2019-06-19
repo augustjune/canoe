@@ -1,6 +1,7 @@
 package com.canoe.telegram.models
 
 import com.canoe.telegram.models.ChatType.ChatType
+import com.canoe.telegram.models.messages.TelegramMessage
 
 /** This object represents a chat.
   *
@@ -29,7 +30,7 @@ case class Chat(
                  photo         : Option[ChatPhoto] = None,
                  description   : Option[String] = None,
                  inviteLink    : Option[String] = None,
-                 pinnedMessage : Option[Message] = None,
+                 pinnedMessage : Option[TelegramMessage] = None,
                  stickerSetName: Option[String] = None,
                  canSetStickerSet : Option[Boolean] = None
                )

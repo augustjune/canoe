@@ -1,7 +1,8 @@
 package com.canoe.telegram.methods.messages
 
 import com.canoe.telegram.methods.MultipartRequest
-import com.canoe.telegram.models.{ChatId, InputFile, InputMedia, Message}
+import com.canoe.telegram.models.messages.TelegramMessage
+import com.canoe.telegram.models.{ChatId, InputFile, InputMedia}
 
 /**
   * Use this method to send a group of photos or videos as an album.
@@ -15,7 +16,7 @@ import com.canoe.telegram.models.{ChatId, InputFile, InputMedia, Message}
 case class SendMediaGroup(chatId: ChatId,
                           media: List[InputMedia],
                           disableNotification: Option[Boolean] = None,
-                          replyToMessageId: Option[Int] = None) extends MultipartRequest[Array[Message]] {
+                          replyToMessageId: Option[Int] = None) extends MultipartRequest[Array[TelegramMessage]] {
 
   override def getFiles: List[(String, InputFile)] = media.flatMap(_.getFiles)
 }

@@ -1,7 +1,8 @@
 package com.canoe.telegram.methods.messages
 
 import com.canoe.telegram.methods.JsonRequest
-import com.canoe.telegram.models.{ChatId, InlineKeyboardMarkup, Message}
+import com.canoe.telegram.models.messages.TelegramMessage
+import com.canoe.telegram.models.{ChatId, InlineKeyboardMarkup}
 
 /**
   * Use this method to edit live location messages sent by the bot or via the bot (for inline bots).
@@ -22,4 +23,4 @@ case class EditMessageLiveLocation(chatId          : Option[ChatId] = None,
                                    latitude        : Option[Double] = None,
                                    longitude       : Option[Double] = None,
                                    replyMarkup     : Option[InlineKeyboardMarkup] = None
-                                  ) extends JsonRequest[Either[Boolean,Message]]
+                                  ) extends JsonRequest[Either[Boolean, TelegramMessage]]

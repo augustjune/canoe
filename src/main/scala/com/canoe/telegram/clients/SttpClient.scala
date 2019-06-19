@@ -27,7 +27,7 @@ class SttpClient[F[_]](token: String, telegramHost: String = "api.telegram.org")
 
   override def sendRequest[R, T <: Request[_]](request: T)(implicit encT: Encoder[T], decR: Decoder[R]): F[R] = {
     val url = apiBaseUrl + request.methodName
-    println(s"Calling $url")
+//    println(s"Calling $url with body: ${encT(request)}")
 
     val sttpRequest: RequestT[Id, String, Nothing] = request match {
       case r: JsonRequest[_] =>

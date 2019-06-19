@@ -1,7 +1,8 @@
 package com.canoe.telegram.methods.messages
 
 import com.canoe.telegram.methods.JsonRequest
-import com.canoe.telegram.models.{ChatId, InlineKeyboardMarkup, Message}
+import com.canoe.telegram.models.messages.TelegramMessage
+import com.canoe.telegram.models.{ChatId, InlineKeyboardMarkup}
 
 /**
   * Use this method to stop updating a live location message sent by the bot or via the bot (for inline bots) before live_period expires.
@@ -17,4 +18,4 @@ case class StopMessageLiveLocation(chatId: Option[ChatId] = None,
                                    messageId: Option[Int] = None,
                                    inlineMessageId: Option[Int] = None,
                                    replyMarkup: Option[InlineKeyboardMarkup] = None
-                                  ) extends JsonRequest[Either[Boolean,Message]]
+                                  ) extends JsonRequest[Either[Boolean, TelegramMessage]]

@@ -1,7 +1,8 @@
 package com.canoe.telegram.methods.games
 
 import com.canoe.telegram.methods.JsonRequest
-import com.canoe.telegram.models.{ChatId, Message}
+import com.canoe.telegram.models.ChatId
+import com.canoe.telegram.models.messages.TelegramMessage
 
 /** Use this method to set the score of the specified user in a game.
   *
@@ -27,7 +28,7 @@ case class SetGameScore(userId: Int,
                         chatId: Option[ChatId] = None,
                         messageId: Option[Int] = None,
                         inlineMessageId: Option[String] = None
-                       ) extends JsonRequest[Either[Boolean, Message]] {
+                       ) extends JsonRequest[Either[Boolean, TelegramMessage]] {
 
   if (inlineMessageId.isEmpty) {
     require(chatId.isDefined, "Required if inlineMessageId is not specified")

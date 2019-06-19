@@ -1,8 +1,9 @@
 package com.canoe.telegram.methods.messages
 
 import com.canoe.telegram.methods.JsonRequest
-import com.canoe.telegram.models.{ChatId, Message, ReplyMarkup}
 import com.canoe.telegram.models.ParseMode.ParseMode
+import com.canoe.telegram.models.messages.TelegramMessage
+import com.canoe.telegram.models.{ChatId, ReplyMarkup}
 
 /** Use this method to edit text messages sent by the bot or via the bot (for inline bots).
   * On success, if edited message is sent by the bot, the edited Message is returned, otherwise True is returned.
@@ -22,7 +23,7 @@ case class EditMessageText(chatId: Option[ChatId] = None,
                            parseMode: Option[ParseMode] = None,
                            disableWebPagePreview: Option[Boolean] = None,
                            replyMarkup: Option[ReplyMarkup] = None
-                          ) extends JsonRequest[Either[Boolean, Message]] {
+                          ) extends JsonRequest[Either[Boolean, TelegramMessage]] {
 
   if (inlineMessageId.isEmpty) {
     require(chatId.isDefined, "Required if inlineMessageId is not specified")

@@ -19,6 +19,7 @@ import com.canoe.telegram.models.MessageEntityType.MessageEntityType
 import com.canoe.telegram.models.ParseMode.ParseMode
 import com.canoe.telegram.models.UpdateType.UpdateType
 import com.canoe.telegram.models._
+import com.canoe.telegram.models.messages._
 import io.circe.generic.semiauto._
 import io.circe.generic.auto._
 import io.circe.syntax._
@@ -55,7 +56,35 @@ trait CirceEncoders {
   implicit val animationEncoder: Encoder[Animation] = deriveEncoder[Animation]
   implicit val gameEncoder: Encoder[Game] = deriveEncoder[Game]
 
-  implicit val messageEncoder: Encoder[Message] = deriveEncoder[Message]
+  implicit val messageEncoder: Encoder[TelegramMessage] = Encoder.instance {
+    case m: AnimationMessage => m.asJson
+    case m: AudioMessage => m.asJson
+    case m: ChannelCreated => m.asJson
+    case m: ChatMemberAdded => m.asJson
+    case m: ChatMemberLeft => m.asJson
+    case m: ChatPhotoChanged => m.asJson
+    case m: ChatPhotoDeleted => m.asJson
+    case m: ChatTitleChanged => m.asJson
+    case m: ContactMessage => m.asJson
+    case m: DocumentMessage => m.asJson
+    case m: GameMessage => m.asJson
+    case m: InvoiceMessage => m.asJson
+    case m: LocationMessage => m.asJson
+    case m: MessagePinned => m.asJson
+    case m: MigratedFromGroup => m.asJson
+    case m: MigratedToSupergroup => m.asJson
+    case m: PhotoMessage => m.asJson
+    case m: PollMessage => m.asJson
+    case m: StickerMessage => m.asJson
+    case m: SuccessfulPaymentMessage => m.asJson
+    case m: SupergroupCreated => m.asJson
+    case m: TextMessage => m.asJson
+    case m: VenueMessage => m.asJson
+    case m: VideoMessage => m.asJson
+    case m: VideoNoteMessage => m.asJson
+    case m: VoiceMessage => m.asJson
+    case m: WebsiteConnected => m.asJson
+  }
 
   implicit val messageEntityTypeEncoder: Encoder[MessageEntityType] =
     Encoder[String].contramap[MessageEntityType](e ⇒ CaseConversions.snakenize(e.toString))

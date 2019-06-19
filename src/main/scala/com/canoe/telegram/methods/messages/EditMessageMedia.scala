@@ -1,7 +1,8 @@
 package com.canoe.telegram.methods.messages
 
 import com.canoe.telegram.methods.MultipartRequest
-import com.canoe.telegram.models.{ChatId, InlineKeyboardMarkup, InputFile, InputMedia, Message}
+import com.canoe.telegram.models.messages.TelegramMessage
+import com.canoe.telegram.models.{ChatId, InlineKeyboardMarkup, InputFile, InputMedia}
 
 /** Use this method to edit audio, document, photo, or video messages.
   * If a message is a part of a message album, then it can be edited only to a photo or a video.
@@ -21,7 +22,7 @@ case class EditMessageMedia(chatId: Option[ChatId] = None,
                             inlineMessageId: Option[String] = None,
                             media: InputMedia,
                             replyMarkup: Option[InlineKeyboardMarkup] = None
-                           ) extends MultipartRequest[Either[Boolean, Message]] {
+                           ) extends MultipartRequest[Either[Boolean, TelegramMessage]] {
 
   override def getFiles: List[(String, InputFile)] = media.getFiles
 }

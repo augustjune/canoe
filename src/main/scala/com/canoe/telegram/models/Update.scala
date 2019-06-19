@@ -1,5 +1,7 @@
 package com.canoe.telegram.models
 
+import com.canoe.telegram.models.messages.TelegramMessage
+
 sealed trait Update {
   def updateId: Long
 }
@@ -8,13 +10,13 @@ object Update {
   def empty: Update = new Update { def updateId: Long = -1 }
 }
 
-final case class ReceivedMessage(updateId: Long, message: Message) extends Update
+final case class ReceivedMessage(updateId: Long, message: TelegramMessage) extends Update
 
-final case class EditedMessage(updateId: Long, editedMessage: Message) extends Update
+final case class EditedMessage(updateId: Long, editedMessage: TelegramMessage) extends Update
 
-final case class ChannelPost(updateId: Long, channelPost: Message) extends Update
+final case class ChannelPost(updateId: Long, channelPost: TelegramMessage) extends Update
 
-final case class EditedChannelPost(updateId: Long, editedChannelPost: Message) extends Update
+final case class EditedChannelPost(updateId: Long, editedChannelPost: TelegramMessage) extends Update
 
 final case class PollUpdate(updateId: Long, poll: Poll) extends Update
 

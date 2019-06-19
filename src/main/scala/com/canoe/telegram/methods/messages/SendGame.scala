@@ -1,7 +1,8 @@
 package com.canoe.telegram.methods.messages
 
 import com.canoe.telegram.methods.JsonRequest
-import com.canoe.telegram.models.{Message, ReplyMarkup}
+import com.canoe.telegram.models.ReplyMarkup
+import com.canoe.telegram.models.messages.TelegramMessage
 
 /** Use this method to send a game.
   * On success, the sent Message is returned.
@@ -20,4 +21,4 @@ case class SendGame(chatId: Long,
                     disableNotification: Option[Boolean] = None,
                     replyToMessageId: Option[Int] = None,
                     replyMarkup: Option[ReplyMarkup] = None
-                   ) extends JsonRequest[Message]
+                   ) extends JsonRequest[TelegramMessage]

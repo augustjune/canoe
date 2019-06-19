@@ -2,7 +2,8 @@ package com.canoe.telegram.methods.messages
 
 import com.canoe.telegram.methods.MultipartRequest
 import com.canoe.telegram.models.ParseMode.ParseMode
-import com.canoe.telegram.models.{ChatId, InputFile, Message, ReplyMarkup}
+import com.canoe.telegram.models.messages.TelegramMessage
+import com.canoe.telegram.models.{ChatId, InputFile, ReplyMarkup}
 
 /** Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message.
   * For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Audio or Document).
@@ -32,6 +33,6 @@ case class SendVoice(chatId: ChatId,
                      disableNotification: Option[Boolean] = None,
                      replyToMessageId: Option[Int] = None,
                      replyMarkup: Option[ReplyMarkup] = None
-                    ) extends MultipartRequest[Message] {
+                    ) extends MultipartRequest[TelegramMessage] {
   override def getFiles: List[(String, InputFile)] = List("voice" -> voice)
 }

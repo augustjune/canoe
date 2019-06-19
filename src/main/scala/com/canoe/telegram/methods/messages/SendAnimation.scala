@@ -2,7 +2,8 @@ package com.canoe.telegram.methods.messages
 
 import com.canoe.telegram.methods.MultipartRequest
 import com.canoe.telegram.models.ParseMode.ParseMode
-import com.canoe.telegram.models.{ChatId, InputFile, Message, ReplyMarkup}
+import com.canoe.telegram.models.messages.TelegramMessage
+import com.canoe.telegram.models.{ChatId, InputFile, ReplyMarkup}
 
 /** Use this method to send animation files (GIF or H.264/MPEG-4 AVC video without sound).
   * On success, the sent Message is returned.
@@ -31,7 +32,7 @@ case class SendAnimation(chatId              : ChatId,
                          disableNotification : Option[Boolean] = None,
                          replyToMessageId    : Option[Int] = None,
                          replyMarkup         : Option[ReplyMarkup] = None
-                        ) extends MultipartRequest[Message] {
+                        ) extends MultipartRequest[TelegramMessage] {
   override def getFiles: List[(String, InputFile)] = {
     List("animation" -> animation) ++ thumb.map(t => "thumb" -> t).toList
   }

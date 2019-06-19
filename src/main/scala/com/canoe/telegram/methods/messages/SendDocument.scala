@@ -2,7 +2,8 @@ package com.canoe.telegram.methods.messages
 
 import com.canoe.telegram.methods.MultipartRequest
 import com.canoe.telegram.models.ParseMode.ParseMode
-import com.canoe.telegram.models.{ChatId, InputFile, Message, ReplyMarkup}
+import com.canoe.telegram.models.messages.TelegramMessage
+import com.canoe.telegram.models.{ChatId, InputFile, ReplyMarkup}
 
 /** Use this method to send general files. On success, the sent Message is returned.
   * Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
@@ -28,6 +29,6 @@ case class SendDocument(chatId: ChatId,
                         disableNotification: Option[Boolean] = None,
                         replyToMessageId: Option[Int] = None,
                         replyMarkup: Option[ReplyMarkup] = None
-                       ) extends MultipartRequest[Message] {
+                       ) extends MultipartRequest[TelegramMessage] {
   override def getFiles: List[(String, InputFile)] = List("document" -> document)
 }

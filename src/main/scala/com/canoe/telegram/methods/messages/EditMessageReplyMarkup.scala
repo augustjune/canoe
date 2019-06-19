@@ -1,7 +1,8 @@
 package com.canoe.telegram.methods.messages
 
 import com.canoe.telegram.methods.JsonRequest
-import com.canoe.telegram.models.{ChatId, InlineKeyboardMarkup, Message}
+import com.canoe.telegram.models.messages.TelegramMessage
+import com.canoe.telegram.models.{ChatId, InlineKeyboardMarkup}
 
 /** Use this method to edit only the reply markup of messages sent by the bot or via the bot (for inline bots).
   * On success, if edited message is sent by the bot, the edited Message is returned, otherwise True is returned.
@@ -15,7 +16,7 @@ case class EditMessageReplyMarkup(chatId: Option[ChatId] = None,
                                   messageId: Option[Int] = None,
                                   inlineMessageId: Option[String] = None,
                                   replyMarkup: Option[InlineKeyboardMarkup] = None
-                                 ) extends JsonRequest[Either[Boolean, Message]] {
+                                 ) extends JsonRequest[Either[Boolean, TelegramMessage]] {
   if (inlineMessageId.isEmpty) {
     require(chatId.isDefined, "Required if inlineMessageId is not specified")
     require(messageId.isDefined, "Required if inlineMessageId is not specified")

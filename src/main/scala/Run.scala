@@ -3,6 +3,7 @@ import cats.effect.{ExitCode, IO, IOApp}
 import cats.implicits._
 import com.canoe.telegram.api._
 import com.canoe.telegram.clients.SttpClient
+import com.canoe.telegram.models.messages.TextMessage
 import com.canoe.telegram.models.outgoing._
 import com.softwaremill.sttp.asynchttpclient.cats.AsyncHttpClientCatsBackend
 import com.typesafe.config.ConfigFactory
@@ -20,13 +21,11 @@ object Run extends IOApp {
   implicit def showEnc[T: Encoder]: Show[T] =
     _.asJson.pretty(Printer.spaces2.copy(dropNullValues = true))
 
-
-
   def run(args: List[String]): IO[ExitCode] =
     for {
       bot <- Bot.polling[IO]
       _ <- bot.start.concurrently(
-        bot.messages.evalMap(_.reply(BotMessage(TextContent("Hello biatch!"))))
+        bot.messages.map(println)
       ).compile.drain
     } yield ExitCode.Success
 }

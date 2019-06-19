@@ -34,8 +34,6 @@ object marshalling extends CirceEncoders with CirceDecoders with CaseConversions
   def toJson[T: Encoder](t: T): String = printer.pretty(snakeKeys(t.asJson))
 
   def fromJson[T: Decoder](s: String): T = {
-    parse(s).fold(throw _,
-      json =>
-        camelKeys(json).as[T].fold(throw _, identity))
+    parse(s).fold(throw _, json => camelKeys(json).as[T].fold(throw _, identity))
   }
 }

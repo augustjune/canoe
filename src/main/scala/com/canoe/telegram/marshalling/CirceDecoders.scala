@@ -13,6 +13,7 @@ import com.canoe.telegram.models.MemberStatus.MemberStatus
 import com.canoe.telegram.models.MessageEntityType.MessageEntityType
 import com.canoe.telegram.models.ParseMode.ParseMode
 import com.canoe.telegram.models.UpdateType.UpdateType
+import com.canoe.telegram.models.messages._
 import io.circe.Decoder
 import io.circe.generic.semiauto._
 
@@ -81,7 +82,6 @@ trait CirceDecoders  {
 
   implicit val stickerDecoder: Decoder[Sticker] = deriveDecoder[Sticker]
 
-  implicit val messageDecoder: Decoder[Message] = deriveDecoder[Message]
   implicit val callbackQueryDecoder: Decoder[CallbackQuery] = deriveDecoder[CallbackQuery]
 
   implicit val stickerSetDecoder: Decoder[StickerSet] = deriveDecoder[StickerSet]
@@ -140,6 +140,37 @@ trait CirceDecoders  {
       deriveDecoder[ReceivedCallbackQuery].widen,
       deriveDecoder[ReceivedShippingQuery].widen,
       deriveDecoder[ReceivedPreCheckoutQuery].widen
+    ).reduceLeft(_ or _)
+
+  implicit val telegramMessageDecoder: Decoder[TelegramMessage] =
+    List[Decoder[TelegramMessage]](
+      deriveDecoder[AnimationMessage].widen,
+      deriveDecoder[AudioMessage].widen,
+      deriveDecoder[ChannelCreated].widen,
+      deriveDecoder[ChatMemberAdded].widen,
+      deriveDecoder[ChatMemberLeft].widen,
+      deriveDecoder[ChatPhotoChanged].widen,
+      deriveDecoder[ChatPhotoDeleted].widen,
+      deriveDecoder[ChatTitleChanged].widen,
+      deriveDecoder[ContactMessage].widen,
+      deriveDecoder[DocumentMessage].widen,
+      deriveDecoder[GameMessage].widen,
+      deriveDecoder[InvoiceMessage].widen,
+      deriveDecoder[LocationMessage].widen,
+      deriveDecoder[MessagePinned].widen,
+      deriveDecoder[MigratedFromGroup].widen,
+      deriveDecoder[MigratedToSupergroup].widen,
+      deriveDecoder[PhotoMessage].widen,
+      deriveDecoder[PollMessage].widen,
+      deriveDecoder[StickerMessage].widen,
+      deriveDecoder[SuccessfulPaymentMessage].widen,
+      deriveDecoder[SupergroupCreated].widen,
+      deriveDecoder[TextMessage].widen,
+      deriveDecoder[VenueMessage].widen,
+      deriveDecoder[VideoMessage].widen,
+      deriveDecoder[VideoNoteMessage].widen,
+      deriveDecoder[VoiceMessage].widen,
+      deriveDecoder[WebsiteConnected].widen
     ).reduceLeft(_ or _)
 
   implicit def responseDecoder[T](implicit decT: Decoder[T]): Decoder[Response[T]] = deriveDecoder[Response[T]]

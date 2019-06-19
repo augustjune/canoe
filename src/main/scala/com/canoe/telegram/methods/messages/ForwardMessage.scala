@@ -1,7 +1,8 @@
 package com.canoe.telegram.methods.messages
 
 import com.canoe.telegram.methods.JsonRequest
-import com.canoe.telegram.models.{ChatId, Message}
+import com.canoe.telegram.models.ChatId
+import com.canoe.telegram.models.messages.TelegramMessage
 
 /** Use this method to forward messages of any kind. On success, the sent Message is returned.
   *
@@ -14,4 +15,4 @@ case class ForwardMessage(chatId: ChatId,
                           fromChatId: ChatId,
                           disableNotification: Option[Boolean] = None,
                           messageId: Int
-                         ) extends JsonRequest[Message]
+                         ) extends JsonRequest[TelegramMessage]

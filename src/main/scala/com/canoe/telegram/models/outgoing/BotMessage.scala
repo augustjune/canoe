@@ -46,8 +46,8 @@ case class BotMessage(content: MessageContent,
       SendLocation(chatId, latitude, longitude, livePeriod, disableNotification, replyToMessageId, replyMarkup)
 
       // ToDo - unhandled case
-//    case MediaGroupContent(media) =>
-//      SendMediaGroup(chatId, media, disableNotification, replyToMessageId)
+    case MediaGroupContent(media) => throw new RuntimeException("Sending media group content is not yet implemented(")
+//      SendMediaGroup(chatId, media, disableNotification, replyToMessageId) // returns list of messages
 
     case TextContent(text, parseMode, disableWebPagePreview) =>
       SendMessage(chatId, text, parseMode, disableWebPagePreview, disableNotification, replyToMessageId, replyMarkup)

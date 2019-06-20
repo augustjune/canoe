@@ -1,6 +1,5 @@
 package com.canoe.telegram.api
 
-import cats.Functor
 import cats.effect.{Concurrent, Timer}
 import cats.implicits._
 import com.canoe.telegram.clients.RequestHandler
@@ -9,7 +8,7 @@ import com.canoe.telegram.models.messages.TelegramMessage
 import fs2.Stream
 import fs2.concurrent.Topic
 
-class Bot[F[_] : Functor](topic: UpdateTopic[F]) {
+class Bot[F[_]](topic: UpdateTopic[F]) {
 
   /**
     * Starts accepting the updates from the service

@@ -4,6 +4,14 @@ version := "0.1"
 
 scalaVersion := "2.12.8"
 
+scalacOptions ++= Seq(
+  "-feature",
+  "-language:higherKinds",             // Allow higher-kinded types
+  "-language:implicitConversions",     // Allow definition of implicit functions called views
+  "-Xfatal-warnings",
+  "-Ypartial-unification"
+)
+
 libraryDependencies += "org.typelevel" %% "cats-core" % "2.0.0-M1"
 libraryDependencies += "org.typelevel" %% "cats-free" % "2.0.0-M1"
 libraryDependencies += "org.typelevel" %% "cats-effect" % "1.3.0"

@@ -1,5 +1,6 @@
 package com.canoe.telegram.api.models
 
+import cats.Applicative
 import com.canoe.telegram.clients.RequestHandler
 import com.canoe.telegram.methods.chats._
 import com.canoe.telegram.models.ChatAction.ChatAction
@@ -22,8 +23,11 @@ final class ChatApi[F[_]](chat: Chat)
   def exportInviteLink: F[String] =
     client.execute(ExportChatInviteLink(chat.id))
 
-  def administrators: F[Seq[ChatMember]] =
-    client.execute(GetChatAdministrators(chat.id))
+  def administrators(implicit F: Applicative[F]): F[Seq[ChatMember]] =
+    chat match {
+      case _: PrivateChat => F.pure(Seq.empty)
+      case _ => client.execute(GetChatAdministrators(chat.id))
+    }
 
   def getMember(user: User): F[ChatMember] =
     client.execute(GetChatMember(chat.id, user.id))
@@ -61,8 +65,7 @@ final class ChatApi[F[_]](chat: Chat)
   def unpinMessage: F[Boolean] =
     client.execute(UnpinChatMessage(chat.id))
 
-  // ToDo - naming stuff
-  def reread: F[Chat] =
+  def details: F[DetailedChat] =
     client.execute(GetChat(chat.id))
 
   def sendMessage(message: BotMessage): F[TelegramMessage] =

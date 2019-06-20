@@ -61,7 +61,17 @@ trait CirceDecoders  {
 
   implicit val audioDecoder: Decoder[Audio] = deriveDecoder[Audio]
 
-  implicit val chatDecoder: Decoder[Chat] = deriveDecoder[Chat]
+  implicit val detailedChatDecoder: Decoder[DetailedChat] = deriveDecoder[DetailedChat]
+
+  implicit val chatDecoder: Decoder[Chat] = Decoder.instance {
+    cursor => cursor.get[ChatType]("type").map {
+      case ChatType.Private => deriveDecoder[PrivateChat]
+      case ChatType.Group => deriveDecoder[GroupChat]
+      case ChatType.Supergroup => deriveDecoder[Supergroup]
+      case ChatType.Channel => deriveDecoder[Channel]
+    }.flatMap(_.tryDecode(cursor))
+  }
+
   implicit val chatPhotoDecoder: Decoder[ChatPhoto] = deriveDecoder[ChatPhoto]
 
   implicit val contactDecoder: Decoder[Contact] = deriveDecoder[Contact]

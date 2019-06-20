@@ -9,6 +9,7 @@ package com.canoe.telegram.models
   * @param username     Optional User's or bot's username
   * @param languageCode String Optional. IETF language tag of the user's language
   */
+// ToDo - fun-models - User/Bot
 case class User(
                  id           : Int,
                  isBot        : Boolean,

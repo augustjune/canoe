@@ -86,7 +86,19 @@ trait CirceDecoders  {
 
   implicit val stickerSetDecoder: Decoder[StickerSet] = deriveDecoder[StickerSet]
 
-  implicit val chatMemberDecoder: Decoder[ChatMember] = deriveDecoder[ChatMember]
+  implicit val chatMemberDecoder: Decoder[ChatMember] =
+    Decoder.instance {
+      cursor =>
+        cursor.get[MemberStatus]("status").map {
+          case MemberStatus.Creator => deriveDecoder[ChatCreator]
+          case MemberStatus.Administrator => deriveDecoder[ChatAdministrator]
+          case MemberStatus.Member => deriveDecoder[CurrentMember]
+          case MemberStatus.Restricted => deriveDecoder[RestrictedMember]
+          case MemberStatus.Left => deriveDecoder[LeftMember]
+          case MemberStatus.Kicked => deriveDecoder[KickedMember]
+        }.flatMap(_.tryDecode(cursor))
+    }
+
 
   implicit val maskPositionDecoder: Decoder[MaskPosition] = deriveDecoder[MaskPosition]
 

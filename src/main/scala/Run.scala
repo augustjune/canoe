@@ -25,7 +25,7 @@ object Run extends IOApp {
     for {
       bot <- Bot.polling[IO]
       _ <- bot.start.concurrently(
-        bot.messages.map(println)
+        bot.messages.evalMap(_.chat.administrators).map(println)
       ).compile.drain
     } yield ExitCode.Success
 }

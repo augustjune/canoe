@@ -40,7 +40,14 @@ trait CirceEncoders {
   implicit val chatTypeEncoder: Encoder[ChatType] =
     Encoder[String].contramap[ChatType](e => CaseConversions.snakenize(e.toString))
 
-  implicit val chatEncoder: Encoder[Chat] = deriveEncoder[Chat]
+  implicit val detailedChatEncoder: Encoder[DetailedChat] = deriveEncoder[DetailedChat]
+
+  implicit val chatEncoder: Encoder[Chat] = Encoder.instance {
+    case c: PrivateChat => c.asJson
+    case c: GroupChat => c.asJson
+    case c: Supergroup => c.asJson
+    case c: Channel => c.asJson
+  }
 
   implicit val chatMemberEncoder: Encoder[ChatMember] = Encoder.instance {
     case m: ChatCreator => m.asJson
@@ -146,6 +153,7 @@ trait CirceEncoders {
     case u: ReceivedCallbackQuery => u.asJson
     case u: ReceivedShippingQuery => u.asJson
     case u: ReceivedPreCheckoutQuery => u.asJson
+    case u => u.asJson
   }
 
   // Inline

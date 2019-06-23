@@ -31,8 +31,7 @@ object Simple extends IOApp {
 
   final case class Expect[F[_]](p: Message => Boolean) extends Scenario[F, Message] {
     def fulfill(messages: Stream[F, Message]): Stream[F, (Message, Stream[F, Message])] = {
-      val s = messages.dropWhile(!p(_))
-      s.head.map(_ -> s.tail)
+      messages.filter(p).map(m => m -> messages.dropThrough(_ != m))
     }
   }
 
@@ -42,11 +41,19 @@ object Simple extends IOApp {
   }
 
   object Scenario {
-    def expect[F[_]](pf: PartialFunction[Message, Boolean]): Scenario[F, Message] =
+    def expectAny[F[_]](pf: PartialFunction[Message, Boolean]): Scenario[F, Message] =
       Expect(m => pf.applyOrElse(m, (_: Message) => false))
 
-    def expect[F[_]](p: Message => Boolean): Scenario[F, Message] =
+    def expectAny[F[_]](p: Message => Boolean): Scenario[F, Message] =
       Expect(p)
+
+    def expectNext[F[_]](p: Message => Boolean): Scenario[F, Message] =
+      new Scenario[F, Message] {
+        def fulfill(messages: Stream[F, Message]): Stream[F, (Message, Stream[F, Message])] = {
+          val s = messages.dropWhile(!p(_))
+          s.head.map(_ -> s.tail)
+        }
+      }
 
     def eval[F[_], A](fa: F[A]): Scenario[F, A] =
       Action(fa)
@@ -55,14 +62,15 @@ object Simple extends IOApp {
 
   val greetings: Scenario[IO, String] =
     for {
-      _ <- Scenario.expect(_.startsWith("Hello"))
+      _ <- Scenario.expectAny(_.startsWith("Hello"))
       _ <- Scenario.eval(IO(println("Found 'Hello'")))
-      m2 <- Scenario.expect(_ => true)
+      m2 <- Scenario.expectNext(_ => true)
       a <- Scenario.eval[IO, String](IO(s"Hello, master $m2"))
     } yield a
 
   def run(args: List[String]): IO[ExitCode] =
-    Stream("This", "that", "Hello", "August")
+    (Stream("This", "that", "Hello1", "August") ++ Stream("This", "that", "Hello2", "August"))
+      .evalMap(s => IO {println(s"Evaluating '$s'"); s })
       .through(greetings)
       .showLinesStdOut.compile.drain.map(_ => ExitCode.Success)
 

@@ -9,6 +9,15 @@ object Simple extends IOApp {
 
   type Message = String
 
+  def chat(m: Message): String = m.take(3) + m.length
+
+  implicit class MessageScenario[F[_], A <: Message](val scenario: Scenario[F, A]) extends AnyVal {
+    def withinChat: Scenario[F, A] = new Scenario[F, A] {
+      def fulfill(messages: Stream[F, Message]): Stream[F, (A, Stream[F, Message])] =
+        scenario.fulfill(messages).map { case (a, rest) => a -> rest.filter(chat(_) == chat(a))}
+    }
+  }
+
   sealed abstract class Scenario[F[_], A] extends (Stream[F, Message] => Stream[F, A]) {
     self =>
 
@@ -74,7 +83,7 @@ object Simple extends IOApp {
   }
 
   object Scenario {
-    private def fullPredicate[A](pf: PartialFunction[A, Boolean]): Function1[A, Boolean] =
+    private def fullPredicate[A](pf: PartialFunction[A, Boolean]): A => Boolean =
       pf.applyOrElse(_, (_: A) => false)
 
     def receive[F[_]](pf: PartialFunction[Message, Boolean]): Scenario[F, Message] =
@@ -118,7 +127,7 @@ object Simple extends IOApp {
     } yield ()
 
   def run(args: List[String]): IO[ExitCode] =
-    Stream("Some", "Hello", "august", "August")
+    Stream("Some", "Hello", "august", "August", "Hello", "Jura")
 //      .evalMap(s => IO {println(s"Evaluating '$s'"); s })
       .through(greetings)
       .compile.toList

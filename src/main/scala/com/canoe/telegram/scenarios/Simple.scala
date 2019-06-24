@@ -1,7 +1,8 @@
 package com.canoe.telegram.scenarios
 
 import cats.effect.{ExitCode, IO, IOApp}
-import cats.instances.string._
+import cats.syntax.all._
+import cats.{Applicative, Id}
 import fs2.Stream
 
 object Simple extends IOApp {
@@ -29,9 +30,15 @@ object Simple extends IOApp {
     }
   }
 
-  final case class Expect[F[_]](p: Message => Boolean) extends Scenario[F, Message] {
+  final case class Receive[F[_]](p: Message => Boolean) extends Scenario[F, Message] {
     def fulfill(messages: Stream[F, Message]): Stream[F, (Message, Stream[F, Message])] = {
       messages.filter(p).map(m => m -> messages.dropThrough(_ != m))
+    }
+  }
+
+  final case class Expect[F[_]](p: Message => Boolean) extends Scenario[F, Message] {
+    def fulfill(messages: Stream[F, Message]): Stream[F, (Message, Stream[F, Message])] = {
+      messages.head.filter(p).map(_ -> messages.tail)
     }
   }
 
@@ -41,37 +48,42 @@ object Simple extends IOApp {
   }
 
   object Scenario {
-    def expectAny[F[_]](pf: PartialFunction[Message, Boolean]): Scenario[F, Message] =
-      Expect(m => pf.applyOrElse(m, (_: Message) => false))
+    private def fullPredicate[A](pf: PartialFunction[A, Boolean]): Function1[A, Boolean] =
+      pf.applyOrElse(_, (_: A) => false)
 
-    def expectAny[F[_]](p: Message => Boolean): Scenario[F, Message] =
+    def receive[F[_]](pf: PartialFunction[Message, Boolean]): Scenario[F, Message] =
+      Receive(fullPredicate(pf))
+
+    def receive[F[_]](p: Message => Boolean): Scenario[F, Message] =
+      Receive(p)
+
+    def expect[F[_]](pf: PartialFunction[Message, Boolean]): Scenario[F, Message] =
+      Expect(fullPredicate(pf))
+
+    def expect[F[_]](p: Message => Boolean): Scenario[F, Message] =
       Expect(p)
 
-    def expectNext[F[_]](p: Message => Boolean): Scenario[F, Message] =
-      new Scenario[F, Message] {
-        def fulfill(messages: Stream[F, Message]): Stream[F, (Message, Stream[F, Message])] = {
-          val s = messages.dropWhile(!p(_))
-          s.head.map(_ -> s.tail)
-        }
-      }
-
-    def eval[F[_], A](fa: F[A]): Scenario[F, A] =
+    def execute[F[_], A](fa: F[A]): Scenario[F, A] =
       Action(fa)
   }
 
+  val recursive: Scenario[IO, Unit] =
+    Scenario.execute(IO(println("i"))).flatMap(_ => recursive)
 
-  val greetings: Scenario[IO, String] =
+  val greetings: Scenario[IO, Unit] =
     for {
-      _ <- Scenario.expectAny(_.startsWith("Hello"))
-      _ <- Scenario.eval(IO(println("Found 'Hello'")))
-      m2 <- Scenario.expectNext(_ => true)
-      a <- Scenario.eval[IO, String](IO(s"Hello, master $m2"))
-    } yield a
+      m1 <- Scenario.receive(_.startsWith("Hello"))
+      _ <- Scenario.execute(IO(println(s"Found '$m1'")))
+      name <- Scenario.expect(_.head.isUpper)
+      _ <- Scenario.execute[IO, Unit](IO(println(s"Hello, master $name")))
+    } yield ()
 
   def run(args: List[String]): IO[ExitCode] =
-    (Stream("This", "that", "Hello1", "August") ++ Stream("This", "that", "Hello2", "August"))
-      .evalMap(s => IO {println(s"Evaluating '$s'"); s })
+    Stream("Some", "Hello", "august", "August")
+//      .evalMap(s => IO {println(s"Evaluating '$s'"); s })
       .through(greetings)
-      .showLinesStdOut.compile.drain.map(_ => ExitCode.Success)
+      .compile.toList
+      .flatMap(l => IO(println(l.size)))
+      .map(_ => ExitCode.Success)
 
 }

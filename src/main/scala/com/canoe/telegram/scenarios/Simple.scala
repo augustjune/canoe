@@ -91,6 +91,15 @@ object Simple extends IOApp {
 
     def execute[F[_], A](fa: F[A]): Scenario[F, A] =
       Action(fa)
+
+    def pure[F[_]: Applicative, A](a: A): Scenario[F, A] =
+      execute(a.pure[F])
+
+    def pure[A](a: A): Scenario[Id, A] =
+      execute[Id, A](a)
+
+    def unit[F[_]: Applicative]: Scenario[F, Unit] =
+      pure(())
   }
 
   val recursive: Scenario[IO, Unit] =

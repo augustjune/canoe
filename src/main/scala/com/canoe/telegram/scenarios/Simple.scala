@@ -28,6 +28,32 @@ object Simple extends IOApp {
           self.fulfill(messages).flatMap { case (a, rest) => fn(a).fulfill(rest) }
       }
     }
+
+    def or[B](other: => Scenario[F, B]): Scenario[F, Either[A, B]] =
+      new Scenario[F, Either[A, B]] {
+        def fulfill(messages: Stream[F, Message]): Stream[F, (Either[A, B], Stream[F, Message])] = {
+          (self.fulfill(messages).map { case (a, rest) => Left(a) -> rest } ++
+            other.fulfill(messages).map { case (b, rest) => Right(b) -> rest }).head
+        }
+      }
+
+    def recoverWith(fn: Message => Scenario[F, A]): Scenario[F, A] =
+      new Scenario[F, A] {
+        def fulfill(messages: Stream[F, Message]): Stream[F, (A, Stream[F, Message])] = {
+          val primary = self.fulfill(messages)
+          val secondary = messages.head.map(fn).flatMap(sc => sc.fulfill(messages.tail))
+          (primary ++ secondary).head
+        }
+      }
+
+    def recover[B](fn: Message => F[B]): Scenario[F, A] =
+      new Scenario[F, A] {
+        def fulfill(messages: Stream[F, Message]): Stream[F, (A, Stream[F, Message])] = {
+          val primary = self.fulfill(messages)
+          val secondary = messages.head.evalMap(fn).flatMap(_ => self.fulfill(messages.tail))
+          (primary ++ secondary).head
+        }
+      }
   }
 
   final case class Receive[F[_]](p: Message => Boolean) extends Scenario[F, Message] {
@@ -73,8 +99,12 @@ object Simple extends IOApp {
   val greetings: Scenario[IO, Unit] =
     for {
       m1 <- Scenario.receive(_.startsWith("Hello"))
+
       _ <- Scenario.execute(IO(println(s"Found '$m1'")))
+
       name <- Scenario.expect(_.head.isUpper)
+        .recover(m => IO(println(s"Expected name starting with uppercase letter (not $m). Try again")))
+
       _ <- Scenario.execute[IO, Unit](IO(println(s"Hello, master $name")))
     } yield ()
 

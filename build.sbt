@@ -7,6 +7,7 @@ scalaVersion := "2.12.8"
 scalacOptions ++= Seq(
   "-feature",
   "-language:higherKinds",             // Allow higher-kinded types
+  "-language:postfixOps",             // Allow higher-kinded types
   "-language:implicitConversions",     // Allow definition of implicit functions called views
   "-Xfatal-warnings",
   "-Ypartial-unification"

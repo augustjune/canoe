@@ -1,6 +1,7 @@
 package com.canoe.telegram.scenarios
 
 import cats.effect.{Concurrent, ExitCode, IO, IOApp, Sync}
+import cats.syntax.all._
 import fs2.Stream
 import fs2.concurrent.Topic
 
@@ -22,7 +23,7 @@ object Simple extends IOApp {
     s
   }
 
-  implicit class MessageScenario[F[_]: Concurrent, A <: Message](val scenario: Scenario[F, A]) {
+  implicit class MessageScenario[F[_] : Concurrent, A <: Message](val scenario: Scenario[F, A]) {
     def withinChat: Scenario[F, A] = new Scenario[F, A] {
       def fulfill(messages: Stream[F, Message]): Stream[F, (A, Stream[F, Message])] =
         scenario.fulfill(messages).map { case (a, rest) => a -> rest.filter(chat(_) == chat(a)) }
@@ -57,13 +58,13 @@ object Simple extends IOApp {
     //    def unit[F[_] : Applicative]: Scenario[F, Unit] =
     //      pure(())
 
-    def end[F[_]: Concurrent, A]: Scenario[F, A] =
+    def end[F[_] : Concurrent, A]: Scenario[F, A] =
       new Scenario[F, A] {
         def fulfill(messages: Stream[F, Message]): Stream[F, (A, Stream[F, Message])] = Stream.empty
       }
   }
 
-  sealed abstract class Scenario[F[_]: Concurrent, A] extends (Stream[F, Message] => Stream[F, A]) {
+  sealed abstract class Scenario[F[_] : Concurrent, A] extends (Stream[F, Message] => Stream[F, A]) {
     self =>
 
     def apply(messages: Stream[F, Message]): Stream[F, A] =
@@ -93,15 +94,6 @@ object Simple extends IOApp {
         }
       }
 
-    def recover[B](fn: Message => F[B]): Scenario[F, A] =
-      new Scenario[F, A] {
-        def fulfill(messages: Stream[F, Message]): Stream[F, (A, Stream[F, Message])] = {
-          val primary = self.fulfill(messages)
-          val secondary = messages.evalMap(log[F, Message]("second")).head.evalMap(fn).flatMap(_ => self.fulfill(messages))
-          (primary ++ secondary).head
-        }
-      }
-
     def flatMap[B](fn: A => Scenario[F, B]): Scenario[F, B] = {
       new Scenario[F, B] {
         def fulfill(messages: Stream[F, Message]): Stream[F, (B, Stream[F, Message])] =
@@ -110,29 +102,26 @@ object Simple extends IOApp {
     }
   }
 
-  // Fixed
   final case class Receive[F[_] : Concurrent](p: Message => Boolean) extends Scenario[F, Message] {
-    def fulfill(messages: Stream[F, Message]): Stream[F, (Message, Stream[F, Message])] = {
-      messages
-        .evalMap(log[F, Message]("receive - before predicate"))
-        .filter(p)
-        .evalMap(log[F, Message]("receive - after predicate"))
-        .map(_ -> messages)
-    }
+    self =>
+    def fulfill(messages: Stream[F, Message]): Stream[F, (Message, Stream[F, Message])] =
+      messages.filter(p).map(_ -> messages)
   }
 
-  // Good
   final case class Expect[F[_] : Concurrent](p: Message => Boolean) extends Scenario[F, Message] {
-    def fulfill(messages: Stream[F, Message]): Stream[F, (Message, Stream[F, Message])] = {
-      messages.head
-        .evalMap(log[F, Message]("expect - before predicate"))
-        .filter(p)
-        .evalMap(log[F, Message]("expect - after predicate"))
-        .map(_ -> messages)
+    self =>
+    def fulfill(messages: Stream[F, Message]): Stream[F, (Message, Stream[F, Message])] =
+      messages.head.filter(p).map(_ -> messages)
+
+    def recover[B](fn: Message => F[B]): Scenario[F, Message] = new Scenario[F, Message] {
+      def fulfill(messages: Stream[F, Message]): Stream[F, (Message, Stream[F, Message])] =
+        messages.head.flatMap { m =>
+          if (p(m)) self.fulfill(Stream(m) ++ messages)
+          else Stream.eval(fn(m)) *> self.fulfill(messages)
+        }
     }
   }
 
-  // Good
   final case class Action[F[_] : Concurrent, A](fa: F[A]) extends Scenario[F, A] {
     def fulfill(messages: Stream[F, Message]): Stream[F, (A, Stream[F, Message])] =
       Stream.eval(fa).map(_ -> messages)
@@ -141,18 +130,18 @@ object Simple extends IOApp {
   val greetings: Scenario[IO, Unit] =
     for {
       _ <- Receive[IO](_.startsWith("start"))
+
       _ <- Action(IO(println("ok, let's go")))
-      _ <- Expect[IO](_ == "1")
-        .recover(_ => IO(println("Please provide 1")))
+
+      _ <- Expect[IO](_ == "1").recover(_ => IO(println("Please provide 1")))
+
       _ <- Action(IO(println("Done.")))
     } yield ()
 
   def run(args: List[String]): IO[ExitCode] =
-    for {
-      topic <- Topic[IO, String]("")
-      _ <- Stream
-        .repeatEval(IO(StdIn.readLine()))
-        .through(greetings)
-        .compile.drain
-    } yield ExitCode.Success
+    Stream
+      .repeatEval(IO(StdIn.readLine()))
+      .through(greetings)
+      .compile.drain.as(ExitCode.Success)
+
 }

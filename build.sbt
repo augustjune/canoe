@@ -13,6 +13,10 @@ scalacOptions ++= Seq(
   "-Ypartial-unification"
 )
 
+resolvers += Resolver.sonatypeRepo("releases")
+
+addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.10.3")
+
 libraryDependencies += "org.typelevel" %% "cats-core" % "2.0.0-M1"
 libraryDependencies += "org.typelevel" %% "cats-free" % "2.0.0-M1"
 libraryDependencies += "org.typelevel" %% "cats-effect" % "1.3.0"

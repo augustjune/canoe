@@ -12,14 +12,22 @@ package com.canoe.telegram.models
   * It is not possible to resend thumbnails.
   * Resending a photo by file_id will send all of its sizes.
   */
-trait InputFile
+sealed trait InputFile
 
 object InputFile {
-  final case class FileId(fileId: String) extends InputFile
-  final case class Path(path: java.nio.file.Path) extends InputFile
-  final case class Contents(filename: String, contents: Array[Byte]) extends InputFile
 
-  def apply(fileId: String): InputFile = FileId(fileId)
-  def apply(path: java.nio.file.Path): InputFile = Path(path)
-  def apply(filename: String, contents: Array[Byte]): InputFile = Contents(filename, contents)
+  /**
+    * File which should be uploaded
+    */
+  final case class Upload(filename: String, contents: Array[Byte]) extends InputFile
+
+  /**
+    * File existing in the telegram or on the web
+    *
+    * @param key telegram FileId or URL
+    */
+  final case class Existing(key: String) extends InputFile
+
+  def apply(key: String): InputFile = Existing(key)
+  def apply(filename: String, contents: Array[Byte]): InputFile = Upload(filename, contents)
 }

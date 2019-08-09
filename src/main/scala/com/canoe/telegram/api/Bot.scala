@@ -7,25 +7,25 @@ import com.canoe.telegram.clients.RequestHandler
 import com.canoe.telegram.methods.updates.GetUpdates
 import com.canoe.telegram.models._
 import com.canoe.telegram.models.messages.TelegramMessage
-import com.canoe.telegram.scenarios.ChatScenario
+import com.canoe.telegram.scenarios.Scenario
 import fs2.concurrent.Broadcast
 import fs2.{Pipe, Pull, Stream}
 
 class Bot[F[_]: Concurrent](client: RequestHandler[F]) {
 
-  def listen: Stream[F, Update] = updates
+  def updates: Stream[F, Update] = pollUpdates(0)
 
   // Todo - remove to the other pipes
   private val incomingMessages: Pipe[F, Update, TelegramMessage] =
     _.collect { case ReceivedMessage(_, m) => m }
 
-  def follow(scenarios: List[ChatScenario[F, Unit]]): Stream[F, Update] =
+  def follow(scenarios: List[Scenario[F, Unit]]): Stream[F, Update] =
     forkThrough(updates, scenarios.map(runScenario(_) _ compose incomingMessages) :_*)
 
   private def forkThrough[A](stream: Stream[F, A], pipes: Pipe[F, A, Any]*): Stream[F, A] =
     stream.through(Broadcast.through((identity: Pipe[F, A, A]) :: pipes.toList.map(_.andThen(_.drain)): _*))
 
-  private def runScenario[A](scenario: ChatScenario[F, A])(messages: Stream[F, TelegramMessage]): Stream[F, A] = {
+  private def runScenario[A](scenario: Scenario[F, A])(messages: Stream[F, TelegramMessage]): Stream[F, A] = {
 
     val filterByFirst: Pipe[F, TelegramMessage, TelegramMessage] =
       _.pull.peek1.flatMap {
@@ -50,8 +50,6 @@ class Bot[F[_]: Concurrent](client: RequestHandler[F]) {
 
     Stream.eval(Ref.of(Set.empty[Long])).flatMap(ids => go(messages, ids).stream)
   }
-
-  private def updates: Stream[F, Update] = pollUpdates(0)
 
   private def pollUpdates(startOffset: Long): Stream[F, Update] =
     Stream(()).repeat.covary[F]

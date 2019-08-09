@@ -40,11 +40,8 @@ class SttpClient[F[_]](token: String, telegramHost: String = "api.telegram.org")
           case (camelKey, inputFile) =>
             val key = CaseConversions.snakenize(camelKey)
             inputFile match {
-              case InputFile.FileId(id) => multipart(key, id)
-              case InputFile.Contents(filename, contents) => multipart(key, contents).fileName(filename)
-              //case InputFile.Path(path) => multipartFile(key, path)
-              case other =>
-                throw new RuntimeException(s"InputFile $other not supported")
+              case InputFile.Existing(id) => multipart(key, id)
+              case InputFile.Upload(filename, contents) => multipart(key, contents).fileName(filename)
             }
         }
 

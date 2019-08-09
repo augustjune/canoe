@@ -68,7 +68,7 @@ final class ChatApi[F[_]](chat: Chat)
   def details: F[DetailedChat] =
     client.execute(GetChat(chat.id))
 
-  def sendMessage(message: BotMessage): F[TelegramMessage] =
+  def send(message: BotMessage): F[TelegramMessage] =
     client.execute(message.toRequest(chat.id))
 
 }

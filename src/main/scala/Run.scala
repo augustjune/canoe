@@ -1,8 +1,7 @@
-import java.io.{File, FileInputStream}
 import java.nio.file.{Files, Paths}
 
 import cats.Show
-import cats.effect.{ExitCode, IO, IOApp, Resource}
+import cats.effect.{ExitCode, IO, IOApp}
 import cats.implicits._
 import com.canoe.telegram.api._
 import com.canoe.telegram.api.syntax._
@@ -38,8 +37,9 @@ object Run extends IOApp {
         case _ => false
       }
       _ <- Action(m1.chat.send(BotMessage("Wassup?")))
-      m2 <- Expect[IO] { case m: TextMessage if m.text.contains("fine") => true; case _ => false } or
-        Expect[IO] { case m: TextMessage if m.text.contains("bad") => true; case _ => false }
+      m2 <- (Expect[IO] { case m: TextMessage => println(s"matching $m"); m.text.contains("fine"); case _ => false } or
+        Expect[IO] { case m: TextMessage => println(s"matching $m"); m.text.contains("bad"); case _ => false })
+        .tolerate(_.reply(BotMessage("Your answer must contain either 'fine' or 'bad'")))
 
       _ <- m2 match {
         case Left(fine) => Action(fine.chat.send(BotMessage("Oh, I'm so happy for you")))
@@ -66,7 +66,7 @@ object Run extends IOApp {
     } yield ()
 
 
-  val updates = bot.follow(List(sendFiles))
+  val updates = bot.follow(List(greetings))
 
   import io.circe.syntax._
 
@@ -75,6 +75,7 @@ object Run extends IOApp {
 
   def run(args: List[String]): IO[ExitCode] =
     for {
-      _ <- updates.showLinesStdOut.compile.drain
+      _ <- updates
+        .compile.drain
     } yield ExitCode.Success
 }

@@ -1,11 +1,28 @@
 package com.canoe.telegram.scenarios
 
 import cats.{Applicative, Monad, MonadError}
-import cats.syntax.all._
 import com.canoe.telegram.models.messages.TelegramMessage
 import fs2.{Pipe, Pull, Stream}
 
 object Scenario {
+
+  def receive[F[_]](p: PartialFunction[TelegramMessage, Boolean]): Scenario[F, TelegramMessage] =
+    Receive(p.applyOrElse(_, (_: Any) => false))
+
+  def expect[F[_]](p: PartialFunction[TelegramMessage, Boolean]): Scenario[F, TelegramMessage] =
+    Expect(p.applyOrElse(_, (_: Any) => false))
+
+  def eval[F[_], A](fa: F[A]): Scenario[F, A] =
+    Action(fa)
+
+  def unit[F[_]](implicit F: Applicative[F]) =
+    Action(F.unit)
+
+  def end[F[_], A]: Scenario[F, A] =
+    new Scenario[F, A] {
+      def fulfill(messages: Stream[F, TelegramMessage]): Stream[F, (Result[A], Stream[F, TelegramMessage])] =
+        Stream.empty
+    }
 
   implicit def monadInstance[F[_]](implicit F: Applicative[F]): Monad[Scenario[F, ?]] =
     new Monad[Scenario[F, ?]] {
@@ -134,34 +151,12 @@ final case class Expect[F[_]](p: TelegramMessage => Boolean) extends Scenario[F,
 
     go(messages).stream
   }
-
-  //  override def recover[B](fn: TelegramMessage => F[B]): Scenario[F, TelegramMessage] = new Scenario[F, TelegramMessage] {
-  //    def fulfill(messages: Stream[F, TelegramMessage]): Stream[F, (Result[TelegramMessage], Stream[F, TelegramMessage])] =
-  //      messages.head.flatMap { m =>
-  //        if (p(m)) self.fulfill(messages.cons1(m))
-  //        else Stream.eval(fn(m)) *> self.fulfill(messages)
-  //      }
-  //  }
-
-  //  def recoverWith(fn: TelegramMessage => Scenario[F, TelegramMessage]): Scenario[F, TelegramMessage] =
-  //    new Scenario[F, TelegramMessage] {
-  //      def fulfill(messages: Stream[F, TelegramMessage]): Stream[F, (Result[TelegramMessage], Stream[F, TelegramMessage])] =
-  //        messages.head.flatMap { m =>
-  //          if (p(m)) self.fulfill(messages.cons1(m))
-  //          else fn(m).fulfill(messages)
-  //        }
-  //    }
-
-  //  def or[B](other: => Scenario[F, B]): Scenario[F, Either[TelegramMessage, B]] =
-  //    new Scenario[F, Either[TelegramMessage, B]] {
-  //      def fulfill(messages: Stream[F, TelegramMessage]): Stream[F, (Result[Either[TelegramMessage, B]], Stream[F, TelegramMessage])] =
-  //        messages.head.flatMap { m =>
-  //          if (p(m)) self.fulfill(messages.cons1(m)).map { case (a, rest) => a.map(Left(_)) -> rest }
-  //          else other.fulfill(messages.cons1(m)).map { case (a, rest) => a.map(Right(_)) -> rest }
-  //        }
-  //    }
 }
 
+object Receive {
+
+  def any[F[_]]: Receive[F] = Receive(_ => true)
+}
 
 final case class Receive[F[_]](p: TelegramMessage => Boolean) extends Scenario[F, TelegramMessage] {
 

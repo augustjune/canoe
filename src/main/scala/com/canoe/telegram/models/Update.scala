@@ -6,10 +6,6 @@ sealed trait Update {
   def updateId: Long
 }
 
-object Update {
-  def empty: Update = new Update { def updateId: Long = -1 }
-}
-
 final case class ReceivedMessage(updateId: Long, message: TelegramMessage) extends Update
 
 final case class EditedMessage(updateId: Long, editedMessage: TelegramMessage) extends Update

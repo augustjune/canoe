@@ -8,17 +8,17 @@ sealed trait MessageContent
 
 // ToDo - think about naming (e.g.: MessageAnimation, AnimationMessage, etc.)
 case class AnimationContent(animation: InputFile,
+                            caption: String = "",
                             duration: Option[Int] = None,
                             width: Option[Int] = None,
                             height: Option[Int] = None,
                             thumb: Option[InputFile] = None,
-                            caption: Option[String] = None,
                             parseMode: Option[ParseMode] = None) extends MessageContent
 
 
 case class AudioContent(audio: InputFile,
+                        caption: String = "",
                         duration: Option[Int] = None,
-                        caption: Option[String] = None,
                         parseMode: Option[ParseMode] = None,
                         performer: Option[String] = None,
                         title: Option[String] = None) extends MessageContent
@@ -31,7 +31,7 @@ case class ContactContent(phoneNumber: String,
 
 
 case class DocumentContent(document: InputFile,
-                           caption: Option[String] = None,
+                           caption: String = "",
                            parseMode: Option[ParseMode] = None
                           ) extends MessageContent
 
@@ -71,7 +71,7 @@ case class TextContent(text: String,
 
 
 case class PhotoContent(photo: InputFile,
-                        caption: Option[String] = None,
+                        caption: String = "",
                         parseMode: Option[ParseMode] = None) extends MessageContent
 
 
@@ -91,10 +91,10 @@ case class VenueContent(latitude: Double,
 
 
 case class VideoContent(video: InputFile,
+                        caption: String = "",
                         duration: Option[Int] = None,
                         width: Option[Int] = None,
                         height: Option[Int] = None,
-                        caption: Option[String] = None,
                         parseMode: Option[ParseMode] = None,
                         supportsStreaming: Option[Boolean] = None) extends MessageContent
 
@@ -105,6 +105,6 @@ case class VideoNoteContent(videoNote: InputFile,
 
 
 case class VoiceContent(voice: InputFile,
-                        caption: Option[String] = None,
+                        caption: String = "",
                         parseMode: Option[ParseMode] = None,
                         duration: Option[Int] = None) extends MessageContent

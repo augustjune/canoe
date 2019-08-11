@@ -24,22 +24,6 @@ object Scenario {
         Stream.empty
     }
 
-  implicit def monadInstance[F[_]](implicit F: Applicative[F]): Monad[Scenario[F, ?]] =
-    new Monad[Scenario[F, ?]] {
-
-      override def pure[A](x: A): Scenario[F, A] =
-        Action(F.pure(x))
-
-      override def flatMap[A, B](fa: Scenario[F, A])(f: A => Scenario[F, B]): Scenario[F, B] =
-        fa.flatMap(f)
-
-      override def tailRecM[A, B](a: A)(f: A => Scenario[F, Either[A, B]]): Scenario[F, B] =
-        f(a).flatMap {
-          case Left(a) => tailRecM(a)(f)
-          case Right(b) => Action(F.pure(b))
-        }
-    }
-
   implicit def monadErrorInstance[F[_]](implicit F: Applicative[F]): MonadError[Scenario[F, ?], TelegramMessage] =
     new MonadError[Scenario[F, ?], TelegramMessage] {
       def raiseError[A](e: TelegramMessage): Scenario[F, A] =
@@ -136,6 +120,19 @@ sealed abstract class Scenario[F[_], A] extends Pipe[F, TelegramMessage, A] {
     }
 }
 
+object Expect {
+
+  def any[F[_]]: Expect[F] = Expect(_ => true)
+
+  def collect[F[_]]: ExpectCollectPartiallyApplied[F] = new ExpectCollectPartiallyApplied[F]
+
+  final class ExpectCollectPartiallyApplied[F[_]](val dummy: Boolean = true) extends AnyVal {
+    def apply[A](p: PartialFunction[TelegramMessage, A]): Scenario[F, A] =
+      Expect(p.isDefinedAt).map(p)
+  }
+
+}
+
 final case class Expect[F[_]](p: TelegramMessage => Boolean) extends Scenario[F, TelegramMessage] {
 
   def fulfill(messages: Stream[F, TelegramMessage]): Stream[F, (Result[TelegramMessage], Stream[F, TelegramMessage])] = {
@@ -156,6 +153,14 @@ final case class Expect[F[_]](p: TelegramMessage => Boolean) extends Scenario[F,
 object Receive {
 
   def any[F[_]]: Receive[F] = Receive(_ => true)
+
+  def collect[F[_]]: ReceiveCollectPartiallyApplied[F] = new ReceiveCollectPartiallyApplied[F]
+
+  final class ReceiveCollectPartiallyApplied[F[_]](val dummy: Boolean = true) extends AnyVal {
+    def apply[A](p: PartialFunction[TelegramMessage, A]): Scenario[F, A] =
+      Receive(p.isDefinedAt).map(p)
+  }
+
 }
 
 final case class Receive[F[_]](p: TelegramMessage => Boolean) extends Scenario[F, TelegramMessage] {

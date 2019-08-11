@@ -1,5 +1,3 @@
-import java.nio.file.{Files, Paths}
-
 import cats.Show
 import cats.effect.{ExitCode, IO, IOApp}
 import cats.implicits._
@@ -7,26 +5,28 @@ import com.canoe.telegram.api._
 import com.canoe.telegram.api.syntax._
 import com.canoe.telegram.clients.SttpClient
 import com.canoe.telegram.models.InputFile
-import com.canoe.telegram.models.messages.TextMessage
+import com.canoe.telegram.models.messages.{AudioMessage, TextMessage}
 import com.canoe.telegram.models.outgoing.{BotMessage, PhotoContent}
-import com.canoe.telegram.scenarios.{Action, Expect, Receive, Scenario}
+import com.canoe.telegram.scenarios.{Expect, Receive, Scenario}
 import com.softwaremill.sttp.asynchttpclient.cats.AsyncHttpClientCatsBackend
 import com.typesafe.config.ConfigFactory
 import io.circe.{Encoder, Printer}
+import com.canoe.telegram.marshalling.CirceEncoders._
+import fs2.Pipe
 
 object Run extends IOApp {
-  val token: String = ConfigFactory.parseResources("credentials/telegram.conf").getString("token")
+  val token: String =
+    ConfigFactory.parseResources("credentials/telegram.conf")
+      .getString("token")
 
   implicit val sttpBackend = AsyncHttpClientCatsBackend[cats.effect.IO]()
   implicit val client = new SttpClient[IO](token)
   val bot = new Bot(client)
 
-  val sendFiles: Scenario[IO, Unit] =
+  val respondAudio: Scenario[IO, Unit] =
     for {
-      m <- Receive.any[IO]
-      _ <- Scenario.eval(m.chat.send(BotMessage(PhotoContent(InputFile("AgADBAADjK8xG8_WcVL6ZDHt58Fsd_RxqBsABAEAAwIAA20AA4v2AAIWBA"), Some("Kermit the frog here")))))
-      _ <- Scenario.eval(m.chat.send(BotMessage(PhotoContent(InputFile("https://www.google.com/imgres?imgurl=https%3A%2F%2Fa1cf74336522e87f135f-2f21ace9a6cf0052456644b80fa06d4f.ssl.cf2.rackcdn.com%2Fimages%2Fcharacters_opt%2Fp-the-transporter-2-jason-statham.jpg&imgrefurl=https%3A%2F%2Fwww.charactour.com%2Fhub%2Fcharacters%2Fview%2FFrank-Martin.The-Transporter&docid=sFjB3yr6FmtMFM&tbnid=TowqSBOSgcn3nM%3A&vet=10ahUKEwjB0PfamfbjAhVNzRoKHePKDzsQMwiAASgFMAU..i&w=300&h=301&bih=907&biw=1680&q=the%20transporter&ved=0ahUKEwjB0PfamfbjAhVNzRoKHePKDzsQMwiAASgFMAU&iact=mrc&uact=8")))))
-      _ <- Scenario.eval(IO(Files.readAllBytes(Paths.get("./trans.jpg"))).flatMap(bytes => m.chat.send(BotMessage(PhotoContent(InputFile.Upload("Da", bytes))))))
+      m <- Receive.collect[IO] { case m: AudioMessage => m }
+      _ <- Scenario.eval(m.chat.send(BotMessage(m.audio)))
     } yield ()
 
   val greetings: Scenario[IO, Unit] =
@@ -45,13 +45,10 @@ object Run extends IOApp {
 
   val repeat: Scenario[IO, Unit] =
     for {
-      m <- Expect(_.isInstanceOf[TextMessage])
-      _ <- m match {
-        case text: TextMessage =>
-          if (text.text.contains("stop")) Action(m.chat.send(BotMessage("Ok, that's all")))
-          else Scenario.eval(m.chat.send(BotMessage(text.text))).flatMap(_ => repeat)
-        case _ => Scenario.unit[IO]
-      }
+      m <- Expect.collect { case m: TextMessage => m }
+      _ <-
+        if (m.text.contains("stop")) Scenario.eval(m.chat.send(BotMessage("Ok, that's all")))
+        else Scenario.eval(m.chat.send(BotMessage(m.text))) >> repeat
     } yield ()
 
   val mock: Scenario[IO, Unit] =
@@ -61,8 +58,9 @@ object Run extends IOApp {
       _ <- repeat
     } yield ()
 
+  val updates = bot.follow(List(respondAudio, sendFiles))
 
-  val updates = bot.follow(List(greetings))
+  val polls = pipes.pollUpdates[IO].andThen(_.evalMap(p => IO.unit))
 
   import io.circe.syntax._
 
@@ -70,8 +68,8 @@ object Run extends IOApp {
     _.asJson.pretty(Printer.spaces2.copy(dropNullValues = true))
 
   def run(args: List[String]): IO[ExitCode] =
-    for {
-      _ <- updates
-        .compile.drain
-    } yield ExitCode.Success
+    updates
+      .showLinesStdOut
+      .compile.drain
+      .as(ExitCode.Success)
 }

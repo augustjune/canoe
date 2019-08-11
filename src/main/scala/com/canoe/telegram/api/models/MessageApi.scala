@@ -32,5 +32,5 @@ final class MessageApi[F[_]](message: TelegramMessage)
 
   // ToDo - handle case, when the message doesn't correspond to the poll
   def stopPoll(markup: Option[ReplyMarkup] = None): F[Poll] =
-    client.execute(StopPoll(message.chat.id, message.messageId, markup))
+    client.execute(StopPoll(chatId, messageId, markup))
 }

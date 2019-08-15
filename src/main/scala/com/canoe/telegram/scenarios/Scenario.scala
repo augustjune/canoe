@@ -1,6 +1,6 @@
 package com.canoe.telegram.scenarios
 
-import cats.{Applicative, Monad, MonadError}
+import cats.{Applicative, MonadError}
 import com.canoe.telegram.models.messages.TelegramMessage
 import fs2.{Pipe, Pull, Stream}
 
@@ -18,7 +18,7 @@ object Scenario {
   def unit[F[_]](implicit F: Applicative[F]) =
     Action(F.unit)
 
-  def end[F[_], A]: Scenario[F, A] =
+  def drain[F[_], A]: Scenario[F, A] =
     new Scenario[F, A] {
       def fulfill(messages: Stream[F, TelegramMessage]): Stream[F, (Result[A], Stream[F, TelegramMessage])] =
         Stream.empty
@@ -111,6 +111,7 @@ sealed abstract class Scenario[F[_], A] extends Pipe[F, TelegramMessage, A] {
         self.fulfill(messages).flatMap {
           case (Right(a), rest) =>
             Stream(Right(Left(a)) -> rest)
+
           case (Left(m), rest) =>
             other.fulfill(rest.cons1(m)).map {
               case (Right(b), rest2) => Right(Right(b)) -> rest2
@@ -118,6 +119,8 @@ sealed abstract class Scenario[F[_], A] extends Pipe[F, TelegramMessage, A] {
             }
         }
     }
+
+  def drain: Scenario[F, Unit] = flatMap(_ => Scenario.drain)
 }
 
 object Expect {
@@ -195,7 +198,6 @@ final case class Receive[F[_]](p: TelegramMessage => Boolean) extends Scenario[F
       }.take(n)
   }
 }
-
 
 final case class Action[F[_], A](fa: F[A]) extends Scenario[F, A] {
   def fulfill(messages: Stream[F, TelegramMessage]): Stream[F, (Result[A], Stream[F, TelegramMessage])] =

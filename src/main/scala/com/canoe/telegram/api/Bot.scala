@@ -16,12 +16,13 @@ class Bot[F[_]: Concurrent](client: RequestHandler[F]) {
   def updates: Stream[F, Update] = pollUpdates(0)
 
   def follow(scenarios: List[Scenario[F, Unit]]): Stream[F, Update] =
-    forkThrough(updates, scenarios.map(runScenario(_) _ compose pipes.incomingMessages[F]) :_*)
+    forkThrough(updates, scenarios.map(pipes.messages[F] andThen runScenario(_)) :_*)
 
   private def forkThrough[A](stream: Stream[F, A], pipes: Pipe[F, A, Any]*): Stream[F, A] =
     stream.through(Broadcast.through((identity: Pipe[F, A, A]) :: pipes.toList.map(_.andThen(_.drain)): _*))
 
-  private def runScenario[A](scenario: Scenario[F, A])(messages: Stream[F, TelegramMessage]): Stream[F, A] = {
+  private def runScenario[A](scenario: Scenario[F, A])
+                            (messages: Stream[F, TelegramMessage]): Stream[F, Nothing] = {
 
     val filterByFirst: Pipe[F, TelegramMessage, TelegramMessage] =
       _.pull.peek1.flatMap {
@@ -29,7 +30,7 @@ class Bot[F[_]: Concurrent](client: RequestHandler[F]) {
         case None => Pull.done
       }.stream
 
-    def go(input: Stream[F, TelegramMessage], ids: Ref[F, Set[Long]]): Pull[F, A, Unit] =
+    def go(input: Stream[F, TelegramMessage], ids: Ref[F, Set[Long]]): Pull[F, Nothing, Unit] =
       input.pull.peek1.flatMap {
         case Some((m, rest)) =>
           Pull.eval(ids.get.map(_.contains(m.chat.id))).flatMap {
@@ -38,7 +39,7 @@ class Bot[F[_]: Concurrent](client: RequestHandler[F]) {
 
             case false => // doesn't contain
               Pull.eval(ids.update(_ + m.chat.id)) >>
-                go(forkThrough(rest, scenario compose filterByFirst).tail, ids)
+                go(forkThrough(rest, filterByFirst andThen scenario).tail, ids)
           }
 
         case None => Pull.done

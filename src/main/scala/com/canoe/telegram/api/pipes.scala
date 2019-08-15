@@ -6,7 +6,7 @@ import fs2.Pipe
 
 object pipes {
 
-  def incomingMessages[F[_]]: Pipe[F, Update, TelegramMessage] =
+  def messages[F[_]]: Pipe[F, Update, TelegramMessage] =
     _.collect { case ReceivedMessage(_, message) => message }
 
   def editedMessages[F[_]]: Pipe[F, Update, TelegramMessage] =
@@ -15,7 +15,7 @@ object pipes {
   def channelPosts[F[_]]: Pipe[F, Update, TelegramMessage] =
     _.collect { case ChannelPost(_, post) => post }
 
-  def editedChannelPosts[F[_]]: Pipe[F, Update, TelegramMessage] =
+  def editedPosts[F[_]]: Pipe[F, Update, TelegramMessage] =
     _.collect { case EditedChannelPost(_, post) => post }
 
   def pollUpdates[F[_]]: Pipe[F, Update, Poll] =

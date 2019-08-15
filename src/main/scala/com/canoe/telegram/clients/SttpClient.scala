@@ -40,15 +40,14 @@ class SttpClient[F[_]](token: String, telegramHost: String = "api.telegram.org")
           case (camelKey, inputFile) =>
             val key = CaseConversions.snakenize(camelKey)
             inputFile match {
-              case InputFile.Existing(id) => multipart(key, id)
+              case InputFile.Existing(id)               => multipart(key, id)
               case InputFile.Upload(filename, contents) => multipart(key, contents).fileName(filename)
             }
         }
 
         val fields = parse(marshalling.toJson(request)).fold(throw _, _.asObject.map {
-          _.toMap.mapValues {
-            json =>
-              json.asString.getOrElse(marshalling.printer.pretty(json))
+          _.toMap.mapValues { json =>
+            json.asString.getOrElse(marshalling.printer.pretty(json))
           }
         })
 

@@ -6,9 +6,9 @@ scalaVersion := "2.12.8"
 
 scalacOptions ++= Seq(
   "-feature",
-  "-language:higherKinds",             // Allow higher-kinded types
-  "-language:postfixOps",             // Allow higher-kinded types
-  "-language:implicitConversions",     // Allow definition of implicit functions called views
+  "-language:higherKinds", // Allow higher-kinded types
+  "-language:postfixOps", // Allow higher-kinded types
+  "-language:implicitConversions", // Allow definition of implicit functions called views
   "-Xfatal-warnings",
   "-Ypartial-unification"
 )
@@ -27,6 +27,9 @@ libraryDependencies += "com.softwaremill.sttp" %% "core" % "1.5.19"
 libraryDependencies += "com.softwaremill.sttp" %% "async-http-client-backend-cats" % "1.5.19"
 
 libraryDependencies += "com.typesafe" % "config" % "1.3.4"
+
+libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.14.0" % Test
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.8" % Test
 
 val circeVersion = "0.10.0"
 

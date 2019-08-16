@@ -88,9 +88,9 @@ sealed abstract class Scenario[F[_], A] extends Pipe[F, TelegramMessage, A] {
     }
   }
 
-  def tolerate[B](fn: TelegramMessage => F[B]): Scenario[F, A] = tolerateN(fn)(1)
+  def tolerate[B](fn: TelegramMessage => F[B]): Scenario[F, A] = tolerateN(1)(fn)
 
-  def tolerateN[B](fn: TelegramMessage => F[B])(n: Int): Scenario[F, A] = {
+  def tolerateN[B](n: Int)(fn: TelegramMessage => F[B]): Scenario[F, A] = {
 
     def tolerateFulfill(n: Int, messages: Stream[F, TelegramMessage]): Stream[F, (Result[A], Stream[F, TelegramMessage])] =
       if (n <= 0) self.fulfill(messages)
@@ -180,22 +180,6 @@ final case class Receive[F[_]](p: TelegramMessage => Boolean) extends Scenario[F
     }
 
     go(messages).stream
-  }
-
-  def limit(n: Int): Scenario[F, TelegramMessage] = new Scenario[F, TelegramMessage] {
-    def fulfill(messages: Stream[F, TelegramMessage]): Stream[F, (Result[TelegramMessage], Stream[F, TelegramMessage])] = {
-
-      def go(input: Stream[F, TelegramMessage]): Pull[F, (Result[TelegramMessage], Stream[F, TelegramMessage]), Unit] = {
-        input.dropWhile(!p(_)).pull.uncons1.flatMap {
-          case Some((m, rest)) =>
-            Pull.output1(Right(m) -> rest) >> go(rest)
-
-          case None => Pull.done
-        }
-      }
-
-      go(messages).stream
-      }.take(n)
   }
 }
 

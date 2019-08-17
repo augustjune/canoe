@@ -29,14 +29,14 @@ object Scenario {
       def raiseError[A](e: TelegramMessage): Scenario[F, A] =
         new Scenario[F, A] {
           def fulfill(messages: Stream[F, TelegramMessage]): Stream[F, (Result[A], Stream[F, TelegramMessage])] =
-            Stream(Left(e) -> messages)
+            Stream(Missed(e) -> messages)
         }
 
       def handleErrorWith[A](fa: Scenario[F, A])(f: TelegramMessage => Scenario[F, A]): Scenario[F, A] = {
         new Scenario[F, A] {
           def fulfill(messages: Stream[F, TelegramMessage]): Stream[F, (Result[A], Stream[F, TelegramMessage])] =
             fa.fulfill(messages).flatMap {
-              case (Left(m), rest) =>
+              case (Missed(m), rest) =>
                 f(m).fulfill(rest)
 
               case success => Stream(success)
@@ -57,16 +57,27 @@ object Scenario {
         }
     }
 
-  type Result[A] = Either[TelegramMessage, A]
+  sealed trait Result[+A] {
+    def map[B](f: A => B): Result[B] = this match {
+      case Matched(a) => Matched(f(a))
+      case same @ Missed(_) => same
+      case same @ Cancelled(_) => same
+    }
+  }
+
+  case class Matched[A](a: A) extends Result[A]
+  case class Missed(message: TelegramMessage) extends Result[Nothing]
+  case class Cancelled(message: TelegramMessage) extends Result[Nothing]
+
 }
 
-import Scenario.Result
+import Scenario._
 
 sealed abstract class Scenario[F[_], A] extends Pipe[F, TelegramMessage, A] {
   self =>
 
   def apply(messages: Stream[F, TelegramMessage]): Stream[F, A] =
-    fulfill(messages).map(_._1).collect { case Right(a) => a }
+    fulfill(messages).map(_._1).collect { case Matched(a) => a }
 
   def fulfill(messages: Stream[F, TelegramMessage]): Stream[F, (Result[A], Stream[F, TelegramMessage])]
 
@@ -81,8 +92,9 @@ sealed abstract class Scenario[F[_], A] extends Pipe[F, TelegramMessage, A] {
     new Scenario[F, B] {
       def fulfill(messages: Stream[F, TelegramMessage]): Stream[F, (Result[B], Stream[F, TelegramMessage])] =
         self.fulfill(messages).flatMap {
-          case (Right(a), rest) => fn(a).fulfill(rest)
-          case (Left(m), rest) => Stream(Left(m) -> rest)
+          case (Matched(a), rest) => fn(a).fulfill(rest)
+          case (Missed(m), rest) => Stream(Missed(m) -> rest)
+          case (Cancelled(m), rest) => Stream(Cancelled(m) -> rest)
         }
 
     }
@@ -95,7 +107,8 @@ sealed abstract class Scenario[F[_], A] extends Pipe[F, TelegramMessage, A] {
     def tolerateFulfill(n: Int, messages: Stream[F, TelegramMessage]): Stream[F, (Result[A], Stream[F, TelegramMessage])] =
       if (n <= 0) self.fulfill(messages)
       else self.fulfill(messages).flatMap {
-        case (Left(m), rest) => Stream.eval(fn(m)) >> tolerateFulfill(n - 1, rest)
+        case (Cancelled(_), rest) => self.fulfill(rest)
+        case (Missed(m), rest) => Stream.eval(fn(m)) >> tolerateFulfill(n - 1, rest)
         case matched => Stream(matched)
       }
 
@@ -105,17 +118,28 @@ sealed abstract class Scenario[F[_], A] extends Pipe[F, TelegramMessage, A] {
     }
   }
 
+  // Doesn't keep the history of matched messages
+  // (second scenario starts matching from the point where the first one missed / was cancelled)
   def or[B](other: => Scenario[F, B]): Scenario[F, Either[A, B]] =
     new Scenario[F, Either[A, B]] {
       def fulfill(messages: Stream[F, TelegramMessage]): Stream[F, (Result[Either[A, B]], Stream[F, TelegramMessage])] =
         self.fulfill(messages).flatMap {
-          case (Right(a), rest) =>
-            Stream(Right(Left(a)) -> rest)
+          case (Matched(a), rest) =>
+            Stream(Matched(Left(a)) -> rest)
 
-          case (Left(m), rest) =>
+          case (Missed(m), rest) =>
             other.fulfill(rest.cons1(m)).map {
-              case (Right(b), rest2) => Right(Right(b)) -> rest2
-              case (Left(m), rest2) => Left(m) -> rest2
+              case (Matched(b), rest2) => Matched(Right(b)) -> rest2
+              case (Missed(m), rest2) => Missed(m) -> rest2
+              case (Cancelled(m), rest2) => Cancelled(m) -> rest2
+            }
+
+          // Try second scenario even if the first one was cancelled (should the cancellation message be read? [other.fulfill(rest.cons1(m)).map])
+          case (Cancelled(m), rest) =>
+            other.fulfill(rest.cons1(m)).map {
+              case (Matched(b), rest2) => Matched(Right(b)) -> rest2
+              case (Missed(m), rest2) => Missed(m) -> rest2
+              case (Cancelled(m), rest2) => Cancelled(m) -> rest2
             }
         }
     }
@@ -143,8 +167,8 @@ final case class Expect[F[_]](p: TelegramMessage => Boolean) extends Scenario[F,
     def go(input: Stream[F, TelegramMessage]): Pull[F, (Result[TelegramMessage], Stream[F, TelegramMessage]), Unit] =
       input.pull.uncons1.flatMap {
         case Some((m, rest)) =>
-          if (p(m)) Pull.output1(Right(m) -> rest)
-          else Pull.output1(Left(m) -> rest)
+          if (p(m)) Pull.output1(Matched(m) -> rest)
+          else Pull.output1(Missed(m) -> rest)
 
         case None => Pull.done
       }
@@ -173,7 +197,7 @@ final case class Receive[F[_]](p: TelegramMessage => Boolean) extends Scenario[F
     def go(input: Stream[F, TelegramMessage]): Pull[F, (Result[TelegramMessage], Stream[F, TelegramMessage]), Unit] = {
       input.dropWhile(!p(_)).pull.uncons1.flatMap {
         case Some((m, rest)) =>
-          Pull.output1(Right(m) -> rest) >> go(rest)
+          Pull.output1(Matched(m) -> rest) >> go(rest)
 
         case None => Pull.done
       }
@@ -185,5 +209,5 @@ final case class Receive[F[_]](p: TelegramMessage => Boolean) extends Scenario[F
 
 final case class Action[F[_], A](fa: F[A]) extends Scenario[F, A] {
   def fulfill(messages: Stream[F, TelegramMessage]): Stream[F, (Result[A], Stream[F, TelegramMessage])] =
-    Stream.eval(fa).map(Right(_) -> messages)
+    Stream.eval(fa).map(Matched(_) -> messages)
 }

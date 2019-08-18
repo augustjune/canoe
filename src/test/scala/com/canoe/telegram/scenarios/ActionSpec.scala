@@ -19,16 +19,16 @@ class ActionSpec extends FunSuite {
   }
 
   test("Action doesn't consume any message") {
-    val scenario: Scenario[Id, Unit] = Action((): Id[Unit])
-    val input: Stream[Pure, TelegramMessage] = Stream.empty
+    val scenario: Scenario[Id, Unit, Unit] = Scenario.eval((): Id[Unit])
+    val input: Stream[Pure, Unit] = Stream.empty
 
     assert(input.through(scenario).covaryId[IO].size == 1)
   }
 
   test("Action evaluates effect") {
     var evaluated = false
-    val scenario: Scenario[IO, Unit] = Action(IO { evaluated = true })
-    val input: Stream[Pure, TelegramMessage] = Stream.empty
+    val scenario: Scenario[IO, Unit, Unit] = Scenario.eval(IO { evaluated = true })
+    val input: Stream[Pure, Unit] = Stream.empty
 
     input.through(scenario).run()
 
@@ -36,16 +36,16 @@ class ActionSpec extends FunSuite {
   }
 
   test("Action evaluates value in an effect") {
-    val scenario: Scenario[IO, Int] = Action(IO.pure(1))
-    val input: Stream[Pure, TelegramMessage] = Stream.empty
+    val scenario: Scenario[IO, Unit, Int] = Scenario.eval(IO.pure(1))
+    val input: Stream[Pure, Unit] = Stream.empty
 
     assert(input.through(scenario).value() == 1)
   }
 
   test("Action evaluates effect only once") {
     var times = 0
-    val scenario: Scenario[IO, Unit] = Action(IO { times = times + 1 })
-    val input: Stream[Pure, TelegramMessage] = Stream.empty
+    val scenario: Scenario[IO, Unit, Unit] = Scenario.eval(IO { times = times + 1 })
+    val input: Stream[Pure, Unit] = Stream.empty
 
     input.through(scenario).run()
     assert(times == 1)

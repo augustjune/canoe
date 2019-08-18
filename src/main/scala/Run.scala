@@ -7,9 +7,10 @@ import com.canoe.telegram.api.syntax._
 import com.canoe.telegram.clients.SttpClient
 import com.canoe.telegram.marshalling.CirceEncoders._
 import com.canoe.telegram.models.Chat
-import com.canoe.telegram.models.messages.{AudioMessage, TextMessage}
+import com.canoe.telegram.models.messages.{AudioMessage, TelegramMessage, TextMessage}
 import com.canoe.telegram.models.outgoing.BotMessage
-import com.canoe.telegram.scenarios.{Expect, Receive, Scenario}
+import com.canoe.telegram.scenarios.ChatScenario.ChatScenario
+import com.canoe.telegram.scenarios.{ChatScenario, Scenario}
 import com.softwaremill.sttp.asynchttpclient.cats.AsyncHttpClientCatsBackend
 import com.typesafe.config.ConfigFactory
 import io.circe.{Encoder, Printer}
@@ -27,10 +28,10 @@ object Run extends IOApp {
   implicit val client = new SttpClient[IO](token)
   val bot = new Bot(client)
 
-  val respondAudio: Scenario[IO, Unit] =
+  val respondAudio: Scenario[IO, TelegramMessage, Unit] =
     for {
-      m <- Receive.collect[IO] { case m: AudioMessage => m }
-      _ <- Scenario.eval(m.chat.send(BotMessage(m.audio)))
+      m <- ChatScenario.start { case m: AudioMessage => m }
+      _ <- ChatScenario.eval(m.chat.send(BotMessage(m.audio)))
     } yield ()
 
   def count(chat: Chat, d: FiniteDuration, i: Int): IO[Unit] =
@@ -41,41 +42,24 @@ object Run extends IOApp {
       _ <- count(chat, d, i + 1)
     } yield ()
 
-  val counter: Scenario[IO, Unit] =
+  val counter: Scenario[IO, TelegramMessage, Unit] =
     for {
-      m <- Receive.collect { case m: TextMessage if m.text.startsWith("/count") => m }
+      m <- ChatScenario.start { case m: TextMessage if m.text.startsWith("/count") => m }
       start = Try(m.text.split(" ")(1).toInt).getOrElse(0)
-      _ <- Scenario.eval(count(m.chat, 1.second, start).start)
+      _ <- ChatScenario.eval(count(m.chat, 1.second, start).start)
     } yield ()
 
-  val greetings: Scenario[IO, Unit] =
+  val repeat: ChatScenario[IO, Unit] =
     for {
-      m1 <- Scenario.receive[IO] { case m: TextMessage => m.text.contains("Hi") }
-      _ <- Scenario.eval(m1.chat.send(BotMessage("Wassup?")))
-      m2 <- Scenario
-        .expect[IO] { case m: TextMessage => m.text.contains("fine") }
-        .or(Scenario.expect[IO] { case m: TextMessage => m.text.contains("bad") })
-        .tolerate(_.reply(BotMessage("Your answer must contain either 'fine' or 'bad'")))
-
-      _ <- m2 match {
-        case Left(fine) => Scenario.eval(fine.chat.send(BotMessage("Oh, I'm so happy for you")))
-        case Right(bad) =>
-          Scenario.eval(
-            bad.chat.send(BotMessage("Oh, I'm sorry. Is there something I can do for you?")))
-      }
-    } yield ()
-
-  val repeat: Scenario[IO, Unit] =
-    for {
-      m <- Expect.collect { case m: TextMessage => m }
+      m <- ChatScenario.next { case m: TextMessage => m }
       _ <- if (m.text.contains("stop")) Scenario.eval(m.chat.send(BotMessage("Ok, that's all")))
-      else Scenario.eval(m.chat.send(BotMessage(m.text))) >> repeat
+      else ChatScenario.eval(m.chat.send(BotMessage(m.text))).flatMap(_ => repeat)
     } yield ()
 
-  val mock: Scenario[IO, Unit] =
+  val mock: Scenario[IO, TelegramMessage, Unit] =
     for {
-      start <- Scenario.receive[IO] { case m: TextMessage => m.text.contains("start") }
-      _ <- Scenario.eval(start.chat.send(BotMessage("Starting mocking")))
+      start <- ChatScenario.start { case m: TextMessage if m.text.contains("start") => m }
+      _ <- ChatScenario.eval(start.chat.send(BotMessage("Starting mocking")))
       _ <- repeat
     } yield ()
 

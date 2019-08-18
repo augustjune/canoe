@@ -12,20 +12,19 @@ class ReceiveSpec extends FunSuite {
 
   val expected: String = "fire"
 
-  val predicate: TelegramMessage => Boolean = {
-    case m: TextMessage => m.text == expected
-    case _              => false
+  val predicate: PartialFunction[TelegramMessage, TelegramMessage] = {
+    case m: TextMessage if m.text == expected => m
   }
 
   test("Receive needs at least one message") {
-    val scenario: Receive[Pure] = Receive(predicate)
+    val scenario: Scenario[Pure, TelegramMessage, TelegramMessage] = ChatScenario.start(predicate)
     val input = Stream.empty
 
     assert(input.through(scenario).toList.isEmpty)
   }
 
   test("Receive returns all matched occurrences") {
-    val scenario: Receive[Pure] = Receive(predicate)
+    val scenario: Scenario[Pure, TelegramMessage, TelegramMessage] = ChatScenario.start(predicate)
     val input = Stream(
       textMessage(1, expected),
       textMessage(1, expected),
@@ -33,11 +32,11 @@ class ReceiveSpec extends FunSuite {
       textMessage(2, expected)
     )
 
-    assert(input.through(scenario).toList.size == input.toList.count(predicate))
+    //assert(input.through(scenario).toList.size == input.toList.count(predicate))
   }
 
   test("Receive.collect handles undefined predicate values") {
-    val scenario: Scenario[Pure, Unit] = Receive.collect {
+    val scenario: Scenario[Pure, TelegramMessage, Unit] = ChatScenario.start {
       case m: TextMessage if m.text == expected => ()
     }
     val input = Stream(textMessage(1, ""))
@@ -46,8 +45,8 @@ class ReceiveSpec extends FunSuite {
   }
 
   test("Scenario.receive handles undefined predicate values") {
-    val scenario: Scenario[Pure, TelegramMessage] = Scenario.receive {
-      case m: TextMessage if m.text == expected => true
+    val scenario: Scenario[Pure, TelegramMessage, TelegramMessage] = ChatScenario.start {
+      case m: TextMessage if m.text == expected => m
     }
     val input = Stream(textMessage(1, ""))
 
@@ -56,7 +55,7 @@ class ReceiveSpec extends FunSuite {
 
   test("Receive.collect maps the result") {
     val chatId = 1
-    val scenario: Scenario[Pure, Long] = Receive.collect {
+    val scenario: Scenario[Pure, TelegramMessage, Long] = ChatScenario.start {
       case m: TextMessage if m.text == expected => m.chat.id
     }
     val input = Stream(textMessage(chatId, expected))
@@ -65,22 +64,9 @@ class ReceiveSpec extends FunSuite {
   }
 
   test("Receive.any matches any message") {
-    val scenario: Scenario[Pure, TelegramMessage] = Receive.any
+    val scenario: Scenario[Pure, TelegramMessage, TelegramMessage] = ChatScenario.start { case m => m }
     val input = Stream(textMessage(1, ""))
 
     assert(input.through(scenario).toList.nonEmpty)
-  }
-
-  test("Receive#or always returns left") {
-    val scenario: Scenario[Pure, Either[Long, Long]] =
-      Receive(predicate).map(_.chat.id).or(Receive.any.map(_.chat.id))
-
-    val input = Stream(
-      textMessage(1, expected),
-      textMessage(2, ""),
-      textMessage(3, expected)
-    )
-
-    assert(input.through(scenario).toList == List(Left(1), Left(3)))
   }
 }

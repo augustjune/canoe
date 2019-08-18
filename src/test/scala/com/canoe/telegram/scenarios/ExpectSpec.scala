@@ -20,20 +20,19 @@ class ExpectSpec extends FunSuite {
 
   val expected: String = "fire"
 
-  val predicate: TelegramMessage => Boolean = {
-    case m: TextMessage => m.text == expected
-    case _              => false
+  val predicate: PartialFunction[TelegramMessage, TelegramMessage] = {
+    case m: TextMessage if m.text == expected => m
   }
 
   test("Expect needs at least one message") {
-    val scenario: Scenario[Pure, TelegramMessage] = Expect(predicate)
+    val scenario: Scenario[Pure, TelegramMessage, TelegramMessage] = ChatScenario.start(predicate)
     val input = Stream.empty
 
     assert(input.through(scenario).toList.isEmpty)
   }
 
   test("Expect matches only the first message") {
-    val scenario: Scenario[Pure, TelegramMessage] = Expect(predicate)
+    val scenario: Scenario[Pure, TelegramMessage, TelegramMessage] = ChatScenario.next(predicate)
 
     val input = Stream(textMessage(1, expected), textMessage(2, expected))
 
@@ -43,14 +42,14 @@ class ExpectSpec extends FunSuite {
   }
 
   test("Expect uses provided predicate to match the result") {
-    val scenario: Scenario[Pure, TelegramMessage] = Expect(predicate)
+    val scenario: Scenario[Pure, TelegramMessage, TelegramMessage] = ChatScenario.next(predicate)
     val input = Stream(textMessage(1, ""))
 
     assert(input.through(scenario).toList.isEmpty)
   }
 
   test("Expect.collect handles undefined predicate values") {
-    val scenario: Scenario[Pure, Unit] = Expect.collect {
+    val scenario: Scenario[Pure, TelegramMessage, Unit] = ChatScenario.next {
       case m: TextMessage if m.text == expected => ()
     }
     val input = Stream(textMessage(1, ""))
@@ -59,8 +58,8 @@ class ExpectSpec extends FunSuite {
   }
 
   test("Scenario.expect handles undefined predicate values") {
-    val scenario: Scenario[Pure, TelegramMessage] = Scenario.expect {
-      case m: TextMessage if m.text == expected => true
+    val scenario: Scenario[Pure, TelegramMessage, TelegramMessage] = ChatScenario.next {
+      case m: TextMessage if m.text == expected => m
     }
     val input = Stream(textMessage(1, ""))
 
@@ -69,7 +68,7 @@ class ExpectSpec extends FunSuite {
 
   test("Expect.collect maps the result") {
     val chatId = 1
-    val scenario: Scenario[Pure, Long] = Expect.collect {
+    val scenario: Scenario[Pure, TelegramMessage, Long] = ChatScenario.next {
       case m: TextMessage if m.text == expected => m.chat.id
     }
     val input = Stream(textMessage(chatId, expected))
@@ -78,15 +77,15 @@ class ExpectSpec extends FunSuite {
   }
 
   test("Expect.any matches any message") {
-    val scenario: Scenario[Pure, TelegramMessage] = Expect.any
+    val scenario: Scenario[Pure, TelegramMessage, TelegramMessage] = ChatScenario.next { case m => m }
     val input = Stream(textMessage(1, ""))
 
     assert(input.through(scenario).toList.nonEmpty)
   }
 
   test("Expect#tolerate doesn't skip the element if it matches") {
-    val scenario: Scenario[Id, Long] =
-      Expect(predicate).map(_.chat.id).tolerate(_ => (): Id[Unit])
+    val scenario: Scenario[Id, TelegramMessage, Long] =
+      ChatScenario.next(predicate).map(_.chat.id).tolerate(_ => (): Id[Unit])
 
     val input = Stream(textMessage(1, expected), textMessage(2, expected))
 
@@ -94,8 +93,8 @@ class ExpectSpec extends FunSuite {
   }
 
   test("Expect#tolerate skips the element if it doesn't match") {
-    val scenario: Scenario[Id, Long] =
-      Expect(predicate).map(_.chat.id).tolerate(_ => (): Id[Unit])
+    val scenario: Scenario[Id, TelegramMessage, Long] =
+      ChatScenario.next(predicate).map(_.chat.id).tolerate(_ => (): Id[Unit])
 
     val input = Stream(textMessage(1, ""), textMessage(2, expected))
 
@@ -104,8 +103,8 @@ class ExpectSpec extends FunSuite {
 
   test("Expect#tolerateN skips up to N elements if they don't match") {
     val n = 5
-    val scenario: Scenario[Id, Long] =
-      Expect(predicate).map(_.chat.id).tolerateN(n)(_ => (): Id[Unit])
+    val scenario: Scenario[Id, TelegramMessage, Long] =
+      ChatScenario.next(predicate).map(_.chat.id).tolerateN(n)(_ => (): Id[Unit])
 
     val input = Stream(textMessage(1, "")).repeatN(5) ++ Stream(
       textMessage(2, expected)
@@ -114,25 +113,4 @@ class ExpectSpec extends FunSuite {
     assert(input.through(scenario).toList.head == 2)
   }
 
-  test("Expect#or returns left if the first expect matched") {
-    val scenario: Scenario[Pure, Either[Long, Long]] =
-      Expect(predicate)
-        .map(_.chat.id)
-        .or(Expect.collect { case m: TextMessage if m.text == "" => m.chat.id })
-
-    val input = Stream(textMessage(1, expected))
-
-    assert(input.through(scenario).toList.head == Left(1))
-  }
-
-  test("Expect#or returns right if the first expect matched") {
-    val scenario: Scenario[Pure, Either[Long, Long]] =
-      Expect(predicate)
-        .map(_.chat.id)
-        .or(Expect.any.map(_.chat.id))
-
-    val input = Stream(textMessage(1, ""))
-
-    assert(input.through(scenario).toList.head == Right(1))
-  }
 }

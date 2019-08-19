@@ -7,7 +7,7 @@ import com.canoe.telegram.clients.RequestHandler
 import com.canoe.telegram.methods.updates.GetUpdates
 import com.canoe.telegram.models._
 import com.canoe.telegram.models.messages.TelegramMessage
-import com.canoe.telegram.scenarios.ChatScenario.ChatScenario
+import com.canoe.telegram.scenarios.Interaction
 import fs2.concurrent.Broadcast
 import fs2.{Pipe, Pull, Stream}
 
@@ -15,13 +15,13 @@ class Bot[F[_]: Concurrent](client: RequestHandler[F]) {
 
   def updates: Stream[F, Update] = pollUpdates(0)
 
-  def follow(scenarios: List[ChatScenario[F, Unit]]): Stream[F, Update] =
+  def follow(scenarios: Interaction[F, Unit]*): Stream[F, Update] =
     forkThrough(updates, scenarios.map(pipes.messages[F] andThen runScenario(_)) :_*)
 
   private def forkThrough[A](stream: Stream[F, A], pipes: Pipe[F, A, Any]*): Stream[F, A] =
     stream.through(Broadcast.through((identity: Pipe[F, A, A]) :: pipes.toList.map(_.andThen(_.drain)): _*))
 
-  private def runScenario[A](scenario: ChatScenario[F, A])
+  private def runScenario[A](scenario: Interaction[F, A])
                             (messages: Stream[F, TelegramMessage]): Stream[F, Nothing] = {
 
     val filterByFirst: Pipe[F, TelegramMessage, TelegramMessage] =

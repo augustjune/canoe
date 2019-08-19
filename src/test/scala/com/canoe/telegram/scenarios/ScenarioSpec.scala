@@ -2,48 +2,153 @@ package com.canoe.telegram.scenarios
 
 import cats.Id
 import cats.effect.IO
-import com.canoe.telegram.models.PrivateChat
-import com.canoe.telegram.models.messages.{TelegramMessage, TextMessage}
 import org.scalatest.FunSuite
 import fs2.{Pure, Stream}
 
 class ScenarioSpec extends FunSuite {
 
-  implicit class IdStreamOps[A](stream: Stream[Id, A]) {
-    def toList: List[A] = stream.covaryId[IO].compile.toList.unsafeRunSync()
+  implicit class IOStreamOps[A](stream: Stream[IO, A]) {
+    def toList(): List[A] = stream.compile.toList.unsafeRunSync()
 
-    def size: Int = toList.size
+    def value(): A = toList().head
+
+    def size(): Int = toList().size
+
+    def run(): Unit = stream.compile.drain.unsafeRunSync()
   }
 
-  def textMessage(chatId: Long, text: String): TextMessage =
-    TextMessage(-1, PrivateChat(chatId, None, "", None), 0, text)
+  val expected: String = "fire"
 
-  test("Receive >>= Expect") {
-    val scenario: Scenario[Pure, TextMessage, Long] =
+  val predicate: String => Boolean = _.endsWith(expected)
+
+
+  test("Start >>= Next") {
+    val scenario: Scenario[Pure, String, String] =
       for {
-        m <- ChatScenario.start { case m: TextMessage if m.text == "one" => m }
-        _ <- ChatScenario.next { case m: TextMessage  if m.text == "two" => m }
-      } yield m.chat.id
+        m <- Scenario.start[Pure, String](_.endsWith("one"))
+        _ <- Scenario.next[Pure, String](_.endsWith("two"))
+      } yield m
 
-    val chatId = 12
-    val input = Stream(textMessage(chatId, "one"), textMessage(chatId, "two"))
+    val input = Stream("one", "two")
 
-    assert(input.through(scenario).toList.size == 1)
+    assert(input.through(scenario).toList().size == 1)
   }
 
   test("Scenario doesn't ignore the element which is mismatched") {
-    val scenario: Scenario[Pure, TelegramMessage, Long] =
+    val scenario: Scenario[Pure, String, String] =
       for {
-        m <- ChatScenario.start { case m: TextMessage if m.text == "one" => m }
-        _ <- ChatScenario.next { case m: TextMessage  if m.text == "two" => m }
-      } yield m.chat.id
+        m <- Scenario.start[Pure, String](_.endsWith("one"))
+        _ <- Scenario.next[Pure, String](_.endsWith("two"))
+      } yield m
 
+    val input = Stream("1.one", "2.one", "3.two")
+
+    assert(input.through(scenario).toList().head.take(1) == "2")
+  }
+
+  test("Scenario.start needs at least one message") {
+    val scenario: Scenario[Pure, String, String] = Scenario.start(predicate)
+    val input = Stream.empty
+
+    assert(input.through(scenario).toList().isEmpty)
+  }
+
+  test("Scenario.start returns all matched occurrences") {
+    val scenario: Scenario[Pure, String, String] = Scenario.start(predicate)
     val input = Stream(
-      textMessage(1, "one"),
-      textMessage(2, "one"),
-      textMessage(3, "two")
+      s"1.$expected",
+      s"1.$expected",
+      s"1.",
+      s"2.$expected"
     )
 
-    assert(input.through(scenario).toList.head == 2)
+    assert(input.through(scenario).size() == input.toList().count(predicate))
+  }
+
+
+  test("Scenario.next needs at least one message") {
+    val scenario: Scenario[Pure, String, String] = Scenario.next(predicate)
+    val input = Stream.empty
+
+    assert(input.through(scenario).toList().isEmpty)
+  }
+
+  test("Scenario.next matches only the first message") {
+    val scenario: Scenario[Pure, String, String] = Scenario.next(predicate)
+
+    val input = Stream(s"1.$expected", s"2.$expected")
+
+    val results = input.through(scenario).toList()
+    assert(results.size == 1)
+    assert(results.head.startsWith("1"))
+  }
+
+  test("Scenario.next uses provided predicate to match the result") {
+    val scenario: Scenario[Pure, String, String] = Scenario.next(predicate)
+    val input = Stream("")
+
+    assert(input.through(scenario).toList().isEmpty)
+  }
+
+
+  test("Scenario.next#tolerate doesn't skip the element if it matches") {
+    val scenario: Scenario[Id, String, String] =
+      Scenario.next(predicate).tolerate(_ => (): Id[Unit])
+
+    val input = Stream(s"1.$expected", s"2.$expected")
+
+    assert(input.through(scenario).covaryId[IO].toList().head.startsWith("1"))
+  }
+
+  test("Scenario.next#tolerate skips the element if it doesn't match") {
+    val scenario: Scenario[Id, String, String] =
+      Scenario.next(predicate).tolerate(_ => (): Id[Unit])
+
+    val input = Stream("1", s"2.$expected")
+
+    assert(input.through(scenario).covaryId[IO].toList().head.startsWith("2"))
+  }
+
+  test("Scenario.next#tolerateN skips up to N elements if they don't match") {
+    val n = 5
+    val scenario: Scenario[Id, String, String] =
+      Scenario.next(predicate).tolerateN(n)(_ => (): Id[Unit])
+
+    val input = Stream("").repeatN(5) ++ Stream(s"2.$expected")
+
+    assert(input.through(scenario).covaryId[IO].toList().head.startsWith("2"))
+  }
+
+  test("Scenario.eval doesn't consume any message") {
+    val scenario: Scenario[Id, Unit, Unit] = Scenario.eval((): Id[Unit])
+    val input: Stream[Pure, Unit] = Stream.empty
+
+    assert(input.through(scenario).covaryId[IO].size == 1)
+  }
+
+  test("Scenario.eval evaluates effect") {
+    var evaluated = false
+    val scenario: Scenario[IO, Unit, Unit] = Scenario.eval(IO { evaluated = true })
+    val input: Stream[Pure, Unit] = Stream.empty
+
+    input.through(scenario).run()
+
+    assert(evaluated)
+  }
+
+  test("Action evaluates value in an effect") {
+    val scenario: Scenario[IO, Unit, Int] = Scenario.eval(IO.pure(1))
+    val input: Stream[Pure, Unit] = Stream.empty
+
+    assert(input.through(scenario).value() == 1)
+  }
+
+  test("Action evaluates effect only once") {
+    var times = 0
+    val scenario: Scenario[IO, Unit, Unit] = Scenario.eval(IO { times = times + 1 })
+    val input: Stream[Pure, Unit] = Stream.empty
+
+    input.through(scenario).run()
+    assert(times == 1)
   }
 }

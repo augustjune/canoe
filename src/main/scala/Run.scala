@@ -1,15 +1,13 @@
+import canoe.api.syntax._
+import canoe.api.{Bot, pipes, _}
+import canoe.clients.SttpClient
+import canoe.models.messages.{AudioMessage, TextMessage}
+import canoe.models.outgoing.BotMessage
+import canoe.models.{Chat, outgoing}
+import canoe.scenarios.{Interaction, Scenario}
 import cats.Show
-import cats.effect.concurrent.Ref
-import cats.effect.{Bracket, ContextShift, ExitCode, IO, IOApp}
+import cats.effect.{ExitCode, IO, IOApp}
 import cats.implicits._
-import com.canoe.telegram.api._
-import com.canoe.telegram.api.syntax._
-import com.canoe.telegram.clients.SttpClient
-import com.canoe.telegram.marshalling.CirceEncoders._
-import com.canoe.telegram.models.Chat
-import com.canoe.telegram.models.messages.{AudioMessage, TelegramMessage, TextMessage}
-import com.canoe.telegram.models.outgoing.BotMessage
-import com.canoe.telegram.scenarios.{Interaction, Scenario}
 import com.softwaremill.sttp.asynchttpclient.cats.AsyncHttpClientCatsBackend
 import com.typesafe.config.ConfigFactory
 import io.circe.{Encoder, Printer}
@@ -36,7 +34,7 @@ object Run extends IOApp {
   def count(chat: Chat, d: FiniteDuration, i: Int): IO[Unit] =
     if (i > 10) IO.unit
     else for {
-      _ <- chat.send(BotMessage(s"$i..."))
+      _ <- chat.send(outgoing.BotMessage(s"$i..."))
       _ <- IO.sleep(d)
       _ <- count(chat, d, i + 1)
     } yield ()
@@ -51,14 +49,14 @@ object Run extends IOApp {
   val repeat: Interaction[IO, Unit] =
     for {
       m <- Interaction.expect { case m: TextMessage => m }
-      _ <- if (m.text.contains("stop")) Scenario.eval(m.chat.send(BotMessage("Ok, that's all")))
+      _ <- if (m.text.contains("stop")) Scenario.eval(m.chat.send(outgoing.BotMessage("Ok, that's all")))
       else Interaction.eval(m.chat.send(BotMessage(m.text))).flatMap(_ => repeat)
     } yield ()
 
   val mock: Interaction[IO, Unit] =
     for {
       start <- Interaction.receive { case m: TextMessage if m.text.contains("start") => m }
-      _ <- Interaction.eval(start.chat.send(BotMessage("Starting mocking")))
+      _ <- Interaction.eval(start.chat.send(outgoing.BotMessage("Starting mocking")))
       _ <- repeat
     } yield ()
 

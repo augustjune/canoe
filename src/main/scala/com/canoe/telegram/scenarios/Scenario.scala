@@ -2,6 +2,8 @@ package com.canoe.telegram.scenarios
 
 import cats.{Applicative, Monad}
 import fs2.{Pipe, Pull, Stream}
+import cats.instances.list._
+import cats.syntax.all._
 
 import Scenario._
 
@@ -16,12 +18,23 @@ sealed trait Scenario[F[_], -I, +O] extends Pipe[F, I, O] {
 
   def map[O2](fn: O => O2): Scenario[F, I, O2] = Mapped(this, fn)
 
-  def cancelOn[I2 <: I](p: I2 => Boolean): Scenario[F, I2, O] = Cancellable(this, p)
+  def cancelOn[I2 <: I](p: I2 => Boolean): Scenario[F, I2, O] =
+    Cancellable(this, p, None)
+
+  /**
+    * @param p Predicate which determines what input value causes cancellation
+    * @param cancellation Function which result is going to be evaluated during the cancellation
+    */
+  def cancelWith[I2 <: I](
+    p: I2 => Boolean
+  )(cancellation: I2 => F[Any]): Scenario[F, I2, O] =
+    Cancellable(this, p, Some(cancellation))
 
   def tolerateN[I2 <: I, A](n: Int)(fn: I2 => F[A]): Scenario[F, I2, O] =
     Tolerate(this, Some(n), fn)
 
-  def tolerate[I2 <: I, A](fn: I2 => F[A]): Scenario[F, I2, O] = tolerateN(1)(fn)
+  def tolerate[I2 <: I, A](fn: I2 => F[A]): Scenario[F, I2, O] =
+    tolerateN(1)(fn)
 
   def tolerateAll[I2 <: I, A](fn: I2 => F[A]): Scenario[F, I2, O] =
     Tolerate(this, None, fn)
@@ -42,7 +55,8 @@ final case class Mapped[F[_], I, O1, O2](scenario: Scenario[F, I, O1],
     extends Scenario[F, I, O2]
 
 final case class Cancellable[F[_], I, O](scenario: Scenario[F, I, O],
-                                         cancelOn: I => Boolean)
+                                         cancelOn: I => Boolean,
+                                         finalizer: Option[I => F[Any]])
     extends Scenario[F, I, O]
 
 final case class Tolerate[F[_], I, O, A](scenario: Scenario[F, I, O],
@@ -73,7 +87,7 @@ object Scenario {
   private def loop[F[_], I, O](
     scenario: Scenario[F, I, O],
     input: Stream[F, I],
-    cancelTokens: List[I => Boolean]
+    cancelTokens: List[(I => Boolean, Option[I => F[Any]])]
   ): Stream[F, (Result[I, O], Stream[F, I])] = {
     scenario match {
       case Eval(fa) =>
@@ -94,18 +108,24 @@ object Scenario {
         def go(in: Stream[F, I]): Pull[F, (Result[I, O], Stream[F, I]), Unit] =
           in.pull.uncons1.flatMap {
             case Some((m, rest)) =>
-              if (cancelTokens.exists(_(m)))
-                Pull.output1(Cancelled(m) -> rest)
-              else if (p(m)) Pull.output1(Matched(m.asInstanceOf[O]) -> rest)
-              else Pull.output1(Missed(m) -> rest)
+              cancelTokens.collect { case (p, f) if p(m) => f } match {
+                case Nil =>
+                  if (p(m)) Pull.output1(Matched(m.asInstanceOf[O]) -> rest)
+                  else Pull.output1(Missed(m) -> rest)
 
+                case nonEmpty =>
+                  nonEmpty
+                    .collect { case Some(f) => f }
+                    .traverse(f => Pull.eval(f(m))) >>
+                    Pull.output1(Cancelled(m) -> rest)
+              }
             case None => Pull.done
           }
 
         go(input).stream
 
-      case Cancellable(scenario, p) =>
-        loop(scenario, input, p :: cancelTokens)
+      case Cancellable(scenario, p, f) =>
+        loop(scenario, input, (p, f) :: cancelTokens)
 
       case Tolerate(scenario, limit, fn) =>
         limit match {

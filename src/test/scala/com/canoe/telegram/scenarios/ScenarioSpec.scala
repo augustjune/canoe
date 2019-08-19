@@ -46,6 +46,36 @@ class ScenarioSpec extends FunSuite {
     assert(input.through(scenario).toList().head.take(1) == "2")
   }
 
+  test("Scenario can be cancelled while it's in progress") {
+    val cancelToken = "cancel"
+
+    val scenario: Scenario[Pure, String, String] =
+      (for {
+        m <- Scenario.start[Pure, String](_.endsWith("one"))
+        _ <- Scenario.next[Pure, String](_ => true)
+      } yield m).cancelOn(_ == cancelToken)
+
+    val input = Stream("1.one", cancelToken, "any")
+
+    assert(input.through(scenario).size == 0)
+  }
+
+  test("Scenario evaluates cancellation function when it is cancelled") {
+    var cancelledWith = ""
+    val cancelToken = "cancel"
+
+    val scenario: Scenario[IO, String, String] =
+      (for {
+        m <- Scenario.start[IO, String](_.endsWith("one"))
+        _ <- Scenario.next[IO, String](_ => true)
+      } yield m).cancelWith[String](_ == cancelToken)(m => IO { cancelledWith = m })
+
+    val input = Stream("1.one", cancelToken, "any")
+    input.through(scenario).run()
+
+    assert(cancelledWith == cancelToken)
+  }
+
   test("Scenario.start needs at least one message") {
     val scenario: Scenario[Pure, String, String] = Scenario.start(predicate)
     val input = Stream.empty

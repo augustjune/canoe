@@ -143,16 +143,16 @@ trait CirceEncoders {
   implicit val countryCodeEncoder: Encoder[CountryCode] = Encoder[String].contramap(c => CaseConversions.snakenize(c.toString))
 
   implicit val updateEncoder: Encoder[Update] = Encoder.instance {
-    case u: ReceivedMessage => u.asJson
-    case u: EditedMessage => u.asJson
+    case u: MessageReceived => u.asJson
+    case u: MessageEdited => u.asJson
     case u: ChannelPost => u.asJson
-    case u: EditedChannelPost => u.asJson
-    case u: PollUpdate => u.asJson
-    case u: ReceivedInlineQuery => u.asJson
-    case u: ReceivedChosenInlineResult => u.asJson
-    case u: ReceivedCallbackQuery => u.asJson
-    case u: ReceivedShippingQuery => u.asJson
-    case u: ReceivedPreCheckoutQuery => u.asJson
+    case u: ChannelPostEdited => u.asJson
+    case u: PollUpdated => u.asJson
+    case u: InlineQueryReceived => u.asJson
+    case u: InlineResultSelected => u.asJson
+    case u: CallbackButtonSelected => u.asJson
+    case u: ShippingQueryReceived => u.asJson
+    case u: PreCheckoutQueryReceived => u.asJson
     case u => u.asJson
   }
 

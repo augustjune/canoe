@@ -152,16 +152,16 @@ trait CirceDecoders  {
 
   implicit val updateDecoder: Decoder[Update] =
     List[Decoder[Update]](
-      deriveDecoder[ReceivedMessage].widen,
-      deriveDecoder[EditedMessage].widen,
+      deriveDecoder[MessageReceived].widen,
+      deriveDecoder[MessageEdited].widen,
       deriveDecoder[ChannelPost].widen,
-      deriveDecoder[EditedChannelPost].widen,
-      deriveDecoder[PollUpdate].widen,
-      deriveDecoder[ReceivedInlineQuery].widen,
-      deriveDecoder[ReceivedChosenInlineResult].widen,
-      deriveDecoder[ReceivedCallbackQuery].widen,
-      deriveDecoder[ReceivedShippingQuery].widen,
-      deriveDecoder[ReceivedPreCheckoutQuery].widen
+      deriveDecoder[ChannelPostEdited].widen,
+      deriveDecoder[PollUpdated].widen,
+      deriveDecoder[InlineQueryReceived].widen,
+      deriveDecoder[InlineResultSelected].widen,
+      deriveDecoder[CallbackButtonSelected].widen,
+      deriveDecoder[ShippingQueryReceived].widen,
+      deriveDecoder[PreCheckoutQueryReceived].widen
     ).reduceLeft(_ or _)
 
   implicit val telegramMessageDecoder: Decoder[TelegramMessage] =

@@ -6,7 +6,7 @@ sealed trait Chat {
 
 case class PrivateChat(id: Long,
                        username: Option[String],
-                       firstName: String,
+                       firstName: Option[String],
                        lastName: Option[String]) extends Chat
 
 case class GroupChat(id: Long,

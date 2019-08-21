@@ -72,7 +72,11 @@ final class ChatApi[F[_]](chat: Chat)
   def send(message: BotMessage): F[TelegramMessage] =
     client.execute(message.toRequest(chat.id))
 
-  def send(mediaGroupContent: MediaGroupContent): F[Array[TelegramMessage]] =
-    client.execute(SendMediaGroup(chat.id, mediaGroupContent.media))
+  /**
+    * Sends a list of media files as an album
+    * @param media Must include 2-10 items
+    */
+  def sendAlbum(media: List[InputMedia], disableNotification: Boolean = false): F[List[TelegramMessage]] =
+    client.execute(SendMediaGroup(chat.id, media, disableNotification = Some(disableNotification)))
 
 }

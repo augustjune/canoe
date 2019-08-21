@@ -16,7 +16,7 @@ import canoe.models.{ChatId, InputFile, InputMedia}
 case class SendMediaGroup(chatId: ChatId,
                           media: List[InputMedia],
                           disableNotification: Option[Boolean] = None,
-                          replyToMessageId: Option[Int] = None) extends MultipartRequest[Array[TelegramMessage]] {
+                          replyToMessageId: Option[Int] = None) extends MultipartRequest[List[TelegramMessage]] {
 
   override def getFiles: List[(String, InputFile)] = media.flatMap(_.getFiles)
 }

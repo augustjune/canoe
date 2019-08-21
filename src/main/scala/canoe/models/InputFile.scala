@@ -28,6 +28,7 @@ object InputFile {
     */
   final case class Existing(key: String) extends InputFile
 
-  def apply(key: String): InputFile = Existing(key)
-  def apply(filename: String, contents: Array[Byte]): InputFile = Upload(filename, contents)
+  def fromUrl(url: String): InputFile = Existing(url)
+  def fromFileId(fileId: String): InputFile = Existing(fileId)
+  def fromBytes(name: String, bytes: Array[Byte]) = Upload(name, bytes)
 }

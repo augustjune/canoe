@@ -2,6 +2,7 @@ package canoe.api.models
 
 import canoe.clients.RequestHandler
 import canoe.methods.chats._
+import canoe.methods.messages.SendMediaGroup
 import canoe.models.ChatAction.ChatAction
 import canoe.models._
 import canoe.models.messages.TelegramMessage
@@ -70,5 +71,8 @@ final class ChatApi[F[_]](chat: Chat)
 
   def send(message: BotMessage): F[TelegramMessage] =
     client.execute(message.toRequest(chat.id))
+
+  def send(mediaGroupContent: MediaGroupContent): F[Array[TelegramMessage]] =
+    client.execute(SendMediaGroup(chat.id, mediaGroupContent.media))
 
 }

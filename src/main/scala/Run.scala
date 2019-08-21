@@ -1,9 +1,11 @@
+import java.nio.file.{Files, Paths}
+
 import canoe.api.syntax._
 import canoe.api.{Bot, pipes, _}
 import canoe.clients.SttpClient
-import canoe.models.messages.{AudioMessage, TextMessage}
-import canoe.models.outgoing.BotMessage
-import canoe.models.{Chat, outgoing}
+import canoe.models.messages.{AudioMessage, PhotoMessage, TextMessage}
+import canoe.models.outgoing.{BotMessage, MediaGroupContent, PhotoContent}
+import canoe.models.{Chat, InputFile, InputMediaPhoto, outgoing}
 import canoe.scenarios.{Interaction, Scenario}
 import cats.Show
 import cats.effect.{ExitCode, IO, IOApp}
@@ -60,7 +62,27 @@ object Run extends IOApp {
       _ <- repeat
     } yield ()
 
-  val updates = bot.follow(counter)
+  val repsondMediaGroup: Interaction[IO, Unit] =
+  for {
+    chat <- Interaction.receive { case m: TextMessage if m.text.contains("group") => m.chat }
+    messages <- Interaction.eval(chat.send(MediaGroupContent(List.fill(10)(InputMediaPhoto(InputFile.Existing("https://ichef.bbci.co.uk/news/660/cpsprodpb/1486F/production/_105597048_snakes8.jpg"))))))
+    _ <- Interaction.eval(IO(println(s"Group messages [${{messages.length}}]: ${messages.map(_.messageId)}")))
+  } yield ()
+
+  val respondSinglePhoto: Interaction[IO, Unit] =
+    for {
+      chat <- Interaction.receive { case m: TextMessage if m.text.contains("single") => m.chat }
+      m <- Interaction.eval(chat.send(BotMessage(PhotoContent(InputFile.Upload("local", Files.readAllBytes(Paths.get("C:/Users/slinkyur/Desktop/img.jpg")))))))
+    } yield ()
+
+  val replyPhoto: Interaction[IO, Unit] =
+    for {
+      m <- Interaction.receive { case m: PhotoMessage => m }
+      _ <- Interaction.eval(IO(println(s"Responding to the message with fileId: ${m.photo.last.fileId}")))
+      _ <- Interaction.eval(m.reply(BotMessage(PhotoContent(InputFile.Existing(m.photo.last.fileId)))))
+    } yield ()
+
+  val updates = bot.follow(repsondMediaGroup, respondSinglePhoto, replyPhoto)
 
   val polls = pipes.pollUpdates[IO].andThen(_.evalMap(p => IO.unit))
 

@@ -11,9 +11,10 @@ import io.circe.{Decoder, Encoder}
 
 import scala.concurrent.duration._
 
-class SttpClient[F[_]](token: String, telegramHost: String = "api.telegram.org")
-                      (implicit backend: SttpBackend[F, Nothing], monadError: MonadError[F, Throwable])
-  extends RequestHandler[F] {
+class SttpClient[F[_]](token: String, telegramHost: String = "api.telegram.org")(
+  implicit backend: SttpBackend[F, Nothing],
+  monadError: MonadError[F, Throwable]
+) extends RequestHandler[F] {
 
   val readTimeout: Duration = 50.seconds
 
@@ -25,7 +26,9 @@ class SttpClient[F[_]](token: String, telegramHost: String = "api.telegram.org")
 
   private val apiBaseUrl = s"https://$telegramHost/bot$token/"
 
-  override def sendRequest[R, T <: Request[_]](request: T)(implicit encT: Encoder[T], decR: Decoder[R]): F[R] = {
+  override def sendRequest[R, T <: Request[_]](
+    request: T
+  )(implicit encT: Encoder[T], decR: Decoder[R]): F[R] = {
     val url = apiBaseUrl + request.methodName
 //    println(s"Calling $url with body: ${encT(request)}")
 
@@ -36,20 +39,18 @@ class SttpClient[F[_]](token: String, telegramHost: String = "api.telegram.org")
       case r: MultipartRequest[_] =>
         val files = r.getFiles
 
-        val parts = files.map {
-          case (camelKey, inputFile) =>
-            val key = CaseConversions.snakenize(camelKey)
-            inputFile match {
-              case InputFile.Existing(id)               => multipart(key, id)
-              case InputFile.Upload(filename, contents) => multipart(key, contents).fileName(filename)
-            }
+        val parts = files.collect {
+          case (key, InputFile.Upload(filename, contents)) =>
+            multipart(CaseConversions.snakenize(key), contents)
+              .fileName(filename)
         }
 
-        val fields = parse(marshalling.toJson(request)).fold(throw _, _.asObject.map {
-          _.toMap.mapValues { json =>
-            json.asString.getOrElse(marshalling.printer.pretty(json))
-          }
-        })
+        val fields =
+          parse(marshalling.toJson(request)).fold(throw _, _.asObject.map {
+            _.toMap.mapValues { json =>
+              json.asString.getOrElse(marshalling.printer.pretty(json))
+            }
+          })
 
         val params = fields.getOrElse(Map())
 

@@ -2,7 +2,7 @@ package canoe.models.outgoing
 
 import canoe.models.Currency.Currency
 import canoe.models.ParseMode.ParseMode
-import canoe.models.{InputFile, InputMedia, LabeledPrice}
+import canoe.models.{InputFile, LabeledPrice}
 
 sealed trait MessageContent
 
@@ -60,10 +60,6 @@ case class InvoiceContent(title: String,
 case class LocationContent(latitude: Double,
                            longitude: Double,
                            livePeriod: Option[Int] = None) extends MessageContent
-
-
-case class MediaGroupContent(media: List[InputMedia]) extends MessageContent
-
 
 case class TextContent(text: String,
                        parseMode: Option[ParseMode] = None,

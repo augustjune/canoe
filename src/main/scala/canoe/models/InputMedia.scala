@@ -3,17 +3,11 @@ package canoe.models
 import canoe.models.ParseMode.ParseMode
 
 sealed trait InputMedia {
-  def getFiles: List[(String, InputFile)] = {
-    val attachPrefix = "attach://"
-    val t = this match {
-      case photo: InputMediaPhoto => photo.photo.map(photo.media.stripPrefix(attachPrefix) -> _)
-      case video: InputMediaVideo => video.video.map(video.media.stripPrefix(attachPrefix) -> _)
-      case audio: InputMediaAudio => audio.audio.map(audio.media.stripPrefix(attachPrefix) -> _)
-      case document: InputMediaDocument => document.document.map(document.media.stripPrefix(attachPrefix) -> _)
-      case animation: InputMediaAnimation => animation.animation.map(animation.media.stripPrefix(attachPrefix) -> _)
-    }
-    t.toList
-  }
+  def getFiles: List[(String, InputFile)] = List(`type` -> media)
+
+  def media: InputFile
+
+  def `type`: String
 }
 
 /**
@@ -24,14 +18,12 @@ sealed trait InputMedia {
   *                pass an HTTP URL for Telegram to get a file from the Internet,
   *                or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name.
   *                More info on Sending Files »
-  * @param photo   InputFile for the "attach://file_attach_name" case.
   *
   * @param caption String Optional. Caption of the photo to be sent, 0-200 characters
   * @param parseMode String Optional. Send Markdown or HTML, if you want Telegram apps to show bold, italic,
   *                  fixed-width text or inline URLs in the media caption.
   */
-case class InputMediaPhoto(media     : String,
-                           photo     : Option[InputFile], // file to attach
+case class InputMediaPhoto(media     : InputFile,
                            caption   : Option[String] = None,
                            parseMode : Option[ParseMode] = None,
                            `type`    : String = "photo") extends InputMedia
@@ -52,8 +44,7 @@ case class InputMediaPhoto(media     : String,
   *                  fixed-width text or inline URLs in the media caption.
   * @param supportsStreaming Boolean Optional. Pass True, if the uploaded video is suitable for streaming
   */
-case class InputMediaVideo(media     : String,
-                           video     : Option[InputFile] = None, // file to attach
+case class InputMediaVideo(media     : InputFile,
                            caption   : Option[String] = None,
                            width     : Option[Int] = None,
                            height    : Option[Int] = None,
@@ -75,8 +66,7 @@ case class InputMediaVideo(media     : String,
   * @param height    Integer Optional. Animation height
   * @param duration  Integer Optional. Animation duration
   */
-case class InputMediaAnimation(media     : String,
-                               animation : Option[InputFile] = None,// file to attach
+case class InputMediaAnimation(media     : InputFile,
                                thumb     : Option[InputFile] = None,
                                caption   : Option[String] = None,
                                parseMode : Option[ParseMode] = None,
@@ -102,8 +92,7 @@ case class InputMediaAnimation(media     : String,
   * @param performer String Optional. Performer of the audio
   * @param title     String Optional. Title of the audio
   */
-case class InputMediaAudio(media     : String,
-                           audio     : Option[InputFile] = None, // file to attach
+case class InputMediaAudio(media     : InputFile,
                            thumb     : Option[InputFile] = None,
                            caption   : Option[String] = None,
                            parseMode : Option[ParseMode] = None,
@@ -122,8 +111,7 @@ case class InputMediaAudio(media     : String,
   * @param caption    String Optional. Caption of the document to be sent, 0-200 characters
   * @param parseMode  String 	Optional. Send Markdown or HTML, if you want Telegram apps to show bold, italic, fixed-width text or inline URLs in the media caption.
   */
-case class InputMediaDocument(media     : String,
-                              document  : Option[InputFile] = None, // file to attach
+case class InputMediaDocument(media     : InputFile,
                               thumb     : Option[InputFile] = None,
                               caption   : Option[String] = None,
                               parseMode : Option[ParseMode] = None,

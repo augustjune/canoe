@@ -20,10 +20,10 @@ import canoe.models.ParseMode.ParseMode
 import canoe.models.UpdateType.UpdateType
 import canoe.models._
 import canoe.models.messages.{ChannelCreated, ChatMemberAdded, ChatMemberLeft, ChatPhotoDeleted, ChatTitleChanged, ContactMessage, GameMessage, MessagePinned, MigratedFromGroup, MigratedToSupergroup, StickerMessage, SuccessfulPaymentMessage, VenueMessage, VideoMessage, VideoNoteMessage, VoiceMessage, WebsiteConnected, _}
-import io.circe.Encoder
 import io.circe.generic.auto._
 import io.circe.generic.semiauto._
 import io.circe.syntax._
+import io.circe.{Encoder, Json}
 
 /** Circe marshalling borrowed/inspired from [[https://github.com/nikdon/telepooz]]
   */
@@ -259,9 +259,9 @@ trait CirceEncoders {
   implicit val answerInlineQueryEncoder: Encoder[AnswerInlineQuery] = deriveEncoder[AnswerInlineQuery]
 
   // Methods
-  implicit val getMeEncoder: Encoder[GetMe.type] = Encoder.instance(_ ⇒ io.circe.Json.Null)
-  implicit val deleteWebhookEncoder: Encoder[DeleteWebhook.type] = Encoder.instance(_ ⇒ io.circe.Json.Null)
-  implicit val getWebhookInfoEncoder: Encoder[GetWebhookInfo.type] = Encoder.instance(_ ⇒ io.circe.Json.Null)
+  implicit val getMeEncoder: Encoder[GetMe.type] = Encoder.instance(_ ⇒ Json.Null)
+  implicit val deleteWebhookEncoder: Encoder[DeleteWebhook.type] = Encoder.instance(_ ⇒ Json.Null)
+  implicit val getWebhookInfoEncoder: Encoder[GetWebhookInfo.type] = Encoder.instance(_ ⇒ Json.Null)
 
   implicit val updatesTypeEncoder: Encoder[UpdateType] = Encoder[String].contramap(e => CaseConversions.snakenize(e.toString))
 
@@ -270,7 +270,22 @@ trait CirceEncoders {
   implicit val getUpdatesEncoder: Encoder[GetUpdates] = deriveEncoder[GetUpdates]
 
   // Ignore InputFiles as JSON.
-  implicit def inputFileEncoder: Encoder[InputFile] = Encoder.instance(_ ⇒ io.circe.Json.Null)
+  implicit def inputFileEncoder: Encoder[InputFile] = Encoder.instance[InputFile] {
+    case InputFile.Upload(_, _) => Json.Null
+    case InputFile.Existing(handle) => Json.fromString(handle)
+  }
+
+  implicit def inputMediaEncoder: Encoder[InputMedia] = Encoder.instance[InputMedia] { input =>
+    input.media match {
+      case InputFile.Upload(_, _) =>
+        Json.Null
+      case InputFile.Existing(handle) =>
+        Json.obj(
+          "type" -> Json.fromString(input.`type`),
+          "media" -> Json.fromString(handle)
+        )
+    }
+  }
 
   implicit val sendLocationEncoder: Encoder[SendLocation] = deriveEncoder[SendLocation]
   implicit val sendVenueEncoder: Encoder[SendVenue] = deriveEncoder[SendVenue]
@@ -350,7 +365,11 @@ trait CirceEncoders {
   implicit val createNewStickerSetEncoder: Encoder[CreateNewStickerSet] = deriveEncoder[CreateNewStickerSet]
   implicit val sendAudioEncoder: Encoder[SendAudio] = deriveEncoder[SendAudio]
   implicit val sendDocumentEncoder: Encoder[SendDocument] = deriveEncoder[SendDocument]
-  implicit val sendMediaGroupEncoder: Encoder[SendMediaGroup] = deriveEncoder[SendMediaGroup]
+  implicit val sendMediaGroupEncoder: Encoder[SendMediaGroup] =
+    deriveEncoder[SendMediaGroup].contramap[SendMediaGroup](s => s.copy(media = s.media.filter(_.media match {
+      case InputFile.Upload(_, _) => false
+      case InputFile.Existing(_) => true
+    })))
   implicit val sendPhotoEncoder: Encoder[SendPhoto] = deriveEncoder[SendPhoto]
   implicit val sendStickerEncoder: Encoder[SendSticker] = deriveEncoder[SendSticker]
   implicit val sendVideoEncoder: Encoder[SendVideo] = deriveEncoder[SendVideo]

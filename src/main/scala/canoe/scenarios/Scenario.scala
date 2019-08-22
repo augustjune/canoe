@@ -7,6 +7,7 @@ import cats.{Applicative, Monad}
 import fs2.{Pipe, Pull, Stream}
 
 sealed trait Scenario[F[_], -I, +O] extends Pipe[F, I, O] {
+
   def apply(input: Stream[F, I]): Stream[F, O] =
     loop(this, input, Nil).collect {
       case (Matched(o), _) => o
@@ -26,41 +27,44 @@ sealed trait Scenario[F[_], -I, +O] extends Pipe[F, I, O] {
     */
   def cancelWith[I2 <: I](
     p: I2 => Boolean
-  )(cancellation: I2 => F[Any]): Scenario[F, I2, O] =
+  )(cancellation: I2 => F[Unit]): Scenario[F, I2, O] =
     Cancellable(this, p, Some(cancellation))
 
-  def tolerateN[I2 <: I, A](n: Int)(fn: I2 => F[A]): Scenario[F, I2, O] =
+  def tolerateN[I2 <: I](n: Int)(fn: I2 => F[Unit]): Scenario[F, I2, O] =
     Tolerate(this, Some(n), fn)
 
-  def tolerate[I2 <: I, A](fn: I2 => F[A]): Scenario[F, I2, O] =
+  def tolerate[I2 <: I](fn: I2 => F[Unit]): Scenario[F, I2, O] =
     tolerateN(1)(fn)
 
-  def tolerateAll[I2 <: I, A](fn: I2 => F[A]): Scenario[F, I2, O] =
+  def tolerateAll[I2 <: I](fn: I2 => F[Unit]): Scenario[F, I2, O] =
     Tolerate(this, None, fn)
 }
 
-final case class Eval[F[_], I, A](fa: F[A]) extends Scenario[F, I, A]
+private final case class Eval[F[_], I, A](fa: F[A]) extends Scenario[F, I, A]
 
-final case class Next[F[_], A](p: A => Boolean) extends Scenario[F, A, A]
+private final case class Next[F[_], A](p: A => Boolean)
+    extends Scenario[F, A, A]
 
-final case class Start[F[_], A](p: A => Boolean) extends Scenario[F, A, A]
+private final case class Start[F[_], A](p: A => Boolean)
+    extends Scenario[F, A, A]
 
-final case class Bind[F[_], I, O1, O2](scenario: Scenario[F, I, O1],
-                                       fn: O1 => Scenario[F, I, O2])
+private final case class Bind[F[_], I, O1, O2](scenario: Scenario[F, I, O1],
+                                               fn: O1 => Scenario[F, I, O2])
     extends Scenario[F, I, O2]
 
-final case class Mapped[F[_], I, O1, O2](scenario: Scenario[F, I, O1],
-                                         fn: O1 => O2)
+private final case class Mapped[F[_], I, O1, O2](scenario: Scenario[F, I, O1],
+                                                 fn: O1 => O2)
     extends Scenario[F, I, O2]
 
-final case class Cancellable[F[_], I, O](scenario: Scenario[F, I, O],
-                                         cancelOn: I => Boolean,
-                                         finalizer: Option[I => F[Any]])
-    extends Scenario[F, I, O]
+private final case class Cancellable[F[_], I, O](
+  scenario: Scenario[F, I, O],
+  cancelOn: I => Boolean,
+  finalizer: Option[I => F[Unit]]
+) extends Scenario[F, I, O]
 
-final case class Tolerate[F[_], I, O, A](scenario: Scenario[F, I, O],
-                                         limit: Option[Int],
-                                         fn: I => F[A])
+private final case class Tolerate[F[_], I, O](scenario: Scenario[F, I, O],
+                                              limit: Option[Int],
+                                              fn: I => F[Unit])
     extends Scenario[F, I, O]
 
 object Scenario {
@@ -71,7 +75,30 @@ object Scenario {
 
   def next[F[_], I](p: I => Boolean): Scenario[F, I, I] = Next(p)
 
-  sealed trait Result[+E, +A] {
+  implicit def monadInstance[F[_]: Applicative, I]: Monad[Scenario[F, I, ?]] =
+    new Monad[Scenario[F, I, ?]] {
+      def pure[A](x: A): Scenario[F, I, A] = Eval(Applicative[F].pure(x))
+
+      def flatMap[A, B](
+        scenario: Scenario[F, I, A]
+      )(fn: A => Scenario[F, I, B]): Scenario[F, I, B] =
+        scenario.flatMap(fn)
+
+      override def map[A, B](
+        scenario: Scenario[F, I, A]
+      )(f: A => B): Scenario[F, I, B] =
+        scenario.map(f)
+
+      def tailRecM[A, B](
+        a: A
+      )(f: A => Scenario[F, I, Either[A, B]]): Scenario[F, I, B] =
+        flatMap(f(a)) {
+          case Left(a)  => tailRecM(a)(f)
+          case Right(b) => Eval(Applicative[F].pure(b))
+        }
+    }
+
+  private sealed trait Result[+E, +A] {
     def map[B](f: A => B): Result[E, B] = this match {
       case Matched(a)          => Matched(f(a))
       case same @ Missed(_)    => same
@@ -79,14 +106,14 @@ object Scenario {
     }
   }
 
-  final case class Matched[A](a: A) extends Result[Nothing, A]
-  final case class Missed[E](message: E) extends Result[E, Nothing]
-  final case class Cancelled[E](message: E) extends Result[E, Nothing]
+  private final case class Matched[A](a: A) extends Result[Nothing, A]
+  private final case class Missed[E](message: E) extends Result[E, Nothing]
+  private final case class Cancelled[E](message: E) extends Result[E, Nothing]
 
   private def loop[F[_], I, O](
     scenario: Scenario[F, I, O],
     input: Stream[F, I],
-    cancelTokens: List[(I => Boolean, Option[I => F[Any]])]
+    cancelTokens: List[(I => Boolean, Option[I => F[Unit]])]
   ): Stream[F, (Result[I, O], Stream[F, I])] = {
     scenario match {
       case Eval(fa) =>
@@ -160,27 +187,4 @@ object Scenario {
         }
     }
   }
-
-  implicit def monadInstance[F[_]: Applicative, I]: Monad[Scenario[F, I, ?]] =
-    new Monad[Scenario[F, I, ?]] {
-      def pure[A](x: A): Scenario[F, I, A] = Eval(Applicative[F].pure(x))
-
-      def flatMap[A, B](
-        scenario: Scenario[F, I, A]
-      )(fn: A => Scenario[F, I, B]): Scenario[F, I, B] =
-        scenario.flatMap(fn)
-
-      override def map[A, B](
-        scenario: Scenario[F, I, A]
-      )(f: A => B): Scenario[F, I, B] =
-        scenario.map(f)
-
-      def tailRecM[A, B](
-        a: A
-      )(f: A => Scenario[F, I, Either[A, B]]): Scenario[F, I, B] =
-        flatMap(f(a)) {
-          case Left(a)  => tailRecM(a)(f)
-          case Right(b) => Eval(Applicative[F].pure(b))
-        }
-    }
 }

@@ -1,6 +1,5 @@
 package canoe.scenarios
 
-import cats.Id
 import cats.effect.IO
 import fs2.{Pure, Stream}
 import org.scalatest.FunSuite
@@ -122,38 +121,38 @@ class ScenarioSpec extends FunSuite {
 
 
   test("Scenario.next#tolerate doesn't skip the element if it matches") {
-    val scenario: Scenario[Id, String, String] =
-      Scenario.next(predicate).tolerate(_ => (): Id[Unit])
+    val scenario: Scenario[IO, String, String] =
+      Scenario.next(predicate).tolerate(_ => IO.unit)
 
     val input = Stream(s"1.$expected", s"2.$expected")
 
-    assert(input.through(scenario).covaryId[IO].toList().head.startsWith("1"))
+    assert(input.through(scenario).toList().head.startsWith("1"))
   }
 
   test("Scenario.next#tolerate skips the element if it doesn't match") {
-    val scenario: Scenario[Id, String, String] =
-      Scenario.next(predicate).tolerate(_ => (): Id[Unit])
+    val scenario: Scenario[IO, String, String] =
+      Scenario.next(predicate).tolerate(_ => IO.unit)
 
     val input = Stream("1", s"2.$expected")
 
-    assert(input.through(scenario).covaryId[IO].toList().head.startsWith("2"))
+    assert(input.through(scenario).toList().head.startsWith("2"))
   }
 
   test("Scenario.next#tolerateN skips up to N elements if they don't match") {
     val n = 5
-    val scenario: Scenario[Id, String, String] =
-      Scenario.next(predicate).tolerateN(n)(_ => (): Id[Unit])
+    val scenario: Scenario[IO, String, String] =
+      Scenario.next(predicate).tolerateN(n)(_ => IO.unit)
 
     val input = Stream("").repeatN(5) ++ Stream(s"2.$expected")
 
-    assert(input.through(scenario).covaryId[IO].toList().head.startsWith("2"))
+    assert(input.through(scenario).toList().head.startsWith("2"))
   }
 
   test("Scenario.eval doesn't consume any message") {
-    val scenario: Scenario[Id, Unit, Unit] = Scenario.eval((): Id[Unit])
+    val scenario: Scenario[IO, Unit, Unit] = Scenario.eval(IO.unit)
     val input: Stream[Pure, Unit] = Stream.empty
 
-    assert(input.through(scenario).covaryId[IO].size == 1)
+    assert(input.through(scenario).size == 1)
   }
 
   test("Scenario.eval evaluates effect") {
@@ -166,14 +165,14 @@ class ScenarioSpec extends FunSuite {
     assert(evaluated)
   }
 
-  test("Action evaluates value in an effect") {
+  test("Scenario.eval evaluates value in an effect") {
     val scenario: Scenario[IO, Unit, Int] = Scenario.eval(IO.pure(1))
     val input: Stream[Pure, Unit] = Stream.empty
 
     assert(input.through(scenario).value() == 1)
   }
 
-  test("Action evaluates effect only once") {
+  test("Scenario.eval evaluates effect only once") {
     var times = 0
     val scenario: Scenario[IO, Unit, Unit] = Scenario.eval(IO { times = times + 1 })
     val input: Stream[Pure, Unit] = Stream.empty

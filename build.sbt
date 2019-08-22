@@ -1,41 +1,67 @@
-name := "canoe"
-
-version := "0.1"
-
-scalaVersion := "2.12.8"
-
-scalacOptions ++= Seq(
-  "-feature",
-  "-language:higherKinds", // Allow higher-kinded types
-  "-language:postfixOps", // Allow higher-kinded types
-  "-language:implicitConversions", // Allow definition of implicit functions called views
-  "-Xfatal-warnings",
-  "-Ypartial-unification"
+lazy val root = (project in file(".")).settings(
+  commonSettings,
+  compilerOptions,
+  typeSystemEnhancements,
+  dependencies,
+  tests
 )
+
+val fs2Version                 = "1.0.5"
+val catsCoreVersion            = "1.6.1"
+val catsEffectVersion          = "1.4.0"
+val circeVersion               = "0.11.1"
+val sttpVersion                = "1.6.4"
+val scalatestVersion           = "3.0.8"
+val kindProjectorVersion       = "0.10.3"
+val typesafeConfigVersion      = "1.3.4"
+
+lazy val commonSettings = Seq(
+  organization := "com.augustjune",
+  name := "canoe",
+  scalaVersion := "2.12.8",
+  version := "0.0.1"
+)
+
+lazy val compilerOptions =
+  scalacOptions ++= Seq(
+    "-Xfatal-warnings",                  // Fail the compilation if there are any warnings.
+    "-Ypartial-unification",             // Enable partial unification in type constructor inference
+    "-deprecation",                      // Emit warning and location for usages of deprecated APIs.
+    "-explaintypes",                     // Explain type errors in more detail.
+    "-feature",                          // Emit warning and location for usages of features that should be imported explicitly.
+    "-language:higherKinds",             // Allow higher-kinded types
+    "-language:postfixOps",              // Allow higher-kinded types
+    "-language:implicitConversions"      // Allow definition of implicit functions called views
+  )
 
 resolvers += Resolver.sonatypeRepo("releases")
 
-addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.10.3")
+lazy val typeSystemEnhancements =
+  addCompilerPlugin("org.typelevel" %% "kind-projector" % kindProjectorVersion)
 
-libraryDependencies += "org.typelevel" %% "cats-core" % "2.0.0-M1"
-libraryDependencies += "org.typelevel" %% "cats-free" % "2.0.0-M1"
-libraryDependencies += "org.typelevel" %% "cats-effect" % "1.3.0"
+lazy val dependencies =
+  libraryDependencies ++= Seq(
+    "co.fs2" %% "fs2-core" % fs2Version,
+    "org.typelevel" %% "cats-core" % catsCoreVersion,
+    "org.typelevel" %% "cats-free" % catsCoreVersion,
+    "org.typelevel" %% "cats-effect" % catsEffectVersion,
+    "io.circe" %% "circe-core" % circeVersion,
+    "io.circe" %% "circe-generic" % circeVersion,
+    "io.circe" %% "circe-generic-extras" % circeVersion,
+    "io.circe" %% "circe-parser" % circeVersion,
+    "com.softwaremill.sttp" %% "core" % sttpVersion,
+    "com.softwaremill.sttp" %% "async-http-client-backend-cats" % sttpVersion,
+    "com.typesafe" % "config" % typesafeConfigVersion
+  )
 
-libraryDependencies += "co.fs2" %% "fs2-core" % "1.0.4"
+lazy val tests = {
+  val dependencies =
+    libraryDependencies ++= Seq(
+      "org.scalatest" %% "scalatest" % scalatestVersion
+    ).map(_ % Test)
 
-libraryDependencies += "com.softwaremill.sttp" %% "core" % "1.5.19"
-libraryDependencies += "com.softwaremill.sttp" %% "async-http-client-backend-cats" % "1.5.19"
+  val frameworks =
+    testFrameworks := Seq(TestFrameworks.ScalaTest)
 
-libraryDependencies += "com.typesafe" % "config" % "1.3.4"
-
-libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.14.0" % Test
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.8" % Test
-
-val circeVersion = "0.10.0"
-
-libraryDependencies ++= Seq(
-  "io.circe" %% "circe-core",
-  "io.circe" %% "circe-generic",
-  "io.circe" %% "circe-generic-extras",
-  "io.circe" %% "circe-parser"
-).map(_ % circeVersion)
+  Seq(dependencies, frameworks)
+}

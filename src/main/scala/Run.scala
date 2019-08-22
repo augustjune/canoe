@@ -4,7 +4,7 @@ import canoe.clients.SttpClient
 import canoe.models.messages.{AudioMessage, TextMessage}
 import canoe.models.outgoing.BotMessage
 import canoe.models.{Chat, InputFile, InputMediaPhoto, outgoing}
-import canoe.scenarios.{Interaction, Scenario}
+import canoe.scenarios.Scenario
 import cats.Show
 import cats.effect.{ExitCode, IO, IOApp}
 import cats.implicits._
@@ -25,10 +25,10 @@ object Run extends IOApp {
   implicit val client = new SttpClient[IO](token)
   val bot = new Bot(client)
 
-  val respondAudio: Interaction[IO, Unit] =
+  val respondAudio: Scenario[IO, Unit] =
     for {
-      m <- Interaction.receive { case m: AudioMessage => m }
-      _ <- Interaction.eval(m.chat.send(BotMessage(m.audio)))
+      m <- Scenario.start { case m: AudioMessage => m }
+      _ <- Scenario.eval(m.chat.send(BotMessage(m.audio)))
     } yield ()
 
   def count(chat: Chat, d: FiniteDuration, i: Int): IO[Unit] =
@@ -39,32 +39,32 @@ object Run extends IOApp {
       _ <- count(chat, d, i + 1)
     } yield ()
 
-  val counter: Interaction[IO, Unit] =
+  val counter: Scenario[IO, Unit] =
     for {
-      m <- Interaction.receive { case m: TextMessage if m.text.startsWith("/count") => m }
+      m <- Scenario.start { case m: TextMessage if m.text.startsWith("/count") => m }
       start = Try(m.text.split(" ")(1).toInt).getOrElse(0)
-      _ <- Interaction.eval(count(m.chat, 1.second, start).start)
+      _ <- Scenario.eval(count(m.chat, 1.second, start).start)
     } yield ()
 
-  val repeat: Interaction[IO, Unit] =
+  val repeat: Scenario[IO, Unit] =
     for {
-      m <- Interaction.expect { case m: TextMessage => m }
+      m <- Scenario.next { case m: TextMessage => m }
       _ <- if (m.text.contains("stop")) Scenario.eval(m.chat.send(outgoing.BotMessage("Ok, that's all")))
-      else Interaction.eval(m.chat.send(BotMessage(m.text))).flatMap(_ => repeat)
+      else Scenario.eval(m.chat.send(BotMessage(m.text))).flatMap(_ => repeat)
     } yield ()
 
-  val mock: Interaction[IO, Unit] =
+  val mock: Scenario[IO, Unit] =
     for {
-      start <- Interaction.receive { case m: TextMessage if m.text.contains("start") => m }
-      _ <- Interaction.eval(start.chat.send(outgoing.BotMessage("Starting mocking")))
+      start <- Scenario.start { case m: TextMessage if m.text.contains("start") => m }
+      _ <- Scenario.eval(start.chat.send(outgoing.BotMessage("Starting mocking")))
       _ <- repeat
     } yield ()
 
-  val repsondMediaGroup: Interaction[IO, Unit] =
+  val repsondMediaGroup: Scenario[IO, Unit] =
   for {
-    chat <- Interaction.receive { case m: TextMessage if m.text.contains("group") => m.chat }
-    messages <- Interaction.eval(chat.sendAlbum(List.fill(10)(InputMediaPhoto(InputFile.fromUrl("https://ichef.bbci.co.uk/news/660/cpsprodpb/1486F/production/_105597048_snakes8.jpg")))))
-    _ <- Interaction.eval(IO(println(s"Group messages [${{messages.length}}]: ${messages.map(_.messageId)}")))
+    chat <- Scenario.start { case m: TextMessage if m.text.contains("group") => m.chat }
+    messages <- Scenario.eval(chat.sendAlbum(List.fill(10)(InputMediaPhoto(InputFile.fromUrl("https://ichef.bbci.co.uk/news/660/cpsprodpb/1486F/production/_105597048_snakes8.jpg")))))
+    _ <- Scenario.eval(IO(println(s"Group messages [${{messages.length}}]: ${messages.map(_.messageId)}")))
   } yield ()
 
   val updates = bot.follow(repsondMediaGroup)

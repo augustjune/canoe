@@ -1,24 +1,24 @@
 package canoe.scenarios
 
-import canoe.scenarios.Scenario._
+import canoe.scenarios.Episode._
 import cats.instances.list._
 import cats.syntax.all._
 import cats.{Applicative, Monad}
 import fs2.{Pipe, Pull, Stream}
 
-sealed trait Scenario[F[_], -I, +O] extends Pipe[F, I, O] {
+sealed trait Episode[F[_], -I, +O] extends Pipe[F, I, O] {
 
   def apply(input: Stream[F, I]): Stream[F, O] =
-    loop(this, input, Nil).collect {
+    find(this, input, Nil).collect {
       case (Matched(o), _) => o
     }
 
-  def flatMap[I2 <: I, O2](fn: O => Scenario[F, I2, O2]): Scenario[F, I2, O2] =
+  def flatMap[I2 <: I, O2](fn: O => Episode[F, I2, O2]): Episode[F, I2, O2] =
     Bind(this, fn)
 
-  def map[O2](fn: O => O2): Scenario[F, I, O2] = Mapped(this, fn)
+  def map[O2](fn: O => O2): Episode[F, I, O2] = Mapped(this, fn)
 
-  def cancelOn[I2 <: I](p: I2 => Boolean): Scenario[F, I2, O] =
+  def cancelOn[I2 <: I](p: I2 => Boolean): Episode[F, I2, O] =
     Cancellable(this, p, None)
 
   /**
@@ -27,71 +27,70 @@ sealed trait Scenario[F[_], -I, +O] extends Pipe[F, I, O] {
     */
   def cancelWith[I2 <: I](
     p: I2 => Boolean
-  )(cancellation: I2 => F[Unit]): Scenario[F, I2, O] =
+  )(cancellation: I2 => F[Unit]): Episode[F, I2, O] =
     Cancellable(this, p, Some(cancellation))
 
-  def tolerateN[I2 <: I](n: Int)(fn: I2 => F[Unit]): Scenario[F, I2, O] =
+  def tolerateN[I2 <: I](n: Int)(fn: I2 => F[Unit]): Episode[F, I2, O] =
     Tolerate(this, Some(n), fn)
 
-  def tolerate[I2 <: I](fn: I2 => F[Unit]): Scenario[F, I2, O] =
+  def tolerate[I2 <: I](fn: I2 => F[Unit]): Episode[F, I2, O] =
     tolerateN(1)(fn)
 
-  def tolerateAll[I2 <: I](fn: I2 => F[Unit]): Scenario[F, I2, O] =
+  def tolerateAll[I2 <: I](fn: I2 => F[Unit]): Episode[F, I2, O] =
     Tolerate(this, None, fn)
 }
 
-private final case class Eval[F[_], I, A](fa: F[A]) extends Scenario[F, I, A]
+private final case class Eval[F[_], I, A](fa: F[A]) extends Episode[F, I, A]
 
-private final case class Next[F[_], A](p: A => Boolean)
-    extends Scenario[F, A, A]
+private final case class Next[F[_], A](p: A => Boolean) extends Episode[F, A, A]
 
-private final case class Start[F[_], A](p: A => Boolean)
-    extends Scenario[F, A, A]
+private final case class First[F[_], A](p: A => Boolean)
+    extends Episode[F, A, A]
 
-private final case class Bind[F[_], I, O1, O2](scenario: Scenario[F, I, O1],
-                                               fn: O1 => Scenario[F, I, O2])
-    extends Scenario[F, I, O2]
+private final case class Bind[F[_], I, O1, O2](episode: Episode[F, I, O1],
+                                               fn: O1 => Episode[F, I, O2])
+    extends Episode[F, I, O2]
 
-private final case class Mapped[F[_], I, O1, O2](scenario: Scenario[F, I, O1],
+private final case class Mapped[F[_], I, O1, O2](episode: Episode[F, I, O1],
                                                  fn: O1 => O2)
-    extends Scenario[F, I, O2]
+    extends Episode[F, I, O2]
 
 private final case class Cancellable[F[_], I, O](
-  scenario: Scenario[F, I, O],
+  episode: Episode[F, I, O],
   cancelOn: I => Boolean,
   finalizer: Option[I => F[Unit]]
-) extends Scenario[F, I, O]
+) extends Episode[F, I, O]
 
-private final case class Tolerate[F[_], I, O](scenario: Scenario[F, I, O],
+private final case class Tolerate[F[_], I, O](episode: Episode[F, I, O],
                                               limit: Option[Int],
                                               fn: I => F[Unit])
-    extends Scenario[F, I, O]
+    extends Episode[F, I, O]
 
-object Scenario {
+object Episode {
 
-  def eval[F[_], I, A](fa: F[A]): Scenario[F, I, A] = Eval(fa)
+  def eval[F[_], I, A](fa: F[A]): Episode[F, I, A] = Eval(fa)
 
-  def start[F[_], I](p: I => Boolean): Scenario[F, I, I] = Start(p)
+  def first[F[_], I](p: I => Boolean): Episode[F, I, I] = First(p)
 
-  def next[F[_], I](p: I => Boolean): Scenario[F, I, I] = Next(p)
+  def next[F[_], I](p: I => Boolean): Episode[F, I, I] = Next(p)
 
-  implicit def monadInstance[F[_]: Applicative, I]: Monad[Scenario[F, I, ?]] =
-    new Monad[Scenario[F, I, ?]] {
-      def pure[A](x: A): Scenario[F, I, A] = Eval(Applicative[F].pure(x))
+  implicit def monadInstance[F[_]: Applicative, I]: Monad[Episode[F, I, ?]] =
+    new Monad[Episode[F, I, ?]] {
+      def pure[A](x: A): Episode[F, I, A] = Eval(Applicative[F].pure(x))
 
       def flatMap[A, B](
-        scenario: Scenario[F, I, A]
-      )(fn: A => Scenario[F, I, B]): Scenario[F, I, B] =
-        scenario.flatMap(fn)
+        episode: Episode[F, I, A]
+      )(fn: A => Episode[F, I, B]): Episode[F, I, B] =
+        episode.flatMap(fn)
 
       override def map[A, B](
-        scenario: Scenario[F, I, A]
-      )(f: A => B): Scenario[F, I, B] =
-        scenario.map(f)
+        episode: Episode[F, I, A]
+      )(f: A => B): Episode[F, I, B] =
+        episode.map(f)
 
       def tailRecM[A, B](
         a: A
-      )(f: A => Scenario[F, I, Either[A, B]]): Scenario[F, I, B] =
+      )(f: A => Episode[F, I, Either[A, B]]): Episode[F, I, B] =
         flatMap(f(a)) {
           case Left(a)  => tailRecM(a)(f)
           case Right(b) => Eval(Applicative[F].pure(b))
@@ -110,16 +109,16 @@ object Scenario {
   private final case class Missed[E](message: E) extends Result[E, Nothing]
   private final case class Cancelled[E](message: E) extends Result[E, Nothing]
 
-  private def loop[F[_], I, O](
-    scenario: Scenario[F, I, O],
+  private def find[F[_], I, O](
+    episode: Episode[F, I, O],
     input: Stream[F, I],
     cancelTokens: List[(I => Boolean, Option[I => F[Unit]])]
   ): Stream[F, (Result[I, O], Stream[F, I])] = {
-    scenario match {
+    episode match {
       case Eval(fa) =>
         Stream.eval(fa).map(o => Matched(o) -> input)
 
-      case Start(p: (I => Boolean)) =>
+      case First(p: (I => Boolean)) =>
         def go(in: Stream[F, I]): Pull[F, (Result[I, O], Stream[F, I]), Unit] =
           in.dropWhile(!p(_)).pull.uncons1.flatMap {
             case Some((m, rest)) =>
@@ -150,20 +149,20 @@ object Scenario {
 
         go(input).stream
 
-      case Cancellable(scenario, p, f) =>
-        loop(scenario, input, (p, f) :: cancelTokens)
+      case Cancellable(episode, p, f) =>
+        find(episode, input, (p, f) :: cancelTokens)
 
-      case Tolerate(scenario, limit, fn) =>
+      case Tolerate(episode, limit, fn) =>
         limit match {
           case Some(n) if n <= 0 =>
-            loop(scenario, input, cancelTokens)
+            find(episode, input, cancelTokens)
 
           case _ =>
-            loop(scenario, input, cancelTokens).flatMap {
+            find(episode, input, cancelTokens).flatMap {
               case (Cancelled(m), rest) => Stream(Cancelled(m) -> rest)
               case (Missed(m), rest) =>
-                Stream.eval(fn(m)) >> loop(
-                  Tolerate(scenario, limit.map(_ - 1), fn),
+                Stream.eval(fn(m)) >> find(
+                  Tolerate(episode, limit.map(_ - 1), fn),
                   rest,
                   cancelTokens
                 )
@@ -172,17 +171,17 @@ object Scenario {
         }
 
       case Bind(prev, fn) =>
-        loop(prev, input, cancelTokens).flatMap {
+        find(prev, input, cancelTokens).flatMap {
           case (result, rest) =>
             result match {
-              case Matched(a)         => loop(fn(a), rest, cancelTokens)
+              case Matched(a)         => find(fn(a), rest, cancelTokens)
               case Missed(message)    => Stream(Missed(message) -> rest)
               case Cancelled(message) => Stream(Cancelled(message) -> rest)
             }
         }
 
       case Mapped(prev, fn) =>
-        loop(prev, input, cancelTokens).map {
+        find(prev, input, cancelTokens).map {
           case (result, rest) => result.map(fn) -> rest
         }
     }

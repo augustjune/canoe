@@ -1,4 +1,4 @@
-#canoe
+# canoe
 
 **canoe** is a compositional Scala Telegram Bot library. 
 It allows you to build interactive Telegram bots in a purely functional style.

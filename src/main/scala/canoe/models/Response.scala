@@ -1,5 +1,8 @@
 package canoe.models
 
+import canoe.marshalling.CirceDecoders
+import io.circe.Decoder
+
 /** Telegram Bot API Response object
   *
   * The response contains a JSON object. If 'ok' equals true, the request was successful and the result of the query can be found in the 'result' field.
@@ -17,3 +20,8 @@ case class Response[R](ok: Boolean,
                        description: Option[String] = None,
                        errorCode: Option[Int] = None,
                        parameters: Option[ResponseParameters] = None)
+
+object Response {
+
+  implicit def decoder[A: Decoder]: Decoder[Response[A]] = CirceDecoders.responseDecoder
+}

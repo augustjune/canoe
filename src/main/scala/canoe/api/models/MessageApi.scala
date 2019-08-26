@@ -1,13 +1,14 @@
 package canoe.api.models
 
-import canoe.clients.RequestHandler
+import canoe.api._
+import canoe.clients.TelegramClient
 import canoe.methods.messages._
 import canoe.models.messages.TelegramMessage
-import canoe.models.outgoing.BotMessage
+import canoe.models.outgoing._
 import canoe.models.{Chat, InlineKeyboardMarkup, Poll, ReplyMarkup}
 
 final class MessageApi[F[_]](message: TelegramMessage)
-                            (implicit client: RequestHandler[F]) {
+                            (implicit client: TelegramClient[F]) {
 
   private def chatId: Long = message.chat.id
   private def messageId: Int = message.messageId
@@ -18,8 +19,10 @@ final class MessageApi[F[_]](message: TelegramMessage)
   def forward(to: Chat, disableNotification: Option[Boolean] = None): F[TelegramMessage] =
     client.execute(ForwardMessage(to.id, chatId, disableNotification, messageId))
 
-  def reply(message: BotMessage): F[TelegramMessage] =
-    client.execute(message.asReplyToMessage(messageId).toRequest(chatId))
+  def reply(content: MessageContent,
+            replyMarkup: Option[ReplyMarkup] = None,
+            disableNotification: Option[Boolean] = None): F[TelegramMessage] =
+    message.chat.send(content, Some(messageId), replyMarkup, disableNotification)
 
   def editText(text: String): F[Either[Boolean, TelegramMessage]] =
     client.execute(EditMessageText(Some(chatId), Some(messageId), text = text))

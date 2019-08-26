@@ -6,7 +6,6 @@ import canoe.models.{InputFile, LabeledPrice}
 
 sealed trait MessageContent
 
-// ToDo - think about naming (e.g.: MessageAnimation, AnimationMessage, etc.)
 case class AnimationContent(animation: InputFile,
                             caption: String = "",
                             duration: Option[Int] = None,

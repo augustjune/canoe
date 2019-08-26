@@ -1,6 +1,6 @@
 package canoe.api
 
-import canoe.clients.RequestHandler
+import canoe.clients.TelegramClient
 import canoe.methods.updates.GetUpdates
 import canoe.models.Update
 import canoe.models.messages.TelegramMessage
@@ -11,7 +11,7 @@ import cats.implicits._
 import fs2.concurrent.Broadcast
 import fs2.{Pipe, Pull, Stream}
 
-class Bot[F[_]: Concurrent](client: RequestHandler[F]) {
+class Bot[F[_]: Concurrent](client: TelegramClient[F]) {
 
   def updates: Stream[F, Update] = pollUpdates(0)
 
@@ -56,7 +56,6 @@ class Bot[F[_]: Concurrent](client: RequestHandler[F]) {
   private def requestUpdates(offset: Long): F[(Long, List[Update])] =
     client
       .execute(GetUpdates(Some(offset)))
-      .map(_.toList)
       .map(updates => (lastId(updates).map(_ + 1).getOrElse(offset), updates))
 
 

@@ -13,14 +13,14 @@ case class GetChatMembersCount(chatId: ChatId) extends JsonRequest[Int]
 
 object GetChatMembersCount {
 
-  implicit val method: Method[GetChatMembersCount, Boolean] =
-    new Method[GetChatMembersCount, Boolean] {
+  implicit val method: Method[GetChatMembersCount, Int] =
+    new Method[GetChatMembersCount, Int] {
 
       def name: String = "getChatMembersCount"
 
       def encoder: Encoder[GetChatMembersCount] = CirceEncoders.getChatMembersCountEncoder
 
-      def decoder: Decoder[Boolean] = Decoder.decodeBoolean
+      def decoder: Decoder[Int] = Decoder.decodeInt
 
       def uploads(request: GetChatMembersCount): List[(String, InputFile)] = Nil
     }

@@ -1,8 +1,8 @@
 package canoe.methods.chats
 
-import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.marshalling.CirceEncoders
 import canoe.methods.{JsonRequest, Method}
-import canoe.models.{ChatId, InputFile, Update}
+import canoe.models.{ChatId, InputFile}
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -31,14 +31,14 @@ case class RestrictChatMember(chatId: ChatId,
 
 object RestrictChatMember {
 
-  implicit val method: Method[RestrictChatMember, List[Update]] =
-    new Method[RestrictChatMember, List[Update]] {
+  implicit val method: Method[RestrictChatMember, Boolean] =
+    new Method[RestrictChatMember, Boolean] {
 
       def name: String = "restrictChatMember"
 
       def encoder: Encoder[RestrictChatMember] = CirceEncoders.restrictChatMemberEncoder
 
-      def decoder: Decoder[List[Update]] = Decoder.decodeList(CirceDecoders.updateDecoder)
+      def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 
       def uploads(request: RestrictChatMember): List[(String, InputFile)] = Nil
     }

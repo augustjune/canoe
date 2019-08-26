@@ -1,7 +1,9 @@
 package canoe.methods.queries
 
-import canoe.methods.JsonRequest
-import canoe.models.InlineQueryResult
+import canoe.marshalling.CirceEncoders
+import canoe.methods.{JsonRequest, Method}
+import canoe.models.{InlineQueryResult, InputFile}
+import io.circe.{Decoder, Encoder}
 
 /** Use this method to send answers to an inline query. On success, True is returned.
   * No more than 50 results per query are allowed.
@@ -22,3 +24,18 @@ case class AnswerInlineQuery(inlineQueryId: String,
                              switchPmText: Option[String] = None,
                              switchPmParameter: Option[String] = None
                             ) extends JsonRequest[Boolean]
+
+object AnswerInlineQuery {
+
+  implicit val method: Method[AnswerInlineQuery, Boolean] =
+    new Method[AnswerInlineQuery, Boolean] {
+
+      def name: String = "answerInlineQuery"
+
+      def encoder: Encoder[AnswerInlineQuery] = CirceEncoders.answerInlineQueryEncoder
+
+      def decoder: Decoder[Boolean] = Decoder.decodeBoolean
+
+      def uploads(request: AnswerInlineQuery): List[(String, InputFile)] = Nil
+    }
+}

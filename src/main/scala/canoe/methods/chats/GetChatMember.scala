@@ -1,7 +1,9 @@
 package canoe.methods.chats
 
-import canoe.methods.JsonRequest
-import canoe.models.{ChatId, ChatMember}
+import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.methods.{JsonRequest, Method}
+import canoe.models.{ChatId, ChatMember, InputFile}
+import io.circe.{Decoder, Encoder}
 
 /** Use this method to get information about a member of a chat. Returns a ChatMember object on success.
   *
@@ -9,3 +11,18 @@ import canoe.models.{ChatId, ChatMember}
   * @param userId Integer Unique identifier of the target user
   */
 case class GetChatMember(chatId: ChatId, userId: Int) extends JsonRequest[ChatMember]
+
+object GetChatMember {
+
+  implicit val method: Method[GetChatMember, ChatMember] =
+    new Method[GetChatMember, ChatMember] {
+
+      def name: String = "getChatMember"
+
+      def encoder: Encoder[GetChatMember] = CirceEncoders.getChatMemberEncoder
+
+      def decoder: Decoder[ChatMember] = CirceDecoders.chatMemberDecoder
+
+      def uploads(request: GetChatMember): List[(String, InputFile)] = Nil
+    }
+}

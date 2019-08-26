@@ -1,8 +1,10 @@
 package canoe.methods.messages
 
-import canoe.methods.JsonRequest
+import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.methods.{JsonRequest, Method}
 import canoe.models.messages.TelegramMessage
-import canoe.models.{ChatId, ReplyMarkup}
+import canoe.models.{ChatId, InputFile, ReplyMarkup}
+import io.circe.{Decoder, Encoder}
 
 /** Use this method to send phone contacts.
   * On success, the sent Message is returned.
@@ -29,3 +31,18 @@ case class SendContact(chatId: ChatId,
                        replyToMessageId: Option[Int] = None,
                        replyMarkup: Option[ReplyMarkup] = None
                       ) extends JsonRequest[TelegramMessage]
+
+object SendContact {
+
+  implicit val method: Method[SendContact, TelegramMessage] =
+    new Method[SendContact, TelegramMessage] {
+
+      def name: String = "sendContact"
+
+      def encoder: Encoder[SendContact] = CirceEncoders.sendContactEncoder
+
+      def decoder: Decoder[TelegramMessage] = CirceDecoders.telegramMessageDecoder
+
+      def uploads(request: SendContact): List[(String, InputFile)] = Nil
+    }
+}

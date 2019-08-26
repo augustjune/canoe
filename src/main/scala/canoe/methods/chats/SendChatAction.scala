@@ -1,8 +1,10 @@
 package canoe.methods.chats
 
-import canoe.methods.JsonRequest
+import canoe.marshalling.CirceEncoders
+import canoe.methods.{JsonRequest, Method}
 import canoe.models.ChatAction.ChatAction
-import canoe.models.ChatId
+import canoe.models.{ChatId, InputFile}
+import io.circe.{Decoder, Encoder}
 
 /** Use this method when you need to tell the user that something is happening on the bot's side.
   * The status is set for 5 seconds or less (when a message arrives from your bot, Telegram clients clear its typing status).
@@ -18,3 +20,18 @@ import canoe.models.ChatId
   *                typing for text messages, upload_photo for photos, record_video or upload_video for videos, record_audio or upload_audio for audio files, upload_document for general files, find_location for location data.
   */
 case class SendChatAction(chatId : ChatId, action : ChatAction) extends JsonRequest[Boolean]
+
+object SendChatAction {
+
+  implicit val method: Method[SendChatAction, Boolean] =
+    new Method[SendChatAction, Boolean] {
+
+      def name: String = "sendChatAction"
+
+      def encoder: Encoder[SendChatAction] = CirceEncoders.sendChatActionEncoder
+
+      def decoder: Decoder[Boolean] = Decoder.decodeBoolean
+
+      def uploads(request: SendChatAction): List[(String, InputFile)] = Nil
+    }
+}

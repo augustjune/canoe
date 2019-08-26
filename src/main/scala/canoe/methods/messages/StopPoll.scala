@@ -1,7 +1,9 @@
 package canoe.methods.messages
 
-import canoe.methods.JsonRequest
-import canoe.models.{ChatId, Poll, ReplyMarkup}
+import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.methods.{JsonRequest, Method}
+import canoe.models.{ChatId, InputFile, Poll, ReplyMarkup}
+import io.circe.{Decoder, Encoder}
 
 /**
   * Use this method to stop a poll which was sent by the bot.
@@ -15,3 +17,18 @@ case class StopPoll(chatId      : ChatId,
                     messageId   : Int,
                     replyMarkup : Option[ReplyMarkup] = None
                    ) extends JsonRequest[Poll]
+
+object StopPoll {
+
+  implicit val method: Method[StopPoll, Poll] =
+    new Method[StopPoll, Poll] {
+
+      def name: String = "stopPoll"
+
+      def encoder: Encoder[StopPoll] = CirceEncoders.stopPollEncoder
+
+      def decoder: Decoder[Poll] = CirceDecoders.pollDecoder
+
+      def uploads(request: StopPoll): List[(String, InputFile)] = Nil
+    }
+}

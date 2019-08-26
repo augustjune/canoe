@@ -1,9 +1,11 @@
 package canoe.methods.messages
 
-import canoe.methods.MultipartRequest
+import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.methods.{Method, MultipartRequest}
 import canoe.models.ParseMode.ParseMode
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
+import io.circe.{Decoder, Encoder}
 
 /** Use this method to send general files. On success, the sent Message is returned.
   * Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
@@ -31,4 +33,20 @@ case class SendDocument(chatId: ChatId,
                         replyMarkup: Option[ReplyMarkup] = None
                        ) extends MultipartRequest[TelegramMessage] {
   override def getFiles: List[(String, InputFile)] = List("document" -> document)
+}
+
+object SendDocument {
+
+  implicit val method: Method[SendDocument, TelegramMessage] =
+    new Method[SendDocument, TelegramMessage] {
+
+      def name: String = "sendDocument"
+
+      def encoder: Encoder[SendDocument] = CirceEncoders.sendDocumentEncoder
+
+      def decoder: Decoder[TelegramMessage] = CirceDecoders.telegramMessageDecoder
+
+      def uploads(request: SendDocument): List[(String, InputFile)] =
+        List("document" -> request.document)
+    }
 }

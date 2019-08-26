@@ -18,5 +18,5 @@ case class SendMediaGroup(chatId: ChatId,
                           disableNotification: Option[Boolean] = None,
                           replyToMessageId: Option[Int] = None) extends MultipartRequest[List[TelegramMessage]] {
 
-  override def getFiles: List[(String, InputFile)] = media.flatMap(_.getFiles)
+  override def getFiles: List[(String, InputFile)] = media.flatMap(_.files)
 }

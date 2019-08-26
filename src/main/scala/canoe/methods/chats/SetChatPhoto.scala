@@ -1,7 +1,9 @@
 package canoe.methods.chats
 
-import canoe.methods.MultipartRequest
+import canoe.marshalling.CirceEncoders
+import canoe.methods.{Method, MultipartRequest}
 import canoe.models.{ChatId, InputFile}
+import io.circe.{Decoder, Encoder}
 
 /**
   * Use this method to set a new profile photo for the chat.
@@ -16,4 +18,19 @@ import canoe.models.{ChatId, InputFile}
   */
 case class SetChatPhoto(chatId: ChatId, photo: InputFile) extends MultipartRequest[Boolean] {
   override def getFiles: List[(String, InputFile)] = List("photo" -> photo)
+}
+
+object SetChatPhoto {
+
+  implicit val method: Method[SetChatPhoto, Boolean] =
+    new Method[SetChatPhoto, Boolean] {
+
+      def name: String = "setChatPhoto"
+
+      def encoder: Encoder[SetChatPhoto] = CirceEncoders.setChatPhotoEncoder
+
+      def decoder: Decoder[Boolean] = Decoder.decodeBoolean
+
+      def uploads(request: SetChatPhoto): List[(String, InputFile)] = List("photo" -> request.photo)
+    }
 }

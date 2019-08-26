@@ -1,7 +1,9 @@
 package canoe.methods.chats
 
-import canoe.methods.JsonRequest
-import canoe.models.ChatId
+import canoe.marshalling.CirceEncoders
+import canoe.methods.{JsonRequest, Method}
+import canoe.models.{ChatId, InputFile}
+import io.circe.{Decoder, Encoder}
 
 /**
   * Use this method to promote or demote a user in a supergroup or a channel.
@@ -34,3 +36,18 @@ case class PromoteChatMember(chatId: ChatId,
                              canPinMessages: Option[Boolean] = None,
                              canPromoteMembers: Option[Boolean] = None
                             ) extends JsonRequest[Boolean]
+
+object PromoteChatMember {
+
+  implicit val method: Method[PromoteChatMember, Boolean] =
+    new Method[PromoteChatMember, Boolean] {
+
+      def name: String = "promoteChatMember"
+
+      def encoder: Encoder[PromoteChatMember] = CirceEncoders.promoteChatMemberEncoder
+
+      def decoder: Decoder[Boolean] = Decoder.decodeBoolean
+
+      def uploads(request: PromoteChatMember): List[(String, InputFile)] = Nil
+    }
+}

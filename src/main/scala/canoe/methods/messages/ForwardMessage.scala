@@ -1,8 +1,10 @@
 package canoe.methods.messages
 
-import canoe.methods.JsonRequest
-import canoe.models.ChatId
+import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.methods.{JsonRequest, Method}
 import canoe.models.messages.TelegramMessage
+import canoe.models.{ChatId, InputFile}
+import io.circe.{Decoder, Encoder}
 
 /** Use this method to forward messages of any kind. On success, the sent Message is returned.
   *
@@ -16,3 +18,18 @@ case class ForwardMessage(chatId: ChatId,
                           disableNotification: Option[Boolean] = None,
                           messageId: Int
                          ) extends JsonRequest[TelegramMessage]
+
+object ForwardMessage {
+
+  implicit val method: Method[ForwardMessage, TelegramMessage] =
+    new Method[ForwardMessage, TelegramMessage] {
+
+      def name: String = "forwardMessage"
+
+      def encoder: Encoder[ForwardMessage] = CirceEncoders.forwardMessageEncoder
+
+      def decoder: Decoder[TelegramMessage] = CirceDecoders.telegramMessageDecoder
+
+      def uploads(request: ForwardMessage): List[(String, InputFile)] = Nil
+    }
+}

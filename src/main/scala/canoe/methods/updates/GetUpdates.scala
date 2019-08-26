@@ -1,8 +1,12 @@
 package canoe.methods.updates
 
-import canoe.methods.JsonRequest
-import canoe.models.Update
+
+import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.methods.{JsonRequest, Method}
 import canoe.models.UpdateType.UpdateType
+import canoe.models.{InputFile, Update}
+import io.circe.{Decoder, Encoder}
+
 
 /** Use this method to receive incoming updates using long polling (wiki). An Array of Update objects is returned.
   *
@@ -25,3 +29,18 @@ case class GetUpdates(offset: Option[Long] = None,
                       timeout: Option[Int] = None,
                       allowedUpdates: Option[Seq[UpdateType]] = None
                      ) extends JsonRequest[Seq[Update]]
+
+object GetUpdates {
+
+  implicit val method: Method[GetUpdates, List[Update]] =
+    new Method[GetUpdates, List[Update]] {
+
+      def name: String = "getUpdates"
+
+      def encoder: Encoder[GetUpdates] = CirceEncoders.getUpdatesEncoder
+
+      def decoder: Decoder[List[Update]] = Decoder.decodeList(CirceDecoders.updateDecoder)
+
+      def uploads(request: GetUpdates): List[(String, InputFile)] = Nil
+    }
+}

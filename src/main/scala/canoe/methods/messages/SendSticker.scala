@@ -1,8 +1,10 @@
 package canoe.methods.messages
 
-import canoe.methods.MultipartRequest
+import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.methods.{Method, MultipartRequest}
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
+import io.circe.{Decoder, Encoder}
 
 /** Use this method to send .webp stickers. On success, the sent Message is returned.
   *
@@ -24,4 +26,20 @@ case class SendSticker(chatId: ChatId,
                        replyMarkup: Option[ReplyMarkup] = None
                       ) extends MultipartRequest[TelegramMessage] {
   override def getFiles: List[(String, InputFile)] = List("sticker" -> sticker)
+}
+
+object SendSticker {
+
+  implicit val method: Method[SendSticker, TelegramMessage] =
+    new Method[SendSticker, TelegramMessage] {
+
+      def name: String = "sendSticker"
+
+      def encoder: Encoder[SendSticker] = CirceEncoders.sendStickerEncoder
+
+      def decoder: Decoder[TelegramMessage] = CirceDecoders.telegramMessageDecoder
+
+      def uploads(request: SendSticker): List[(String, InputFile)] =
+        List("sticker" -> request.sticker)
+    }
 }

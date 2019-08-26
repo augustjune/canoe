@@ -1,4 +1,6 @@
-target
 .idea
+.metals
+.vscode
+target
 
 src/main/resources

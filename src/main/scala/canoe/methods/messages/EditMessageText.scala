@@ -1,9 +1,11 @@
 package canoe.methods.messages
 
-import canoe.methods.JsonRequest
+import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.methods.{JsonRequest, Method}
 import canoe.models.ParseMode.ParseMode
 import canoe.models.messages.TelegramMessage
-import canoe.models.{ChatId, ReplyMarkup}
+import canoe.models.{ChatId, InputFile, ReplyMarkup}
+import io.circe.{Decoder, Encoder}
 
 /** Use this method to edit text messages sent by the bot or via the bot (for inline bots).
   * On success, if edited message is sent by the bot, the edited Message is returned, otherwise True is returned.
@@ -32,4 +34,24 @@ case class EditMessageText(chatId: Option[ChatId] = None,
 
   if (chatId.isEmpty && messageId.isEmpty)
     require(inlineMessageId.isDefined, "Required if chatId and messageId are not specified")
+}
+
+object EditMessageText {
+
+  implicit val method: Method[EditMessageText, Either[Boolean, TelegramMessage]] =
+    new Method[EditMessageText, Either[Boolean, TelegramMessage]] {
+
+      def name: String = "editMessageText"
+
+      def encoder: Encoder[EditMessageText] = CirceEncoders.editMessageTextEncoder
+
+      def decoder: Decoder[Either[Boolean, TelegramMessage]] =
+      // ToDo - set keys
+        Decoder.decodeEither("", "")(
+          Decoder.decodeBoolean,
+          CirceDecoders.telegramMessageDecoder
+        )
+
+      def uploads(request: EditMessageText): List[(String, InputFile)] = Nil
+    }
 }

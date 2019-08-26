@@ -1,7 +1,9 @@
 package canoe.methods.chats
 
-import canoe.methods.JsonRequest
-import canoe.models.ChatId
+import canoe.marshalling.CirceEncoders
+import canoe.methods.{JsonRequest, Method}
+import canoe.models.{ChatId, InputFile}
+import io.circe.{Decoder, Encoder}
 
 /**
   * Use this method to kick a user from a group, a supergroup or a channel.
@@ -22,3 +24,18 @@ case class KickChatMember(chatId: ChatId,
                           userId: Int,
                           untilDate: Option[Int] = None
                          ) extends JsonRequest[Boolean]
+
+object KickChatMember {
+
+  implicit val method: Method[KickChatMember, Boolean] =
+    new Method[KickChatMember, Boolean] {
+
+      def name: String = "kickChatMember"
+
+      def encoder: Encoder[KickChatMember] = CirceEncoders.kickChatMemberEncoder
+
+      def decoder: Decoder[Boolean] = Decoder.decodeBoolean
+
+      def uploads(request: KickChatMember): List[(String, InputFile)] = Nil
+    }
+}

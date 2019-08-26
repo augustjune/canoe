@@ -1,8 +1,10 @@
 package canoe.methods.messages
 
-import canoe.methods.MultipartRequest
+import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.methods.{Method, MultipartRequest}
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InputFile, InputMedia}
+import io.circe.{Decoder, Encoder}
 
 /**
   * Use this method to send a group of photos or videos as an album.
@@ -19,4 +21,22 @@ case class SendMediaGroup(chatId: ChatId,
                           replyToMessageId: Option[Int] = None) extends MultipartRequest[List[TelegramMessage]] {
 
   override def getFiles: List[(String, InputFile)] = media.flatMap(_.files)
+}
+
+object SendMediaGroup {
+
+  implicit val method: Method[SendMediaGroup, List[TelegramMessage]] =
+    new Method[SendMediaGroup, List[TelegramMessage]] {
+
+      def name: String = "sendMediaGroup"
+
+      def encoder: Encoder[SendMediaGroup] =
+        CirceEncoders.sendMediaGroupEncoder
+
+      def decoder: Decoder[List[TelegramMessage]] =
+        Decoder.decodeList(CirceDecoders.telegramMessageDecoder)
+
+      def uploads(request: SendMediaGroup): List[(String, InputFile)] =
+        request.media.flatMap(_.files)
+    }
 }

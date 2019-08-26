@@ -1,11 +1,11 @@
 package canoe.api.models
 
-import canoe.clients.RequestHandler
+import canoe.clients.TelegramClient
 import canoe.methods.queries.AnswerInlineQuery
 import canoe.models.{InlineQuery, InlineQueryResult}
 
 final class InlineQueryApi[F[_]](query: InlineQuery)
-                          (implicit client: RequestHandler[F]) {
+                          (implicit client: TelegramClient[F]) {
 
   def answer(results: Seq[InlineQueryResult],
              switchPmText: Option[String] = None,

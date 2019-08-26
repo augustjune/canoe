@@ -1,7 +1,9 @@
 package canoe.methods.chats
 
-import canoe.methods.JsonRequest
-import canoe.models.ChatId
+import canoe.marshalling.CirceEncoders
+import canoe.methods.{JsonRequest, Method}
+import canoe.models.{ChatId, InputFile}
+import io.circe.{Decoder, Encoder}
 
 /**
   * Use this method to change the description of a supergroup or a channel.
@@ -12,3 +14,18 @@ import canoe.models.ChatId
   * @param description String	No	New chat description, 0-255 characters pinChatMessage  *
   */
 case class SetChatDescription(chatId: ChatId, description: Option[String] = None) extends JsonRequest[Boolean]
+
+object SetChatDescription {
+
+  implicit val method: Method[SetChatDescription, Boolean] =
+    new Method[SetChatDescription, Boolean] {
+
+      def name: String = "setChatDescription"
+
+      def encoder: Encoder[SetChatDescription] = CirceEncoders.setChatDescriptionEncoder
+
+      def decoder: Decoder[Boolean] = Decoder.decodeBoolean
+
+      def uploads(request: SetChatDescription): List[(String, InputFile)] = Nil
+    }
+}

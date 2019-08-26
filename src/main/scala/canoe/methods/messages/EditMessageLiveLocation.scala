@@ -1,8 +1,10 @@
 package canoe.methods.messages
 
-import canoe.methods.JsonRequest
+import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.methods.{JsonRequest, Method}
 import canoe.models.messages.TelegramMessage
-import canoe.models.{ChatId, InlineKeyboardMarkup}
+import canoe.models.{ChatId, InlineKeyboardMarkup, InputFile}
+import io.circe.{Decoder, Encoder}
 
 /**
   * Use this method to edit live location messages sent by the bot or via the bot (for inline bots).
@@ -24,3 +26,23 @@ case class EditMessageLiveLocation(chatId          : Option[ChatId] = None,
                                    longitude       : Option[Double] = None,
                                    replyMarkup     : Option[InlineKeyboardMarkup] = None
                                   ) extends JsonRequest[Either[Boolean, TelegramMessage]]
+
+object EditMessageLiveLocation {
+
+  implicit val method: Method[EditMessageLiveLocation, Either[Boolean, TelegramMessage]] =
+    new Method[EditMessageLiveLocation, Either[Boolean, TelegramMessage]] {
+
+      def name: String = "editMessageLiveLocation"
+
+      def encoder: Encoder[EditMessageLiveLocation] = CirceEncoders.editMessageLiveLocationEncoder
+
+      def decoder: Decoder[Either[Boolean, TelegramMessage]] =
+      // ToDo - set keys
+        Decoder.decodeEither("", "")(
+          Decoder.decodeBoolean,
+          CirceDecoders.telegramMessageDecoder
+        )
+
+      def uploads(request: EditMessageLiveLocation): List[(String, InputFile)] = Nil
+    }
+}

@@ -1,8 +1,10 @@
 package canoe.methods.games
 
-import canoe.methods.JsonRequest
-import canoe.models.ChatId
+import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.methods.{JsonRequest, Method}
 import canoe.models.messages.TelegramMessage
+import canoe.models.{ChatId, InputFile}
+import io.circe.{Decoder, Encoder}
 
 /** Use this method to set the score of the specified user in a game.
   *
@@ -37,4 +39,24 @@ case class SetGameScore(userId: Int,
 
   if (chatId.isEmpty && messageId.isEmpty)
     require(inlineMessageId.isDefined, "Required if chatId and messageId are not specified")
+}
+
+object SetGameScore {
+
+  implicit val method: Method[SetGameScore, Either[Boolean, TelegramMessage]] =
+    new Method[SetGameScore, Either[Boolean, TelegramMessage]] {
+
+      def name: String = "setGameScore"
+
+      def encoder: Encoder[SetGameScore] = CirceEncoders.setGameScoreEncoder
+
+      def decoder: Decoder[Either[Boolean, TelegramMessage]] =
+      // ToDo - set keys
+        Decoder.decodeEither("", "")(
+          Decoder.decodeBoolean,
+          CirceDecoders.telegramMessageDecoder
+        )
+
+      def uploads(request: SetGameScore): List[(String, InputFile)] = Nil
+    }
 }

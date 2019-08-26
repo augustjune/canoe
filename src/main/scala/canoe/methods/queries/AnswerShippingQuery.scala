@@ -1,7 +1,9 @@
 package canoe.methods.queries
 
-import canoe.methods.JsonRequest
-import canoe.models.ShippingOption
+import canoe.marshalling.CirceEncoders
+import canoe.methods.{JsonRequest, Method}
+import canoe.models.{InputFile, ShippingOption}
+import io.circe.{Decoder, Encoder}
 
 /**
   * If you sent an invoice requesting a shipping address and the parameter is_flexible was specified,
@@ -27,4 +29,19 @@ case class AnswerShippingQuery(shippingQueryId: String,
 
   require(!ok || shippingOptions.isDefined, "shippingOptions required if ok is True")
   require(ok || errorMessage.isDefined, "errorMessage required if ok is False")
+}
+
+object AnswerShippingQuery {
+
+  implicit val method: Method[AnswerShippingQuery, Boolean] =
+    new Method[AnswerShippingQuery, Boolean] {
+
+      def name: String = "answerShippingQuery"
+
+      def encoder: Encoder[AnswerShippingQuery] = CirceEncoders.answerShippingQueryEncoder
+
+      def decoder: Decoder[Boolean] = Decoder.decodeBoolean
+
+      def uploads(request: AnswerShippingQuery): List[(String, InputFile)] = Nil
+    }
 }

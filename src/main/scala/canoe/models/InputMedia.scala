@@ -3,7 +3,7 @@ package canoe.models
 import canoe.models.ParseMode.ParseMode
 
 sealed trait InputMedia {
-  def getFiles: List[(String, InputFile)] = List(`type` -> media)
+  def files: List[(String, InputFile)] = List(`type` -> media)
 
   def media: InputFile
 

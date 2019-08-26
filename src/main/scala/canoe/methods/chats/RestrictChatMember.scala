@@ -1,7 +1,9 @@
 package canoe.methods.chats
 
-import canoe.methods.JsonRequest
-import canoe.models.ChatId
+import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.methods.{JsonRequest, Method}
+import canoe.models.{ChatId, InputFile, Update}
+import io.circe.{Decoder, Encoder}
 
 /**
   * Use this method to restrict a user in a supergroup.
@@ -26,3 +28,18 @@ case class RestrictChatMember(chatId: ChatId,
                               canSendOtherMessages: Option[Boolean] = None,
                               canAddWebPagePreviews: Option[Boolean] = None
                              ) extends JsonRequest[Boolean]
+
+object RestrictChatMember {
+
+  implicit val method: Method[RestrictChatMember, List[Update]] =
+    new Method[RestrictChatMember, List[Update]] {
+
+      def name: String = "restrictChatMember"
+
+      def encoder: Encoder[RestrictChatMember] = CirceEncoders.restrictChatMemberEncoder
+
+      def decoder: Decoder[List[Update]] = Decoder.decodeList(CirceDecoders.updateDecoder)
+
+      def uploads(request: RestrictChatMember): List[(String, InputFile)] = Nil
+    }
+}

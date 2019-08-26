@@ -1,7 +1,9 @@
 package canoe.methods.chats
 
-import canoe.methods.JsonRequest
-import canoe.models.ChatId
+import canoe.marshalling.CirceEncoders
+import canoe.methods.{JsonRequest, Method}
+import canoe.models.{ChatId, InputFile}
+import io.circe.{Decoder, Encoder}
 
 /**
   * Use this method to pin a message in a supergroup.
@@ -18,3 +20,18 @@ case class PinChatMessage(chatId: ChatId,
                           messageId: Int,
                           disableNotification: Option[Boolean] = None
                          ) extends JsonRequest[Boolean]
+
+object PinChatMessage {
+
+  implicit val method: Method[PinChatMessage, Boolean] =
+    new Method[PinChatMessage, Boolean] {
+
+      def name: String = "pinChatMessage"
+
+      def encoder: Encoder[PinChatMessage] = CirceEncoders.pinChatMessageEncoder
+
+      def decoder: Decoder[Boolean] = Decoder.decodeBoolean
+
+      def uploads(request: PinChatMessage): List[(String, InputFile)] = Nil
+    }
+}

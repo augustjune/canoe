@@ -1,8 +1,10 @@
 package canoe.methods.messages
 
-import canoe.methods.JsonRequest
+import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.methods.{JsonRequest, Method}
 import canoe.models.messages.TelegramMessage
-import canoe.models.{ChatId, InlineKeyboardMarkup}
+import canoe.models.{ChatId, InlineKeyboardMarkup, InputFile}
+import io.circe.{Decoder, Encoder}
 
 /**
   * Use this method to stop updating a live location message sent by the bot or via the bot (for inline bots) before live_period expires.
@@ -19,3 +21,23 @@ case class StopMessageLiveLocation(chatId: Option[ChatId] = None,
                                    inlineMessageId: Option[Int] = None,
                                    replyMarkup: Option[InlineKeyboardMarkup] = None
                                   ) extends JsonRequest[Either[Boolean, TelegramMessage]]
+
+object StopMessageLiveLocation {
+
+  implicit val method: Method[StopMessageLiveLocation, Either[Boolean, TelegramMessage]] =
+    new Method[StopMessageLiveLocation, Either[Boolean, TelegramMessage]] {
+
+      def name: String = "stopMessageLiveLocation"
+
+      def encoder: Encoder[StopMessageLiveLocation] = CirceEncoders.stopMessageLiveLocationEncoder
+
+      def decoder: Decoder[Either[Boolean, TelegramMessage]] =
+      // ToDo - set keys
+        Decoder.decodeEither("", "")(
+          Decoder.decodeBoolean,
+          CirceDecoders.telegramMessageDecoder
+        )
+
+      def uploads(request: StopMessageLiveLocation): List[(String, InputFile)] = Nil
+    }
+}

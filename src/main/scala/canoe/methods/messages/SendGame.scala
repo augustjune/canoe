@@ -1,8 +1,10 @@
 package canoe.methods.messages
 
-import canoe.methods.JsonRequest
-import canoe.models.ReplyMarkup
+import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.methods.{JsonRequest, Method}
 import canoe.models.messages.TelegramMessage
+import canoe.models.{InputFile, ReplyMarkup}
+import io.circe.{Decoder, Encoder}
 
 /** Use this method to send a game.
   * On success, the sent Message is returned.
@@ -22,3 +24,18 @@ case class SendGame(chatId: Long,
                     replyToMessageId: Option[Int] = None,
                     replyMarkup: Option[ReplyMarkup] = None
                    ) extends JsonRequest[TelegramMessage]
+
+object SendGame {
+
+  implicit val method: Method[SendGame, TelegramMessage] =
+    new Method[SendGame, TelegramMessage] {
+
+      def name: String = "sendGame"
+
+      def encoder: Encoder[SendGame] = CirceEncoders.sendGameEncoder
+
+      def decoder: Decoder[TelegramMessage] = CirceDecoders.telegramMessageDecoder
+
+      def uploads(request: SendGame): List[(String, InputFile)] = Nil
+    }
+}

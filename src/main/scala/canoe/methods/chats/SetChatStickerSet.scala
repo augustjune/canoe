@@ -1,7 +1,9 @@
 package canoe.methods.chats
 
-import canoe.methods.JsonRequest
-import canoe.models.ChatId
+import canoe.marshalling.CirceEncoders
+import canoe.methods.{JsonRequest, Method}
+import canoe.models.{ChatId, InputFile}
+import io.circe.{Decoder, Encoder}
 
 /**
   * Use this method to set a new group sticker set for a supergroup.
@@ -12,3 +14,18 @@ import canoe.models.ChatId
   * @param stickerSetName  String Yes Name of the sticker set to be set as the group sticker set
   */
 case class SetChatStickerSet(chatId: ChatId, stickerSetName: String) extends JsonRequest[Boolean]
+
+object SetChatStickerSet {
+
+  implicit val method: Method[SetChatStickerSet, Boolean] =
+    new Method[SetChatStickerSet, Boolean] {
+
+      def name: String = "setChatStickerSet"
+
+      def encoder: Encoder[SetChatStickerSet] = CirceEncoders.setChatStickerSetEncoder
+
+      def decoder: Decoder[Boolean] = Decoder.decodeBoolean
+
+      def uploads(request: SetChatStickerSet): List[(String, InputFile)] = Nil
+    }
+}

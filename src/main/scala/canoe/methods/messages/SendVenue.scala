@@ -1,8 +1,10 @@
 package canoe.methods.messages
 
-import canoe.methods.JsonRequest
+import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.methods.{JsonRequest, Method}
 import canoe.models.messages.TelegramMessage
-import canoe.models.{ChatId, ReplyMarkup}
+import canoe.models.{ChatId, InputFile, ReplyMarkup}
+import io.circe.{Decoder, Encoder}
 
 /** Use this method to send information about a venue. On success, the sent Message is returned.
   *
@@ -32,3 +34,18 @@ case class SendVenue(chatId: ChatId,
                      replyToMessageId: Option[Int] = None,
                      replyMarkup: Option[ReplyMarkup] = None
                     ) extends JsonRequest[TelegramMessage]
+
+object SendVenue {
+
+  implicit val method: Method[SendVenue, TelegramMessage] =
+    new Method[SendVenue, TelegramMessage] {
+
+      def name: String = "sendVenue"
+
+      def encoder: Encoder[SendVenue] = CirceEncoders.sendVenueEncoder
+
+      def decoder: Decoder[TelegramMessage] = CirceDecoders.telegramMessageDecoder
+
+      def uploads(request: SendVenue): List[(String, InputFile)] = Nil
+    }
+}

@@ -1,8 +1,10 @@
 package canoe.methods.messages
 
-import canoe.methods.JsonRequest
+import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.methods.{JsonRequest, Method}
 import canoe.models.messages.TelegramMessage
-import canoe.models.{ChatId, ReplyMarkup}
+import canoe.models.{ChatId, InputFile, ReplyMarkup}
+import io.circe.{Decoder, Encoder}
 
 /**
   * Use this method to send a native poll.
@@ -22,3 +24,18 @@ case class SendPoll(chatId              : ChatId,
                     replyToMessageId    : Option[Int] = None,
                     replyMarkup         : Option[ReplyMarkup] = None
                    ) extends JsonRequest[TelegramMessage]
+
+object SendPoll {
+
+  implicit val method: Method[SendPoll, TelegramMessage] =
+    new Method[SendPoll, TelegramMessage] {
+
+      def name: String = "sendPoll"
+
+      def encoder: Encoder[SendPoll] = CirceEncoders.sendPollEncoder
+
+      def decoder: Decoder[TelegramMessage] = CirceDecoders.telegramMessageDecoder
+
+      def uploads(request: SendPoll): List[(String, InputFile)] = Nil
+    }
+}

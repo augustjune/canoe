@@ -1,7 +1,9 @@
 package canoe.methods.chats
 
-import canoe.methods.JsonRequest
-import canoe.models.ChatId
+import canoe.marshalling.CirceEncoders
+import canoe.methods.{JsonRequest, Method}
+import canoe.models.{ChatId, InputFile}
+import io.circe.{Decoder, Encoder}
 
 /** Use this method to unban a previously kicked user in a supergroup.
   * The user will not return to the group automatically, but will be able to join via link, etc.
@@ -11,3 +13,18 @@ import canoe.models.ChatId
   * @param userId Integer Unique identifier of the target user
   */
 case class UnbanChatMember(chatId: ChatId, userId: Int) extends JsonRequest[Boolean]
+
+object UnbanChatMember {
+
+  implicit val method: Method[UnbanChatMember, Boolean] =
+    new Method[UnbanChatMember, Boolean] {
+
+      def name: String = "unbanChatMember"
+
+      def encoder: Encoder[UnbanChatMember] = CirceEncoders.unbanChatMemberEncoder
+
+      def decoder: Decoder[Boolean] = Decoder.decodeBoolean
+
+      def uploads(request: UnbanChatMember): List[(String, InputFile)] = Nil
+    }
+}

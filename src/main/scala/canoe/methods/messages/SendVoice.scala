@@ -1,9 +1,11 @@
 package canoe.methods.messages
 
-import canoe.methods.MultipartRequest
+import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.methods.{Method, MultipartRequest}
 import canoe.models.ParseMode.ParseMode
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
+import io.circe.{Decoder, Encoder}
 
 /** Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message.
   * For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Audio or Document).
@@ -35,4 +37,20 @@ case class SendVoice(chatId: ChatId,
                      replyMarkup: Option[ReplyMarkup] = None
                     ) extends MultipartRequest[TelegramMessage] {
   override def getFiles: List[(String, InputFile)] = List("voice" -> voice)
+}
+
+object SendVoice {
+
+  implicit val method: Method[SendVoice, TelegramMessage] =
+    new Method[SendVoice, TelegramMessage] {
+
+      def name: String = "sendVoice"
+
+      def encoder: Encoder[SendVoice] = CirceEncoders.sendVoiceEncoder
+
+      def decoder: Decoder[TelegramMessage] = CirceDecoders.telegramMessageDecoder
+
+      def uploads(request: SendVoice): List[(String, InputFile)] =
+        List("voice" -> request.voice)
+    }
 }

@@ -1,8 +1,10 @@
 package canoe.methods.messages
 
-import canoe.methods.MultipartRequest
+import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.methods.{Method, MultipartRequest}
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
+import io.circe.{Decoder, Encoder}
 
 /**
   * As of v.4.0, Telegram clients support rounded square mp4 videos of up to 1 minute long.
@@ -30,4 +32,20 @@ case class SendVideoNote(chatId: ChatId,
                          replyMarkup: Option[ReplyMarkup] = None
                         ) extends MultipartRequest[TelegramMessage] {
   override def getFiles: List[(String, InputFile)] = List("videoNote" -> videoNote)
+}
+
+object SendVideoNote {
+
+  implicit val method: Method[SendVideoNote, TelegramMessage] =
+    new Method[SendVideoNote, TelegramMessage] {
+
+      def name: String = "sendVideoNote"
+
+      def encoder: Encoder[SendVideoNote] = CirceEncoders.sendVideoNoteEncoder
+
+      def decoder: Decoder[TelegramMessage] = CirceDecoders.telegramMessageDecoder
+
+      def uploads(request: SendVideoNote): List[(String, InputFile)] =
+        List("videoNote" -> request.videoNote)
+    }
 }

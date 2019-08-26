@@ -1,7 +1,9 @@
 package canoe.methods.chats
 
-import canoe.methods.JsonRequest
-import canoe.models.ChatId
+import canoe.marshalling.CirceEncoders
+import canoe.methods.{JsonRequest, Method}
+import canoe.models.{ChatId, InputFile}
+import io.circe.{Decoder, Encoder}
 
 /**
   * Use this method to change the title of a chat.
@@ -15,3 +17,18 @@ import canoe.models.ChatId
   * @param title  String	New chat title, 1-255 characters
   */
 case class SetChatTitle(chatId: ChatId, title: String) extends JsonRequest[Boolean]
+
+object SetChatTitle {
+
+  implicit val method: Method[SetChatTitle, Boolean] =
+    new Method[SetChatTitle, Boolean] {
+
+      def name: String = "setChatTitle"
+
+      def encoder: Encoder[SetChatTitle] = CirceEncoders.setChatTitleEncoder
+
+      def decoder: Decoder[Boolean] = Decoder.decodeBoolean
+
+      def uploads(request: SetChatTitle): List[(String, InputFile)] = Nil
+    }
+}

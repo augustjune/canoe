@@ -1,7 +1,9 @@
 package canoe.methods.files
 
-import canoe.methods.JsonRequest
-import canoe.models.File
+import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.methods.{JsonRequest, Method}
+import canoe.models.{File, InputFile}
+import io.circe.{Decoder, Encoder}
 
 /** Use this method to get basic info about a file and prepare it for downloading.
   * For the moment, bots can download files of up to 20MB in size. On success, a File object is returned.
@@ -13,3 +15,18 @@ import canoe.models.File
   * @param fileId String File identifier to get info about
   */
 case class GetFile(fileId : String) extends JsonRequest[File]
+
+object GetFile {
+
+  implicit val method: Method[GetFile, File] =
+    new Method[GetFile, File] {
+
+      def name: String = "getFile"
+
+      def encoder: Encoder[GetFile] = CirceEncoders.getFileEncoder
+
+      def decoder: Decoder[File] = CirceDecoders.fileDecoder
+
+      def uploads(request: GetFile): List[(String, InputFile)] = Nil
+    }
+}

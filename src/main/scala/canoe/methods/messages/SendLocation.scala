@@ -1,8 +1,10 @@
 package canoe.methods.messages
 
-import canoe.methods.JsonRequest
+import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.methods.{JsonRequest, Method}
 import canoe.models.messages.TelegramMessage
-import canoe.models.{ChatId, ReplyMarkup}
+import canoe.models.{ChatId, InputFile, ReplyMarkup}
+import io.circe.{Decoder, Encoder}
 
 /** Use this method to send point on the map.
   * On success, the sent Message is returned.
@@ -27,3 +29,18 @@ case class SendLocation(chatId: ChatId,
                         replyToMessageId: Option[Int] = None,
                         replyMarkup: Option[ReplyMarkup] = None
                        ) extends JsonRequest[TelegramMessage]
+
+object SendLocation {
+
+  implicit val method: Method[SendLocation, TelegramMessage] =
+    new Method[SendLocation, TelegramMessage] {
+
+      def name: String = "sendLocation"
+
+      def encoder: Encoder[SendLocation] = CirceEncoders.sendLocationEncoder
+
+      def decoder: Decoder[TelegramMessage] = CirceDecoders.telegramMessageDecoder
+
+      def uploads(request: SendLocation): List[(String, InputFile)] = Nil
+    }
+}

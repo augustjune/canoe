@@ -1,9 +1,11 @@
 package canoe.methods.messages
 
-import canoe.methods.JsonRequest
+import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.methods.{JsonRequest, Method}
 import canoe.models.Currency.Currency
 import canoe.models.messages.TelegramMessage
-import canoe.models.{LabeledPrice, ReplyMarkup}
+import canoe.models.{InputFile, LabeledPrice, ReplyMarkup}
+import io.circe.{Decoder, Encoder}
 
 /**
   * Use this method to send invoices.
@@ -58,3 +60,18 @@ case class SendInvoice(chatId: Long,
                        replyToMessageId: Option[Int] = None,
                        replyMarkup: Option[ReplyMarkup] = None
                       ) extends JsonRequest[TelegramMessage]
+
+object SendInvoice {
+
+  implicit val method: Method[SendInvoice, TelegramMessage] =
+    new Method[SendInvoice, TelegramMessage] {
+
+      def name: String = "sendInvoice"
+
+      def encoder: Encoder[SendInvoice] = CirceEncoders.sendInvoiceEncoder
+
+      def decoder: Decoder[TelegramMessage] = CirceDecoders.telegramMessageDecoder
+
+      def uploads(request: SendInvoice): List[(String, InputFile)] = Nil
+    }
+}

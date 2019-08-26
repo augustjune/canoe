@@ -1,7 +1,9 @@
 package canoe.methods.chats
 
-import canoe.methods.JsonRequest
-import canoe.models.ChatId
+import canoe.marshalling.CirceEncoders
+import canoe.methods.{JsonRequest, Method}
+import canoe.models.{ChatId, InputFile}
+import io.circe.{Decoder, Encoder}
 
 /**
   * Use this method to delete a group sticker set from a supergroup.
@@ -12,3 +14,18 @@ import canoe.models.ChatId
   * @param chatId Integer or String Yes Unique identifier for the target chat or username of the target supergroup (in the format @supergroupusername)
   */
 case class DeleteChatStickerSet(chatId: ChatId) extends JsonRequest[Boolean]
+
+object DeleteChatStickerSet {
+
+  implicit val method: Method[DeleteChatStickerSet, Boolean] =
+    new Method[DeleteChatStickerSet, Boolean] {
+
+      def name: String = "deleteChatStickerSet"
+
+      def encoder: Encoder[DeleteChatStickerSet] = CirceEncoders.deleteChatStickerSetEncoder
+
+      def decoder: Decoder[Boolean] = Decoder.decodeBoolean
+
+      def uploads(request: DeleteChatStickerSet): List[(String, InputFile)] = Nil
+    }
+}

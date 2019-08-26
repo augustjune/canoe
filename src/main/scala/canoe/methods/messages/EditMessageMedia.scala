@@ -1,8 +1,10 @@
 package canoe.methods.messages
 
-import canoe.methods.MultipartRequest
+import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.methods.{Method, MultipartRequest}
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InlineKeyboardMarkup, InputFile, InputMedia}
+import io.circe.{Decoder, Encoder}
 
 /** Use this method to edit audio, document, photo, or video messages.
   * If a message is a part of a message album, then it can be edited only to a photo or a video.
@@ -24,5 +26,26 @@ case class EditMessageMedia(chatId: Option[ChatId] = None,
                             replyMarkup: Option[InlineKeyboardMarkup] = None
                            ) extends MultipartRequest[Either[Boolean, TelegramMessage]] {
 
-  override def getFiles: List[(String, InputFile)] = media.getFiles
+  override def getFiles: List[(String, InputFile)] = media.files
+}
+
+object EditMessageMedia {
+
+  implicit val method: Method[EditMessageMedia, Either[Boolean, TelegramMessage]] =
+    new Method[EditMessageMedia, Either[Boolean, TelegramMessage]] {
+
+      def name: String = "editMessageMedia"
+
+      def encoder: Encoder[EditMessageMedia] = CirceEncoders.editMessageMediaEncoder
+
+      def decoder: Decoder[Either[Boolean, TelegramMessage]] =
+      // ToDo - set keys
+        Decoder.decodeEither("", "")(
+          Decoder.decodeBoolean,
+          CirceDecoders.telegramMessageDecoder
+        )
+
+      def uploads(request: EditMessageMedia): List[(String, InputFile)] =
+        request.media.files
+    }
 }

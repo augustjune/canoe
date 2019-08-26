@@ -1,6 +1,9 @@
 package canoe.methods.queries
 
-import canoe.methods.JsonRequest
+import canoe.marshalling.CirceEncoders
+import canoe.methods.{JsonRequest, Method}
+import canoe.models.InputFile
+import io.circe.{Decoder, Encoder}
 
 /**
   * Once the user has confirmed their payment and shipping details,
@@ -27,4 +30,19 @@ case class AnswerPreCheckoutQuery(preCheckoutQueryId : String,
                                  ) extends JsonRequest[Boolean] {
 
   require(ok || errorMessage.isDefined, "errorMessage is required if ok is False")
+}
+
+object AnswerPreCheckoutQuery {
+
+  implicit val method: Method[AnswerPreCheckoutQuery, Boolean] =
+    new Method[AnswerPreCheckoutQuery, Boolean] {
+
+      def name: String = "answerPreCheckoutQuery"
+
+      def encoder: Encoder[AnswerPreCheckoutQuery] = CirceEncoders.answerPreCheckoutQueryEncoder
+
+      def decoder: Decoder[Boolean] = Decoder.decodeBoolean
+
+      def uploads(request: AnswerPreCheckoutQuery): List[(String, InputFile)] = Nil
+    }
 }

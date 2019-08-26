@@ -1,8 +1,10 @@
 package canoe.methods.webhooks
 
-import canoe.methods.MultipartRequest
+import canoe.marshalling.CirceEncoders
+import canoe.methods.{Method, MultipartRequest}
 import canoe.models.InputFile
 import canoe.models.UpdateType.UpdateType
+import io.circe.{Decoder, Encoder}
 
 /** Use this method to specify a url and receive incoming updates via an outgoing webhook.
   * Whenever there is an update for the bot, we will send an HTTPS POST request to the specified url, containing a JSON-serialized Update.
@@ -34,4 +36,20 @@ case class SetWebhook(url: String,
                       allowedUpdates: Option[Seq[UpdateType]] = None
                      ) extends MultipartRequest[Boolean] {
   override def getFiles: List[(String, InputFile)] = certificate.map("certificate" -> _).toList
+}
+
+object SetWebhook {
+
+  implicit val method: Method[SetWebhook, Boolean] =
+    new Method[SetWebhook, Boolean] {
+
+      def name: String = "setWebhook"
+
+      def encoder: Encoder[SetWebhook] = CirceEncoders.setWebhookEncoder
+
+      def decoder: Decoder[Boolean] = Decoder.decodeBoolean
+
+      def uploads(request: SetWebhook): List[(String, InputFile)] =
+        request.certificate.map("certificate" -> _).toList
+    }
 }

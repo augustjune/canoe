@@ -1,9 +1,11 @@
 package canoe.methods.messages
 
-import canoe.methods.MultipartRequest
+import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.methods.{Method, MultipartRequest}
 import canoe.models.ParseMode.ParseMode
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
+import io.circe.{Decoder, Encoder}
 
 /** Use this method to send photos.
   * On success, the sent Message is returned.
@@ -31,4 +33,20 @@ case class SendPhoto(chatId: ChatId,
                      replyMarkup: Option[ReplyMarkup] = None
                     ) extends MultipartRequest[TelegramMessage] {
   override def getFiles: List[(String, InputFile)] = List("photo" -> photo)
+}
+
+object SendPhoto {
+
+  implicit val method: Method[SendPhoto, TelegramMessage] =
+    new Method[SendPhoto, TelegramMessage] {
+
+      def name: String = "sendPhoto"
+
+      def encoder: Encoder[SendPhoto] = CirceEncoders.sendPhotoEncoder
+
+      def decoder: Decoder[TelegramMessage] = CirceDecoders.telegramMessageDecoder
+
+      def uploads(request: SendPhoto): List[(String, InputFile)] =
+        List("photo" -> request.photo)
+    }
 }

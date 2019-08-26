@@ -1,7 +1,9 @@
 package canoe.methods.stickers
 
-import canoe.methods.MultipartRequest
+import canoe.marshalling.CirceEncoders
+import canoe.methods.{Method, MultipartRequest}
 import canoe.models.{InputFile, MaskPosition}
+import io.circe.{Decoder, Encoder}
 
 /**
   * Use this method to create new sticker set owned by a user.
@@ -30,4 +32,20 @@ case class CreateNewStickerSet(userId: Int,
                                maskPosition: Option[MaskPosition] = None
                               ) extends MultipartRequest[Boolean] {
   override def getFiles: List[(String, InputFile)] = List("png_sticker" -> pngSticker)
+}
+
+object CreateNewStickerSet {
+
+  implicit val method: Method[CreateNewStickerSet, Boolean] =
+    new Method[CreateNewStickerSet, Boolean] {
+
+      def name: String = "createNewStickerSet"
+
+      def encoder: Encoder[CreateNewStickerSet] = CirceEncoders.createNewStickerSetEncoder
+
+      def decoder: Decoder[Boolean] = Decoder.decodeBoolean
+
+      def uploads(request: CreateNewStickerSet): List[(String, InputFile)] =
+        List("png_sticker" -> request.pngSticker)
+    }
 }

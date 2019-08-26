@@ -1,7 +1,9 @@
 package canoe.methods.stickers
 
-import canoe.methods.MultipartRequest
+import canoe.marshalling.CirceEncoders
+import canoe.methods.{Method, MultipartRequest}
 import canoe.models.{InputFile, MaskPosition}
+import io.circe.{Decoder, Encoder}
 
 /**
   * Use this method to add a new sticker to a set created by the bot.
@@ -20,4 +22,20 @@ case class AddStickerToSet(userId: Int,
                            maskPosition: Option[MaskPosition] = None
                           ) extends MultipartRequest[Boolean] {
   override def getFiles: List[(String, InputFile)] = List("pngSticker" -> pngSticker)
+}
+
+object AddStickerToSet {
+
+  implicit val method: Method[AddStickerToSet, Boolean] =
+    new Method[AddStickerToSet, Boolean] {
+
+      def name: String = "addStickerToSet"
+
+      def encoder: Encoder[AddStickerToSet] = CirceEncoders.addStickerToSetEncoder
+
+      def decoder: Decoder[Boolean] = Decoder.decodeBoolean
+
+      def uploads(request: AddStickerToSet): List[(String, InputFile)] =
+        List("pngSticker" -> request.pngSticker)
+    }
 }

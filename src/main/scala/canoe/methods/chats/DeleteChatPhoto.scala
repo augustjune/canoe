@@ -1,7 +1,9 @@
 package canoe.methods.chats
 
-import canoe.methods.JsonRequest
-import canoe.models.ChatId
+import canoe.marshalling.CirceEncoders
+import canoe.methods.{JsonRequest, Method}
+import canoe.models.{ChatId, InputFile}
+import io.circe.{Decoder, Encoder}
 
 /**
   * Use this method to delete a chat photo.
@@ -15,3 +17,18 @@ import canoe.models.ChatId
   * @param chatId Integer or String Unique identifier for the target chat or username of the target channel (in the format @channelusername)
   */
 case class DeleteChatPhoto(chatId: ChatId) extends JsonRequest[Boolean]
+
+object DeleteChatPhoto {
+
+  implicit val method: Method[DeleteChatPhoto, Boolean] =
+    new Method[DeleteChatPhoto, Boolean] {
+
+      def name: String = "deleteChatPhoto"
+
+      def encoder: Encoder[DeleteChatPhoto] = CirceEncoders.deleteChatPhotoEncoder
+
+      def decoder: Decoder[Boolean] = Decoder.decodeBoolean
+
+      def uploads(request: DeleteChatPhoto): List[(String, InputFile)] = Nil
+    }
+}

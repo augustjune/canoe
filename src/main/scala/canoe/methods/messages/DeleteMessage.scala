@@ -1,7 +1,9 @@
 package canoe.methods.messages
 
-import canoe.methods.JsonRequest
-import canoe.models.ChatId
+import canoe.marshalling.CirceEncoders
+import canoe.methods.{JsonRequest, Method}
+import canoe.models.{ChatId, InputFile}
+import io.circe.{Decoder, Encoder}
 
 /** Use this method to delete a message.
   *
@@ -17,3 +19,18 @@ import canoe.models.ChatId
   * @param messageId  Integer Identifier of the message to delete
   */
 case class DeleteMessage(chatId: ChatId, messageId: Int) extends JsonRequest[Boolean]
+
+object DeleteMessage {
+
+  implicit val method: Method[DeleteMessage, Boolean] =
+    new Method[DeleteMessage, Boolean] {
+
+      def name: String = "deleteMessage"
+
+      def encoder: Encoder[DeleteMessage] = CirceEncoders.deleteMessageEncoder
+
+      def decoder: Decoder[Boolean] = Decoder.decodeBoolean
+
+      def uploads(request: DeleteMessage): List[(String, InputFile)] = Nil
+    }
+}

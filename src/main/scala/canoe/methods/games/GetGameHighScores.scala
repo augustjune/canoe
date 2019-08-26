@@ -1,7 +1,9 @@
 package canoe.methods.games
 
-import canoe.methods.JsonRequest
-import canoe.models.{ChatId, GameHighScore}
+import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.methods.{JsonRequest, Method}
+import canoe.models.{ChatId, GameHighScore, InputFile}
+import io.circe.{Decoder, Encoder}
 
 /** Use this method to get data for high score tables.
   * Will return the score of the specified user and several of his neighbors in a game.
@@ -21,3 +23,18 @@ case class GetGameHighScores(userId: Int,
                              messageId: Option[Int] = None,
                              inlineMessageId: Option[String] = None
                             ) extends JsonRequest[Seq[GameHighScore]]
+
+object GetGameHighScores {
+
+  implicit val method: Method[GetGameHighScores, List[GameHighScore]] =
+    new Method[GetGameHighScores, List[GameHighScore]] {
+
+      def name: String = "getGameHighScores"
+
+      def encoder: Encoder[GetGameHighScores] = CirceEncoders.getGameHighScoresEncoder
+
+      def decoder: Decoder[List[GameHighScore]] = Decoder.decodeList(CirceDecoders.gameHighScoreDecoder)
+
+      def uploads(request: GetGameHighScores): List[(String, InputFile)] = Nil
+    }
+}

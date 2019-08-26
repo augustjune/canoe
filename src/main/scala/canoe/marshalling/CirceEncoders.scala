@@ -326,6 +326,7 @@ trait CirceEncoders {
   implicit val editMessageTextEncoder: Encoder[EditMessageText] = deriveEncoder[EditMessageText]
   implicit val editMessageCaptionEncoder: Encoder[EditMessageCaption] = deriveEncoder[EditMessageCaption]
   implicit val editMessageReplyMarkupEncoder: Encoder[EditMessageReplyMarkup] = deriveEncoder[EditMessageReplyMarkup]
+  implicit val editMessageMediaEncoder: Encoder[EditMessageMedia] = deriveEncoder[EditMessageMedia]
 
   implicit val deleteChatPhotoEncoder: Encoder[DeleteChatPhoto] = deriveEncoder[DeleteChatPhoto]
 
@@ -358,12 +359,13 @@ trait CirceEncoders {
   implicit val unpinChatMessageEncoder: Encoder[UnpinChatMessage] = deriveEncoder[UnpinChatMessage]
 
   implicit val sendPollEncoder: Encoder[SendPoll] = deriveEncoder[SendPoll]
-  implicit val StopPollEncoder: Encoder[StopPoll] = deriveEncoder[StopPoll]
+  implicit val stopPollEncoder: Encoder[StopPoll] = deriveEncoder[StopPoll]
 
   // Multipart methods
   implicit val addStickerToSetEncoder: Encoder[AddStickerToSet] = deriveEncoder[AddStickerToSet]
   implicit val createNewStickerSetEncoder: Encoder[CreateNewStickerSet] = deriveEncoder[CreateNewStickerSet]
   implicit val sendAudioEncoder: Encoder[SendAudio] = deriveEncoder[SendAudio]
+  implicit val sendAnimationEncoder: Encoder[SendAnimation] = deriveEncoder[SendAnimation]
   implicit val sendDocumentEncoder: Encoder[SendDocument] = deriveEncoder[SendDocument]
   implicit val sendMediaGroupEncoder: Encoder[SendMediaGroup] =
     deriveEncoder[SendMediaGroup].contramap[SendMediaGroup](s => s.copy(media = s.media.filter(_.media match {

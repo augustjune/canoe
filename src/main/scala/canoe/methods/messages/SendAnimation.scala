@@ -1,9 +1,11 @@
 package canoe.methods.messages
 
-import canoe.methods.MultipartRequest
+import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.methods.{Method, MultipartRequest}
 import canoe.models.ParseMode.ParseMode
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
+import io.circe.{Decoder, Encoder}
 
 /** Use this method to send animation files (GIF or H.264/MPEG-4 AVC video without sound).
   * On success, the sent Message is returned.
@@ -36,4 +38,20 @@ case class SendAnimation(chatId              : ChatId,
   override def getFiles: List[(String, InputFile)] = {
     List("animation" -> animation) ++ thumb.map(t => "thumb" -> t).toList
   }
+}
+
+object SendAnimation {
+
+  implicit val method: Method[SendAnimation, TelegramMessage] =
+    new Method[SendAnimation, TelegramMessage] {
+
+      def name: String = "sendAnimation"
+
+      def encoder: Encoder[SendAnimation] = CirceEncoders.sendAnimationEncoder
+
+      def decoder: Decoder[TelegramMessage] = CirceDecoders.telegramMessageDecoder
+
+      def uploads(request: SendAnimation): List[(String, InputFile)] =
+        List("animation" -> request.animation) ++ request.thumb.map(t => "thumb" -> t).toList
+    }
 }

@@ -1,6 +1,9 @@
 package canoe.methods.queries
 
-import canoe.methods.JsonRequest
+import canoe.marshalling.CirceEncoders
+import canoe.methods.{JsonRequest, Method}
+import canoe.models.InputFile
+import io.circe.{Decoder, Encoder}
 
 /** Use this method to send answers to callback queries sent from inline keyboards.
   *
@@ -27,3 +30,18 @@ case class AnswerCallbackQuery(callbackQueryId: String,
                                url: Option[String] = None,
                                cacheTime: Option[Int] = None
                               ) extends JsonRequest[Boolean]
+
+object AnswerCallbackQuery {
+
+  implicit val method: Method[AnswerCallbackQuery, Boolean] =
+    new Method[AnswerCallbackQuery, Boolean] {
+
+      def name: String = "answerCallbackQuery"
+
+      def encoder: Encoder[AnswerCallbackQuery] = CirceEncoders.answerCallbackQueryEncoder
+
+      def decoder: Decoder[Boolean] = Decoder.decodeBoolean
+
+      def uploads(request: AnswerCallbackQuery): List[(String, InputFile)] = Nil
+    }
+}

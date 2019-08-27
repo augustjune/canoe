@@ -1,7 +1,7 @@
 package canoe.methods.stickers
 
 import canoe.marshalling.CirceEncoders
-import canoe.methods.{Method, MultipartRequest}
+import canoe.methods.Method
 import canoe.models.{InputFile, MaskPosition}
 import io.circe.{Decoder, Encoder}
 
@@ -29,10 +29,7 @@ case class CreateNewStickerSet(userId: Int,
                                pngSticker: InputFile,
                                emojis: String,
                                containsMasks: Option[Boolean] = None,
-                               maskPosition: Option[MaskPosition] = None
-                              ) extends MultipartRequest[Boolean] {
-  override def getFiles: List[(String, InputFile)] = List("png_sticker" -> pngSticker)
-}
+                               maskPosition: Option[MaskPosition] = None)
 
 object CreateNewStickerSet {
 

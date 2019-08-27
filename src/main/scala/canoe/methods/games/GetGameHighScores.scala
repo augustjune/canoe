@@ -1,7 +1,7 @@
 package canoe.methods.games
 
 import canoe.marshalling.{CirceDecoders, CirceEncoders}
-import canoe.methods.{JsonRequest, Method}
+import canoe.methods.Method
 import canoe.models.{ChatId, GameHighScore, InputFile}
 import io.circe.{Decoder, Encoder}
 
@@ -22,7 +22,7 @@ case class GetGameHighScores(userId: Int,
                              chatId: Option[ChatId] = None,
                              messageId: Option[Int] = None,
                              inlineMessageId: Option[String] = None
-                            ) extends JsonRequest[Seq[GameHighScore]]
+                            )
 
 object GetGameHighScores {
 

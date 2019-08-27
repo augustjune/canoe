@@ -1,7 +1,7 @@
 package canoe.methods.webhooks
 
 import canoe.marshalling.{CirceDecoders, CirceEncoders}
-import canoe.methods.{JsonRequest, Method}
+import canoe.methods.Method
 import canoe.models.{InputFile, WebhookInfo}
 import io.circe.{Decoder, Encoder}
 
@@ -9,7 +9,7 @@ import io.circe.{Decoder, Encoder}
   * Requires no parameters. On success, returns a WebhookInfo object.
   * If the bot is using getUpdates, will return an object with the url field empty.
   */
-case object GetWebhookInfo extends JsonRequest[WebhookInfo] {
+case object GetWebhookInfo {
 
   implicit val method: Method[GetWebhookInfo.type, WebhookInfo] =
     new Method[GetWebhookInfo.type, WebhookInfo] {

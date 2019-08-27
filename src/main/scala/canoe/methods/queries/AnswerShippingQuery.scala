@@ -1,7 +1,7 @@
 package canoe.methods.queries
 
 import canoe.marshalling.CirceEncoders
-import canoe.methods.{JsonRequest, Method}
+import canoe.methods.Method
 import canoe.models.{InputFile, ShippingOption}
 import io.circe.{Decoder, Encoder}
 
@@ -25,7 +25,7 @@ case class AnswerShippingQuery(shippingQueryId: String,
                                ok: Boolean,
                                shippingOptions: Option[Array[ShippingOption]] = None,
                                errorMessage: Option[String] = None
-                              ) extends JsonRequest[Boolean] {
+                              ) {
 
   require(!ok || shippingOptions.isDefined, "shippingOptions required if ok is True")
   require(ok || errorMessage.isDefined, "errorMessage required if ok is False")

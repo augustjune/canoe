@@ -1,7 +1,7 @@
 package canoe.methods.messages
 
 import canoe.marshalling.{CirceDecoders, CirceEncoders}
-import canoe.methods.{Method, MultipartRequest}
+import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InputFile, InputMedia}
 import io.circe.{Decoder, Encoder}
@@ -18,10 +18,7 @@ import io.circe.{Decoder, Encoder}
 case class SendMediaGroup(chatId: ChatId,
                           media: List[InputMedia],
                           disableNotification: Option[Boolean] = None,
-                          replyToMessageId: Option[Int] = None) extends MultipartRequest[List[TelegramMessage]] {
-
-  override def getFiles: List[(String, InputFile)] = media.flatMap(_.files)
-}
+                          replyToMessageId: Option[Int] = None)
 
 object SendMediaGroup {
 

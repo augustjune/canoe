@@ -1,7 +1,7 @@
 package canoe.methods.chats
 
 import canoe.marshalling.CirceEncoders
-import canoe.methods.{JsonRequest, Method}
+import canoe.methods.Method
 import canoe.models.{ChatId, InputFile}
 import io.circe.{Decoder, Encoder}
 
@@ -35,7 +35,7 @@ case class PromoteChatMember(chatId: ChatId,
                              canRestrictMembers: Option[Boolean] = None,
                              canPinMessages: Option[Boolean] = None,
                              canPromoteMembers: Option[Boolean] = None
-                            ) extends JsonRequest[Boolean]
+                            )
 
 object PromoteChatMember {
 

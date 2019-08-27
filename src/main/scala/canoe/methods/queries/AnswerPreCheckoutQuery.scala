@@ -1,7 +1,7 @@
 package canoe.methods.queries
 
 import canoe.marshalling.CirceEncoders
-import canoe.methods.{JsonRequest, Method}
+import canoe.methods.Method
 import canoe.models.InputFile
 import io.circe.{Decoder, Encoder}
 
@@ -26,8 +26,7 @@ import io.circe.{Decoder, Encoder}
   */
 case class AnswerPreCheckoutQuery(preCheckoutQueryId : String,
                                   ok                 : Boolean,
-                                  errorMessage       : Option[String] = None
-                                 ) extends JsonRequest[Boolean] {
+                                  errorMessage       : Option[String] = None) {
 
   require(ok || errorMessage.isDefined, "errorMessage is required if ok is False")
 }

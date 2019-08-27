@@ -1,7 +1,7 @@
 package canoe.methods.chats
 
 import canoe.marshalling.CirceEncoders
-import canoe.methods.{Method, MultipartRequest}
+import canoe.methods.Method
 import canoe.models.{ChatId, InputFile}
 import io.circe.{Decoder, Encoder}
 
@@ -16,9 +16,7 @@ import io.circe.{Decoder, Encoder}
   * @param chatId Integer or String Unique identifier for the target chat or username of the target channel (in the format @channelusername)
   * @param photo  InputFile New chat photo, uploaded using multipart/form-data
   */
-case class SetChatPhoto(chatId: ChatId, photo: InputFile) extends MultipartRequest[Boolean] {
-  override def getFiles: List[(String, InputFile)] = List("photo" -> photo)
-}
+case class SetChatPhoto(chatId: ChatId, photo: InputFile)
 
 object SetChatPhoto {
 

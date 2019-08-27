@@ -1,7 +1,7 @@
 package canoe.methods.users
 
 import canoe.marshalling.{CirceDecoders, CirceEncoders}
-import canoe.methods.{JsonRequest, Method}
+import canoe.methods.Method
 import canoe.models.{InputFile, UserProfilePhotos}
 import io.circe.{Decoder, Encoder}
 
@@ -14,7 +14,7 @@ import io.circe.{Decoder, Encoder}
 case class GetUserProfilePhotos(userId: Int,
                                 offset: Option[Int] = None,
                                 limit: Option[Int] = None
-                               ) extends JsonRequest[UserProfilePhotos]
+                               )
 
 object GetUserProfilePhotos {
 

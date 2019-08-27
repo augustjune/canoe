@@ -1,7 +1,7 @@
 package canoe.methods.stickers
 
 import canoe.marshalling.CirceEncoders
-import canoe.methods.{JsonRequest, Method}
+import canoe.methods.Method
 import canoe.models.InputFile
 import io.circe.{Decoder, Encoder}
 
@@ -12,7 +12,7 @@ import io.circe.{Decoder, Encoder}
   * @param sticker   String File identifier of the sticker
   * @param position  Integer New sticker position in the set, zero-based
   */
-case class SetStickerPositionInSet(sticker: String, position: Int) extends JsonRequest[Boolean]
+case class SetStickerPositionInSet(sticker: String, position: Int)
 
 object SetStickerPositionInSet {
 

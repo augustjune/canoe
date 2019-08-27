@@ -1,7 +1,7 @@
 package canoe.methods.chats
 
 import canoe.marshalling.CirceEncoders
-import canoe.methods.{JsonRequest, Method}
+import canoe.methods.Method
 import canoe.models.{ChatId, InputFile}
 import io.circe.{Decoder, Encoder}
 
@@ -13,7 +13,7 @@ import io.circe.{Decoder, Encoder}
   * @param chatId      Integer or String	Yes	Unique identifier for the target chat or username of the target channel (in the format @channelusername)
   * @param description String	No	New chat description, 0-255 characters pinChatMessage  *
   */
-case class SetChatDescription(chatId: ChatId, description: Option[String] = None) extends JsonRequest[Boolean]
+case class SetChatDescription(chatId: ChatId, description: Option[String] = None)
 
 object SetChatDescription {
 

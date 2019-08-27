@@ -1,7 +1,7 @@
 package canoe.methods.chats
 
 import canoe.marshalling.CirceEncoders
-import canoe.methods.{JsonRequest, Method}
+import canoe.methods.Method
 import canoe.models.{ChatId, InputFile}
 import io.circe.{Decoder, Encoder}
 
@@ -12,7 +12,7 @@ import io.circe.{Decoder, Encoder}
   * @param chatId Integer or String Unique identifier for the target group or username of the target supergroup (in the format @supergroupusername)
   * @param userId Integer Unique identifier of the target user
   */
-case class UnbanChatMember(chatId: ChatId, userId: Int) extends JsonRequest[Boolean]
+case class UnbanChatMember(chatId: ChatId, userId: Int)
 
 object UnbanChatMember {
 

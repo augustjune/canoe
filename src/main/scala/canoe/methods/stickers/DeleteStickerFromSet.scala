@@ -1,7 +1,7 @@
 package canoe.methods.stickers
 
 import canoe.marshalling.CirceEncoders
-import canoe.methods.{JsonRequest, Method}
+import canoe.methods.Method
 import canoe.models.InputFile
 import io.circe.{Decoder, Encoder}
 
@@ -11,7 +11,7 @@ import io.circe.{Decoder, Encoder}
   *
   * @param sticker String	File identifier of the sticker
   */
-case class DeleteStickerFromSet(sticker: String) extends JsonRequest[Boolean]
+case class DeleteStickerFromSet(sticker: String)
 
 object DeleteStickerFromSet {
 

@@ -2,7 +2,7 @@ package canoe.methods.updates
 
 
 import canoe.marshalling.{CirceDecoders, CirceEncoders}
-import canoe.methods.{JsonRequest, Method}
+import canoe.methods.Method
 import canoe.models.UpdateType.UpdateType
 import canoe.models.{InputFile, Update}
 import io.circe.{Decoder, Encoder}
@@ -28,7 +28,7 @@ case class GetUpdates(offset: Option[Long] = None,
                       limit: Option[Int] = None,
                       timeout: Option[Int] = None,
                       allowedUpdates: Option[Seq[UpdateType]] = None
-                     ) extends JsonRequest[Seq[Update]]
+                     )
 
 object GetUpdates {
 

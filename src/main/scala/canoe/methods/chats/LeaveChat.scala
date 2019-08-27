@@ -1,7 +1,7 @@
 package canoe.methods.chats
 
 import canoe.marshalling.CirceEncoders
-import canoe.methods.{JsonRequest, Method}
+import canoe.methods.Method
 import canoe.models.{ChatId, InputFile}
 import io.circe.{Decoder, Encoder}
 
@@ -9,7 +9,7 @@ import io.circe.{Decoder, Encoder}
   *
   * @param chatId Integer or String Unique identifier for the target chat or username of the target supergroup or channel (in the format @channelusername)
   */
-case class LeaveChat(chatId: ChatId) extends JsonRequest[Boolean]
+case class LeaveChat(chatId: ChatId)
 
 object LeaveChat {
 

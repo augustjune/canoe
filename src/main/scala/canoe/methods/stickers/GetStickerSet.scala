@@ -1,8 +1,8 @@
 package canoe.methods.stickers
 
 import canoe.marshalling.CirceEncoders
-import canoe.methods.{JsonRequest, Method}
-import canoe.models.{InputFile, StickerSet}
+import canoe.methods.Method
+import canoe.models.InputFile
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -11,7 +11,7 @@ import io.circe.{Decoder, Encoder}
   *
   * @param name  String Name of the sticker set
   */
-case class GetStickerSet(name: String) extends JsonRequest[StickerSet]
+case class GetStickerSet(name: String)
 
 object GetStickerSet {
 

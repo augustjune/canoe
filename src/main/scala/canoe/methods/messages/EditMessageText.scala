@@ -1,7 +1,7 @@
 package canoe.methods.messages
 
 import canoe.marshalling.{CirceDecoders, CirceEncoders}
-import canoe.methods.{JsonRequest, Method}
+import canoe.methods.Method
 import canoe.models.ParseMode.ParseMode
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
@@ -25,7 +25,7 @@ case class EditMessageText(chatId: Option[ChatId] = None,
                            parseMode: Option[ParseMode] = None,
                            disableWebPagePreview: Option[Boolean] = None,
                            replyMarkup: Option[ReplyMarkup] = None
-                          ) extends JsonRequest[Either[Boolean, TelegramMessage]] {
+                          ) {
 
   if (inlineMessageId.isEmpty) {
     require(chatId.isDefined, "Required if inlineMessageId is not specified")

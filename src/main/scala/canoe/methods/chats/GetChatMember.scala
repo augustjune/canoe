@@ -1,7 +1,7 @@
 package canoe.methods.chats
 
 import canoe.marshalling.{CirceDecoders, CirceEncoders}
-import canoe.methods.{JsonRequest, Method}
+import canoe.methods.Method
 import canoe.models.{ChatId, ChatMember, InputFile}
 import io.circe.{Decoder, Encoder}
 
@@ -10,7 +10,7 @@ import io.circe.{Decoder, Encoder}
   * @param chatId Integer or String Unique identifier for the target chat or username of the target supergroup or channel (in the format @channelusername)
   * @param userId Integer Unique identifier of the target user
   */
-case class GetChatMember(chatId: ChatId, userId: Int) extends JsonRequest[ChatMember]
+case class GetChatMember(chatId: ChatId, userId: Int)
 
 object GetChatMember {
 

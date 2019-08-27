@@ -1,7 +1,7 @@
 package canoe.methods.chats
 
 import canoe.marshalling.CirceEncoders
-import canoe.methods.{JsonRequest, Method}
+import canoe.methods.Method
 import canoe.models.{ChatId, InputFile}
 import io.circe.{Decoder, Encoder}
 
@@ -27,7 +27,7 @@ case class RestrictChatMember(chatId: ChatId,
                               canSendMediaMessages: Option[Boolean] = None,
                               canSendOtherMessages: Option[Boolean] = None,
                               canAddWebPagePreviews: Option[Boolean] = None
-                             ) extends JsonRequest[Boolean]
+                             )
 
 object RestrictChatMember {
 

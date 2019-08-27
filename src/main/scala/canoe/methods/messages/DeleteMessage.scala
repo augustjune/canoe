@@ -1,7 +1,7 @@
 package canoe.methods.messages
 
 import canoe.marshalling.CirceEncoders
-import canoe.methods.{JsonRequest, Method}
+import canoe.methods.Method
 import canoe.models.{ChatId, InputFile}
 import io.circe.{Decoder, Encoder}
 
@@ -18,7 +18,7 @@ import io.circe.{Decoder, Encoder}
   * @param chatId     Integer or String Unique identifier for the target chat or username of the target channel (in the format @channelusername)
   * @param messageId  Integer Identifier of the message to delete
   */
-case class DeleteMessage(chatId: ChatId, messageId: Int) extends JsonRequest[Boolean]
+case class DeleteMessage(chatId: ChatId, messageId: Int)
 
 object DeleteMessage {
 

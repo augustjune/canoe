@@ -1,7 +1,7 @@
 package canoe.methods.messages
 
 import canoe.marshalling.{CirceDecoders, CirceEncoders}
-import canoe.methods.{JsonRequest, Method}
+import canoe.methods.Method
 import canoe.models.Currency.Currency
 import canoe.models.messages.TelegramMessage
 import canoe.models.{InputFile, LabeledPrice, ReplyMarkup}
@@ -59,7 +59,7 @@ case class SendInvoice(chatId: Long,
                        disableNotification: Option[Boolean] = None,
                        replyToMessageId: Option[Int] = None,
                        replyMarkup: Option[ReplyMarkup] = None
-                      ) extends JsonRequest[TelegramMessage]
+                      )
 
 object SendInvoice {
 

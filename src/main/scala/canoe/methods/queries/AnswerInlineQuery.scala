@@ -1,7 +1,7 @@
 package canoe.methods.queries
 
 import canoe.marshalling.CirceEncoders
-import canoe.methods.{JsonRequest, Method}
+import canoe.methods.Method
 import canoe.models.{InlineQueryResult, InputFile}
 import io.circe.{Decoder, Encoder}
 
@@ -23,7 +23,7 @@ case class AnswerInlineQuery(inlineQueryId: String,
                              nextOffset: Option[String] = None,
                              switchPmText: Option[String] = None,
                              switchPmParameter: Option[String] = None
-                            ) extends JsonRequest[Boolean]
+                            )
 
 object AnswerInlineQuery {
 

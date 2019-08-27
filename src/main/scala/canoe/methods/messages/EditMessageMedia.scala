@@ -1,7 +1,7 @@
 package canoe.methods.messages
 
 import canoe.marshalling.{CirceDecoders, CirceEncoders}
-import canoe.methods.{Method, MultipartRequest}
+import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InlineKeyboardMarkup, InputFile, InputMedia}
 import io.circe.{Decoder, Encoder}
@@ -24,10 +24,7 @@ case class EditMessageMedia(chatId: Option[ChatId] = None,
                             inlineMessageId: Option[String] = None,
                             media: InputMedia,
                             replyMarkup: Option[InlineKeyboardMarkup] = None
-                           ) extends MultipartRequest[Either[Boolean, TelegramMessage]] {
-
-  override def getFiles: List[(String, InputFile)] = media.files
-}
+                           )
 
 object EditMessageMedia {
 

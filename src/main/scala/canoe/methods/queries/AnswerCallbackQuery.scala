@@ -1,7 +1,7 @@
 package canoe.methods.queries
 
 import canoe.marshalling.CirceEncoders
-import canoe.methods.{JsonRequest, Method}
+import canoe.methods.Method
 import canoe.models.InputFile
 import io.circe.{Decoder, Encoder}
 
@@ -29,7 +29,7 @@ case class AnswerCallbackQuery(callbackQueryId: String,
                                showAlert: Option[Boolean] = None,
                                url: Option[String] = None,
                                cacheTime: Option[Int] = None
-                              ) extends JsonRequest[Boolean]
+                              )
 
 object AnswerCallbackQuery {
 

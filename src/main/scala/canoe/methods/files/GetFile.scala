@@ -1,7 +1,7 @@
 package canoe.methods.files
 
 import canoe.marshalling.{CirceDecoders, CirceEncoders}
-import canoe.methods.{JsonRequest, Method}
+import canoe.methods.Method
 import canoe.models.{File, InputFile}
 import io.circe.{Decoder, Encoder}
 
@@ -14,7 +14,7 @@ import io.circe.{Decoder, Encoder}
   *
   * @param fileId String File identifier to get info about
   */
-case class GetFile(fileId : String) extends JsonRequest[File]
+case class GetFile(fileId : String)
 
 object GetFile {
 

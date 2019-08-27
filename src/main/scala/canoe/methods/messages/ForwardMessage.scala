@@ -1,7 +1,7 @@
 package canoe.methods.messages
 
 import canoe.marshalling.{CirceDecoders, CirceEncoders}
-import canoe.methods.{JsonRequest, Method}
+import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InputFile}
 import io.circe.{Decoder, Encoder}
@@ -17,7 +17,7 @@ case class ForwardMessage(chatId: ChatId,
                           fromChatId: ChatId,
                           disableNotification: Option[Boolean] = None,
                           messageId: Int
-                         ) extends JsonRequest[TelegramMessage]
+                         )
 
 object ForwardMessage {
 

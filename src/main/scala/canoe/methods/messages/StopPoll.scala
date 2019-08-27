@@ -1,7 +1,7 @@
 package canoe.methods.messages
 
 import canoe.marshalling.{CirceDecoders, CirceEncoders}
-import canoe.methods.{JsonRequest, Method}
+import canoe.methods.Method
 import canoe.models.{ChatId, InputFile, Poll, ReplyMarkup}
 import io.circe.{Decoder, Encoder}
 
@@ -16,7 +16,7 @@ import io.circe.{Decoder, Encoder}
 case class StopPoll(chatId      : ChatId,
                     messageId   : Int,
                     replyMarkup : Option[ReplyMarkup] = None
-                   ) extends JsonRequest[Poll]
+                   )
 
 object StopPoll {
 

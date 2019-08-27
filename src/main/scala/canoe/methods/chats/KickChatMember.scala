@@ -1,7 +1,7 @@
 package canoe.methods.chats
 
 import canoe.marshalling.CirceEncoders
-import canoe.methods.{JsonRequest, Method}
+import canoe.methods.Method
 import canoe.models.{ChatId, InputFile}
 import io.circe.{Decoder, Encoder}
 
@@ -23,7 +23,7 @@ import io.circe.{Decoder, Encoder}
 case class KickChatMember(chatId: ChatId,
                           userId: Int,
                           untilDate: Option[Int] = None
-                         ) extends JsonRequest[Boolean]
+                         )
 
 object KickChatMember {
 

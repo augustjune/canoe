@@ -1,7 +1,7 @@
 package canoe.methods.webhooks
 
 import canoe.marshalling.CirceEncoders
-import canoe.methods.{Method, MultipartRequest}
+import canoe.methods.Method
 import canoe.models.InputFile
 import canoe.models.UpdateType.UpdateType
 import io.circe.{Decoder, Encoder}
@@ -33,10 +33,7 @@ import io.circe.{Decoder, Encoder}
 case class SetWebhook(url: String,
                       certificate: Option[InputFile] = None,
                       maxConnections: Option[Int] = None,
-                      allowedUpdates: Option[Seq[UpdateType]] = None
-                     ) extends MultipartRequest[Boolean] {
-  override def getFiles: List[(String, InputFile)] = certificate.map("certificate" -> _).toList
-}
+                      allowedUpdates: Option[Seq[UpdateType]] = None)
 
 object SetWebhook {
 

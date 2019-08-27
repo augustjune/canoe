@@ -1,7 +1,7 @@
 package canoe.methods.messages
 
 import canoe.marshalling.{CirceDecoders, CirceEncoders}
-import canoe.methods.{JsonRequest, Method}
+import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
 import io.circe.{Decoder, Encoder}
@@ -33,7 +33,7 @@ case class SendVenue(chatId: ChatId,
                      disableNotification: Option[Boolean] = None,
                      replyToMessageId: Option[Int] = None,
                      replyMarkup: Option[ReplyMarkup] = None
-                    ) extends JsonRequest[TelegramMessage]
+                    )
 
 object SendVenue {
 

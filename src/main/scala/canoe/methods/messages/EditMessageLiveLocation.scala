@@ -1,7 +1,7 @@
 package canoe.methods.messages
 
 import canoe.marshalling.{CirceDecoders, CirceEncoders}
-import canoe.methods.{JsonRequest, Method}
+import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InlineKeyboardMarkup, InputFile}
 import io.circe.{Decoder, Encoder}
@@ -25,7 +25,7 @@ case class EditMessageLiveLocation(chatId          : Option[ChatId] = None,
                                    latitude        : Option[Double] = None,
                                    longitude       : Option[Double] = None,
                                    replyMarkup     : Option[InlineKeyboardMarkup] = None
-                                  ) extends JsonRequest[Either[Boolean, TelegramMessage]]
+                                  )
 
 object EditMessageLiveLocation {
 

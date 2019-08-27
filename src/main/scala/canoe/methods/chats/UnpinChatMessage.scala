@@ -1,7 +1,7 @@
 package canoe.methods.chats
 
 import canoe.marshalling.CirceEncoders
-import canoe.methods.{JsonRequest, Method}
+import canoe.methods.Method
 import canoe.models.{ChatId, InputFile}
 import io.circe.{Decoder, Encoder}
 
@@ -13,7 +13,7 @@ import io.circe.{Decoder, Encoder}
   *
   * @param chatId Integer or String Unique identifier for the target chat or username of the target channel (in the format @channelusername)
   */
-case class UnpinChatMessage(chatId: ChatId) extends JsonRequest[Boolean]
+case class UnpinChatMessage(chatId: ChatId)
 
 object UnpinChatMessage {
 

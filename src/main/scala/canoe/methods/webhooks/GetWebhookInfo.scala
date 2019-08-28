@@ -1,9 +1,9 @@
 package canoe.methods.webhooks
 
-import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.marshalling.CirceDecoders
 import canoe.methods.Method
 import canoe.models.{InputFile, WebhookInfo}
-import io.circe.{Decoder, Encoder}
+import io.circe.{Decoder, Encoder, Json}
 
 /** Use this method to get current webhook status.
   * Requires no parameters. On success, returns a WebhookInfo object.
@@ -16,7 +16,7 @@ case object GetWebhookInfo {
 
       def name: String = "getWebhookInfo"
 
-      def encoder: Encoder[GetWebhookInfo.type] = CirceEncoders.getWebhookInfoEncoder
+      def encoder: Encoder[GetWebhookInfo.type] = Encoder.instance(_ => Json.Null)
 
       def decoder: Decoder[WebhookInfo] = CirceDecoders.webhookInfoDecoder
 

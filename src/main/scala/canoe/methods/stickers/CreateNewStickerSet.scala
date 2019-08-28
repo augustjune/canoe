@@ -1,8 +1,9 @@
 package canoe.methods.stickers
 
-import canoe.marshalling.CirceEncoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.{InputFile, MaskPosition}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -32,13 +33,14 @@ case class CreateNewStickerSet(userId: Int,
                                maskPosition: Option[MaskPosition] = None)
 
 object CreateNewStickerSet {
+  import io.circe.generic.auto._
 
   implicit val method: Method[CreateNewStickerSet, Boolean] =
     new Method[CreateNewStickerSet, Boolean] {
 
       def name: String = "createNewStickerSet"
 
-      def encoder: Encoder[CreateNewStickerSet] = CirceEncoders.createNewStickerSetEncoder
+      def encoder: Encoder[CreateNewStickerSet] = deriveEncoder[CreateNewStickerSet].snakeCase
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 

@@ -1,9 +1,11 @@
 package canoe.methods.messages
 
-import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.marshalling.CirceDecoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /** Use this method to send information about a venue. On success, the sent Message is returned.
@@ -36,13 +38,14 @@ case class SendVenue(chatId: ChatId,
                     )
 
 object SendVenue {
+  import io.circe.generic.auto._
 
   implicit val method: Method[SendVenue, TelegramMessage] =
     new Method[SendVenue, TelegramMessage] {
 
       def name: String = "sendVenue"
 
-      def encoder: Encoder[SendVenue] = CirceEncoders.sendVenueEncoder
+      def encoder: Encoder[SendVenue] = deriveEncoder[SendVenue].snakeCase
 
       def decoder: Decoder[TelegramMessage] = CirceDecoders.telegramMessageDecoder
 

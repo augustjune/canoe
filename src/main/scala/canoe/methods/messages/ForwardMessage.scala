@@ -1,9 +1,11 @@
 package canoe.methods.messages
 
-import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.marshalling.CirceDecoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InputFile}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /** Use this method to forward messages of any kind. On success, the sent Message is returned.
@@ -26,7 +28,7 @@ object ForwardMessage {
 
       def name: String = "forwardMessage"
 
-      def encoder: Encoder[ForwardMessage] = CirceEncoders.forwardMessageEncoder
+      def encoder: Encoder[ForwardMessage] = deriveEncoder[ForwardMessage].snakeCase
 
       def decoder: Decoder[TelegramMessage] = CirceDecoders.telegramMessageDecoder
 

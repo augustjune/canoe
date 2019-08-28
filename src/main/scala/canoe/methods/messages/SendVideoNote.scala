@@ -1,9 +1,11 @@
 package canoe.methods.messages
 
-import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.marshalling.CirceDecoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -33,13 +35,14 @@ case class SendVideoNote(chatId: ChatId,
                         )
 
 object SendVideoNote {
+  import io.circe.generic.auto._
 
   implicit val method: Method[SendVideoNote, TelegramMessage] =
     new Method[SendVideoNote, TelegramMessage] {
 
       def name: String = "sendVideoNote"
 
-      def encoder: Encoder[SendVideoNote] = CirceEncoders.sendVideoNoteEncoder
+      def encoder: Encoder[SendVideoNote] = deriveEncoder[SendVideoNote].snakeCase
 
       def decoder: Decoder[TelegramMessage] = CirceDecoders.telegramMessageDecoder
 

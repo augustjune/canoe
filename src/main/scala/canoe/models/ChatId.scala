@@ -1,5 +1,8 @@
 package canoe.models
 
+import io.circe.Encoder
+import io.circe.syntax._
+
 import scala.language.implicitConversions
 
 /**
@@ -27,4 +30,9 @@ object ChatId {
 
   def apply(chat: Long): ChatId = Chat(chat)
   def apply(channel: String): ChatId = Channel(channel)
+
+  implicit val chatIdEncoder: Encoder[ChatId] = Encoder.instance {
+    case ChatId.Chat(chat) => chat.asJson
+    case ChatId.Channel(channel) => channel.asJson
+  }
 }

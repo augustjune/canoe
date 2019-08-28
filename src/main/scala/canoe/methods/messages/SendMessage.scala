@@ -1,10 +1,12 @@
 package canoe.methods.messages
 
-import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.marshalling.CirceDecoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.ParseMode.ParseMode
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /** Use this method to send text messages.
@@ -60,13 +62,14 @@ case class SendMessage(chatId: ChatId,
                       )
 
 object SendMessage {
+  import io.circe.generic.auto._
 
   implicit val method: Method[SendMessage, TelegramMessage] =
     new Method[SendMessage, TelegramMessage] {
 
       def name: String = "sendMessage"
 
-      def encoder: Encoder[SendMessage] = CirceEncoders.sendMessageEncoder
+      def encoder: Encoder[SendMessage] = deriveEncoder[SendMessage].snakeCase
 
       def decoder: Decoder[TelegramMessage] = CirceDecoders.telegramMessageDecoder
 

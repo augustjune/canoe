@@ -1,8 +1,9 @@
 package canoe.methods.queries
 
-import canoe.marshalling.CirceEncoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.{InputFile, ShippingOption}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -32,13 +33,14 @@ case class AnswerShippingQuery(shippingQueryId: String,
 }
 
 object AnswerShippingQuery {
+  import io.circe.generic.auto._
 
   implicit val method: Method[AnswerShippingQuery, Boolean] =
     new Method[AnswerShippingQuery, Boolean] {
 
       def name: String = "answerShippingQuery"
 
-      def encoder: Encoder[AnswerShippingQuery] = CirceEncoders.answerShippingQueryEncoder
+      def encoder: Encoder[AnswerShippingQuery] = deriveEncoder[AnswerShippingQuery].snakeCase
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 

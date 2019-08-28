@@ -1,9 +1,11 @@
 package canoe.methods.games
 
-import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.marshalling.CirceDecoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InputFile}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /** Use this method to set the score of the specified user in a game.
@@ -48,7 +50,7 @@ object SetGameScore {
 
       def name: String = "setGameScore"
 
-      def encoder: Encoder[SetGameScore] = CirceEncoders.setGameScoreEncoder
+      def encoder: Encoder[SetGameScore] = deriveEncoder[SetGameScore].snakeCase
 
       def decoder: Decoder[Either[Boolean, TelegramMessage]] =
       // ToDo - set keys

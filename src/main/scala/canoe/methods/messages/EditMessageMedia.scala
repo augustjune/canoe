@@ -1,9 +1,11 @@
 package canoe.methods.messages
 
-import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.marshalling.CirceDecoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InlineKeyboardMarkup, InputFile, InputMedia}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /** Use this method to edit audio, document, photo, or video messages.
@@ -27,13 +29,14 @@ case class EditMessageMedia(chatId: Option[ChatId] = None,
                            )
 
 object EditMessageMedia {
+  import io.circe.generic.auto._
 
   implicit val method: Method[EditMessageMedia, Either[Boolean, TelegramMessage]] =
     new Method[EditMessageMedia, Either[Boolean, TelegramMessage]] {
 
       def name: String = "editMessageMedia"
 
-      def encoder: Encoder[EditMessageMedia] = CirceEncoders.editMessageMediaEncoder
+      def encoder: Encoder[EditMessageMedia] = deriveEncoder[EditMessageMedia].snakeCase
 
       def decoder: Decoder[Either[Boolean, TelegramMessage]] =
       // ToDo - set keys

@@ -1,9 +1,11 @@
 package canoe.methods.messages
 
-import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.marshalling.CirceDecoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InlineKeyboardMarkup, InputFile}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -23,13 +25,14 @@ case class StopMessageLiveLocation(chatId: Option[ChatId] = None,
                                   )
 
 object StopMessageLiveLocation {
+  import io.circe.generic.auto._
 
   implicit val method: Method[StopMessageLiveLocation, Either[Boolean, TelegramMessage]] =
     new Method[StopMessageLiveLocation, Either[Boolean, TelegramMessage]] {
 
       def name: String = "stopMessageLiveLocation"
 
-      def encoder: Encoder[StopMessageLiveLocation] = CirceEncoders.stopMessageLiveLocationEncoder
+      def encoder: Encoder[StopMessageLiveLocation] = deriveEncoder[StopMessageLiveLocation].snakeCase
 
       def decoder: Decoder[Either[Boolean, TelegramMessage]] =
       // ToDo - set keys

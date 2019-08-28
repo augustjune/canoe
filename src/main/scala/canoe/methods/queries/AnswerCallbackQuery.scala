@@ -1,8 +1,9 @@
 package canoe.methods.queries
 
-import canoe.marshalling.CirceEncoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.InputFile
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /** Use this method to send answers to callback queries sent from inline keyboards.
@@ -38,7 +39,7 @@ object AnswerCallbackQuery {
 
       def name: String = "answerCallbackQuery"
 
-      def encoder: Encoder[AnswerCallbackQuery] = CirceEncoders.answerCallbackQueryEncoder
+      def encoder: Encoder[AnswerCallbackQuery] = deriveEncoder[AnswerCallbackQuery].snakeCase
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 

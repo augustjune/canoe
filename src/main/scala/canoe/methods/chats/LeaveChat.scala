@@ -1,8 +1,9 @@
 package canoe.methods.chats
 
-import canoe.marshalling.CirceEncoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.{ChatId, InputFile}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /** Use this method for your bot to leave a group, supergroup or channel. Returns True on success.
@@ -18,7 +19,7 @@ object LeaveChat {
 
       def name: String = "leaveChat"
 
-      def encoder: Encoder[LeaveChat] = CirceEncoders.leaveChatEncoder
+      def encoder: Encoder[LeaveChat] = deriveEncoder[LeaveChat].snakeCase
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 

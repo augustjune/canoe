@@ -1,8 +1,10 @@
 package canoe.methods.users
 
-import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.marshalling.CirceDecoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.{InputFile, UserProfilePhotos}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /** Use this method to get a list of profile pictures for a user. Returns a UserProfilePhotos object.
@@ -23,7 +25,7 @@ object GetUserProfilePhotos {
 
       def name: String = "getUserProfilePhotos"
 
-      def encoder: Encoder[GetUserProfilePhotos] = CirceEncoders.getUserProfilePhotosEncoder
+      def encoder: Encoder[GetUserProfilePhotos] = deriveEncoder[GetUserProfilePhotos].snakeCase
 
       def decoder: Decoder[UserProfilePhotos] = CirceDecoders.userProfilePhotosDecoder
 

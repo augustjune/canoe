@@ -1,9 +1,10 @@
 package canoe.methods.webhooks
 
-import canoe.marshalling.CirceEncoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.InputFile
 import canoe.models.UpdateType.UpdateType
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /** Use this method to specify a url and receive incoming updates via an outgoing webhook.
@@ -42,7 +43,7 @@ object SetWebhook {
 
       def name: String = "setWebhook"
 
-      def encoder: Encoder[SetWebhook] = CirceEncoders.setWebhookEncoder
+      def encoder: Encoder[SetWebhook] = deriveEncoder[SetWebhook].snakeCase
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 

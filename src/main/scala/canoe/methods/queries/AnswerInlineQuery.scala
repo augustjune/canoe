@@ -1,8 +1,9 @@
 package canoe.methods.queries
 
-import canoe.marshalling.CirceEncoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.{InlineQueryResult, InputFile}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /** Use this method to send answers to an inline query. On success, True is returned.
@@ -26,13 +27,14 @@ case class AnswerInlineQuery(inlineQueryId: String,
                             )
 
 object AnswerInlineQuery {
+  import io.circe.generic.auto._
 
   implicit val method: Method[AnswerInlineQuery, Boolean] =
     new Method[AnswerInlineQuery, Boolean] {
 
       def name: String = "answerInlineQuery"
 
-      def encoder: Encoder[AnswerInlineQuery] = CirceEncoders.answerInlineQueryEncoder
+      def encoder: Encoder[AnswerInlineQuery] = deriveEncoder[AnswerInlineQuery].snakeCase
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 

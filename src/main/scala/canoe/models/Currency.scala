@@ -1,5 +1,7 @@
 package canoe.models
 
+import io.circe.Encoder
+
 import scala.language.implicitConversions
 
 /**
@@ -22,6 +24,9 @@ object Currency extends Enumeration {
                                       maxAmount    : Long) extends Val(code)
 
   implicit def valueToCurrency(v: Value): TelegramCurrency = v.asInstanceOf[TelegramCurrency]
+
+  implicit val currencyEncoder: Encoder[Currency] =
+    Encoder[String].contramap(c => c.asInstanceOf[TelegramCurrency].code)
 
   val AED = TelegramCurrency(code = "AED", title = "United Arab Emirates Dirham", symbol = "AED", native = "\u062f.\u0625.\u200f", thousandsSep = ",", decimalSep = ".", symbolLeft = true, spaceBetween = true, exp = 2, minAmount = 367, maxAmount = 3672902)
   val AFN = TelegramCurrency(code = "AFN", title = "Afghan Afghani", symbol = "AFN", native = "\u060b", thousandsSep = ",", decimalSep = ".", symbolLeft = true, spaceBetween = false, exp = 2, minAmount = 6805, maxAmount = 68050003)

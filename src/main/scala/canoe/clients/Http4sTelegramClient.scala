@@ -41,16 +41,14 @@ class Http4sTelegramClient[F[_]: Sync](token: String, client: Client[F]) extends
   }
 
   private def prepareJsonRequest[Req, Res](url: Uri, method: Method[Req, Res], action: Req): F[Request[F]] = {
-    val body: String = marshalling.toJson(action)(method.encoder)
-
-    Method.POST(body, url).map(_.withContentType(`Content-Type`(MediaType.application.json)))
+    Method.POST(action, url)(Sync[F], jsonEncoderOf(Sync[F], method.encoder))
   }
 
   private def prepareMultipartRequest[Req, Res](url: Uri, method: Method[Req, Res], action: Req, parts: List[Part[F]]): F[Request[F]] = {
     val multipart = Multipart[F](parts.toVector)
 
     val params =
-      marshalling.snakeKeys(method.encoder(action))
+      method.encoder(action)
         .asObject
         .map(_.toMap
           .filterNot(kv => kv._2.isNull || kv._2.isObject)

@@ -1,5 +1,7 @@
 package canoe.models
 
+import io.circe.Encoder
+
 import scala.language.implicitConversions
 
 /**
@@ -7,11 +9,13 @@ import scala.language.implicitConversions
   */
 object CountryCode extends Enumeration {
   type CountryCode = Value
-  sealed case class Country(
-                                code        : String,
-                                englishName : String) extends Val(code)
+  sealed case class Country(code        : String,
+                            englishName : String) extends Val(code)
 
   implicit def valueToCountry(v: Value): Country = v.asInstanceOf[Country]
+
+  implicit val countryCodeEncoder: Encoder[CountryCode] =
+    Encoder[String].contramap(_.toString)
 
   val AD = Country(code = "AD", englishName = "Andorra")
   val AE = Country(code = "AE", englishName = "United Arab Emirates")

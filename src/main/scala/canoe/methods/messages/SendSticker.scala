@@ -1,9 +1,11 @@
 package canoe.methods.messages
 
-import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.marshalling.CirceDecoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /** Use this method to send .webp stickers. On success, the sent Message is returned.
@@ -27,13 +29,14 @@ case class SendSticker(chatId: ChatId,
                       )
 
 object SendSticker {
+  import io.circe.generic.auto._
 
   implicit val method: Method[SendSticker, TelegramMessage] =
     new Method[SendSticker, TelegramMessage] {
 
       def name: String = "sendSticker"
 
-      def encoder: Encoder[SendSticker] = CirceEncoders.sendStickerEncoder
+      def encoder: Encoder[SendSticker] = deriveEncoder[SendSticker].snakeCase
 
       def decoder: Decoder[TelegramMessage] = CirceDecoders.telegramMessageDecoder
 

@@ -1,8 +1,10 @@
 package canoe.methods.stickers
 
-import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.marshalling.CirceDecoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.{File, InputFile}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -18,13 +20,14 @@ import io.circe.{Decoder, Encoder}
 case class UploadStickerFile(userId: Int, pngSticker: InputFile)
 
 object UploadStickerFile {
+  import io.circe.generic.auto._
 
   implicit val method: Method[UploadStickerFile, File] =
     new Method[UploadStickerFile, File] {
 
       def name: String = "uploadStickerFile"
 
-      def encoder: Encoder[UploadStickerFile] = CirceEncoders.uploadStickerFileEncoder
+      def encoder: Encoder[UploadStickerFile] = deriveEncoder[UploadStickerFile].snakeCase
 
       def decoder: Decoder[File] = CirceDecoders.fileDecoder
 

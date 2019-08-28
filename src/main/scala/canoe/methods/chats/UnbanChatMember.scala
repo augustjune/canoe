@@ -1,8 +1,9 @@
 package canoe.methods.chats
 
-import canoe.marshalling.CirceEncoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.{ChatId, InputFile}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /** Use this method to unban a previously kicked user in a supergroup.
@@ -21,7 +22,7 @@ object UnbanChatMember {
 
       def name: String = "unbanChatMember"
 
-      def encoder: Encoder[UnbanChatMember] = CirceEncoders.unbanChatMemberEncoder
+      def encoder: Encoder[UnbanChatMember] = deriveEncoder[UnbanChatMember].snakeCase
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 

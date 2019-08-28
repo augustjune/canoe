@@ -1,9 +1,11 @@
 package canoe.methods.messages
 
-import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.marshalling.CirceDecoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /** Use this method to send point on the map.
@@ -31,13 +33,14 @@ case class SendLocation(chatId: ChatId,
                        )
 
 object SendLocation {
+  import io.circe.generic.auto._
 
   implicit val method: Method[SendLocation, TelegramMessage] =
     new Method[SendLocation, TelegramMessage] {
 
       def name: String = "sendLocation"
 
-      def encoder: Encoder[SendLocation] = CirceEncoders.sendLocationEncoder
+      def encoder: Encoder[SendLocation] = deriveEncoder[SendLocation].snakeCase
 
       def decoder: Decoder[TelegramMessage] = CirceDecoders.telegramMessageDecoder
 

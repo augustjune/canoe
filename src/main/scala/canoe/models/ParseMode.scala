@@ -1,5 +1,7 @@
 package canoe.models
 
+import io.circe.Encoder
+
 /** Formatting options
   *   The Bot API supports basic formatting for messages.
   *   You can use bold and italic text, as well as inline links and pre-formatted code in your bots' messages.
@@ -33,4 +35,7 @@ object ParseMode extends Enumeration {
   type ParseMode = Value
   val Markdown = Value("Markdown")
   val HTML = Value("HTML")
+
+  implicit val parseModeEncoder: Encoder[ParseMode] =
+    Encoder[String].contramap[ParseMode](_.toString)
 }

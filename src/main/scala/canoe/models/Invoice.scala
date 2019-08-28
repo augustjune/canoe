@@ -1,7 +1,8 @@
 package canoe.models
 
 import canoe.models.Currency.Currency
-
+import io.circe.Encoder
+import io.circe.generic.semiauto.deriveEncoder
 
 /**
   * This object contains basic information about an invoice.
@@ -12,10 +13,13 @@ import canoe.models.Currency.Currency
   * @param currency       String Three-letter ISO 4217 currency code
   * @param totalAmount    Integer Total price in the smallest units of the currency (integer, not float/double). For example, for a price of US$ 1.45 pass amount = 145. See the exp parameter in currencies.json, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).
   */
-case class Invoice(
-                  title          : String,
-                  description    : String,
-                  startParameter : String,
-                  currency       : Currency,
-                  totalAmount    : Long
-                  )
+case class Invoice(title: String,
+                   description: String,
+                   startParameter: String,
+                   currency: Currency,
+                   totalAmount: Long)
+
+object Invoice {
+
+  implicit val invoiceEncoder: Encoder[Invoice] = deriveEncoder[Invoice]
+}

@@ -1,10 +1,12 @@
 package canoe.methods.messages
 
-import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.marshalling.CirceDecoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.Currency.Currency
 import canoe.models.messages.TelegramMessage
 import canoe.models.{InputFile, LabeledPrice, ReplyMarkup}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -62,13 +64,14 @@ case class SendInvoice(chatId: Long,
                       )
 
 object SendInvoice {
+  import io.circe.generic.auto._
 
   implicit val method: Method[SendInvoice, TelegramMessage] =
     new Method[SendInvoice, TelegramMessage] {
 
       def name: String = "sendInvoice"
 
-      def encoder: Encoder[SendInvoice] = CirceEncoders.sendInvoiceEncoder
+      def encoder: Encoder[SendInvoice] = deriveEncoder[SendInvoice].snakeCase
 
       def decoder: Decoder[TelegramMessage] = CirceDecoders.telegramMessageDecoder
 

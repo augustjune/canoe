@@ -1,8 +1,9 @@
 package canoe.methods.chats
 
-import canoe.marshalling.CirceEncoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.{ChatId, InputFile}
+import io.circe.generic.semiauto._
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -25,7 +26,7 @@ object DeleteChatPhoto {
 
       def name: String = "deleteChatPhoto"
 
-      def encoder: Encoder[DeleteChatPhoto] = CirceEncoders.deleteChatPhotoEncoder
+      def encoder: Encoder[DeleteChatPhoto] = deriveEncoder[DeleteChatPhoto].snakeCase
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 

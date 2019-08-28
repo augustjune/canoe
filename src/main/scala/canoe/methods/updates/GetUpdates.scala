@@ -1,10 +1,12 @@
 package canoe.methods.updates
 
 
-import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.marshalling.CirceDecoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.UpdateType.UpdateType
 import canoe.models.{InputFile, Update}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 
@@ -31,13 +33,14 @@ case class GetUpdates(offset: Option[Long] = None,
                      )
 
 object GetUpdates {
+  import io.circe.generic.auto._
 
   implicit val method: Method[GetUpdates, List[Update]] =
     new Method[GetUpdates, List[Update]] {
 
       def name: String = "getUpdates"
 
-      def encoder: Encoder[GetUpdates] = CirceEncoders.getUpdatesEncoder
+      def encoder: Encoder[GetUpdates] = deriveEncoder[GetUpdates].snakeCase
 
       def decoder: Decoder[List[Update]] = Decoder.decodeList(CirceDecoders.updateDecoder)
 

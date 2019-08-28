@@ -1,8 +1,10 @@
 package canoe.methods.messages
 
-import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.marshalling.CirceDecoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.{ChatId, InputFile, Poll, ReplyMarkup}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -19,13 +21,14 @@ case class StopPoll(chatId      : ChatId,
                    )
 
 object StopPoll {
+  import io.circe.generic.auto._
 
   implicit val method: Method[StopPoll, Poll] =
     new Method[StopPoll, Poll] {
 
       def name: String = "stopPoll"
 
-      def encoder: Encoder[StopPoll] = CirceEncoders.stopPollEncoder
+      def encoder: Encoder[StopPoll] = deriveEncoder[StopPoll].snakeCase
 
       def decoder: Decoder[Poll] = CirceDecoders.pollDecoder
 

@@ -1,8 +1,10 @@
 package canoe.methods.chats
 
-import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.marshalling.CirceDecoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.{ChatId, ChatMember, InputFile}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /** Use this method to get a list of administrators in a chat.
@@ -20,7 +22,7 @@ object GetChatAdministrators {
 
       def name: String = "getChatAdministrators"
 
-      def encoder: Encoder[GetChatAdministrators] = CirceEncoders.getChatAdministratorsEncoder
+      def encoder: Encoder[GetChatAdministrators] = deriveEncoder[GetChatAdministrators].snakeCase
 
       def decoder: Decoder[List[ChatMember]] = Decoder.decodeList(CirceDecoders.chatMemberDecoder)
 

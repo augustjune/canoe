@@ -1,10 +1,12 @@
 package canoe.methods.messages
 
-import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.marshalling.CirceDecoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.ParseMode.ParseMode
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /** Use this method to edit text messages sent by the bot or via the bot (for inline bots).
@@ -37,13 +39,14 @@ case class EditMessageText(chatId: Option[ChatId] = None,
 }
 
 object EditMessageText {
+  import io.circe.generic.auto._
 
   implicit val method: Method[EditMessageText, Either[Boolean, TelegramMessage]] =
     new Method[EditMessageText, Either[Boolean, TelegramMessage]] {
 
       def name: String = "editMessageText"
 
-      def encoder: Encoder[EditMessageText] = CirceEncoders.editMessageTextEncoder
+      def encoder: Encoder[EditMessageText] = deriveEncoder[EditMessageText].snakeCase
 
       def decoder: Decoder[Either[Boolean, TelegramMessage]] =
       // ToDo - set keys

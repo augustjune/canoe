@@ -1,10 +1,12 @@
 package canoe.methods.messages
 
-import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.marshalling.CirceDecoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.ParseMode.ParseMode
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /** Use this method to send audio files, if you want Telegram clients to display them in the music player.
@@ -44,13 +46,14 @@ case class SendAudio(chatId: ChatId,
                     )
 
 object SendAudio {
+  import io.circe.generic.auto._
 
   implicit val method: Method[SendAudio, TelegramMessage] =
     new Method[SendAudio, TelegramMessage] {
 
       def name: String = "sendAudio"
 
-      def encoder: Encoder[SendAudio] = CirceEncoders.sendAudioEncoder
+      def encoder: Encoder[SendAudio] = deriveEncoder[SendAudio].snakeCase
 
       def decoder: Decoder[TelegramMessage] = CirceDecoders.telegramMessageDecoder
 

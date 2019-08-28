@@ -1,8 +1,9 @@
 package canoe.methods.stickers
 
-import canoe.marshalling.CirceEncoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.InputFile
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -20,7 +21,7 @@ object GetStickerSet {
 
       def name: String = "getStickerSet"
 
-      def encoder: Encoder[GetStickerSet] = CirceEncoders.getStickerSetEncoder
+      def encoder: Encoder[GetStickerSet] = deriveEncoder[GetStickerSet].snakeCase
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 

@@ -1,8 +1,9 @@
 package canoe.methods.chats
 
-import canoe.marshalling.CirceEncoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.{ChatId, InputFile}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -28,7 +29,7 @@ object PinChatMessage {
 
       def name: String = "pinChatMessage"
 
-      def encoder: Encoder[PinChatMessage] = CirceEncoders.pinChatMessageEncoder
+      def encoder: Encoder[PinChatMessage] = deriveEncoder[PinChatMessage].snakeCase
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 

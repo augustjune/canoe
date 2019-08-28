@@ -1,10 +1,12 @@
 package canoe.methods.messages
 
-import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.marshalling.CirceDecoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.ParseMode.ParseMode
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /** Use this method to send video files, Telegram clients support mp4 videos (other formats may be sent as Document).
@@ -42,13 +44,14 @@ case class SendVideo(chatId: ChatId,
                     )
 
 object SendVideo {
+  import io.circe.generic.auto._
 
   implicit val method: Method[SendVideo, TelegramMessage] =
     new Method[SendVideo, TelegramMessage] {
 
       def name: String = "sendVideo"
 
-      def encoder: Encoder[SendVideo] = CirceEncoders.sendVideoEncoder
+      def encoder: Encoder[SendVideo] = deriveEncoder[SendVideo].snakeCase
 
       def decoder: Decoder[TelegramMessage] = CirceDecoders.telegramMessageDecoder
 

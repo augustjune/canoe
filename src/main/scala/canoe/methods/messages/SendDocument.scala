@@ -1,10 +1,12 @@
 package canoe.methods.messages
 
-import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.marshalling.CirceDecoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.ParseMode.ParseMode
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /** Use this method to send general files. On success, the sent Message is returned.
@@ -34,13 +36,14 @@ case class SendDocument(chatId: ChatId,
                        )
 
 object SendDocument {
+  import io.circe.generic.auto._
 
   implicit val method: Method[SendDocument, TelegramMessage] =
     new Method[SendDocument, TelegramMessage] {
 
       def name: String = "sendDocument"
 
-      def encoder: Encoder[SendDocument] = CirceEncoders.sendDocumentEncoder
+      def encoder: Encoder[SendDocument] = deriveEncoder[SendDocument].snakeCase
 
       def decoder: Decoder[TelegramMessage] = CirceDecoders.telegramMessageDecoder
 

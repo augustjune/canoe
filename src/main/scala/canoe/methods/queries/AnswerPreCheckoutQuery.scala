@@ -1,8 +1,9 @@
 package canoe.methods.queries
 
-import canoe.marshalling.CirceEncoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.InputFile
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -38,7 +39,7 @@ object AnswerPreCheckoutQuery {
 
       def name: String = "answerPreCheckoutQuery"
 
-      def encoder: Encoder[AnswerPreCheckoutQuery] = CirceEncoders.answerPreCheckoutQueryEncoder
+      def encoder: Encoder[AnswerPreCheckoutQuery] = deriveEncoder[AnswerPreCheckoutQuery].snakeCase
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 

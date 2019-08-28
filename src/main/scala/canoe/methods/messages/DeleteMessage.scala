@@ -1,8 +1,9 @@
 package canoe.methods.messages
 
-import canoe.marshalling.CirceEncoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.{ChatId, InputFile}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /** Use this method to delete a message.
@@ -27,7 +28,7 @@ object DeleteMessage {
 
       def name: String = "deleteMessage"
 
-      def encoder: Encoder[DeleteMessage] = CirceEncoders.deleteMessageEncoder
+      def encoder: Encoder[DeleteMessage] = deriveEncoder[DeleteMessage].snakeCase
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 

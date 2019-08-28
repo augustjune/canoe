@@ -1,9 +1,10 @@
 package canoe.methods.chats
 
-import canoe.marshalling.CirceEncoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.ChatAction.ChatAction
 import canoe.models.{ChatId, InputFile}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /** Use this method when you need to tell the user that something is happening on the bot's side.
@@ -28,7 +29,7 @@ object SendChatAction {
 
       def name: String = "sendChatAction"
 
-      def encoder: Encoder[SendChatAction] = CirceEncoders.sendChatActionEncoder
+      def encoder: Encoder[SendChatAction] = deriveEncoder[SendChatAction].snakeCase
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 

@@ -1,9 +1,11 @@
 package canoe.methods.messages
 
-import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.marshalling.CirceDecoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InputFile, InputMedia}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -21,6 +23,7 @@ case class SendMediaGroup(chatId: ChatId,
                           replyToMessageId: Option[Int] = None)
 
 object SendMediaGroup {
+  import io.circe.generic.auto._
 
   implicit val method: Method[SendMediaGroup, List[TelegramMessage]] =
     new Method[SendMediaGroup, List[TelegramMessage]] {
@@ -28,7 +31,10 @@ object SendMediaGroup {
       def name: String = "sendMediaGroup"
 
       def encoder: Encoder[SendMediaGroup] =
-        CirceEncoders.sendMediaGroupEncoder
+        deriveEncoder[SendMediaGroup].contramap[SendMediaGroup](s => s.copy(media = s.media.filter(_.media match {
+          case InputFile.Upload(_, _) => false
+          case InputFile.Existing(_) => true
+        }))).snakeCase
 
       def decoder: Decoder[List[TelegramMessage]] =
         Decoder.decodeList(CirceDecoders.telegramMessageDecoder)

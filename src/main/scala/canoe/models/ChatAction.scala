@@ -1,5 +1,7 @@
 package canoe.models
 
+import io.circe.Encoder
+
 /** Type of action to broadcast.
   *
   * Choose one, depending on what the user is about to receive:
@@ -24,4 +26,7 @@ object ChatAction extends Enumeration {
   FindLocation,
   RecordVideoNote,
   UploadVideoNote = Value
+
+  implicit val chatActionEncoder: Encoder[ChatAction] =
+    Encoder[String].contramap[ChatAction](_.toString)
 }

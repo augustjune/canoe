@@ -1,8 +1,9 @@
 package canoe.methods.chats
 
-import canoe.marshalling.CirceEncoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.{ChatId, InputFile}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -25,7 +26,7 @@ object SetChatTitle {
 
       def name: String = "setChatTitle"
 
-      def encoder: Encoder[SetChatTitle] = CirceEncoders.setChatTitleEncoder
+      def encoder: Encoder[SetChatTitle] = deriveEncoder[SetChatTitle].snakeCase
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 

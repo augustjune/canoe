@@ -1,8 +1,10 @@
 package canoe.methods.games
 
-import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.marshalling.CirceDecoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.{ChatId, GameHighScore, InputFile}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /** Use this method to get data for high score tables.
@@ -31,7 +33,7 @@ object GetGameHighScores {
 
       def name: String = "getGameHighScores"
 
-      def encoder: Encoder[GetGameHighScores] = CirceEncoders.getGameHighScoresEncoder
+      def encoder: Encoder[GetGameHighScores] = deriveEncoder[GetGameHighScores].snakeCase
 
       def decoder: Decoder[List[GameHighScore]] = Decoder.decodeList(CirceDecoders.gameHighScoreDecoder)
 

@@ -1,8 +1,10 @@
 package canoe.methods.chats
 
-import canoe.marshalling.{CirceDecoders, CirceEncoders}
+import canoe.marshalling.CirceDecoders
+import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.{ChatId, ChatMember, InputFile}
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /** Use this method to get information about a member of a chat. Returns a ChatMember object on success.
@@ -19,7 +21,7 @@ object GetChatMember {
 
       def name: String = "getChatMember"
 
-      def encoder: Encoder[GetChatMember] = CirceEncoders.getChatMemberEncoder
+      def encoder: Encoder[GetChatMember] = deriveEncoder[GetChatMember].snakeCase
 
       def decoder: Decoder[ChatMember] = CirceDecoders.chatMemberDecoder
 

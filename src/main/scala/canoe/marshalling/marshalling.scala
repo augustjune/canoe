@@ -25,11 +25,11 @@ object marshalling extends CirceEncoders with CirceDecoders with CaseConversions
     )
   }
 
-  private def camelKeys(json: io.circe.Json): Json = transformKeys(json, camelize).run
+  def camelKeys(json: Json): Json = transformKeys(json, camelize).run
 
-  private def snakeKeys(json: io.circe.Json): Json = transformKeys(json, snakenize).run
+  def snakeKeys(json: Json): Json = transformKeys(json, snakenize).run
 
-  val printer = Printer.noSpaces.copy(dropNullValues = true)
+  val printer: Printer = Printer.noSpaces.copy(dropNullValues = true)
 
   def toJson[T: Encoder](t: T): String = printer.pretty(snakeKeys(t.asJson))
 

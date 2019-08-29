@@ -1,6 +1,5 @@
 package canoe.methods.games
 
-import canoe.marshalling.CirceDecoders
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
@@ -53,10 +52,9 @@ object SetGameScore {
       def encoder: Encoder[SetGameScore] = deriveEncoder[SetGameScore].snakeCase
 
       def decoder: Decoder[Either[Boolean, TelegramMessage]] =
-      // ToDo - set keys
-        Decoder.decodeEither("", "")(
+        eitherDecoder(
           Decoder.decodeBoolean,
-          CirceDecoders.telegramMessageDecoder
+          TelegramMessage.telegramMessageDecoder
         )
 
       def uploads(request: SetGameScore): List[(String, InputFile)] = Nil

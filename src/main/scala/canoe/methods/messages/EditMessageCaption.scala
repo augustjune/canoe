@@ -1,13 +1,13 @@
 package canoe.methods.messages
 
-import canoe.marshalling.CirceDecoders
+
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.ParseMode.ParseMode
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
-import io.circe.generic.semiauto.deriveEncoder
 import io.circe.generic.auto._
+import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
 /** Use this method to edit captions of messages sent by the bot or via the bot (for inline bots).
@@ -48,10 +48,9 @@ object EditMessageCaption {
       def encoder: Encoder[EditMessageCaption] = deriveEncoder[EditMessageCaption].snakeCase
 
       def decoder: Decoder[Either[Boolean, TelegramMessage]] =
-      // ToDo - set keys
-        Decoder.decodeEither("", "")(
+        eitherDecoder(
           Decoder.decodeBoolean,
-          CirceDecoders.telegramMessageDecoder
+          TelegramMessage.telegramMessageDecoder
         )
 
       def uploads(request: EditMessageCaption): List[(String, InputFile)] = Nil

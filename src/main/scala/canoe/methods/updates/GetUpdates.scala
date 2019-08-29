@@ -1,12 +1,12 @@
 package canoe.methods.updates
 
 
-import canoe.marshalling.CirceDecoders
+
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.UpdateType.UpdateType
 import canoe.models.{InputFile, Update}
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto._
 import io.circe.{Decoder, Encoder}
 
 
@@ -40,9 +40,10 @@ object GetUpdates {
 
       def name: String = "getUpdates"
 
-      def encoder: Encoder[GetUpdates] = deriveEncoder[GetUpdates].snakeCase
+      def encoder: Encoder[GetUpdates] =
+        deriveEncoder[GetUpdates].snakeCase
 
-      def decoder: Decoder[List[Update]] = Decoder.decodeList(CirceDecoders.updateDecoder)
+      def decoder: Decoder[List[Update]] = Decoder.decodeList
 
       def uploads(request: GetUpdates): List[(String, InputFile)] = Nil
     }

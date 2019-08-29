@@ -1,6 +1,6 @@
 package canoe.models
 
-import io.circe.Encoder
+import io.circe.{Decoder, Encoder}
 
 /** Formatting options
   *   The Bot API supports basic formatting for messages.
@@ -38,4 +38,7 @@ object ParseMode extends Enumeration {
 
   implicit val parseModeEncoder: Encoder[ParseMode] =
     Encoder[String].contramap[ParseMode](_.toString)
+
+  implicit val parseModeDecoder: Decoder[ParseMode] =
+    Decoder[String].map(s => ParseMode.withName(s))
 }

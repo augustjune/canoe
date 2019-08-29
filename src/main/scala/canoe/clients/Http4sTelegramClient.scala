@@ -1,17 +1,14 @@
 package canoe.clients
 
-import canoe.marshalling.marshalling
 import canoe.methods.Method
 import canoe.models.{InputFile, Response => TelegramResponse}
 import cats.effect.Sync
 import cats.syntax.all._
 import fs2.Stream
-import io.circe.Decoder
 import org.http4s._
 import org.http4s.circe._
 import org.http4s.client.Client
 import org.http4s.client.dsl.Http4sClientDsl._
-import org.http4s.headers.`Content-Type`
 import org.http4s.multipart.{Multipart, Part}
 
 class Http4sTelegramClient[F[_]: Sync](token: String, client: Client[F]) extends TelegramClient[F] {
@@ -23,7 +20,7 @@ class Http4sTelegramClient[F[_]: Sync](token: String, client: Client[F]) extends
     val req = prepareRequest(botApiUri / M.name, M, request)
 
     implicit val decoder: EntityDecoder[F, TelegramResponse[Res]] =
-      entityDecoder(TelegramResponse.decoder(M.decoder))
+      jsonOf(Sync[F], TelegramResponse.decoder(M.decoder))
 
     client
       .expect[TelegramResponse[Res]](req)
@@ -36,15 +33,14 @@ class Http4sTelegramClient[F[_]: Sync](token: String, client: Client[F]) extends
         Part.fileData(name, filename, Stream.emits(contents).covary[F])
     }
 
-    if (uploads.isEmpty) prepareJsonRequest(url, method, action)
-    else prepareMultipartRequest(url, method, action, uploads)
+    if (uploads.isEmpty) jsonRequest(url, method, action)
+    else multipartRequest(url, method, action, uploads)
   }
 
-  private def prepareJsonRequest[Req, Res](url: Uri, method: Method[Req, Res], action: Req): F[Request[F]] = {
+  private def jsonRequest[Req, Res](url: Uri, method: Method[Req, Res], action: Req): F[Request[F]] =
     Method.POST(action, url)(Sync[F], jsonEncoderOf(Sync[F], method.encoder))
-  }
 
-  private def prepareMultipartRequest[Req, Res](url: Uri, method: Method[Req, Res], action: Req, parts: List[Part[F]]): F[Request[F]] = {
+  private def multipartRequest[Req, Res](url: Uri, method: Method[Req, Res], action: Req, parts: List[Part[F]]): F[Request[F]] = {
     val multipart = Multipart[F](parts.toVector)
 
     val params =
@@ -60,16 +56,6 @@ class Http4sTelegramClient[F[_]: Sync](token: String, client: Client[F]) extends
     }
 
     Method.POST(multipart, urlWithQueryParams).map(_.withHeaders(multipart.headers))
-  }
-
-  private def entityDecoder[A](decoder: Decoder[A]): EntityDecoder[F, A] = {
-    val camelCasedDecoder = decoder.prepare(
-      _.top
-        .map(marshalling.camelKeys)
-        .map(_.hcursor)
-        .getOrElse(throw new RuntimeException("Could not parse the incoming json")))
-
-    jsonOf(Sync[F], camelCasedDecoder)
   }
 
   private def handleTelegramResponse[A](response: TelegramResponse[A]): F[A] = response match {

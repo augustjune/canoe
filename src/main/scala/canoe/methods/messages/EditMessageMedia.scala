@@ -1,6 +1,6 @@
 package canoe.methods.messages
 
-import canoe.marshalling.CirceDecoders
+
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
@@ -25,8 +25,7 @@ case class EditMessageMedia(chatId: Option[ChatId] = None,
                             messageId: Option[Int] = None,
                             inlineMessageId: Option[String] = None,
                             media: InputMedia,
-                            replyMarkup: Option[InlineKeyboardMarkup] = None
-                           )
+                            replyMarkup: Option[InlineKeyboardMarkup] = None)
 
 object EditMessageMedia {
   import io.circe.generic.auto._
@@ -36,13 +35,13 @@ object EditMessageMedia {
 
       def name: String = "editMessageMedia"
 
-      def encoder: Encoder[EditMessageMedia] = deriveEncoder[EditMessageMedia].snakeCase
+      def encoder: Encoder[EditMessageMedia] =
+        deriveEncoder[EditMessageMedia].snakeCase
 
       def decoder: Decoder[Either[Boolean, TelegramMessage]] =
-      // ToDo - set keys
-        Decoder.decodeEither("", "")(
+        eitherDecoder(
           Decoder.decodeBoolean,
-          CirceDecoders.telegramMessageDecoder
+          TelegramMessage.telegramMessageDecoder
         )
 
       def uploads(request: EditMessageMedia): List[(String, InputFile)] =

@@ -1,6 +1,5 @@
 package canoe.methods.messages
 
-import canoe.marshalling.CirceDecoders
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
@@ -40,10 +39,9 @@ object EditMessageLiveLocation {
       def encoder: Encoder[EditMessageLiveLocation] = deriveEncoder[EditMessageLiveLocation].snakeCase
 
       def decoder: Decoder[Either[Boolean, TelegramMessage]] =
-      // ToDo - set keys
-        Decoder.decodeEither("", "")(
+        eitherDecoder(
           Decoder.decodeBoolean,
-          CirceDecoders.telegramMessageDecoder
+          TelegramMessage.telegramMessageDecoder
         )
 
       def uploads(request: EditMessageLiveLocation): List[(String, InputFile)] = Nil

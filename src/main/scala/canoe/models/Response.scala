@@ -1,7 +1,8 @@
 package canoe.models
 
-import canoe.marshalling.CirceDecoders
+import canoe.marshalling.codecs._
 import io.circe.Decoder
+import io.circe.generic.semiauto.deriveDecoder
 
 /** Telegram Bot API Response object
   *
@@ -22,6 +23,8 @@ case class Response[R](ok: Boolean,
                        parameters: Option[ResponseParameters] = None)
 
 object Response {
+  import io.circe.generic.auto._
 
-  implicit def decoder[A: Decoder]: Decoder[Response[A]] = CirceDecoders.responseDecoder
+  implicit def decoder[A: Decoder]: Decoder[Response[A]] =
+    deriveDecoder[Response[A]].camelCase
 }

@@ -4,10 +4,16 @@ import cats.free.Trampoline
 import cats.instances.function._
 import cats.instances.list._
 import cats.syntax.traverse._
-import io.circe.parser.parse
 import io.circe._
+import io.circe.parser.parse
 
 object codecs extends CaseConversions {
+
+  def eitherDecoder[A, B](decA: Decoder[A], decB: Decoder[B]): Decoder[Either[A, B]] = {
+    val l: Decoder[Either[A, B]] = decA.map(Left.apply)
+    val r: Decoder[Either[A, B]] = decB.map(Right.apply)
+    l or r
+  }
 
   implicit class EncoderOps[A](private val encoder: Encoder[A]) extends AnyVal {
     def snakeCase: Encoder[A] =
@@ -18,11 +24,11 @@ object codecs extends CaseConversions {
 
   implicit class DecoderOps[A](private val decoder: Decoder[A]) extends AnyVal {
     def camelCase: Decoder[A] =
-      decoder.prepare(
-        _.top
-          .map(camelKeys)
-          .map(_.hcursor)
-          .getOrElse(throw new RuntimeException("Exception during decoding to camelCase"))
+      decoder.prepare( c =>
+        c.focus match {
+          case Some(json) => camelKeys(json).hcursor
+          case None => c
+        }
       )
   }
 

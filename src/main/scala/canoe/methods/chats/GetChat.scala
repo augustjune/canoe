@@ -14,7 +14,7 @@ import io.circe.{Decoder, Encoder}
 case class GetChat(chatId: ChatId)
 
 object GetChat {
-  import canoe.marshalling.CirceDecoders._
+  import io.circe.generic.auto._
 
   implicit val method: Method[GetChat, DetailedChat] =
     new Method[GetChat, DetailedChat] {
@@ -23,7 +23,7 @@ object GetChat {
 
       def encoder: Encoder[GetChat] = deriveEncoder[GetChat].snakeCase
 
-      def decoder: Decoder[DetailedChat] = deriveDecoder[DetailedChat].camelCase
+      def decoder: Decoder[DetailedChat] = deriveDecoder[DetailedChat]
 
       def uploads(request: GetChat): List[(String, InputFile)] = Nil
     }

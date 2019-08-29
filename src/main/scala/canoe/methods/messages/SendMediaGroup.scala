@@ -1,6 +1,6 @@
 package canoe.methods.messages
 
-import canoe.marshalling.CirceDecoders
+
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
@@ -37,7 +37,7 @@ object SendMediaGroup {
         }))).snakeCase
 
       def decoder: Decoder[List[TelegramMessage]] =
-        Decoder.decodeList(CirceDecoders.telegramMessageDecoder)
+        Decoder.decodeList(TelegramMessage.telegramMessageDecoder)
 
       def uploads(request: SendMediaGroup): List[(String, InputFile)] =
         request.media.flatMap(_.files)

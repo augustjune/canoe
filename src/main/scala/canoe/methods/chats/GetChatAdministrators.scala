@@ -1,6 +1,5 @@
 package canoe.methods.chats
 
-import canoe.marshalling.CirceDecoders
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.{ChatId, ChatMember, InputFile}
@@ -24,7 +23,7 @@ object GetChatAdministrators {
 
       def encoder: Encoder[GetChatAdministrators] = deriveEncoder[GetChatAdministrators].snakeCase
 
-      def decoder: Decoder[List[ChatMember]] = Decoder.decodeList(CirceDecoders.chatMemberDecoder)
+      def decoder: Decoder[List[ChatMember]] = Decoder.decodeList
 
       def uploads(request: GetChatAdministrators): List[(String, InputFile)] = Nil
     }

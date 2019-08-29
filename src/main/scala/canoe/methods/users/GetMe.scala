@@ -1,8 +1,8 @@
 package canoe.methods.users
 
-import canoe.marshalling.CirceDecoders
 import canoe.methods.Method
 import canoe.models.{InputFile, User}
+import io.circe.generic.semiauto._
 import io.circe.{Decoder, Encoder, Json}
 
 /** A simple method for testing your bot's auth token. Requires no parameters.
@@ -17,7 +17,7 @@ case object GetMe {
 
       def encoder: Encoder[GetMe.type] = Encoder.instance(_ => Json.Null)
 
-      def decoder: Decoder[User] = CirceDecoders.userDecoder
+      def decoder: Decoder[User] = deriveDecoder[User]
 
       def uploads(request: GetMe.type): List[(String, InputFile)] = Nil
     }

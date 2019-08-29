@@ -1,6 +1,5 @@
 package canoe.methods.messages
 
-import canoe.marshalling.CirceDecoders
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
@@ -30,7 +29,7 @@ object ForwardMessage {
 
       def encoder: Encoder[ForwardMessage] = deriveEncoder[ForwardMessage].snakeCase
 
-      def decoder: Decoder[TelegramMessage] = CirceDecoders.telegramMessageDecoder
+      def decoder: Decoder[TelegramMessage] = TelegramMessage.telegramMessageDecoder
 
       def uploads(request: ForwardMessage): List[(String, InputFile)] = Nil
     }

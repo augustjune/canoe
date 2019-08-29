@@ -1,6 +1,6 @@
 package canoe.models
 
-import io.circe.Encoder
+import io.circe.{Decoder, Encoder}
 
 object MemberStatus extends Enumeration {
   type MemberStatus = Value
@@ -8,4 +8,8 @@ object MemberStatus extends Enumeration {
 
   implicit val memberStatusEncoder: Encoder[MemberStatus] =
     Encoder[String].contramap(_.toString)
+
+  implicit val memberStatusDecoder: Decoder[MemberStatus] =
+    Decoder[String].map(s => MemberStatus.withName(s.capitalize))
+
 }

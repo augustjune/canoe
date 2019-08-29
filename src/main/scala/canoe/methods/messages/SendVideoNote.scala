@@ -1,6 +1,6 @@
 package canoe.methods.messages
 
-import canoe.marshalling.CirceDecoders
+
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
@@ -44,7 +44,7 @@ object SendVideoNote {
 
       def encoder: Encoder[SendVideoNote] = deriveEncoder[SendVideoNote].snakeCase
 
-      def decoder: Decoder[TelegramMessage] = CirceDecoders.telegramMessageDecoder
+      def decoder: Decoder[TelegramMessage] = TelegramMessage.telegramMessageDecoder
 
       def uploads(request: SendVideoNote): List[(String, InputFile)] =
         List("videoNote" -> request.videoNote)

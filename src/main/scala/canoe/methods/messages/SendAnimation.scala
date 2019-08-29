@@ -1,6 +1,6 @@
 package canoe.methods.messages
 
-import canoe.marshalling.CirceDecoders
+
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.ParseMode.ParseMode
@@ -48,7 +48,7 @@ object SendAnimation {
 
       def encoder: Encoder[SendAnimation] = deriveEncoder[SendAnimation].snakeCase
 
-      def decoder: Decoder[TelegramMessage] = CirceDecoders.telegramMessageDecoder
+      def decoder: Decoder[TelegramMessage] = TelegramMessage.telegramMessageDecoder
 
       def uploads(request: SendAnimation): List[(String, InputFile)] =
         List("animation" -> request.animation) ++ request.thumb.map(t => "thumb" -> t).toList

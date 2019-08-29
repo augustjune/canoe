@@ -1,7 +1,7 @@
 package canoe.models
 
-import io.circe.Encoder
 import io.circe.syntax._
+import io.circe.{Decoder, Encoder}
 
 import scala.language.implicitConversions
 
@@ -35,4 +35,7 @@ object ChatId {
     case ChatId.Chat(chat) => chat.asJson
     case ChatId.Channel(channel) => channel.asJson
   }
+
+  implicit val chatIdDecoder: Decoder[ChatId] =
+    Decoder[String].map(ChatId.Channel) or Decoder[Long].map(ChatId.Chat)
 }

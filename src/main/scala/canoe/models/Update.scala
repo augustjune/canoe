@@ -1,9 +1,30 @@
 package canoe.models
 
 import canoe.models.messages.TelegramMessage
+import cats.syntax.functor._
+import io.circe.Decoder
+import io.circe.generic.auto._
+import io.circe.generic.semiauto.deriveDecoder
 
 sealed trait Update {
   def updateId: Long
+}
+
+object Update {
+
+  implicit val updateDecoder: Decoder[Update] =
+    List[Decoder[Update]](
+      deriveDecoder[MessageReceived].widen,
+      deriveDecoder[MessageEdited].widen,
+      deriveDecoder[ChannelPost].widen,
+      deriveDecoder[ChannelPostEdited].widen,
+      deriveDecoder[PollUpdated].widen,
+      deriveDecoder[InlineQueryReceived].widen,
+      deriveDecoder[InlineResultSelected].widen,
+      deriveDecoder[CallbackButtonSelected].widen,
+      deriveDecoder[ShippingQueryReceived].widen,
+      deriveDecoder[PreCheckoutQueryReceived].widen
+    ).reduceLeft(_ or _)
 }
 
 final case class MessageReceived(updateId: Long, message: TelegramMessage) extends Update

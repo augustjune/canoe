@@ -1,6 +1,6 @@
 package canoe.methods.messages
 
-import canoe.marshalling.CirceDecoders
+
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.Currency.Currency
@@ -73,7 +73,7 @@ object SendInvoice {
 
       def encoder: Encoder[SendInvoice] = deriveEncoder[SendInvoice].snakeCase
 
-      def decoder: Decoder[TelegramMessage] = CirceDecoders.telegramMessageDecoder
+      def decoder: Decoder[TelegramMessage] = TelegramMessage.telegramMessageDecoder
 
       def uploads(request: SendInvoice): List[(String, InputFile)] = Nil
     }

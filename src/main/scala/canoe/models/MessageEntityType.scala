@@ -1,6 +1,9 @@
 package canoe.models
 
-import io.circe.Encoder
+import java.util.NoSuchElementException
+
+import canoe.marshalling.codecs
+import io.circe.{Decoder, Encoder}
 
 /**
   * Different types of in-message entities.
@@ -26,4 +29,16 @@ object MessageEntityType extends Enumeration {
 
   implicit val messageEntityTypeEncoder: Encoder[MessageEntityType] =
     Encoder[String].contramap[MessageEntityType](_.toString)
+
+  implicit val messageEntityTypeDecoder: Decoder[MessageEntityType] =
+    Decoder[String].map {
+      s =>
+        try {
+          MessageEntityType.withName(codecs.pascalize(s))
+        } catch {
+          case _: NoSuchElementException =>
+            //            logger.warn(s"Unexpected MessageEntityType: '$s', fallback to Unknown.")
+            MessageEntityType.Unknown
+        }
+    }
 }

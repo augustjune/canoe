@@ -1,10 +1,9 @@
 package canoe.methods.files
 
-import canoe.marshalling.CirceDecoders
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.{File, InputFile}
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto._
 import io.circe.{Decoder, Encoder}
 
 /** Use this method to get basic info about a file and prepare it for downloading.
@@ -19,6 +18,7 @@ import io.circe.{Decoder, Encoder}
 case class GetFile(fileId : String)
 
 object GetFile {
+  import io.circe.generic.auto._
 
   implicit val method: Method[GetFile, File] =
     new Method[GetFile, File] {
@@ -27,7 +27,7 @@ object GetFile {
 
       def encoder: Encoder[GetFile] = deriveEncoder[GetFile].snakeCase
 
-      def decoder: Decoder[File] = CirceDecoders.fileDecoder
+      def decoder: Decoder[File] = deriveDecoder[File]
 
       def uploads(request: GetFile): List[(String, InputFile)] = Nil
     }

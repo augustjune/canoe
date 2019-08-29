@@ -2,7 +2,7 @@ package canoe.models
 
 import java.util.NoSuchElementException
 
-import canoe.marshalling.codecs
+import canoe.marshalling._
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -34,7 +34,7 @@ object MessageEntityType extends Enumeration {
     Decoder[String].map {
       s =>
         try {
-          MessageEntityType.withName(codecs.pascalize(s))
+          MessageEntityType.withName(s.pascalCase)
         } catch {
           case _: NoSuchElementException =>
             //            logger.warn(s"Unexpected MessageEntityType: '$s', fallback to Unknown.")

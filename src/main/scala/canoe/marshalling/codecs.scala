@@ -7,7 +7,7 @@ import cats.syntax.traverse._
 import io.circe._
 import io.circe.parser.parse
 
-object codecs extends CaseConversions {
+object codecs {
 
   def eitherDecoder[A, B](decA: Decoder[A], decB: Decoder[B]): Decoder[Either[A, B]] = {
     val l: Decoder[Either[A, B]] = decA.map(Left.apply)
@@ -34,9 +34,9 @@ object codecs extends CaseConversions {
 
   private val printer: Printer = Printer.noSpaces.copy(dropNullValues = true)
 
-  private def camelKeys(json: Json): Json = transformKeys(json, camelize).run
+  private def camelKeys(json: Json): Json = transformKeys(json, _.camelCase).run
 
-  private def snakeKeys(json: Json): Json = transformKeys(json, snakenize).run
+  private def snakeKeys(json: Json): Json = transformKeys(json, _.snakeCase).run
 
   private def transformKeys(json: Json, f: String => String): Trampoline[Json] = {
     def transformObjectKeys(obj: JsonObject, f: String => String): JsonObject =

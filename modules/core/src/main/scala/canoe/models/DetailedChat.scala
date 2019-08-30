@@ -2,8 +2,6 @@ package canoe.models
 
 import canoe.models.ChatType.ChatType
 import canoe.models.messages.TelegramMessage
-import io.circe.Decoder
-import io.circe.generic.semiauto.deriveDecoder
 
 /** This object represents detailed chat returned only as a result of `GetChat` method.
   *

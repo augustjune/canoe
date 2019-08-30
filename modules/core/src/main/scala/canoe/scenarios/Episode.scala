@@ -16,6 +16,9 @@ sealed trait Episode[F[_], -I, +O] extends Pipe[F, I, O] {
   def flatMap[I2 <: I, O2](fn: O => Episode[F, I2, O2]): Episode[F, I2, O2] =
     Bind(this, fn)
 
+  def >>[I2 <: I, O2](e2: => Episode[F, I2, O2]): Episode[F, I2, O2] =
+    flatMap(_ => e2)
+
   def map[O2](fn: O => O2): Episode[F, I, O2] = Mapped(this, fn)
 
   def cancelOn[I2 <: I](p: I2 => Boolean): Episode[F, I2, O] =

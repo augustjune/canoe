@@ -2,7 +2,9 @@ package canoe.models.messages
 
 import canoe.models.{Chat, MessageEntity, User, Video}
 
-case class VideoMessage(messageId: Int, chat: Chat, date: Int,
+case class VideoMessage(messageId: Int,
+                        chat: Chat,
+                        date: Int,
                         video: Video,
                         caption: Option[String] = None,
                         captionEntities: Option[Seq[MessageEntity]] = None,
@@ -14,5 +16,5 @@ case class VideoMessage(messageId: Int, chat: Chat, date: Int,
                         forwardDate: Option[Int] = None,
                         replyToMessage: Option[TelegramMessage] = None,
                         editDate: Option[Int] = None,
-                        authorSignature: Option[String] = None
-                       ) extends TelegramMessage
+                        authorSignature: Option[String] = None)
+    extends TelegramMessage

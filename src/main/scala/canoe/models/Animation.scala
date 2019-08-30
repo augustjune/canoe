@@ -10,8 +10,7 @@ package canoe.models
   * @param fileSize Integer Optional. File size
   */
 final case class Animation(fileId: String,
-                     thumb: Option[PhotoSize] = None,
-                     fileName: Option[String] = None,
-                     mimeType: Option[String] = None,
-                     fileSize: Option[Int] = None)
-
+                           thumb: Option[PhotoSize] = None,
+                           fileName: Option[String] = None,
+                           mimeType: Option[String] = None,
+                           fileSize: Option[Int] = None)

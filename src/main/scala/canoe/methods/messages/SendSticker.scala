@@ -1,6 +1,5 @@
 package canoe.methods.messages
 
-
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
@@ -25,8 +24,7 @@ case class SendSticker(chatId: ChatId,
                        sticker: InputFile,
                        disableNotification: Option[Boolean] = None,
                        replyToMessageId: Option[Int] = None,
-                       replyMarkup: Option[ReplyMarkup] = None
-                      )
+                       replyMarkup: Option[ReplyMarkup] = None)
 
 object SendSticker {
   import io.circe.generic.auto._

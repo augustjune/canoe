@@ -9,8 +9,7 @@ import canoe.models.messages.TelegramMessage
 import canoe.models.outgoing._
 import cats.Applicative
 
-final class ChatApi[F[_]](chat: Chat)
-                         (implicit client: TelegramClient[F]) {
+final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
 
   def setAction(action: ChatAction): F[Boolean] =
     client.execute(SendChatAction(chat.id, action))
@@ -27,7 +26,7 @@ final class ChatApi[F[_]](chat: Chat)
   def administrators(implicit F: Applicative[F]): F[List[ChatMember]] =
     chat match {
       case _: PrivateChat => F.pure(Nil)
-      case _ => client.execute(GetChatAdministrators(chat.id))
+      case _              => client.execute(GetChatAdministrators(chat.id))
     }
 
   def getMember(user: User): F[ChatMember] =
@@ -79,31 +78,123 @@ final class ChatApi[F[_]](chat: Chat)
            disableNotification: Option[Boolean] = None): F[TelegramMessage] =
     content match {
       case AnimationContent(animation, caption, duration, width, height, thumb, parseMode) =>
-        client.execute(SendAnimation(chat.id, animation, duration, width, height, thumb, nonEmpty(caption), parseMode, disableNotification, replyToMessageId, replyMarkup))
+        client.execute(
+          SendAnimation(chat.id,
+                        animation,
+                        duration,
+                        width,
+                        height,
+                        thumb,
+                        nonEmpty(caption),
+                        parseMode,
+                        disableNotification,
+                        replyToMessageId,
+                        replyMarkup)
+        )
 
       case AudioContent(audio, caption, duration, parseMode, performer, title) =>
-        client.execute(SendAudio(chat.id, audio, duration, nonEmpty(caption), parseMode, performer, title, disableNotification, replyToMessageId, replyMarkup))
+        client.execute(
+          SendAudio(chat.id,
+                    audio,
+                    duration,
+                    nonEmpty(caption),
+                    parseMode,
+                    performer,
+                    title,
+                    disableNotification,
+                    replyToMessageId,
+                    replyMarkup)
+        )
 
       case ContactContent(phoneNumber, firstName, lastName, vcard) =>
-        client.execute(SendContact(chat.id, phoneNumber, firstName, lastName, vcard, disableNotification, replyToMessageId, replyMarkup))
+        client.execute(
+          SendContact(chat.id,
+                      phoneNumber,
+                      firstName,
+                      lastName,
+                      vcard,
+                      disableNotification,
+                      replyToMessageId,
+                      replyMarkup)
+        )
 
       case DocumentContent(document, caption, parseMode) =>
-        client.execute(SendDocument(chat.id, document, nonEmpty(caption), parseMode, disableNotification, replyToMessageId, replyMarkup))
+        client.execute(
+          SendDocument(chat.id,
+                       document,
+                       nonEmpty(caption),
+                       parseMode,
+                       disableNotification,
+                       replyToMessageId,
+                       replyMarkup)
+        )
 
       case GameContent(gameShortName) =>
         client.execute(SendGame(chat.id, gameShortName, disableNotification, replyToMessageId, replyMarkup))
 
-      case InvoiceContent(title, description, payload, providerToken, startParameter, currency, prices, providerData, photoUrl, photoSize, photoWidth, photoHeight, needName, needPhoneNumber, needEmail, needShippingAddress, isFlexible) =>
-        client.execute(SendInvoice(chat.id, title, description, payload, providerToken, startParameter, currency, prices, providerData, photoUrl, photoSize, photoWidth, photoHeight, needName, needPhoneNumber, needEmail, needShippingAddress, isFlexible, disableNotification, replyToMessageId, replyMarkup))
+      case InvoiceContent(title,
+                          description,
+                          payload,
+                          providerToken,
+                          startParameter,
+                          currency,
+                          prices,
+                          providerData,
+                          photoUrl,
+                          photoSize,
+                          photoWidth,
+                          photoHeight,
+                          needName,
+                          needPhoneNumber,
+                          needEmail,
+                          needShippingAddress,
+                          isFlexible) =>
+        client.execute(
+          SendInvoice(
+            chat.id,
+            title,
+            description,
+            payload,
+            providerToken,
+            startParameter,
+            currency,
+            prices,
+            providerData,
+            photoUrl,
+            photoSize,
+            photoWidth,
+            photoHeight,
+            needName,
+            needPhoneNumber,
+            needEmail,
+            needShippingAddress,
+            isFlexible,
+            disableNotification,
+            replyToMessageId,
+            replyMarkup
+          )
+        )
 
       case LocationContent(latitude, longitude, livePeriod) =>
-        client.execute(SendLocation(chat.id, latitude, longitude, livePeriod, disableNotification, replyToMessageId, replyMarkup))
+        client.execute(
+          SendLocation(chat.id, latitude, longitude, livePeriod, disableNotification, replyToMessageId, replyMarkup)
+        )
 
       case TextContent(text, parseMode, disableWebPagePreview) =>
-        client.execute(SendMessage(chat.id, text, parseMode, disableWebPagePreview, disableNotification, replyToMessageId, replyMarkup))
+        client.execute(
+          SendMessage(chat.id,
+                      text,
+                      parseMode,
+                      disableWebPagePreview,
+                      disableNotification,
+                      replyToMessageId,
+                      replyMarkup)
+        )
 
       case PhotoContent(photo, caption, parseMode) =>
-        client.execute(SendPhoto(chat.id, photo, nonEmpty(caption), parseMode, disableNotification, replyToMessageId, replyMarkup))
+        client.execute(
+          SendPhoto(chat.id, photo, nonEmpty(caption), parseMode, disableNotification, replyToMessageId, replyMarkup)
+        )
 
       case PollContent(question, options) =>
         client.execute(SendPoll(chat.id, question, options, disableNotification, replyToMessageId, replyMarkup))
@@ -112,16 +203,51 @@ final class ChatApi[F[_]](chat: Chat)
         client.execute(SendSticker(chat.id, sticker, disableNotification, replyToMessageId, replyMarkup))
 
       case VenueContent(latitude, longitude, title, address, foursquareId, foursquareType, duration) =>
-        client.execute(SendVenue(chat.id, latitude, longitude, title, address, foursquareId, foursquareType, duration, disableNotification, replyToMessageId, replyMarkup))
+        client.execute(
+          SendVenue(chat.id,
+                    latitude,
+                    longitude,
+                    title,
+                    address,
+                    foursquareId,
+                    foursquareType,
+                    duration,
+                    disableNotification,
+                    replyToMessageId,
+                    replyMarkup)
+        )
 
       case VideoContent(video, caption, duration, width, height, parseMode, supportsStreaming) =>
-        client.execute(SendVideo(chat.id, video, duration, width, height, nonEmpty(caption), parseMode, supportsStreaming, disableNotification, replyToMessageId, replyMarkup))
+        client.execute(
+          SendVideo(chat.id,
+                    video,
+                    duration,
+                    width,
+                    height,
+                    nonEmpty(caption),
+                    parseMode,
+                    supportsStreaming,
+                    disableNotification,
+                    replyToMessageId,
+                    replyMarkup)
+        )
 
       case VideoNoteContent(videoNote, duration, length) =>
-        client.execute(SendVideoNote(chat.id, videoNote, duration, length, disableNotification, replyToMessageId, replyMarkup))
+        client.execute(
+          SendVideoNote(chat.id, videoNote, duration, length, disableNotification, replyToMessageId, replyMarkup)
+        )
 
       case VoiceContent(voice, caption, parseMode, duration) =>
-        client.execute(SendVoice(chat.id, voice, nonEmpty(caption), parseMode, duration, disableNotification, replyToMessageId, replyMarkup))
+        client.execute(
+          SendVoice(chat.id,
+                    voice,
+                    nonEmpty(caption),
+                    parseMode,
+                    duration,
+                    disableNotification,
+                    replyToMessageId,
+                    replyMarkup)
+        )
     }
 
   /**

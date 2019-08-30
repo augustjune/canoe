@@ -1,6 +1,5 @@
 package canoe.methods.messages
 
-
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
@@ -19,8 +18,7 @@ import io.circe.{Decoder, Encoder}
 case class EditMessageReplyMarkup(chatId: Option[ChatId] = None,
                                   messageId: Option[Int] = None,
                                   inlineMessageId: Option[String] = None,
-                                  replyMarkup: Option[InlineKeyboardMarkup] = None
-                                 ) {
+                                  replyMarkup: Option[InlineKeyboardMarkup] = None) {
   if (inlineMessageId.isEmpty) {
     require(chatId.isDefined, "Required if inlineMessageId is not specified")
     require(messageId.isDefined, "Required if inlineMessageId is not specified")

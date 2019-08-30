@@ -2,7 +2,9 @@ package canoe.models.messages
 
 import canoe.models.{Chat, MessageEntity, User, Voice}
 
-case class VoiceMessage(messageId: Int, chat: Chat, date: Int,
+case class VoiceMessage(messageId: Int,
+                        chat: Chat,
+                        date: Int,
                         voice: Voice,
                         caption: Option[String] = None,
                         captionEntities: Option[Seq[MessageEntity]] = None,
@@ -14,5 +16,5 @@ case class VoiceMessage(messageId: Int, chat: Chat, date: Int,
                         forwardDate: Option[Int] = None,
                         replyToMessage: Option[TelegramMessage] = None,
                         editDate: Option[Int] = None,
-                        authorSignature: Option[String] = None
-                       ) extends TelegramMessage
+                        authorSignature: Option[String] = None)
+    extends TelegramMessage

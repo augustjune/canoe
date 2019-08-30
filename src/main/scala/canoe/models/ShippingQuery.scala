@@ -9,8 +9,8 @@ package canoe.models
   * @param shippingAddress  ShippingAddress User specified shipping address
   */
 case class ShippingQuery(
-                          id              : String,
-                          from            : User,
-                          invoicePayload  : String,
-                          shippingAddress : ShippingAddress
-                        )
+  id: String,
+  from: User,
+  invoicePayload: String,
+  shippingAddress: ShippingAddress
+)

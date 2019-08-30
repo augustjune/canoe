@@ -15,7 +15,7 @@ import io.circe.{Decoder, Encoder}
   *
   * @param fileId String File identifier to get info about
   */
-case class GetFile(fileId : String)
+case class GetFile(fileId: String)
 
 object GetFile {
   import io.circe.generic.auto._

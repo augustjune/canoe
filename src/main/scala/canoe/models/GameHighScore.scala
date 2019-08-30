@@ -7,7 +7,7 @@ package canoe.models
   * @param score     Integer Score
   */
 case class GameHighScore(
-                        position : Long,
-                        user     : User,
-                        score    : Long
-                        )
+  position: Long,
+  user: User,
+  score: Long
+)

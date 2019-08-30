@@ -22,8 +22,7 @@ import io.circe.{Decoder, Encoder}
 case class GetGameHighScores(userId: Int,
                              chatId: Option[ChatId] = None,
                              messageId: Option[Int] = None,
-                             inlineMessageId: Option[String] = None
-                            )
+                             inlineMessageId: Option[String] = None)
 
 object GetGameHighScores {
   import io.circe.generic.auto._

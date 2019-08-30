@@ -9,9 +9,9 @@ package canoe.models
   * @param fileSize  Optional File size
   */
 case class Document(
-                     fileId   : String,
-                     thumb    : Option[PhotoSize] = None,
-                     fileName : Option[String] = None,
-                     mimeType : Option[String] = None,
-                     fileSize : Option[Int] = None
-                   )
+  fileId: String,
+  thumb: Option[PhotoSize] = None,
+  fileName: Option[String] = None,
+  mimeType: Option[String] = None,
+  fileSize: Option[Int] = None
+)

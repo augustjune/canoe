@@ -24,7 +24,7 @@ object Update {
       deriveDecoder[CallbackButtonSelected].widen,
       deriveDecoder[ShippingQueryReceived].widen,
       deriveDecoder[PreCheckoutQueryReceived].widen
-    ).reduceLeft(_ or _)
+    ).reduceLeft(_.or(_))
 }
 
 final case class MessageReceived(updateId: Long, message: TelegramMessage) extends Update

@@ -17,10 +17,7 @@ import io.circe.{Decoder, Encoder}
   * @param disableNotification Boolean	Optional Pass True, if it is not necessary to send a notification to all chat members about the new pinned message.
   *                            Notifications are always disabled in channels.
   */
-case class PinChatMessage(chatId: ChatId,
-                          messageId: Int,
-                          disableNotification: Option[Boolean] = None
-                         )
+case class PinChatMessage(chatId: ChatId, messageId: Int, disableNotification: Option[Boolean] = None)
 
 object PinChatMessage {
 

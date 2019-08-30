@@ -1,6 +1,5 @@
 package canoe.methods.messages
 
-
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.ParseMode.ParseMode
@@ -26,8 +25,7 @@ case class EditMessageText(chatId: Option[ChatId] = None,
                            text: String,
                            parseMode: Option[ParseMode] = None,
                            disableWebPagePreview: Option[Boolean] = None,
-                           replyMarkup: Option[ReplyMarkup] = None
-                          ) {
+                           replyMarkup: Option[ReplyMarkup] = None) {
 
   if (inlineMessageId.isEmpty) {
     require(chatId.isDefined, "Required if inlineMessageId is not specified")

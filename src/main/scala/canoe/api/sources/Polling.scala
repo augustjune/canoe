@@ -13,7 +13,8 @@ private[api] class Polling[F[_]: Functor](client: TelegramClient[F]) extends Upd
   def updates: Stream[F, Update] = pollUpdates(0)
 
   private def pollUpdates(startOffset: Long): Stream[F, Update] =
-    Stream(()).repeat.covary[F]
+    Stream(()).repeat
+      .covary[F]
       .evalMapAccumulate(startOffset) { case (offset, _) => requestUpdates(offset) }
       .flatMap { case (_, updates) => Stream.emits(updates) }
 
@@ -22,10 +23,9 @@ private[api] class Polling[F[_]: Functor](client: TelegramClient[F]) extends Upd
       .execute(GetUpdates(Some(offset)))
       .map(updates => (lastId(updates).map(_ + 1).getOrElse(offset), updates))
 
-
   private def lastId(updates: List[Update]): Option[Long] =
     updates match {
-      case Nil => None
+      case Nil      => None
       case nonEmpty => Some(nonEmpty.map(_.updateId).max)
     }
 }

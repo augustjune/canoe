@@ -1,6 +1,5 @@
 package canoe.methods.messages
 
-
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.ParseMode.ParseMode
@@ -25,18 +24,17 @@ import io.circe.{Decoder, Encoder}
   * @param replyToMessageId    Integer 	Optional 	If the message is a reply, ID of the original message
   * @param replyMarkup         InlineKeyboardMarkup or ReplyKeyboardMarkup or ReplyKeyboardRemove or ForceReply 	Optional 	Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove reply keyboard or to force a reply from the user.
   */
-case class SendAnimation(chatId              : ChatId,
-                         animation           : InputFile,
-                         duration            : Option[Int] = None,
-                         width               : Option[Int] = None,
-                         height              : Option[Int] = None,
-                         thumb               : Option[InputFile] = None,
-                         caption             : Option[String] = None,
-                         parseMode           : Option[ParseMode] = None,
-                         disableNotification : Option[Boolean] = None,
-                         replyToMessageId    : Option[Int] = None,
-                         replyMarkup         : Option[ReplyMarkup] = None
-                        )
+case class SendAnimation(chatId: ChatId,
+                         animation: InputFile,
+                         duration: Option[Int] = None,
+                         width: Option[Int] = None,
+                         height: Option[Int] = None,
+                         thumb: Option[InputFile] = None,
+                         caption: Option[String] = None,
+                         parseMode: Option[ParseMode] = None,
+                         disableNotification: Option[Boolean] = None,
+                         replyToMessageId: Option[Int] = None,
+                         replyMarkup: Option[ReplyMarkup] = None)
 
 object SendAnimation {
   import io.circe.generic.auto._

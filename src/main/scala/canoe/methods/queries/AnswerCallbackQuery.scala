@@ -29,8 +29,7 @@ case class AnswerCallbackQuery(callbackQueryId: String,
                                text: Option[String] = None,
                                showAlert: Option[Boolean] = None,
                                url: Option[String] = None,
-                               cacheTime: Option[Int] = None
-                              )
+                               cacheTime: Option[Int] = None)
 
 object AnswerCallbackQuery {
 

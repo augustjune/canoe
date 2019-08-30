@@ -17,8 +17,7 @@ import io.circe.{Decoder, Encoder}
 case class ForwardMessage(chatId: ChatId,
                           fromChatId: ChatId,
                           disableNotification: Option[Boolean] = None,
-                          messageId: Int
-                         )
+                          messageId: Int)
 
 object ForwardMessage {
 

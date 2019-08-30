@@ -8,7 +8,7 @@ package canoe.models
   * @param prices Array of LabeledPrice List of price portions
   */
 case class ShippingOption(
-                         id     : String,
-                         title  : String,
-                         prices : Array[LabeledPrice]
-                         )
+  id: String,
+  title: String,
+  prices: Array[LabeledPrice]
+)

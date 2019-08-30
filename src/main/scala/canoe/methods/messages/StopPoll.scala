@@ -14,10 +14,7 @@ import io.circe.{Decoder, Encoder}
   * @param messageId    Identifier of the original message with the poll
   * @param replyMarkup  A JSON-serialized object for a new message inline keyboard.
   */
-case class StopPoll(chatId      : ChatId,
-                    messageId   : Int,
-                    replyMarkup : Option[ReplyMarkup] = None
-                   )
+case class StopPoll(chatId: ChatId, messageId: Int, replyMarkup: Option[ReplyMarkup] = None)
 
 object StopPoll {
   import io.circe.generic.auto._

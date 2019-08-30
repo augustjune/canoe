@@ -43,5 +43,5 @@ object TelegramMessage {
       deriveDecoder[VideoNoteMessage].widen,
       deriveDecoder[VoiceMessage].widen,
       deriveDecoder[WebsiteConnected].widen
-    ).reduceLeft(_ or _)
+    ).reduceLeft(_.or(_))
 }

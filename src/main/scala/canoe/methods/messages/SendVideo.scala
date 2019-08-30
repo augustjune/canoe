@@ -1,6 +1,5 @@
 package canoe.methods.messages
 
-
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.ParseMode.ParseMode
@@ -40,8 +39,7 @@ case class SendVideo(chatId: ChatId,
                      supportsStreaming: Option[Boolean] = None,
                      disableNotification: Option[Boolean] = None,
                      replyToMessageId: Option[Int] = None,
-                     replyMarkup: Option[ReplyMarkup] = None
-                    )
+                     replyMarkup: Option[ReplyMarkup] = None)
 
 object SendVideo {
   import io.circe.generic.auto._

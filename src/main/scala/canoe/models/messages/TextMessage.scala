@@ -2,7 +2,9 @@ package canoe.models.messages
 
 import canoe.models.{Chat, MessageEntity, User}
 
-case class TextMessage(messageId: Int, chat: Chat, date: Int,
+case class TextMessage(messageId: Int,
+                       chat: Chat,
+                       date: Int,
                        text: String,
                        entities: Option[Seq[MessageEntity]] = None,
                        from: Option[User] = None,
@@ -13,5 +15,5 @@ case class TextMessage(messageId: Int, chat: Chat, date: Int,
                        forwardDate: Option[Int] = None,
                        replyToMessage: Option[TelegramMessage] = None,
                        editDate: Option[Int] = None,
-                       authorSignature: Option[String] = None
-                      ) extends TelegramMessage
+                       authorSignature: Option[String] = None)
+    extends TelegramMessage

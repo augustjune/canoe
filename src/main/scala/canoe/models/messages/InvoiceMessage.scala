@@ -2,7 +2,9 @@ package canoe.models.messages
 
 import canoe.models.{Chat, Invoice, User}
 
-case class InvoiceMessage(messageId: Int, chat: Chat, date: Int,
+case class InvoiceMessage(messageId: Int,
+                          chat: Chat,
+                          date: Int,
                           invoice: Invoice,
                           from: Option[User] = None,
                           forwardFrom: Option[User] = None,
@@ -12,4 +14,5 @@ case class InvoiceMessage(messageId: Int, chat: Chat, date: Int,
                           forwardDate: Option[Int] = None,
                           replyToMessage: Option[TelegramMessage] = None,
                           editDate: Option[Int] = None,
-                          authorSignature: Option[String] = None) extends TelegramMessage
+                          authorSignature: Option[String] = None)
+    extends TelegramMessage

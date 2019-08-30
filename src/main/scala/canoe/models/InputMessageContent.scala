@@ -2,7 +2,6 @@ package canoe.models
 
 import canoe.models.ParseMode.ParseMode
 
-
 /** This object represents the content of a message to be sent as a result of an inline query.
   *
   * Telegram clients currently support the following 4 types:
@@ -13,7 +12,6 @@ import canoe.models.ParseMode.ParseMode
   */
 sealed trait InputMessageContent
 
-
 /** Represents the content of a text message to be sent as the result of an inline query.
   *
   * @param message_text            String Text of the message to be sent, 1-4096 characters
@@ -23,8 +21,8 @@ sealed trait InputMessageContent
   */
 case class InputTextMessageContent(message_text: String,
                                    parseMode: Option[ParseMode] = None,
-                                   disableWebPagePreview: Option[Boolean] = None
-                                  ) extends InputMessageContent
+                                   disableWebPagePreview: Option[Boolean] = None)
+    extends InputMessageContent
 
 /** Represents the content of a location message to be sent as the result of an inline query.
   *
@@ -35,9 +33,9 @@ case class InputTextMessageContent(message_text: String,
   * @param longitude  Float Longitude of the location in degrees
   */
 case class InputLocationMessageContent(
-                                      latitude  : Double,
-                                      longitude : Double
-                                  ) extends InputMessageContent
+  latitude: Double,
+  longitude: Double
+) extends InputMessageContent
 
 /** Represents the content of a venue message to be sent as the result of an inline query.
   *
@@ -51,13 +49,13 @@ case class InputLocationMessageContent(
   * Note: This will only work in Telegram versions released after 9 April, 2016. Older clients will ignore them.
   */
 case class InputVenueMessageContent(
-                                   latitude       : Double,
-                                   longitude      : Double,
-                                   title          : String,
-                                   address        : String,
-                                   foursquareId   : Option[String] = None,
-                                   foursquareType : Option[String] = None
-                                   ) extends InputMessageContent
+  latitude: Double,
+  longitude: Double,
+  title: String,
+  address: String,
+  foursquareId: Option[String] = None,
+  foursquareType: Option[String] = None
+) extends InputMessageContent
 
 /** Represents the content of a contact message to be sent as the result of an inline query.
   *
@@ -70,8 +68,8 @@ case class InputVenueMessageContent(
   * @param vcard        String Optional. Additional data about the contact in the form of a vCard, 0-2048 bytes
   */
 case class InputContactMessageContent(
-                                     phoneNumber : String,
-                                     firstName   : String,
-                                     lastName    : Option[String] = None,
-                                     vcard       : Option[String] = None
-                                     ) extends InputMessageContent
+  phoneNumber: String,
+  firstName: String,
+  lastName: Option[String] = None,
+  vcard: Option[String] = None
+) extends InputMessageContent

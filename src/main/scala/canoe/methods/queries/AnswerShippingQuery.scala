@@ -25,8 +25,7 @@ import io.circe.{Decoder, Encoder}
 case class AnswerShippingQuery(shippingQueryId: String,
                                ok: Boolean,
                                shippingOptions: Option[Array[ShippingOption]] = None,
-                               errorMessage: Option[String] = None
-                              ) {
+                               errorMessage: Option[String] = None) {
 
   require(!ok || shippingOptions.isDefined, "shippingOptions required if ok is True")
   require(ok || errorMessage.isDefined, "errorMessage required if ok is False")

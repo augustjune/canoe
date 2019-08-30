@@ -16,7 +16,7 @@ sealed trait ChatId {
 
 object ChatId {
   implicit def fromChat[T](id: Long): ChatId = ChatId(id)
-  implicit def fromChannel[T](id: String) : ChatId = ChatId(id)
+  implicit def fromChannel[T](id: String): ChatId = ChatId(id)
 
   final case class Chat(id: Long) extends ChatId {
     override def isChannel: Boolean = false
@@ -32,10 +32,10 @@ object ChatId {
   def apply(channel: String): ChatId = Channel(channel)
 
   implicit val chatIdEncoder: Encoder[ChatId] = Encoder.instance {
-    case ChatId.Chat(chat) => chat.asJson
+    case ChatId.Chat(chat)       => chat.asJson
     case ChatId.Channel(channel) => channel.asJson
   }
 
   implicit val chatIdDecoder: Decoder[ChatId] =
-    Decoder[String].map(ChatId.Channel) or Decoder[Long].map(ChatId.Chat)
+    Decoder[String].map(ChatId.Channel).or(Decoder[Long].map(ChatId.Chat))
 }

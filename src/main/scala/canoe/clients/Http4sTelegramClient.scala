@@ -40,15 +40,21 @@ class Http4sTelegramClient[F[_]: Sync](token: String, client: Client[F]) extends
   private def jsonRequest[Req, Res](url: Uri, method: Method[Req, Res], action: Req): F[Request[F]] =
     Method.POST(action, url)(Sync[F], jsonEncoderOf(Sync[F], method.encoder))
 
-  private def multipartRequest[Req, Res](url: Uri, method: Method[Req, Res], action: Req, parts: List[Part[F]]): F[Request[F]] = {
+  private def multipartRequest[Req, Res](url: Uri,
+                                         method: Method[Req, Res],
+                                         action: Req,
+                                         parts: List[Part[F]]): F[Request[F]] = {
     val multipart = Multipart[F](parts.toVector)
 
     val params =
-      method.encoder(action)
+      method
+        .encoder(action)
         .asObject
-        .map(_.toMap
-          .filterNot(kv => kv._2.isNull || kv._2.isObject)
-          .mapValues(_.toString()))
+        .map(
+          _.toMap
+            .filterNot(kv => kv._2.isNull || kv._2.isObject)
+            .mapValues(_.toString())
+        )
         .getOrElse(Map.empty)
 
     val urlWithQueryParams = params.foldLeft(url) {
@@ -62,10 +68,8 @@ class Http4sTelegramClient[F[_]: Sync](token: String, client: Client[F]) extends
     case TelegramResponse(true, Some(result), _, _, _) => result.pure[F]
 
     case TelegramResponse(false, _, description, _, _) =>
-      Sync[F].raiseError[A](
-        new RuntimeException(s"Method execution resulted in error. Description: $description"))
+      Sync[F].raiseError[A](new RuntimeException(s"Method execution resulted in error. Description: $description"))
 
-    case other => Sync[F].raiseError[A](
-      new RuntimeException(s"Unexpected response from Telegram service: $other"))
+    case other => Sync[F].raiseError[A](new RuntimeException(s"Unexpected response from Telegram service: $other"))
   }
 }

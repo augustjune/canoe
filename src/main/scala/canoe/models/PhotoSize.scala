@@ -1,8 +1,5 @@
 package canoe.models
 
-import io.circe.Encoder
-import io.circe.generic.semiauto.deriveEncoder
-
 /** This object represents one size of a photo or a file / sticker thumbnail.
   *
   * @param fileId    Unique identifier for this file
@@ -10,7 +7,4 @@ import io.circe.generic.semiauto.deriveEncoder
   * @param height    Photo height
   * @param fileSize  Optional File size
   */
-case class PhotoSize(fileId: String,
-                     width: Int,
-                     height: Int,
-                     fileSize: Option[Int] = None)
+case class PhotoSize(fileId: String, width: Int, height: Int, fileSize: Option[Int] = None)

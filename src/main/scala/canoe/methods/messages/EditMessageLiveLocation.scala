@@ -20,13 +20,12 @@ import io.circe.{Decoder, Encoder}
   * @param longitude        Float number Yes	Longitude of new location
   * @param replyMarkup      InlineKeyboardMarkup Optional A JSON-serialized object for a new inline keyboard.
   */
-case class EditMessageLiveLocation(chatId          : Option[ChatId] = None,
-                                   messageId       : Option[Int] = None,
-                                   inlineMessageId : Option[Int] = None,
-                                   latitude        : Option[Double] = None,
-                                   longitude       : Option[Double] = None,
-                                   replyMarkup     : Option[InlineKeyboardMarkup] = None
-                                  )
+case class EditMessageLiveLocation(chatId: Option[ChatId] = None,
+                                   messageId: Option[Int] = None,
+                                   inlineMessageId: Option[Int] = None,
+                                   latitude: Option[Double] = None,
+                                   longitude: Option[Double] = None,
+                                   replyMarkup: Option[InlineKeyboardMarkup] = None)
 
 object EditMessageLiveLocation {
   import io.circe.generic.auto._

@@ -2,7 +2,6 @@ package canoe.models
 
 import canoe.models.Currency.Currency
 
-
 /**
   * This object contains basic information about a successful payment.
   *
@@ -17,11 +16,11 @@ import canoe.models.Currency.Currency
   * @param providerPaymentChargeId  String Provider payment identifier
   */
 case class SuccessfulPayment(
-                            currency                : Currency,
-                            totalAmount             : Long,
-                            invoicePayload          : String,
-                            shippingOptionId        : Option[String] = None,
-                            orderInfo               : Option[OrderInfo] = None,
-                            telegramPaymentChargeId : String,
-                            providerPaymentChargeId : String
-                            )
+  currency: Currency,
+  totalAmount: Long,
+  invoicePayload: String,
+  shippingOptionId: Option[String] = None,
+  orderInfo: Option[OrderInfo] = None,
+  telegramPaymentChargeId: String,
+  providerPaymentChargeId: String
+)

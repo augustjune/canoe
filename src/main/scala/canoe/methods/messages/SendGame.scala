@@ -1,6 +1,5 @@
 package canoe.methods.messages
 
-
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
@@ -24,8 +23,7 @@ case class SendGame(chatId: Long,
                     gameShortName: String,
                     disableNotification: Option[Boolean] = None,
                     replyToMessageId: Option[Int] = None,
-                    replyMarkup: Option[ReplyMarkup] = None
-                   )
+                    replyMarkup: Option[ReplyMarkup] = None)
 
 object SendGame {
   import io.circe.generic.auto._

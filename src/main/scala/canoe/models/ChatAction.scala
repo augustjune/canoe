@@ -15,17 +15,8 @@ import io.circe.Encoder
   */
 object ChatAction extends Enumeration {
   type ChatAction = Value
-  val
-  Typing,
-  UploadPhoto,
-  RecordVideo,
-  UploadVideo,
-  RecordAudio,
-  UploadAudio,
-  UploadDocument,
-  FindLocation,
-  RecordVideoNote,
-  UploadVideoNote = Value
+  val Typing, UploadPhoto, RecordVideo, UploadVideo, RecordAudio, UploadAudio, UploadDocument, FindLocation,
+  RecordVideoNote, UploadVideoNote = Value
 
   implicit val chatActionEncoder: Encoder[ChatAction] =
     Encoder[String].contramap[ChatAction](_.toString)

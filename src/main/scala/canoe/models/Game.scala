@@ -18,4 +18,3 @@ case class Game(title: String,
                 text: Option[String] = None,
                 textEntities: Option[Array[MessageEntity]] = None,
                 animation: Option[Animation] = None)
-

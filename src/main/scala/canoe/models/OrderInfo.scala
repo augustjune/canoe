@@ -9,8 +9,8 @@ package canoe.models
   * @param shippingAddress  ShippingAddress Optional. User shipping address
   */
 case class OrderInfo(
-                    name            : Option[String] = None,
-                    phoneNumber     : Option[String] = None,
-                    email           : Option[String] = None,
-                    shippingAddress : Option[ShippingAddress] = None
-                    )
+  name: Option[String] = None,
+  phoneNumber: Option[String] = None,
+  email: Option[String] = None,
+  shippingAddress: Option[ShippingAddress] = None
+)

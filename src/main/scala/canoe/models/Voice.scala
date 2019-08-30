@@ -8,8 +8,8 @@ package canoe.models
   * @param fileSize  Optional File size
   */
 case class Voice(
-                fileId   : String,
-                duration : Int,
-                mimeType : Option[String] = None,
-                fileSize : Option[Int] = None
-                )
+  fileId: String,
+  duration: Int,
+  mimeType: Option[String] = None,
+  fileSize: Option[Int] = None
+)

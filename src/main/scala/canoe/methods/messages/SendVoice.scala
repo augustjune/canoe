@@ -1,6 +1,5 @@
 package canoe.methods.messages
 
-
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.ParseMode.ParseMode
@@ -36,8 +35,7 @@ case class SendVoice(chatId: ChatId,
                      duration: Option[Int] = None,
                      disableNotification: Option[Boolean] = None,
                      replyToMessageId: Option[Int] = None,
-                     replyMarkup: Option[ReplyMarkup] = None
-                    )
+                     replyMarkup: Option[ReplyMarkup] = None)
 
 object SendVoice {
   import io.circe.generic.auto._

@@ -10,9 +10,9 @@ package canoe.models
   * @param fileSize Integer Optional. File size
   */
 case class VideoNote(
-                    fileId   : String,
-                    length   : Int,
-                    duration : Int,
-                    thumb    : Option[PhotoSize] = None,
-                    fileSize : Option[Int] = None
-                    )
+  fileId: String,
+  length: Int,
+  duration: Int,
+  thumb: Option[PhotoSize] = None,
+  fileSize: Option[Int] = None
+)

@@ -1,6 +1,5 @@
 package canoe.methods.messages
 
-
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.Currency.Currency
@@ -60,8 +59,7 @@ case class SendInvoice(chatId: Long,
                        isFlexible: Option[Boolean] = None,
                        disableNotification: Option[Boolean] = None,
                        replyToMessageId: Option[Int] = None,
-                       replyMarkup: Option[ReplyMarkup] = None
-                      )
+                       replyMarkup: Option[ReplyMarkup] = None)
 
 object SendInvoice {
   import io.circe.generic.auto._

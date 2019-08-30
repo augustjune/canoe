@@ -11,11 +11,11 @@ package canoe.models
   * @param fileSize  Optional File size
   */
 case class Video(
-                  fileId   : String,
-                  width    : Int,
-                  height   : Int,
-                  duration : Int,
-                  thumb    : Option[PhotoSize] = None,
-                  mimeType : Option[String] = None,
-                  fileSize : Option[Int] = None
-                )
+  fileId: String,
+  width: Int,
+  height: Int,
+  duration: Int,
+  thumb: Option[PhotoSize] = None,
+  mimeType: Option[String] = None,
+  fileSize: Option[Int] = None
+)

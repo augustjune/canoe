@@ -23,10 +23,11 @@ sealed trait InputMedia {
   * @param parseMode String Optional. Send Markdown or HTML, if you want Telegram apps to show bold, italic,
   *                  fixed-width text or inline URLs in the media caption.
   */
-case class InputMediaPhoto(media     : InputFile,
-                           caption   : Option[String] = None,
-                           parseMode : Option[ParseMode] = None,
-                           `type`    : String = "photo") extends InputMedia
+case class InputMediaPhoto(media: InputFile,
+                           caption: Option[String] = None,
+                           parseMode: Option[ParseMode] = None,
+                           `type`: String = "photo")
+    extends InputMedia
 
 /**
   * Represents a video to be sent.
@@ -44,14 +45,15 @@ case class InputMediaPhoto(media     : InputFile,
   *                  fixed-width text or inline URLs in the media caption.
   * @param supportsStreaming Boolean Optional. Pass True, if the uploaded video is suitable for streaming
   */
-case class InputMediaVideo(media     : InputFile,
-                           caption   : Option[String] = None,
-                           width     : Option[Int] = None,
-                           height    : Option[Int] = None,
-                           duration  : Option[Int] = None,
-                           parseMode : Option[ParseMode] = None,
-                           supportsStreaming : Option[Boolean] = None,
-                           `type`    : String = "video") extends InputMedia
+case class InputMediaVideo(media: InputFile,
+                           caption: Option[String] = None,
+                           width: Option[Int] = None,
+                           height: Option[Int] = None,
+                           duration: Option[Int] = None,
+                           parseMode: Option[ParseMode] = None,
+                           supportsStreaming: Option[Boolean] = None,
+                           `type`: String = "video")
+    extends InputMedia
 
 /** Represents an animation file (GIF or H.264/MPEG-4 AVC video without sound) to be sent.
   * @param type      String Type of the result, must be animation
@@ -66,14 +68,15 @@ case class InputMediaVideo(media     : InputFile,
   * @param height    Integer Optional. Animation height
   * @param duration  Integer Optional. Animation duration
   */
-case class InputMediaAnimation(media     : InputFile,
-                               thumb     : Option[InputFile] = None,
-                               caption   : Option[String] = None,
-                               parseMode : Option[ParseMode] = None,
-                               width     : Option[Int] = None,
-                               height    : Option[Int] = None,
-                               duration  : Option[Int] = None,
-                               `type`    : String = "animation") extends InputMedia
+case class InputMediaAnimation(media: InputFile,
+                               thumb: Option[InputFile] = None,
+                               caption: Option[String] = None,
+                               parseMode: Option[ParseMode] = None,
+                               width: Option[Int] = None,
+                               height: Option[Int] = None,
+                               duration: Option[Int] = None,
+                               `type`: String = "animation")
+    extends InputMedia
 
 /** Represents an audio file to be treated as music to be sent.
   * @param type      String Type of the result, must be audio
@@ -92,14 +95,15 @@ case class InputMediaAnimation(media     : InputFile,
   * @param performer String Optional. Performer of the audio
   * @param title     String Optional. Title of the audio
   */
-case class InputMediaAudio(media     : InputFile,
-                           thumb     : Option[InputFile] = None,
-                           caption   : Option[String] = None,
-                           parseMode : Option[ParseMode] = None,
-                           duration  : Option[Int] = None,
-                           performer : Option[String] = None,
-                           title     : Option[String] = None,
-                           `type`    : String = "audio") extends InputMedia
+case class InputMediaAudio(media: InputFile,
+                           thumb: Option[InputFile] = None,
+                           caption: Option[String] = None,
+                           parseMode: Option[ParseMode] = None,
+                           duration: Option[Int] = None,
+                           performer: Option[String] = None,
+                           title: Option[String] = None,
+                           `type`: String = "audio")
+    extends InputMedia
 
 /** Represents a general file to be sent.
   * @param type       String Type of the result, must be document
@@ -111,8 +115,9 @@ case class InputMediaAudio(media     : InputFile,
   * @param caption    String Optional. Caption of the document to be sent, 0-200 characters
   * @param parseMode  String 	Optional. Send Markdown or HTML, if you want Telegram apps to show bold, italic, fixed-width text or inline URLs in the media caption.
   */
-case class InputMediaDocument(media     : InputFile,
-                              thumb     : Option[InputFile] = None,
-                              caption   : Option[String] = None,
-                              parseMode : Option[ParseMode] = None,
-                              `type`    : String = "document") extends InputMedia
+case class InputMediaDocument(media: InputFile,
+                              thumb: Option[InputFile] = None,
+                              caption: Option[String] = None,
+                              parseMode: Option[ParseMode] = None,
+                              `type`: String = "document")
+    extends InputMedia

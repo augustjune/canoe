@@ -35,8 +35,7 @@ case class PromoteChatMember(chatId: ChatId,
                              canInviteUsers: Option[Boolean] = None,
                              canRestrictMembers: Option[Boolean] = None,
                              canPinMessages: Option[Boolean] = None,
-                             canPromoteMembers: Option[Boolean] = None
-                            )
+                             canPromoteMembers: Option[Boolean] = None)
 
 object PromoteChatMember {
 

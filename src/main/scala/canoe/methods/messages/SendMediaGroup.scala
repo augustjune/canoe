@@ -1,6 +1,5 @@
 package canoe.methods.messages
 
-
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
@@ -31,10 +30,15 @@ object SendMediaGroup {
       def name: String = "sendMediaGroup"
 
       def encoder: Encoder[SendMediaGroup] =
-        deriveEncoder[SendMediaGroup].contramap[SendMediaGroup](s => s.copy(media = s.media.filter(_.media match {
-          case InputFile.Upload(_, _) => false
-          case InputFile.Existing(_) => true
-        }))).snakeCase
+        deriveEncoder[SendMediaGroup]
+          .contramap[SendMediaGroup](
+            s =>
+              s.copy(media = s.media.filter(_.media match {
+                case InputFile.Upload(_, _) => false
+                case InputFile.Existing(_)  => true
+              }))
+          )
+          .snakeCase
 
       def decoder: Decoder[List[TelegramMessage]] =
         Decoder.decodeList(TelegramMessage.telegramMessageDecoder)

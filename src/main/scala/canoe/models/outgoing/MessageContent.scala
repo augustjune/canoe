@@ -12,30 +12,27 @@ case class AnimationContent(animation: InputFile,
                             width: Option[Int] = None,
                             height: Option[Int] = None,
                             thumb: Option[InputFile] = None,
-                            parseMode: Option[ParseMode] = None) extends MessageContent
-
+                            parseMode: Option[ParseMode] = None)
+    extends MessageContent
 
 case class AudioContent(audio: InputFile,
                         caption: String = "",
                         duration: Option[Int] = None,
                         parseMode: Option[ParseMode] = None,
                         performer: Option[String] = None,
-                        title: Option[String] = None) extends MessageContent
-
+                        title: Option[String] = None)
+    extends MessageContent
 
 case class ContactContent(phoneNumber: String,
                           firstName: String,
                           lastName: Option[String] = None,
-                          vcard: Option[String] = None) extends MessageContent
+                          vcard: Option[String] = None)
+    extends MessageContent
 
-
-case class DocumentContent(document: InputFile,
-                           caption: String = "",
-                           parseMode: Option[ParseMode] = None
-                          ) extends MessageContent
+case class DocumentContent(document: InputFile, caption: String = "", parseMode: Option[ParseMode] = None)
+    extends MessageContent
 
 case class GameContent(gameShortName: String) extends MessageContent
-
 
 case class InvoiceContent(title: String,
                           description: String,
@@ -53,28 +50,20 @@ case class InvoiceContent(title: String,
                           needPhoneNumber: Option[Boolean] = None,
                           needEmail: Option[Boolean] = None,
                           needShippingAddress: Option[Boolean] = None,
-                          isFlexible: Option[Boolean] = None) extends MessageContent
+                          isFlexible: Option[Boolean] = None)
+    extends MessageContent
 
+case class LocationContent(latitude: Double, longitude: Double, livePeriod: Option[Int] = None) extends MessageContent
 
-case class LocationContent(latitude: Double,
-                           longitude: Double,
-                           livePeriod: Option[Int] = None) extends MessageContent
+case class TextContent(text: String, parseMode: Option[ParseMode] = None, disableWebPagePreview: Option[Boolean] = None)
+    extends MessageContent
 
-case class TextContent(text: String,
-                       parseMode: Option[ParseMode] = None,
-                       disableWebPagePreview: Option[Boolean] = None) extends MessageContent
-
-
-case class PhotoContent(photo: InputFile,
-                        caption: String = "",
-                        parseMode: Option[ParseMode] = None) extends MessageContent
-
+case class PhotoContent(photo: InputFile, caption: String = "", parseMode: Option[ParseMode] = None)
+    extends MessageContent
 
 case class PollContent(question: String, options: Array[String]) extends MessageContent
 
-
 case class StickerContent(sticker: InputFile) extends MessageContent
-
 
 case class VenueContent(latitude: Double,
                         longitude: Double,
@@ -82,8 +71,8 @@ case class VenueContent(latitude: Double,
                         address: String,
                         foursquareId: Option[String] = None,
                         foursquareType: Option[String] = None,
-                        duration: Option[String] = None) extends MessageContent
-
+                        duration: Option[String] = None)
+    extends MessageContent
 
 case class VideoContent(video: InputFile,
                         caption: String = "",
@@ -91,15 +80,14 @@ case class VideoContent(video: InputFile,
                         width: Option[Int] = None,
                         height: Option[Int] = None,
                         parseMode: Option[ParseMode] = None,
-                        supportsStreaming: Option[Boolean] = None) extends MessageContent
+                        supportsStreaming: Option[Boolean] = None)
+    extends MessageContent
 
-
-case class VideoNoteContent(videoNote: InputFile,
-                            duration: Option[Int] = None,
-                            length: Option[Int] = None) extends MessageContent
-
+case class VideoNoteContent(videoNote: InputFile, duration: Option[Int] = None, length: Option[Int] = None)
+    extends MessageContent
 
 case class VoiceContent(voice: InputFile,
                         caption: String = "",
                         parseMode: Option[ParseMode] = None,
-                        duration: Option[Int] = None) extends MessageContent
+                        duration: Option[Int] = None)
+    extends MessageContent

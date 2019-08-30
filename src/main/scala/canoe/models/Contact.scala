@@ -9,9 +9,9 @@ package canoe.models
   * @param vcard        String Optional. Additional data about the contact in the form of a vCard
   */
 case class Contact(
-                    phoneNumber : String,
-                    firstName   : String,
-                    lastName    : Option[String] = None,
-                    userId      : Option[Int] = None,
-                    vcard       : Option[String] = None
-                  )
+  phoneNumber: String,
+  firstName: String,
+  lastName: Option[String] = None,
+  userId: Option[Int] = None,
+  vcard: Option[String] = None
+)

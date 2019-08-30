@@ -23,8 +23,7 @@ case class AnswerInlineQuery(inlineQueryId: String,
                              isPersonal: Option[Boolean] = None,
                              nextOffset: Option[String] = None,
                              switchPmText: Option[String] = None,
-                             switchPmParameter: Option[String] = None
-                            )
+                             switchPmParameter: Option[String] = None)
 
 object AnswerInlineQuery {
   import io.circe.generic.auto._

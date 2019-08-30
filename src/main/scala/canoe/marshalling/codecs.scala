@@ -17,17 +17,20 @@ object codecs {
 
   implicit class EncoderOps[A](private val encoder: Encoder[A]) extends AnyVal {
     def snakeCase: Encoder[A] =
-      encoder
-        .mapJson(j => parse(printer.pretty(snakeKeys(j)))
-            .getOrElse(throw new RuntimeException("Exception during encoding with snake_case")))
+      encoder.mapJson(
+        j =>
+          parse(printer.pretty(snakeKeys(j)))
+            .getOrElse(throw new RuntimeException("Exception during encoding with snake_case"))
+      )
   }
 
   implicit class DecoderOps[A](private val decoder: Decoder[A]) extends AnyVal {
     def camelCase: Decoder[A] =
-      decoder.prepare( c =>
-        c.focus match {
-          case Some(json) => camelKeys(json).hcursor
-          case None => c
+      decoder.prepare(
+        c =>
+          c.focus match {
+            case Some(json) => camelKeys(json).hcursor
+            case None       => c
         }
       )
   }

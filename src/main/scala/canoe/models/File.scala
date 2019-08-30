@@ -12,7 +12,7 @@ package canoe.models
   * @param filePath  Optional File path. Use https://api.telegram.org/file/bot<token>/<file_path> to get the file.
   */
 case class File(
-                 fileId   : String,
-                 fileSize : Option[Int] = None,
-                 filePath : Option[String] = None
-               )
+  fileId: String,
+  fileSize: Option[Int] = None,
+  filePath: Option[String] = None
+)

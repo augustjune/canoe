@@ -27,6 +27,6 @@ object UnpinChatMessage {
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 
-      def uploads(request: UnpinChatMessage): List[(String, InputFile)]= Nil
+      def uploads(request: UnpinChatMessage): List[(String, InputFile)] = Nil
     }
 }

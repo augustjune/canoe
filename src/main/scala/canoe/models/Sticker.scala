@@ -13,12 +13,12 @@ package canoe.models
   * @param fileSize      Integer Optional. File size
   */
 case class Sticker(
-                    fileId       : String,
-                    width        : Int,
-                    height       : Int,
-                    thumb        : Option[PhotoSize] = None,
-                    emoji        : Option[String] = None,
-                    setName      : Option[String] = None,
-                    maskPosition : Option[MaskPosition] = None,
-                    fileSize     : Option[Int] = None
-                  )
+  fileId: String,
+  width: Int,
+  height: Int,
+  thumb: Option[PhotoSize] = None,
+  emoji: Option[String] = None,
+  setName: Option[String] = None,
+  maskPosition: Option[MaskPosition] = None,
+  fileSize: Option[Int] = None
+)

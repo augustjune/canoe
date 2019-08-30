@@ -13,7 +13,7 @@ import io.circe.{Decoder, Encoder}
   *
   * @param chatId	Integer or String Unique identifier for the target chat or username of the target channel (in the format @channelusername)
   */
-case class ExportChatInviteLink(chatId : ChatId)
+case class ExportChatInviteLink(chatId: ChatId)
 
 object ExportChatInviteLink {
 

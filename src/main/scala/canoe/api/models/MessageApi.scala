@@ -7,8 +7,7 @@ import canoe.models.messages.TelegramMessage
 import canoe.models.outgoing._
 import canoe.models.{Chat, InlineKeyboardMarkup, Poll, ReplyMarkup}
 
-final class MessageApi[F[_]](message: TelegramMessage)
-                            (implicit client: TelegramClient[F]) {
+final class MessageApi[F[_]](message: TelegramMessage)(implicit client: TelegramClient[F]) {
 
   private def chatId: Long = message.chat.id
   private def messageId: Int = message.messageId

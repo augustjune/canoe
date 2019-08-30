@@ -1,6 +1,5 @@
 package canoe.methods.messages
 
-
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.ParseMode.ParseMode
@@ -32,8 +31,7 @@ case class SendDocument(chatId: ChatId,
                         parseMode: Option[ParseMode] = None,
                         disableNotification: Option[Boolean] = None,
                         replyToMessageId: Option[Int] = None,
-                        replyMarkup: Option[ReplyMarkup] = None
-                       )
+                        replyMarkup: Option[ReplyMarkup] = None)
 
 object SendDocument {
   import io.circe.generic.auto._

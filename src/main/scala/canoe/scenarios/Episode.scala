@@ -40,30 +40,24 @@ sealed trait Episode[F[_], -I, +O] extends Pipe[F, I, O] {
     Tolerate(this, None, fn)
 }
 
-private final case class Eval[F[_], I, A](fa: F[A]) extends Episode[F, I, A]
+final private case class Eval[F[_], I, A](fa: F[A]) extends Episode[F, I, A]
 
-private final case class Next[F[_], A](p: A => Boolean) extends Episode[F, A, A]
+final private case class Next[F[_], A](p: A => Boolean) extends Episode[F, A, A]
 
-private final case class First[F[_], A](p: A => Boolean)
-    extends Episode[F, A, A]
+final private case class First[F[_], A](p: A => Boolean) extends Episode[F, A, A]
 
-private final case class Bind[F[_], I, O1, O2](episode: Episode[F, I, O1],
-                                               fn: O1 => Episode[F, I, O2])
+final private case class Bind[F[_], I, O1, O2](episode: Episode[F, I, O1], fn: O1 => Episode[F, I, O2])
     extends Episode[F, I, O2]
 
-private final case class Mapped[F[_], I, O1, O2](episode: Episode[F, I, O1],
-                                                 fn: O1 => O2)
-    extends Episode[F, I, O2]
+final private case class Mapped[F[_], I, O1, O2](episode: Episode[F, I, O1], fn: O1 => O2) extends Episode[F, I, O2]
 
-private final case class Cancellable[F[_], I, O](
+final private case class Cancellable[F[_], I, O](
   episode: Episode[F, I, O],
   cancelOn: I => Boolean,
   finalizer: Option[I => F[Unit]]
 ) extends Episode[F, I, O]
 
-private final case class Tolerate[F[_], I, O](episode: Episode[F, I, O],
-                                              limit: Option[Int],
-                                              fn: I => F[Unit])
+final private case class Tolerate[F[_], I, O](episode: Episode[F, I, O], limit: Option[Int], fn: I => F[Unit])
     extends Episode[F, I, O]
 
 object Episode {
@@ -97,7 +91,7 @@ object Episode {
         }
     }
 
-  private sealed trait Result[+E, +A] {
+  sealed private trait Result[+E, +A] {
     def map[B](f: A => B): Result[E, B] = this match {
       case Matched(a)          => Matched(f(a))
       case same @ Missed(_)    => same
@@ -105,15 +99,15 @@ object Episode {
     }
   }
 
-  private final case class Matched[A](a: A) extends Result[Nothing, A]
-  private final case class Missed[E](message: E) extends Result[E, Nothing]
-  private final case class Cancelled[E](message: E) extends Result[E, Nothing]
+  final private case class Matched[A](a: A) extends Result[Nothing, A]
+  final private case class Missed[E](message: E) extends Result[E, Nothing]
+  final private case class Cancelled[E](message: E) extends Result[E, Nothing]
 
   private def find[F[_], I, O](
     episode: Episode[F, I, O],
     input: Stream[F, I],
     cancelTokens: List[(I => Boolean, Option[I => F[Unit]])]
-  ): Stream[F, (Result[I, O], Stream[F, I])] = {
+  ): Stream[F, (Result[I, O], Stream[F, I])] =
     episode match {
       case Eval(fa) =>
         Stream.eval(fa).map(o => Matched(o) -> input)
@@ -185,5 +179,4 @@ object Episode {
           case (result, rest) => result.map(fn) -> rest
         }
     }
-  }
 }

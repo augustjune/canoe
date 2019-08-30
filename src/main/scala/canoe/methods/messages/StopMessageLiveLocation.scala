@@ -1,6 +1,5 @@
 package canoe.methods.messages
 
-
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
@@ -21,8 +20,7 @@ import io.circe.{Decoder, Encoder}
 case class StopMessageLiveLocation(chatId: Option[ChatId] = None,
                                    messageId: Option[Int] = None,
                                    inlineMessageId: Option[Int] = None,
-                                   replyMarkup: Option[InlineKeyboardMarkup] = None
-                                  )
+                                   replyMarkup: Option[InlineKeyboardMarkup] = None)
 
 object StopMessageLiveLocation {
   import io.circe.generic.auto._

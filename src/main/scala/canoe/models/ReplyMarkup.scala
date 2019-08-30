@@ -18,10 +18,10 @@ sealed trait ReplyMarkup
   *                         Available in private chats only
   */
 case class KeyboardButton(
-                         text            : String,
-                         requestContact  : Option[Boolean] = None,
-                         requestLocation : Option[Boolean] = None
-                         ) /* not a ReplyMarkup */
+  text: String,
+  requestContact: Option[Boolean] = None,
+  requestLocation: Option[Boolean] = None
+) /* not a ReplyMarkup */
 
 /**
   * Preferred (safe) way to instantiate [[KeyboardButton]].
@@ -33,6 +33,7 @@ case class KeyboardButton(
   * }}}
   */
 object KeyboardButton {
+
   /**
     * `text` will be sent to the bot as a message when the button is pressed.
     *
@@ -75,43 +76,40 @@ object KeyboardButton {
   *                         2) if the bot's message is a reply (has replyToMessage_id), sender of the original message.
   */
 case class ReplyKeyboardMarkup(
-                                keyboard        : Seq[Seq[KeyboardButton]],
-                                resizeKeyboard  : Option[Boolean] = None,
-                                oneTimeKeyboard : Option[Boolean] = None,
-                                selective       : Option[Boolean] = None
-                              ) extends ReplyMarkup
+  keyboard: Seq[Seq[KeyboardButton]],
+  resizeKeyboard: Option[Boolean] = None,
+  oneTimeKeyboard: Option[Boolean] = None,
+  selective: Option[Boolean] = None
+) extends ReplyMarkup
 
 object ReplyKeyboardMarkup {
 
   /**
     * Markup with a single big button.
     */
-  def singleButton(button : KeyboardButton,
-                   resizeKeyboard : Option[Boolean] = None,
-                   oneTimeKeyboard : Option[Boolean] = None,
-                   selective : Option[Boolean] = None): ReplyKeyboardMarkup = {
+  def singleButton(button: KeyboardButton,
+                   resizeKeyboard: Option[Boolean] = None,
+                   oneTimeKeyboard: Option[Boolean] = None,
+                   selective: Option[Boolean] = None): ReplyKeyboardMarkup =
     ReplyKeyboardMarkup(Seq(Seq(button)), resizeKeyboard, oneTimeKeyboard, selective)
-  }
 
   /**
     * Markup with a single row of buttons.
     */
-  def singleRow(buttonRow : Seq[KeyboardButton],
-                resizeKeyboard : Option[Boolean] = None,
-                oneTimeKeyboard : Option[Boolean] = None,
-                selective : Option[Boolean] = None): ReplyKeyboardMarkup = {
+  def singleRow(buttonRow: Seq[KeyboardButton],
+                resizeKeyboard: Option[Boolean] = None,
+                oneTimeKeyboard: Option[Boolean] = None,
+                selective: Option[Boolean] = None): ReplyKeyboardMarkup =
     ReplyKeyboardMarkup(Seq(buttonRow), resizeKeyboard, oneTimeKeyboard, selective)
-  }
 
   /**
     * Markup with a single column of stacked buttons.
     */
-  def singleColumn(buttonColumn : Seq[KeyboardButton],
-                resizeKeyboard : Option[Boolean] = None,
-                oneTimeKeyboard : Option[Boolean] = None,
-                selective : Option[Boolean] = None): ReplyKeyboardMarkup = {
+  def singleColumn(buttonColumn: Seq[KeyboardButton],
+                   resizeKeyboard: Option[Boolean] = None,
+                   oneTimeKeyboard: Option[Boolean] = None,
+                   selective: Option[Boolean] = None): ReplyKeyboardMarkup =
     ReplyKeyboardMarkup(buttonColumn.map(Seq(_)), resizeKeyboard, oneTimeKeyboard, selective)
-  }
 }
 
 /** Upon receiving a message with this object, Telegram clients will remove the current custom keyboard and display the default letter-keyboard.
@@ -130,9 +128,9 @@ object ReplyKeyboardMarkup {
   *   for that user, while still showing the keyboard with poll options to users who haven't voted yet.
   */
 case class ReplyKeyboardRemove(
-                              removeKeyboard : Boolean = true,
-                              selective      : Option[Boolean] = None
-                            ) extends ReplyMarkup
+  removeKeyboard: Boolean = true,
+  selective: Option[Boolean] = None
+) extends ReplyMarkup
 
 /** This object represents an inline keyboard that appears right next to the message it belongs to.
   *
@@ -149,10 +147,11 @@ case class ReplyKeyboardRemove(
   * @param inlineKeyboard Array of Array of InlineKeyboardButton Array of button rows, each represented by an Array of InlineKeyboardButton objects
   */
 case class InlineKeyboardMarkup(
-                                 inlineKeyboard: Seq[Seq[InlineKeyboardButton]]
-                               ) extends ReplyMarkup
+  inlineKeyboard: Seq[Seq[InlineKeyboardButton]]
+) extends ReplyMarkup
 
 object InlineKeyboardMarkup {
+
   /**
     * Markup with a single button.
     */
@@ -196,14 +195,13 @@ object InlineKeyboardMarkup {
   *
   * NOTE: This type of button must always be the first button in the first row.
   */
-case class InlineKeyboardButton(
-                               text              : String,
-                               callbackData      : Option[String] = None,
-                               url               : Option[String] = None,
-                               switchInlineQuery : Option[String] = None,
-                               switchInlineQueryCurrentChat : Option[String] = None,
-                               callbackGame      : Option[CallbackGame] = None,
-                               pay               : Option[Boolean] = None) /* not a ReplyMarkup */ {
+case class InlineKeyboardButton(text: String,
+                                callbackData: Option[String] = None,
+                                url: Option[String] = None,
+                                switchInlineQuery: Option[String] = None,
+                                switchInlineQueryCurrentChat: Option[String] = None,
+                                callbackGame: Option[CallbackGame] = None,
+                                pay: Option[Boolean] = None) /* not a ReplyMarkup */ {
   require(
     Seq[Option[_]](
       callbackData,
@@ -213,7 +211,8 @@ case class InlineKeyboardButton(
       callbackGame,
       pay
     ).count(_.isDefined) == 1,
-    "Exactly one of the optional fields should be set.")
+    "Exactly one of the optional fields should be set."
+  )
 }
 
 /**
@@ -297,6 +296,6 @@ object InlineKeyboardButton {
   *                    2) if the bot's message is a reply (has replyToMessage_id), sender of the original message.
   */
 case class ForceReply(
-                       forceReply : Boolean = true,
-                       selective  : Option[Boolean] = None
-                     ) extends ReplyMarkup
+  forceReply: Boolean = true,
+  selective: Option[Boolean] = None
+) extends ReplyMarkup

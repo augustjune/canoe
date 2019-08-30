@@ -9,6 +9,6 @@ package canoe.models
   * @param retryAfter       Integer Optional. In case of exceeding flood control, the number of seconds left to wait before the request can be repeated
   */
 case class ResponseParameters(
-                               migrateToChatId : Option[Long] = None,
-                               retryAfter      : Option[Int] = None
-                             )
+  migrateToChatId: Option[Long] = None,
+  retryAfter: Option[Int] = None
+)

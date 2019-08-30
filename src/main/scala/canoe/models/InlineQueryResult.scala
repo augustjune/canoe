@@ -2,7 +2,6 @@ package canoe.models
 
 import canoe.models.ParseMode.ParseMode
 
-
 /** This object represents one result of an inline query.
   * Telegram clients currently support results of the following 19 types:
   *
@@ -27,9 +26,9 @@ import canoe.models.ParseMode.ParseMode
   *   InlineQueryResultVoice
   */
 sealed trait InlineQueryResult {
-  def id          : String
-  def `type`      : String
-  def replyMarkup : Option[InlineKeyboardMarkup]
+  def id: String
+  def `type`: String
+  def replyMarkup: Option[InlineKeyboardMarkup]
 }
 
 /** Represents a link to an article or web page.
@@ -47,18 +46,18 @@ sealed trait InlineQueryResult {
   * @param thumbHeight          Integer Optional Thumbnail height
   */
 case class InlineQueryResultArticle(
-                                   id                  : String,
-                                   title               : String,
-                                   input_message_content : InputMessageContent,
-                                   replyMarkup         : Option[InlineKeyboardMarkup] = None,
-                                   url                 : Option[String] = None,
-                                   hideUrl             : Option[Boolean] = None,
-                                   description         : Option[String] = None,
-                                   thumbUrl            : Option[String] = None,
-                                   thumbWidth          : Option[Int] = None,
-                                   thumbHeight         : Option[Int] = None,
-                                   `type`              : String = "article"
-                                   ) extends InlineQueryResult
+  id: String,
+  title: String,
+  input_message_content: InputMessageContent,
+  replyMarkup: Option[InlineKeyboardMarkup] = None,
+  url: Option[String] = None,
+  hideUrl: Option[Boolean] = None,
+  description: Option[String] = None,
+  thumbUrl: Option[String] = None,
+  thumbWidth: Option[Int] = None,
+  thumbHeight: Option[Int] = None,
+  `type`: String = "article"
+) extends InlineQueryResult
 
 /** Represents a link to a photo.
   *
@@ -80,19 +79,19 @@ case class InlineQueryResultArticle(
   * @param inputMessageContent  InputMessageContent Optional Content of the message to be sent instead of the photo
   */
 case class InlineQueryResultPhoto(
-                                 id                  : String,
-                                 photoUrl            : String,
-                                 thumbUrl            : String,
-                                 photoWidth          : Option[Int] = None,
-                                 photoHeight         : Option[Int] = None,
-                                 title               : Option[String] = None,
-                                 description         : Option[String] = None,
-                                 caption             : Option[String] = None,
-                                 parseMode           : Option[ParseMode] = None,
-                                 replyMarkup         : Option[InlineKeyboardMarkup] = None,
-                                 inputMessageContent : Option[InputMessageContent] = None,
-                                 `type`              : String = "photo"
-                                 ) extends InlineQueryResult
+  id: String,
+  photoUrl: String,
+  thumbUrl: String,
+  photoWidth: Option[Int] = None,
+  photoHeight: Option[Int] = None,
+  title: Option[String] = None,
+  description: Option[String] = None,
+  caption: Option[String] = None,
+  parseMode: Option[ParseMode] = None,
+  replyMarkup: Option[InlineKeyboardMarkup] = None,
+  inputMessageContent: Option[InputMessageContent] = None,
+  `type`: String = "photo"
+) extends InlineQueryResult
 
 /** Represents a Game.
   *
@@ -106,11 +105,11 @@ case class InlineQueryResultPhoto(
   *   Older clients will not display any inline results if a game result is among them.
   */
 case class InlineQueryResultGame(
-                                  id            : String,
-                                  gameShortName : String,
-                                  replyMarkup   : Option[InlineKeyboardMarkup] = None,
-                                  `type`        : String = "game"
-                                ) extends InlineQueryResult
+  id: String,
+  gameShortName: String,
+  replyMarkup: Option[InlineKeyboardMarkup] = None,
+  `type`: String = "game"
+) extends InlineQueryResult
 
 /** Represents a link to an animated GIF file.
   *
@@ -132,19 +131,19 @@ case class InlineQueryResultGame(
   * @param inputMessageContent  InputMessageContent Optional Content of the message to be sent instead of the GIF animation
   */
 case class InlineQueryResultGif(
-                               id                  : String,
-                               gifUrl              : String,
-                               gifWidth            : Option[Int] = None,
-                               gifHeight           : Option[Int] = None,
-                               gifDuration         : Option[Int] = None,
-                               thumbUrl            : String,
-                               title               : Option[String] = None,
-                               caption             : Option[String] = None,
-                               parseMode           : Option[ParseMode] = None,
-                               replyMarkup         : Option[InlineKeyboardMarkup] = None,
-                               inputMessageContent : Option[InputMessageContent] = None,
-                               `type`              : String = "gif"
-                               ) extends InlineQueryResult
+  id: String,
+  gifUrl: String,
+  gifWidth: Option[Int] = None,
+  gifHeight: Option[Int] = None,
+  gifDuration: Option[Int] = None,
+  thumbUrl: String,
+  title: Option[String] = None,
+  caption: Option[String] = None,
+  parseMode: Option[ParseMode] = None,
+  replyMarkup: Option[InlineKeyboardMarkup] = None,
+  inputMessageContent: Option[InputMessageContent] = None,
+  `type`: String = "gif"
+) extends InlineQueryResult
 
 /** Represents a link to a video animation (H.264/MPEG-4 AVC video without sound).
   *
@@ -166,19 +165,19 @@ case class InlineQueryResultGif(
   * @param inputMessageContent  InputMessageContent Optional Content of the message to be sent instead of the video animation
   */
 case class InlineQueryResultMpeg4Gif(
-                                 id                  : String,
-                                 mpeg4Url            : String,
-                                 mpeg4Width          : Option[Int] = None,
-                                 mpeg4Height         : Option[Int] = None,
-                                 mpeg4Duration       : Option[Int] = None,
-                                 thumbUrl            : String,
-                                 title               : Option[String] = None,
-                                 caption             : Option[String] = None,
-                                 parseMode           : Option[ParseMode] = None,
-                                 replyMarkup         : Option[InlineKeyboardMarkup] = None,
-                                 inputMessageContent : Option[InputMessageContent] = None,
-                                 `type`              : String = "mpeg4_gif"
-                               ) extends InlineQueryResult
+  id: String,
+  mpeg4Url: String,
+  mpeg4Width: Option[Int] = None,
+  mpeg4Height: Option[Int] = None,
+  mpeg4Duration: Option[Int] = None,
+  thumbUrl: String,
+  title: Option[String] = None,
+  caption: Option[String] = None,
+  parseMode: Option[ParseMode] = None,
+  replyMarkup: Option[InlineKeyboardMarkup] = None,
+  inputMessageContent: Option[InputMessageContent] = None,
+  `type`: String = "mpeg4_gif"
+) extends InlineQueryResult
 
 /** Represents a link to a page containing an embedded video player or a video file.
   *
@@ -202,21 +201,21 @@ case class InlineQueryResultMpeg4Gif(
   * @param inputMessageContent  InputMessageContent Optional Content of the message to be sent instead of the video
   */
 case class InlineQueryResultVideo(
-                                 id                  : String,
-                                 videoUrl            : String,
-                                 mimeType            : String,
-                                 thumbUrl            : String,
-                                 title               : Option[String] = None,
-                                 caption             : Option[String] = None,
-                                 parseMode           : Option[ParseMode] = None,
-                                 videoWidth          : Option[Int] = None,
-                                 videoHeight         : Option[Int] = None,
-                                 videoDuration       : Option[Int] = None,
-                                 description         : Option[String] = None,
-                                 replyMarkup         : Option[InlineKeyboardMarkup] = None,
-                                 inputMessageContent : Option[InputMessageContent] = None,
-                                 `type`              : String = "video"
-                                 ) extends InlineQueryResult
+  id: String,
+  videoUrl: String,
+  mimeType: String,
+  thumbUrl: String,
+  title: Option[String] = None,
+  caption: Option[String] = None,
+  parseMode: Option[ParseMode] = None,
+  videoWidth: Option[Int] = None,
+  videoHeight: Option[Int] = None,
+  videoDuration: Option[Int] = None,
+  description: Option[String] = None,
+  replyMarkup: Option[InlineKeyboardMarkup] = None,
+  inputMessageContent: Option[InputMessageContent] = None,
+  `type`: String = "video"
+) extends InlineQueryResult
 
 /** Represents a link to an mp3 audio file. By default, this audio file will be sent by the user.
   *
@@ -237,17 +236,17 @@ case class InlineQueryResultVideo(
   * Note: This will only work in Telegram versions released after 9 April, 2016. Older clients will ignore them.
   */
 case class InlineQueryResultAudio(
-                                   id                  : String,
-                                   audioUrl            : String,
-                                   title               : String,
-                                   caption             : Option[String] = None,
-                                   parseMode           : Option[ParseMode] = None,
-                                   performer           : Option[String] = None,
-                                   audioDuration       : Option[Int] = None,
-                                   replyMarkup         : Option[InlineKeyboardMarkup] = None,
-                                   inputMessageContent : Option[InputMessageContent] = None,
-                                   `type`              : String = "audio"
-                                 ) extends InlineQueryResult
+  id: String,
+  audioUrl: String,
+  title: String,
+  caption: Option[String] = None,
+  parseMode: Option[ParseMode] = None,
+  performer: Option[String] = None,
+  audioDuration: Option[Int] = None,
+  replyMarkup: Option[InlineKeyboardMarkup] = None,
+  inputMessageContent: Option[InputMessageContent] = None,
+  `type`: String = "audio"
+) extends InlineQueryResult
 
 /** Represents a link to a voice recording in an .ogg container encoded with OPUS.
   *
@@ -268,16 +267,16 @@ case class InlineQueryResultAudio(
   * Note: This will only work in Telegram versions released after 9 April, 2016. Older clients will ignore them.
   */
 case class InlineQueryResultVoice(
-                                   id                  : String,
-                                   voiceUrl            : String,
-                                   title               : String,
-                                   caption             : Option[String] = None,
-                                   parseMode           : Option[ParseMode] = None,
-                                   voiceDuration       : Option[Int] = None,
-                                   replyMarkup         : Option[InlineKeyboardMarkup] = None,
-                                   inputMessageContent : Option[InputMessageContent] = None,
-                                   `type`              : String = "voice"
-                                 ) extends InlineQueryResult
+  id: String,
+  voiceUrl: String,
+  title: String,
+  caption: Option[String] = None,
+  parseMode: Option[ParseMode] = None,
+  voiceDuration: Option[Int] = None,
+  replyMarkup: Option[InlineKeyboardMarkup] = None,
+  inputMessageContent: Option[InputMessageContent] = None,
+  `type`: String = "voice"
+) extends InlineQueryResult
 
 /** Represents a link to a file.
   *
@@ -301,20 +300,20 @@ case class InlineQueryResultVoice(
   * @param thumbHeight          Integer Optional Thumbnail height
   */
 case class InlineQueryResultDocument(
-                                     id                  : String,
-                                     title               : String,
-                                     caption             : Option[String] = None,
-                                     parseMode           : Option[ParseMode] = None,
-                                     documentUrl         : Option[String] = None,
-                                     mimeType            : String, // either "application/pdf" or "application/zip"
-                                     description         : Option[String] = None,
-                                     replyMarkup         : Option[InlineKeyboardMarkup] = None,
-                                     inputMessageContent : Option[InputMessageContent] = None,
-                                     thumbUrl            : Option[String] = None,
-                                     thumbWidth          : Option[Int] = None,
-                                     thumbHeight         : Option[Int] = None,
-                                     `type`              : String = "document"
-                                   ) extends InlineQueryResult
+  id: String,
+  title: String,
+  caption: Option[String] = None,
+  parseMode: Option[ParseMode] = None,
+  documentUrl: Option[String] = None,
+  mimeType: String, // either "application/pdf" or "application/zip"
+  description: Option[String] = None,
+  replyMarkup: Option[InlineKeyboardMarkup] = None,
+  inputMessageContent: Option[InputMessageContent] = None,
+  thumbUrl: Option[String] = None,
+  thumbWidth: Option[Int] = None,
+  thumbHeight: Option[Int] = None,
+  `type`: String = "document"
+) extends InlineQueryResult
 
 /** Represents a location on a map.
   *
@@ -335,17 +334,17 @@ case class InlineQueryResultDocument(
   * Note: This will only work in Telegram versions released after 9 April, 2016. Older clients will ignore them.
   */
 case class InlineQueryResultLocation(
-                                    id                  : String,
-                                    latitude            : Double,
-                                    longitude           : Double,
-                                    title               : String,
-                                    replyMarkup         : Option[InlineKeyboardMarkup] = None,
-                                    inputMessageContent : Option[InputMessageContent] = None,
-                                    thumbUrl            : Option[String] = None,
-                                    thumbWidth          : Option[Int] = None,
-                                    thumbHeight         : Option[Int] = None,
-                                    `type`              : String = "location"
-                                    ) extends InlineQueryResult
+  id: String,
+  latitude: Double,
+  longitude: Double,
+  title: String,
+  replyMarkup: Option[InlineKeyboardMarkup] = None,
+  inputMessageContent: Option[InputMessageContent] = None,
+  thumbUrl: Option[String] = None,
+  thumbWidth: Option[Int] = None,
+  thumbHeight: Option[Int] = None,
+  `type`: String = "location"
+) extends InlineQueryResult
 
 /** Represents a venue.
   *
@@ -369,20 +368,20 @@ case class InlineQueryResultLocation(
   * Note: This will only work in Telegram versions released after 9 April, 2016. Older clients will ignore them.
   */
 case class InlineQueryResultVenue(
-                                 id                  : String,
-                                 latitude            : Double,
-                                 longitude           : Double,
-                                 title               : String,
-                                 address             : String,
-                                 foursquareId        : Option[String] = None,
-                                 foursquareType      : Option[String] = None,
-                                 replyMarkup         : Option[InlineKeyboardMarkup] = None,
-                                 inputMessageContent : Option[InputMessageContent] = None,
-                                 thumbUrl            : Option[String] = None,
-                                 thumbWidth          : Option[Int] = None,
-                                 thumbHeight         : Option[Int] = None,
-                                 `type`              : String = "venue"
-                                 ) extends InlineQueryResult
+  id: String,
+  latitude: Double,
+  longitude: Double,
+  title: String,
+  address: String,
+  foursquareId: Option[String] = None,
+  foursquareType: Option[String] = None,
+  replyMarkup: Option[InlineKeyboardMarkup] = None,
+  inputMessageContent: Option[InputMessageContent] = None,
+  thumbUrl: Option[String] = None,
+  thumbWidth: Option[Int] = None,
+  thumbHeight: Option[Int] = None,
+  `type`: String = "venue"
+) extends InlineQueryResult
 
 /** Represents a contact with a phone number.
   *
@@ -404,19 +403,18 @@ case class InlineQueryResultVenue(
   * Note: This will only work in Telegram versions released after 9 April, 2016. Older clients will ignore them.
   */
 case class InlineQueryResultContact(
-                                   id                  : String,
-                                   phoneNumber         : String,
-                                   firstName           : String,
-                                   lastName            : Option[String] = None,
-                                   vcard               : Option[String] = None,
-                                   replyMarkup         : Option[InlineKeyboardMarkup] = None,
-                                   inputMessageContent : Option[InputMessageContent] = None,
-                                   thumbUrl            : Option[String] = None,
-                                   thumbWidth          : Option[Int] = None,
-                                   thumbHeight         : Option[Int] = None,
-                                   `type`              : String = "contact"
-                                 ) extends InlineQueryResult
-
+  id: String,
+  phoneNumber: String,
+  firstName: String,
+  lastName: Option[String] = None,
+  vcard: Option[String] = None,
+  replyMarkup: Option[InlineKeyboardMarkup] = None,
+  inputMessageContent: Option[InputMessageContent] = None,
+  thumbUrl: Option[String] = None,
+  thumbWidth: Option[Int] = None,
+  thumbHeight: Option[Int] = None,
+  `type`: String = "contact"
+) extends InlineQueryResult
 
 /** Represents a link to a photo stored on the Telegram servers.
   *
@@ -435,16 +433,16 @@ case class InlineQueryResultContact(
   * @param inputMessageContent  InputMessageContent Optional Content of the message to be sent instead of the photo
   */
 case class InlineQueryResultCachedPhoto(
-                                   id                  : String,
-                                   photoFileId         : String,
-                                   title               : Option[String] = None,
-                                   description         : Option[String] = None,
-                                   caption             : Option[String] = None,
-                                   parseMode           : Option[ParseMode] = None,
-                                   replyMarkup         : Option[InlineKeyboardMarkup] = None,
-                                   inputMessageContent : Option[InputMessageContent] = None,
-                                   `type`              : String = "photo"
-                                 ) extends InlineQueryResult
+  id: String,
+  photoFileId: String,
+  title: Option[String] = None,
+  description: Option[String] = None,
+  caption: Option[String] = None,
+  parseMode: Option[ParseMode] = None,
+  replyMarkup: Option[InlineKeyboardMarkup] = None,
+  inputMessageContent: Option[InputMessageContent] = None,
+  `type`: String = "photo"
+) extends InlineQueryResult
 
 /** Represents a link to an animated GIF file stored on the Telegram servers.
   *
@@ -462,15 +460,15 @@ case class InlineQueryResultCachedPhoto(
   * @param inputMessageContent  InputMessageContent Optional Content of the message to be sent instead of the GIF animation
   */
 case class InlineQueryResultCachedGif(
-                                   id                  : String,
-                                   gifFileId           : String,
-                                   title               : Option[String] = None,
-                                   caption             : Option[String] = None,
-                                   parseMode           : Option[ParseMode] = None,
-                                   replyMarkup         : Option[InlineKeyboardMarkup] = None,
-                                   inputMessageContent : Option[InputMessageContent] = None,
-                                   `type`              : String = "gif"
-                                 ) extends InlineQueryResult
+  id: String,
+  gifFileId: String,
+  title: Option[String] = None,
+  caption: Option[String] = None,
+  parseMode: Option[ParseMode] = None,
+  replyMarkup: Option[InlineKeyboardMarkup] = None,
+  inputMessageContent: Option[InputMessageContent] = None,
+  `type`: String = "gif"
+) extends InlineQueryResult
 
 /** Represents a link to a video animation (H.264/MPEG-4 AVC video without sound) stored on the Telegram servers.
   *
@@ -488,15 +486,15 @@ case class InlineQueryResultCachedGif(
   * @param inputMessageContent  InputMessageContent Optional Content of the message to be sent instead of the video animation
   */
 case class InlineQueryResultCachedMpeg4Gif(
-                                       id                  : String,
-                                       mpeg4FileId         : String,
-                                       title               : Option[String] = None,
-                                       caption             : Option[String] = None,
-                                       parseMode           : Option[ParseMode] = None,
-                                       replyMarkup         : Option[InlineKeyboardMarkup] = None,
-                                       inputMessageContent : Option[InputMessageContent] = None,
-                                       `type`              : String = "mpeg4_gif"
-                                     ) extends InlineQueryResult
+  id: String,
+  mpeg4FileId: String,
+  title: Option[String] = None,
+  caption: Option[String] = None,
+  parseMode: Option[ParseMode] = None,
+  replyMarkup: Option[InlineKeyboardMarkup] = None,
+  inputMessageContent: Option[InputMessageContent] = None,
+  `type`: String = "mpeg4_gif"
+) extends InlineQueryResult
 
 /** Represents a link to a sticker stored on the Telegram servers.
   *
@@ -512,12 +510,12 @@ case class InlineQueryResultCachedMpeg4Gif(
   * Note: This will only work in Telegram versions released after 9 April, 2016. Older clients will ignore them.
   */
 case class InlineQueryResultCachedSticker(
-                                           id                  : String,
-                                           stickerFileId       : String,
-                                           replyMarkup         : Option[InlineKeyboardMarkup] = None,
-                                           inputMessageContent : Option[InputMessageContent] = None,
-                                           `type`              : String = "sticker"
-                                         ) extends InlineQueryResult
+  id: String,
+  stickerFileId: String,
+  replyMarkup: Option[InlineKeyboardMarkup] = None,
+  inputMessageContent: Option[InputMessageContent] = None,
+  `type`: String = "sticker"
+) extends InlineQueryResult
 
 /** Represents a link to a file stored on the Telegram servers.
   *
@@ -539,16 +537,16 @@ case class InlineQueryResultCachedSticker(
   * Note: This will only work in Telegram versions released after 9 April, 2016. Older clients will ignore them.
   */
 case class InlineQueryResultCachedDocument(
-                                         id                  : String,
-                                         title               : String,
-                                         documentFileId      : String,
-                                         description         : Option[String] = None,
-                                         caption             : Option[String] = None,
-                                         parseMode           : Option[ParseMode] = None,
-                                         replyMarkup         : Option[InlineKeyboardMarkup] = None,
-                                         inputMessageContent : Option[InputMessageContent] = None,
-                                         `type`              : String = "document"
-                                       ) extends InlineQueryResult
+  id: String,
+  title: String,
+  documentFileId: String,
+  description: Option[String] = None,
+  caption: Option[String] = None,
+  parseMode: Option[ParseMode] = None,
+  replyMarkup: Option[InlineKeyboardMarkup] = None,
+  inputMessageContent: Option[InputMessageContent] = None,
+  `type`: String = "document"
+) extends InlineQueryResult
 
 /** Represents a link to a video file stored on the Telegram servers.
   *
@@ -567,16 +565,16 @@ case class InlineQueryResultCachedDocument(
   * @param inputMessageContent  InputMessageContent Optional Content of the message to be sent instead of the video
   */
 case class InlineQueryResultCachedVideo(
-                                       id                  : String,
-                                       videoFileId         : String,
-                                       title               : String,
-                                       description         : Option[String] = None,
-                                       caption             : Option[String] = None,
-                                       parseMode           : Option[ParseMode] = None,
-                                       replyMarkup         : Option[InlineKeyboardMarkup] = None,
-                                       inputMessageContent : Option[InputMessageContent] = None,
-                                       `type`              : String = "video"
-                                      ) extends InlineQueryResult
+  id: String,
+  videoFileId: String,
+  title: String,
+  description: Option[String] = None,
+  caption: Option[String] = None,
+  parseMode: Option[ParseMode] = None,
+  replyMarkup: Option[InlineKeyboardMarkup] = None,
+  inputMessageContent: Option[InputMessageContent] = None,
+  `type`: String = "video"
+) extends InlineQueryResult
 
 /** InlineQueryResultCachedVoice
   *
@@ -597,15 +595,15 @@ case class InlineQueryResultCachedVideo(
   * Note: This will only work in Telegram versions released after 9 April, 2016. Older clients will ignore them.
   */
 case class InlineQueryResultCachedVoice(
-                                         id                  : String,
-                                         voiceFileId         : String,
-                                         title               : String,
-                                         caption             : Option[String] = None,
-                                         parseMode           : Option[ParseMode] = None,
-                                         replyMarkup         : Option[InlineKeyboardMarkup] = None,
-                                         inputMessageContent : Option[InputMessageContent] = None,
-                                         `type`              : String = "voice"
-                                       ) extends InlineQueryResult
+  id: String,
+  voiceFileId: String,
+  title: String,
+  caption: Option[String] = None,
+  parseMode: Option[ParseMode] = None,
+  replyMarkup: Option[InlineKeyboardMarkup] = None,
+  inputMessageContent: Option[InputMessageContent] = None,
+  `type`: String = "voice"
+) extends InlineQueryResult
 
 /** Represents a link to an mp3 audio file stored on the Telegram servers.
   *
@@ -624,11 +622,11 @@ case class InlineQueryResultCachedVoice(
   * Note: This will only work in Telegram versions released after 9 April, 2016. Older clients will ignore them.
   */
 case class InlineQueryResultCachedAudio(
-                                         id                  : String,
-                                         audioFileId         : String,
-                                         caption             : Option[String] = None,
-                                         parseMode           : Option[ParseMode] = None,
-                                         replyMarkup         : Option[InlineKeyboardMarkup] = None,
-                                         inputMessageContent : Option[InputMessageContent] = None,
-                                         `type`              : String = "audio"
-                                       ) extends InlineQueryResult
+  id: String,
+  audioFileId: String,
+  caption: Option[String] = None,
+  parseMode: Option[ParseMode] = None,
+  replyMarkup: Option[InlineKeyboardMarkup] = None,
+  inputMessageContent: Option[InputMessageContent] = None,
+  `type`: String = "audio"
+) extends InlineQueryResult

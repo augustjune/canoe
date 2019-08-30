@@ -1,14 +1,11 @@
 package canoe.methods.updates
 
-
-
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.UpdateType.UpdateType
 import canoe.models.{InputFile, Update}
 import io.circe.generic.semiauto._
 import io.circe.{Decoder, Encoder}
-
 
 /** Use this method to receive incoming updates using long polling (wiki). An Array of Update objects is returned.
   *
@@ -29,8 +26,7 @@ import io.circe.{Decoder, Encoder}
 case class GetUpdates(offset: Option[Long] = None,
                       limit: Option[Int] = None,
                       timeout: Option[Int] = None,
-                      allowedUpdates: Option[Seq[UpdateType]] = None
-                     )
+                      allowedUpdates: Option[Seq[UpdateType]] = None)
 
 object GetUpdates {
   import io.circe.generic.auto._

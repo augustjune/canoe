@@ -30,8 +30,7 @@ case class SetGameScore(userId: Int,
                         disableEditMessage: Option[Boolean] = None,
                         chatId: Option[ChatId] = None,
                         messageId: Option[Int] = None,
-                        inlineMessageId: Option[String] = None
-                       ) {
+                        inlineMessageId: Option[String] = None) {
 
   if (inlineMessageId.isEmpty) {
     require(chatId.isDefined, "Required if inlineMessageId is not specified")

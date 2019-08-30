@@ -27,8 +27,7 @@ case class RestrictChatMember(chatId: ChatId,
                               canSendMessages: Option[Boolean] = None,
                               canSendMediaMessages: Option[Boolean] = None,
                               canSendOtherMessages: Option[Boolean] = None,
-                              canAddWebPagePreviews: Option[Boolean] = None
-                             )
+                              canAddWebPagePreviews: Option[Boolean] = None)
 
 object RestrictChatMember {
 

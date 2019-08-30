@@ -1,7 +1,7 @@
 package canoe.api
 
+import canoe.api.sources.Polling
 import canoe.clients.TelegramClient
-import canoe.methods.updates.GetUpdates
 import canoe.models.Update
 import canoe.models.messages.TelegramMessage
 import canoe.scenarios.Scenario
@@ -11,9 +11,9 @@ import cats.implicits._
 import fs2.concurrent.Broadcast
 import fs2.{Pipe, Pull, Stream}
 
-class Bot[F[_]: Concurrent](client: TelegramClient[F]) {
+class Bot[F[_]: Concurrent] private (source: UpdateSource[F]) {
 
-  def updates: Stream[F, Update] = pollUpdates(0)
+  def updates: Stream[F, Update] = source.updates
 
   def follow(scenarios: Scenario[F, Unit]*): Stream[F, Update] =
     forkThrough(updates, scenarios.map(pipes.messages[F] andThen runScenario(_)) :_*)
@@ -47,21 +47,10 @@ class Bot[F[_]: Concurrent](client: TelegramClient[F]) {
 
     Stream.eval(Ref.of(Set.empty[Long])).flatMap(ids => go(messages, ids).stream)
   }
+}
 
-  private def pollUpdates(startOffset: Long): Stream[F, Update] =
-    Stream(()).repeat.covary[F]
-      .evalMapAccumulate(startOffset) { case (offset, _) => requestUpdates(offset) }
-      .flatMap { case (_, updates) => Stream.emits(updates) }
+object Bot {
 
-  private def requestUpdates(offset: Long): F[(Long, List[Update])] =
-    client
-      .execute(GetUpdates(Some(offset)))
-      .map(updates => (lastId(updates).map(_ + 1).getOrElse(offset), updates))
-
-
-  private def lastId(updates: List[Update]): Option[Long] =
-    updates match {
-      case Nil => None
-      case nonEmpty => Some(nonEmpty.map(_.updateId).max)
-    }
+  def polling[F[_]](implicit C: Concurrent[F], client: TelegramClient[F]): Bot[F] =
+    new Bot[F](new Polling[F](client))
 }

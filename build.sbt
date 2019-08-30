@@ -1,11 +1,28 @@
-lazy val root = (project in file(".")).settings(
-  commonSettings,
-  compilerOptions,
-  typeSystemEnhancements,
-  dependencies,
-  tests
-)
+lazy val root = (project in file("."))
+  .dependsOn(canoe, examples)
+  .aggregate(canoe, examples)
 
+lazy val canoe = project.in(file("modules/core"))
+  .settings(
+    name := "canoe",
+    projectSettings,
+    compilerOptions,
+    typeSystemEnhancements,
+    dependencies,
+    tests
+  )
+
+lazy val examples = project.in(file("modules/examples"))
+  .dependsOn(canoe)
+  .settings(
+    name := "canoe-examples",
+  )
+
+lazy val projectSettings = Seq(
+  organization := "com.augustjune",
+  scalaVersion := "2.12.8",
+  version := "0.0.1"
+)
 val fs2Version                 = "1.0.5"
 val catsCoreVersion            = "1.6.1"
 val catsEffectVersion          = "1.4.0"
@@ -13,14 +30,23 @@ val circeVersion               = "0.11.1"
 val http4sVersion              = "0.20.10"
 val scalatestVersion           = "3.0.8"
 val kindProjectorVersion       = "0.10.3"
+
 val typesafeConfigVersion      = "1.3.4"
 
-lazy val commonSettings = Seq(
-  organization := "com.augustjune",
-  name := "canoe",
-  scalaVersion := "2.12.8",
-  version := "0.0.1"
-)
+lazy val dependencies =
+  libraryDependencies ++= Seq(
+    "co.fs2" %% "fs2-core" % fs2Version,
+    "org.typelevel" %% "cats-core" % catsCoreVersion,
+    "org.typelevel" %% "cats-free" % catsCoreVersion,
+    "org.typelevel" %% "cats-effect" % catsEffectVersion,
+    "io.circe" %% "circe-core" % circeVersion,
+    "io.circe" %% "circe-generic" % circeVersion,
+    "io.circe" %% "circe-generic-extras" % circeVersion,
+    "io.circe" %% "circe-parser" % circeVersion,
+    "org.http4s" %% "http4s-blaze-client" % http4sVersion,
+    "org.http4s" %% "http4s-circe" % http4sVersion,
+    "com.typesafe" % "config" % typesafeConfigVersion
+  )
 
 lazy val compilerOptions =
   scalacOptions ++= Seq(
@@ -38,21 +64,6 @@ resolvers += Resolver.sonatypeRepo("releases")
 
 lazy val typeSystemEnhancements =
   addCompilerPlugin("org.typelevel" %% "kind-projector" % kindProjectorVersion)
-
-lazy val dependencies =
-  libraryDependencies ++= Seq(
-    "co.fs2" %% "fs2-core" % fs2Version,
-    "org.typelevel" %% "cats-core" % catsCoreVersion,
-    "org.typelevel" %% "cats-free" % catsCoreVersion,
-    "org.typelevel" %% "cats-effect" % catsEffectVersion,
-    "io.circe" %% "circe-core" % circeVersion,
-    "io.circe" %% "circe-generic" % circeVersion,
-    "io.circe" %% "circe-generic-extras" % circeVersion,
-    "io.circe" %% "circe-parser" % circeVersion,
-    "org.http4s" %% "http4s-blaze-client" % http4sVersion,
-    "org.http4s" %% "http4s-circe" % http4sVersion,
-    "com.typesafe" % "config" % typesafeConfigVersion
-  )
 
 lazy val tests = {
   val dependencies =

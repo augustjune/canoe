@@ -17,6 +17,9 @@ object TelegramClient {
   def apply[F[_]: ConcurrentEffect](token: String, ec: ExecutionContext): Resource[F, TelegramClient[F]] =
     BlazeClientBuilder[F](ec).resource.map(new Http4sTelegramClient[F](token, _))
 
+  def global[F[_]: ConcurrentEffect](token: String): Resource[F, TelegramClient[F]] =
+    apply(token, scala.concurrent.ExecutionContext.global)
+
   def fromHttp4sClient[F[_]: Sync](token: String)(client: Client[F]): TelegramClient[F] =
     new Http4sTelegramClient[F](token, client)
 }

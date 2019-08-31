@@ -1,10 +1,9 @@
 package samples
 
 import canoe.api._
-import canoe.api.syntax._
 import canoe.clients.TelegramClient
-import canoe.models.messages.TextMessage
 import canoe.scenarios.Scenario
+import canoe.syntax._
 import cats.effect.{ExitCode, IO, IOApp}
 import cats.syntax.functor._
 
@@ -25,9 +24,9 @@ object Greetings extends IOApp {
 
   def greetings[F[_]: TelegramClient]: Scenario[F, Unit] =
     for {
-      chat  <- Scenario.start { case m: TextMessage if m.text.startsWith("/hi") => m.chat }
-      _     <- Scenario.eval { chat.send("Hello. What's your name?") }
-      name  <- Scenario.next { case m: TextMessage => m.text }
-      _     <- Scenario.eval { chat.send(s"Nice to meet you, $name") }
+      chat  <- Scenario.start(command("hi").chat)
+      _     <- Scenario.eval(chat.send("Hello. What's your name?"))
+      name  <- Scenario.next(text)
+      _     <- Scenario.eval(chat.send(s"Nice to meet you, $name"))
     } yield ()
 }

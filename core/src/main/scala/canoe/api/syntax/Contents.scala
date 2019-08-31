@@ -1,9 +1,9 @@
-package canoe.api
+package canoe.api.syntax
 
 import canoe.models._
 import canoe.models.outgoing._
 
-object syntax {
+trait Contents {
 
   implicit def textContent(text: String): TextContent =
     TextContent(text)
@@ -40,5 +40,4 @@ object syntax {
 
   implicit def voiceMessageContent(voice: Voice): VoiceContent =
     VoiceContent(InputFile.fromFileId(voice.fileId))
-
 }

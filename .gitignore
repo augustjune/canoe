@@ -3,4 +3,4 @@
 .vscode
 target
 
-modules/core/src/main/resources
+core/src/main/resources

@@ -1,8 +1,7 @@
-lazy val root = (project in file("."))
-  .dependsOn(canoe, examples)
-  .aggregate(canoe, examples)
+lazy val canoe = (project in file("."))
+  .aggregate(core, examples)
 
-lazy val canoe = project.in(file("modules/core"))
+lazy val core = project
   .settings(
     name := "canoe",
     projectSettings,
@@ -12,14 +11,12 @@ lazy val canoe = project.in(file("modules/core"))
     tests
   )
 
-lazy val examples = project.in(file("modules/examples"))
-  .dependsOn(canoe)
-  .settings(
-    name := "canoe-examples",
-  )
+lazy val examples = project
+  .dependsOn(core)
+  .settings(name := "canoe-examples")
 
 lazy val projectSettings = Seq(
-  organization := "com.augustjune",
+  organization := "org.augustjune",
   scalaVersion := "2.12.8",
   version := "0.0.1"
 )
@@ -30,7 +27,6 @@ val circeVersion               = "0.11.1"
 val http4sVersion              = "0.20.10"
 val scalatestVersion           = "3.0.8"
 val kindProjectorVersion       = "0.10.3"
-
 val typesafeConfigVersion      = "1.3.4"
 
 lazy val dependencies =

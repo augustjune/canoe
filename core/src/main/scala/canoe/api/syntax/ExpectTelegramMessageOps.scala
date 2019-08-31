@@ -3,10 +3,9 @@ package canoe.api.syntax
 import canoe.models.Chat
 import canoe.models.messages.TelegramMessage
 
+final class ExpectTelegramMessageOps(private val original: Expect[TelegramMessage]) extends AnyVal {
 
-final class ExpectTelegramMessageOps(private val original: ExpectMessage[TelegramMessage]) extends AnyVal {
+  def chat: Expect[Chat] = original andThen (_.chat)
 
-  def chat: ExpectMessage[Chat] = original andThen (_.chat)
-
-  def date: ExpectMessage[Int] = original andThen (_.date)
+  def date: Expect[Int] = original andThen (_.date)
 }

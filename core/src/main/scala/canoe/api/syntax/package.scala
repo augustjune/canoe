@@ -4,15 +4,14 @@ import canoe.models.messages.{TelegramMessage, TextMessage}
 
 package object syntax extends Contents with Expects {
 
-  type Expect[A, B] = PartialFunction[A, B]
-  type ExpectMessage[A] = Expect[TelegramMessage, A]
+  type Expect[A] = PartialFunction[TelegramMessage, A]
 
-  implicit def expectImplicitOps[A, B](original: Expect[A, B]): ExpectOps[A, B] =
-    new ExpectOps[A, B](original)
+  implicit def partialFunctionOps[A, B](original: PartialFunction[A, B]): PartialFunctionOps[A, B] =
+    new PartialFunctionOps[A, B](original)
 
-  implicit def expectTelegramMessageOps(original: ExpectMessage[TelegramMessage]): ExpectTelegramMessageOps =
+  implicit def expectTelegramMessageOps(original: Expect[TelegramMessage]): ExpectTelegramMessageOps =
     new ExpectTelegramMessageOps(original)
 
-  implicit def expectTextMessageOps(textMessage: ExpectMessage[TextMessage]): ExpectTextMessageOps =
+  implicit def expectTextMessageOps(textMessage: Expect[TextMessage]): ExpectTextMessageOps =
     new ExpectTextMessageOps(textMessage)
 }

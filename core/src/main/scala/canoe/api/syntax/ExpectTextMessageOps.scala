@@ -1,23 +1,15 @@
 package canoe.api.syntax
 
-import canoe.models.messages.{TelegramMessage, TextMessage}
+import canoe.models.messages.TextMessage
 
-final class ExpectTextMessageOps(private val textMessage: ExpectMessage[TextMessage]) extends AnyVal {
+final class ExpectTextMessageOps(private val textMessage: Expect[TextMessage]) extends AnyVal {
 
-  private def when(p: TextMessage => Boolean): ExpectMessage[TextMessage] =
-    new ExpectMessage[TextMessage] {
-      def isDefinedAt(a: TelegramMessage): Boolean =
-        textMessage.isDefinedAt(a) && p(textMessage.apply(a))
+  def contains(substring: String): Expect[TextMessage] =
+    textMessage.when(_.text.contains(substring))
 
-      def apply(a: TelegramMessage): TextMessage = textMessage.apply(a)
-    }
+  def startsWith(prefix: String): Expect[TextMessage] =
+    textMessage.when(_.text.startsWith(prefix))
 
-  def contains(substring: String): ExpectMessage[TextMessage] =
-    when(_.text.contains(substring))
-
-  def startsWith(prefix: String): ExpectMessage[TextMessage] =
-    when(_.text.startsWith(prefix))
-
-  def endsWith(ending: String): ExpectMessage[TextMessage] =
-    when(_.text.endsWith(ending))
+  def endsWith(ending: String): Expect[TextMessage] =
+    textMessage.when(_.text.endsWith(ending))
 }

@@ -1,4 +1,4 @@
-package canoe.api.syntax
+package canoe.syntax
 
 final class PartialFunctionOps[A, B](private val original: PartialFunction[A, B]) extends AnyVal {
 

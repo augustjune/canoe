@@ -1,4 +1,4 @@
-package canoe.api.syntax
+package canoe.syntax
 
 import canoe.models.Chat
 import canoe.models.messages.TelegramMessage

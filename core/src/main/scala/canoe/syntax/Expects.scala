@@ -1,4 +1,4 @@
-package canoe.api.syntax
+package canoe.syntax
 
 import canoe.models._
 import canoe.models.messages._

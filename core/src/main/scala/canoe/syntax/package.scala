@@ -1,4 +1,4 @@
-package canoe.api
+package canoe
 
 import canoe.models.messages.{TelegramMessage, TextMessage}
 

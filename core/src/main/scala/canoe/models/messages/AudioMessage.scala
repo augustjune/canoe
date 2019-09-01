@@ -2,7 +2,7 @@ package canoe.models.messages
 
 import canoe.models.{Audio, Chat, MessageEntity, User}
 
-case class AudioMessage(messageId: Int,
+final case class AudioMessage(messageId: Int,
                         chat: Chat,
                         date: Int,
                         audio: Audio,
@@ -13,8 +13,9 @@ case class AudioMessage(messageId: Int,
                         forwardFromChat: Option[Chat] = None,
                         forwardFromMessageId: Option[Int] = None,
                         forwardSignature: Option[String] = None,
+                        forwardSenderName: Option[String] = None,
                         forwardDate: Option[Int] = None,
                         replyToMessage: Option[TelegramMessage] = None,
                         editDate: Option[Int] = None,
                         authorSignature: Option[String] = None)
-    extends TelegramMessage
+    extends UserMessage

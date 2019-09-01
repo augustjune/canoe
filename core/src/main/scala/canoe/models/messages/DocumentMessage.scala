@@ -2,7 +2,7 @@ package canoe.models.messages
 
 import canoe.models.{Chat, Document, MessageEntity, User}
 
-case class DocumentMessage(messageId: Int,
+final case class DocumentMessage(messageId: Int,
                            chat: Chat,
                            date: Int,
                            document: Document,
@@ -13,8 +13,9 @@ case class DocumentMessage(messageId: Int,
                            forwardFromChat: Option[Chat] = None,
                            forwardFromMessageId: Option[Int] = None,
                            forwardSignature: Option[String] = None,
+                           forwardSenderName: Option[String] = None,
                            forwardDate: Option[Int] = None,
                            replyToMessage: Option[TelegramMessage] = None,
                            editDate: Option[Int] = None,
                            authorSignature: Option[String] = None)
-    extends TelegramMessage
+    extends UserMessage

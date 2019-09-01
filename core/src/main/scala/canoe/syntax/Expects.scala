@@ -37,6 +37,10 @@ trait Expects {
 
   val location: Expect[Location] = locationMessage.map(_.location)
 
+  val pollMessage: Expect[PollMessage] = { case m: PollMessage => m }
+
+  val poll: Expect[Poll] = pollMessage.map(_.poll)
+
   val stickerMessage: Expect[StickerMessage] = { case m: StickerMessage => m }
 
   val sticker: Expect[Sticker] = stickerMessage.map(_.sticker)

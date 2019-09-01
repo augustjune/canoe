@@ -1,8 +1,30 @@
 package canoe.models.messages
 
 import canoe.models.{Chat, PhotoSize, SuccessfulPayment, User}
+import cats.syntax.functor._
+import io.circe.Decoder
+import io.circe.generic.auto._
+import io.circe.generic.semiauto.deriveDecoder
 
 sealed trait SystemMessage extends TelegramMessage
+
+object SystemMessage {
+
+  implicit val systemMessageDecoder: Decoder[SystemMessage] =
+    List[Decoder[SystemMessage]](
+      deriveDecoder[ChatMemberAdded].widen,
+      deriveDecoder[ChannelCreated].widen,
+      deriveDecoder[ChatMemberLeft].widen,
+      deriveDecoder[ChatPhotoChanged].widen,
+      deriveDecoder[ChatPhotoDeleted].widen,
+      deriveDecoder[ChatTitleChanged].widen,
+      deriveDecoder[MigratedFromGroup].widen,
+      deriveDecoder[MigratedToSupergroup].widen,
+      deriveDecoder[SuccessfulPaymentMessage].widen,
+      deriveDecoder[SupergroupCreated].widen,
+      deriveDecoder[WebsiteConnected].widen
+    ).reduceLeft(_.or(_))
+}
 
 final case class MessagePinned(messageId: Int, chat: Chat, date: Int, pinnedMessage: UserMessage) extends SystemMessage
 

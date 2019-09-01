@@ -198,6 +198,7 @@ object InlineKeyboardMarkup {
 case class InlineKeyboardButton(text: String,
                                 callbackData: Option[String] = None,
                                 url: Option[String] = None,
+                                loginUrl: Option[LoginUrl] = None,
                                 switchInlineQuery: Option[String] = None,
                                 switchInlineQueryCurrentChat: Option[String] = None,
                                 callbackGame: Option[CallbackGame] = None,

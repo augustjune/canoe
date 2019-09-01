@@ -14,6 +14,9 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
   def setAction(action: ChatAction): F[Boolean] =
     client.execute(SendChatAction(chat.id, action))
 
+  def setDefaultPermissions(permissions: ChatPermissions): F[Boolean] =
+    client.execute(SetChatPermissions(chat.id, permissions))
+
   def deletePhoto: F[Boolean] =
     client.execute(DeleteChatPhoto(chat.id))
 
@@ -50,8 +53,8 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
   def promoteMember(user: User): F[Boolean] =
     client.execute(PromoteChatMember(chat.id, user.id))
 
-  def restrictMember(user: User): F[Boolean] =
-    client.execute(RestrictChatMember(chat.id, user.id))
+  def restrictMember(user: User, permissions: ChatPermissions, until: Option[Int] = None): F[Boolean] =
+    client.execute(RestrictChatMember(chat.id, user.id, permissions, until))
 
   def setDescription(description: String): F[Boolean] =
     client.execute(SetChatDescription(chat.id, Option(description)))

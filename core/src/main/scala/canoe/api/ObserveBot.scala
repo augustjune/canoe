@@ -7,11 +7,16 @@ import canoe.models.messages.TelegramMessage
 import canoe.scenarios.Scenario
 import cats.effect.Concurrent
 import cats.effect.concurrent.Ref
-import cats.implicits._
-import fs2.concurrent.Broadcast
+import cats.syntax.all._
 import fs2.{Pipe, Pull, Stream}
 
-class Bot[F[_]: Concurrent](source: UpdateSource[F]) {
+object ObserveBot {
+
+  def polling[F[_]](implicit C: Concurrent[F], client: TelegramClient[F]): ObserveBot[F] =
+    new ObserveBot[F](new Polling[F](client))
+}
+
+class ObserveBot[F[_]: Concurrent](source: UpdateSource[F]) {
 
   def updates: Stream[F, Update] = source.updates
 
@@ -19,7 +24,10 @@ class Bot[F[_]: Concurrent](source: UpdateSource[F]) {
     forkThrough(updates, scenarios.map(pipes.messages[F] andThen runScenario(_)): _*)
 
   private def forkThrough[A](stream: Stream[F, A], pipes: Pipe[F, A, Unit]*): Stream[F, A] =
-    stream.through(Broadcast.through((identity: Pipe[F, A, A]) :: pipes.toList.map(_.andThen(_.drain)): _*))
+    pipes.toList.map(_.andThen(_.drain)).foldLeft(stream) {
+      case (s, pipe) => s.observe(pipe)
+    }
+
 
   private def runScenario(scenario: Scenario[F, Unit])(messages: Stream[F, TelegramMessage]): Stream[F, Nothing] = {
 
@@ -46,10 +54,4 @@ class Bot[F[_]: Concurrent](source: UpdateSource[F]) {
 
     Stream.eval(Ref.of(Set.empty[Long])).flatMap(ids => go(messages, ids).stream)
   }
-}
-
-object Bot {
-
-  def polling[F[_]](implicit C: Concurrent[F], client: TelegramClient[F]): Bot[F] =
-    new Bot[F](new Polling[F](client))
 }

@@ -8,48 +8,68 @@ import canoe.scenarios.Scenario
 import cats.effect.Concurrent
 import cats.effect.concurrent.Ref
 import cats.implicits._
-import fs2.concurrent.Broadcast
-import fs2.{Pipe, Pull, Stream}
+import fs2.concurrent.{Queue, Topic}
+import fs2.{Pipe, Stream}
 
-class Bot[F[_]: Concurrent](source: UpdateSource[F]) {
+object Bot {
+  def polling[F[_]](implicit C: Concurrent[F], client: TelegramClient[F]): Bot[F] =
+    new Bot[F](new Polling[F](client))
+}
+
+class Bot[F[_]] (source: UpdateSource[F])(implicit F: Concurrent[F]) {
 
   def updates: Stream[F, Update] = source.updates
 
-  def follow(scenarios: Scenario[F, Unit]*): Stream[F, Update] =
-    forkThrough(updates, scenarios.map(pipes.messages[F] andThen runScenario(_)): _*)
+  def follow(scenarios: Scenario[F, Unit]*): Stream[F, Update] = {
 
-  private def forkThrough[A](stream: Stream[F, A], pipes: Pipe[F, A, Unit]*): Stream[F, A] =
-    stream.through(Broadcast.through((identity: Pipe[F, A, A]) :: pipes.toList.map(_.andThen(_.drain)): _*))
+    def filterByIds(id: Long): Pipe[F, TelegramMessage, TelegramMessage] =
+      _.filter(_.chat.id == id)
 
-  private def runScenario(scenario: Scenario[F, Unit])(messages: Stream[F, TelegramMessage]): Stream[F, Nothing] = {
+    def runSingle(scenario: Scenario[F, Unit],
+                  idsRef: Ref[F, Set[Long]],
+                  topic: Topic[F, Option[Update]]): Stream[F, Nothing] =
+      topic
+        .subscribe(1)
+        .unNone
+        .through(pipes.messages)
+        .map { m =>
+          Stream.eval(idsRef.get).map(_.contains(m.chat.id)).flatMap {
+            case true => Stream.empty
+            case false =>
+              Stream.eval(idsRef.update(_ + m.chat.id)) >>
+                Stream.eval(Queue.unbounded[F, TelegramMessage]).flatMap { queue =>
+                  val enq = topic
+                    .subscribe(1)
+                    .unNone
+                    .through(pipes.messages andThen filterByIds(m.chat.id))
+                    .through(queue.enqueue)
 
-    val filterByFirst: Pipe[F, TelegramMessage, TelegramMessage] =
-      _.pull.peek1.flatMap {
-        case Some((m, rest)) => rest.filter(_.chat.id == m.chat.id).pull.echo
-        case None            => Pull.done
-      }.stream
+                  val deq = queue.dequeue.through(scenario).drain
 
-    def go(input: Stream[F, TelegramMessage], ids: Ref[F, Set[Long]]): Pull[F, Nothing, Unit] =
-      input.pull.peek1.flatMap {
-        case Some((m, rest)) =>
-          Pull.eval(ids.get.map(_.contains(m.chat.id))).flatMap {
-            case true => // contains
-              go(rest.tail, ids)
-
-            case false => // doesn't contain
-              Pull.eval(ids.update(_ + m.chat.id)) >>
-                go(rest.observe(filterByFirst andThen scenario).tail, ids)
+                  deq.concurrently(enq)
+                }
           }
+        }
+        .parJoinUnbounded
 
-        case None => Pull.done
-      }
+    def runAll(scenarios: List[Scenario[F, Unit]],
+               updates: Stream[F, Update],
+               topic: Topic[F, Option[Update]]): Stream[F, Update] = {
 
-    Stream.eval(Ref.of(Set.empty[Long])).flatMap(ids => go(messages, ids).stream)
+      val run = Stream
+        .emits(scenarios)
+        .zipWith(Stream.repeatEval(Ref[F].of(Set.empty[Long]))) {
+          case (scenario, ids) => runSingle(scenario, ids, topic)
+        }
+        .parJoinUnbounded
+
+      val populate = updates.evalTap(u => topic.publish1(Some(u)))
+
+      populate.concurrently(run)
+    }
+
+    Stream.eval(Topic[F, Option[Update]](None)).flatMap { topic =>
+      runAll(scenarios.toList, updates, topic)
+    }
   }
-}
-
-object Bot {
-
-  def polling[F[_]](implicit C: Concurrent[F], client: TelegramClient[F]): Bot[F] =
-    new Bot[F](new Polling[F](client))
 }

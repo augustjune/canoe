@@ -11,18 +11,13 @@ import cats.implicits._
 import fs2.concurrent.{Queue, Topic}
 import fs2.{Pipe, Stream}
 
-object Bot {
-  def polling[F[_]](implicit C: Concurrent[F], client: TelegramClient[F]): Bot[F] =
-    new Bot[F](new Polling[F](client))
-}
-
-class Bot[F[_]] (source: UpdateSource[F])(implicit F: Concurrent[F]) {
+class Bot[F[_]] private (source: UpdateSource[F])(implicit F: Concurrent[F]) {
 
   def updates: Stream[F, Update] = source.updates
 
   def follow(scenarios: Scenario[F, Unit]*): Stream[F, Update] = {
 
-    def filterByIds(id: Long): Pipe[F, TelegramMessage, TelegramMessage] =
+    def filterById(id: Long): Pipe[F, TelegramMessage, TelegramMessage] =
       _.filter(_.chat.id == id)
 
     def runSingle(scenario: Scenario[F, Unit],
@@ -37,11 +32,12 @@ class Bot[F[_]] (source: UpdateSource[F])(implicit F: Concurrent[F]) {
             case true => Stream.empty
             case false =>
               Stream.eval(idsRef.update(_ + m.chat.id)) >>
+                //  Using queue in order to avoid blocking topic publisher
                 Stream.eval(Queue.unbounded[F, TelegramMessage]).flatMap { queue =>
                   val enq = topic
                     .subscribe(1)
                     .unNone
-                    .through(pipes.messages andThen filterByIds(m.chat.id))
+                    .through(pipes.messages andThen filterById(m.chat.id))
                     .through(queue.enqueue)
 
                   val deq = queue.dequeue.through(scenario).drain
@@ -72,4 +68,9 @@ class Bot[F[_]] (source: UpdateSource[F])(implicit F: Concurrent[F]) {
       runAll(scenarios.toList, updates, topic)
     }
   }
+}
+
+object Bot {
+  def polling[F[_]](implicit F: Concurrent[F], client: TelegramClient[F]): Bot[F] =
+    new Bot[F](new Polling[F](client))
 }

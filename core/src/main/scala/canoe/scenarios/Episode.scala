@@ -43,24 +43,24 @@ sealed trait Episode[F[_], -I, +O] extends Pipe[F, I, O] {
     Tolerate(this, None, fn)
 }
 
-final private case class Eval[F[_], I, A](fa: F[A]) extends Episode[F, I, A]
+private final case class Eval[F[_], I, A](fa: F[A]) extends Episode[F, I, A]
 
-final private case class Next[F[_], A](p: A => Boolean) extends Episode[F, A, A]
+private final case class Next[F[_], A](p: A => Boolean) extends Episode[F, A, A]
 
-final private case class First[F[_], A](p: A => Boolean) extends Episode[F, A, A]
+private final case class First[F[_], A](p: A => Boolean) extends Episode[F, A, A]
 
-final private case class Bind[F[_], I, O1, O2](episode: Episode[F, I, O1], fn: O1 => Episode[F, I, O2])
+private final case class Bind[F[_], I, O1, O2](episode: Episode[F, I, O1], fn: O1 => Episode[F, I, O2])
     extends Episode[F, I, O2]
 
-final private case class Mapped[F[_], I, O1, O2](episode: Episode[F, I, O1], fn: O1 => O2) extends Episode[F, I, O2]
+private final case class Mapped[F[_], I, O1, O2](episode: Episode[F, I, O1], fn: O1 => O2) extends Episode[F, I, O2]
 
-final private case class Cancellable[F[_], I, O](
+private final case class Cancellable[F[_], I, O](
   episode: Episode[F, I, O],
   cancelOn: I => Boolean,
   finalizer: Option[I => F[Unit]]
 ) extends Episode[F, I, O]
 
-final private case class Tolerate[F[_], I, O](episode: Episode[F, I, O], limit: Option[Int], fn: I => F[Unit])
+private final case class Tolerate[F[_], I, O](episode: Episode[F, I, O], limit: Option[Int], fn: I => F[Unit])
     extends Episode[F, I, O]
 
 object Episode {
@@ -102,9 +102,9 @@ object Episode {
     }
   }
 
-  final private case class Matched[A](a: A) extends Result[Nothing, A]
-  final private case class Missed[E](message: E) extends Result[E, Nothing]
-  final private case class Cancelled[E](message: E) extends Result[E, Nothing]
+  private final case class Matched[A](a: A) extends Result[Nothing, A]
+  private final case class Missed[E](message: E) extends Result[E, Nothing]
+  private final case class Cancelled[E](message: E) extends Result[E, Nothing]
 
   private def find[F[_], I, O](
     episode: Episode[F, I, O],

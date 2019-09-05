@@ -1,8 +1,6 @@
 package samples
 
 import canoe.api._
-import canoe.clients.TelegramClient
-import canoe.scenarios.Scenario
 import canoe.syntax._
 import cats.effect.{ExitCode, IO, IOApp}
 import cats.syntax.functor._

@@ -1,5 +1,6 @@
-package canoe.clients
+package canoe.api.clients
 
+import canoe.api.TelegramClient
 import canoe.methods.Method
 import canoe.models.{InputFile, Response => TelegramResponse}
 import cats.effect.Sync
@@ -11,7 +12,7 @@ import org.http4s.client.Client
 import org.http4s.client.dsl.Http4sClientDsl._
 import org.http4s.multipart.{Multipart, Part}
 
-class Http4sTelegramClient[F[_]: Sync](token: String, client: Client[F]) extends TelegramClient[F] {
+private[api] class Http4sTelegramClient[F[_]: Sync](token: String, client: Client[F]) extends TelegramClient[F] {
 
   private val botApiUri: Uri = uri"https://api.telegram.org" / s"bot$token"
 

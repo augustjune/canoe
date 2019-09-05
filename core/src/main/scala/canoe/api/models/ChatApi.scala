@@ -1,6 +1,6 @@
 package canoe.api.models
 
-import canoe.clients.TelegramClient
+import canoe.api.TelegramClient
 import canoe.methods.chats._
 import canoe.methods.messages._
 import canoe.models.ChatAction.ChatAction

@@ -1,5 +1,6 @@
-package canoe.clients
+package canoe.api
 
+import canoe.api.clients.Http4sTelegramClient
 import canoe.methods.Method
 import cats.effect.{ConcurrentEffect, Resource, Sync}
 import org.http4s.client.Client

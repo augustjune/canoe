@@ -1,9 +1,7 @@
 package samples
 
 import canoe.api._
-import canoe.clients.TelegramClient
 import canoe.models.Chat
-import canoe.scenarios.Scenario
 import canoe.syntax._
 import cats.effect.{ExitCode, IO, IOApp, Timer}
 import cats.syntax.all._

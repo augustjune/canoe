@@ -1,4 +1,5 @@
-lazy val canoe = (project in file("."))
+lazy val canoe = project
+  .in(file("."))
   .aggregate(core, examples)
 
 lazy val core = project
@@ -17,17 +18,23 @@ lazy val examples = project
 
 lazy val projectSettings = Seq(
   organization := "org.augustjune",
+  licenses ++= Seq(("MIT", url("http://opensource.org/licenses/MIT"))),
+  homepage := Some(url("https://github.com/augustjune/canoe")),
+  developers := List(
+    Developer("augustjune", "Yura Slinkin", "jurij.jurich@gmail.com", url("https://github.com/augustjune"))
+  ),
   scalaVersion := "2.12.8",
-  version := "0.0.1"
+  crossScalaVersions := Seq(scalaVersion.value)
 )
-val fs2Version                 = "1.0.5"
-val catsCoreVersion            = "1.6.1"
-val catsEffectVersion          = "1.4.0"
-val circeVersion               = "0.11.1"
-val http4sVersion              = "0.20.10"
-val scalatestVersion           = "3.0.8"
-val kindProjectorVersion       = "0.10.3"
-val typesafeConfigVersion      = "1.3.4"
+
+val fs2Version = "1.0.5"
+val catsCoreVersion = "1.6.1"
+val catsEffectVersion = "1.4.0"
+val circeVersion = "0.11.1"
+val http4sVersion = "0.20.10"
+val scalatestVersion = "3.0.8"
+val kindProjectorVersion = "0.10.3"
+val typesafeConfigVersion = "1.3.4"
 
 lazy val dependencies =
   libraryDependencies ++= Seq(
@@ -46,14 +53,14 @@ lazy val dependencies =
 
 lazy val compilerOptions =
   scalacOptions ++= Seq(
-    "-Xfatal-warnings",                  // Fail the compilation if there are any warnings.
-    "-Ypartial-unification",             // Enable partial unification in type constructor inference
-    "-deprecation",                      // Emit warning and location for usages of deprecated APIs.
-    "-explaintypes",                     // Explain type errors in more detail.
-    "-feature",                          // Emit warning and location for usages of features that should be imported explicitly.
-    "-language:higherKinds",             // Allow higher-kinded types
-    "-language:postfixOps",              // Allow higher-kinded types
-    "-language:implicitConversions"      // Allow definition of implicit functions called views
+    "-Xfatal-warnings", // Fail the compilation if there are any warnings.
+    "-Ypartial-unification", // Enable partial unification in type constructor inference
+    "-deprecation", // Emit warning and location for usages of deprecated APIs.
+    "-explaintypes", // Explain type errors in more detail.
+    "-feature", // Emit warning and location for usages of features that should be imported explicitly.
+    "-language:higherKinds", // Allow higher-kinded types
+    "-language:postfixOps", // Allow higher-kinded types
+    "-language:implicitConversions" // Allow definition of implicit functions called views
   )
 
 resolvers += Resolver.sonatypeRepo("releases")

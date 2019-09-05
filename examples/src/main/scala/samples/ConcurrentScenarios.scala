@@ -12,8 +12,8 @@ import fs2.Stream
 /**
   * Example of concurrent execution of >1 scenarios.
   *
-  * Each scenarios is evaluated independently across different chats,
-  * without blocking current chat from evaluating another scenarios.
+  * Each scenario is evaluated independently across different chats,
+  * without blocking current chat from evaluating other scenarios.
   */
 object ConcurrentScenarios extends IOApp {
 

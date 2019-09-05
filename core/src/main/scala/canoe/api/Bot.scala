@@ -1,10 +1,8 @@
 package canoe.api
 
 import canoe.api.sources.Polling
-import canoe.clients.TelegramClient
 import canoe.models.Update
 import canoe.models.messages.TelegramMessage
-import canoe.scenarios.Scenario
 import cats.effect.Concurrent
 import cats.effect.concurrent.Ref
 import cats.implicits._

@@ -1,7 +1,6 @@
 package canoe.api.sources
 
-import canoe.api.UpdateSource
-import canoe.clients.TelegramClient
+import canoe.api.{TelegramClient, UpdateSource}
 import canoe.methods.updates.GetUpdates
 import canoe.models.Update
 import cats.Functor

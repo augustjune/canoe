@@ -1,11 +1,14 @@
 package canoe
 
 import canoe.api.models._
-import canoe.clients.TelegramClient
 import canoe.models.messages.TelegramMessage
 import canoe.models.{Chat, InlineQuery}
+import canoe.scenarios.Episode
 
 package object api {
+
+  type Scenario[F[_], A] = Episode[F, TelegramMessage, A]
+
   implicit def chatApi[F[_]: TelegramClient](chat: Chat): ChatApi[F] =
     new ChatApi[F](chat)
 

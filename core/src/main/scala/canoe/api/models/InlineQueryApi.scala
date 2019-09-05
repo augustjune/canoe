@@ -1,6 +1,6 @@
 package canoe.api.models
 
-import canoe.clients.TelegramClient
+import canoe.api.TelegramClient
 import canoe.methods.queries.AnswerInlineQuery
 import canoe.models.{InlineQuery, InlineQueryResult}
 

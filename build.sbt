@@ -14,7 +14,10 @@ lazy val core = project
 
 lazy val examples = project
   .dependsOn(core)
-  .settings(name := "canoe-examples")
+  .settings(
+    name := "canoe-examples",
+    skip in publish := true
+  )
 
 lazy val projectSettings = Seq(
   organization := "org.augustjune",

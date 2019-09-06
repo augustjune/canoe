@@ -1,6 +1,7 @@
 lazy val canoe = project
   .in(file("."))
   .aggregate(core, examples)
+  .settings(skip in publish := true)
 
 lazy val core = project
   .settings(

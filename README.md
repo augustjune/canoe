@@ -1,24 +1,55 @@
-# canoe
+canoe
+=============
 
-**canoe** is a compositional Scala Telegram Bot library. 
-It allows you to build interactive Telegram bots in a purely functional style.
+[![Build Status](https://travis-ci.org/augustjune/canoe.svg?branch=master)](https://travis-ci.org/augustjune/canoe)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.augustjune/canoe_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.augustjune/canoe_2.12)
+    
+### Overview
+**canoe** provides a purely functional streaming interface over [Telegram Bot API](https://core.telegram.org/bots/api) 
+and allows you to build interactive chatbots using idiomatic Scala code.
 
-## Getting started
-The library is not yet available on Maven Central, but it's coming soon.
-
-## Usage example
-Here's a quick sample of how the definition of simple bot behavior looks like in **canoe**. 
-Complete usage examples will be added here. 
-```scala
-val bot = new Bot(client)
-
-val greetings: Scenario[IO, Unit] =
-  for {
-      chat <- Scenario.start { case m: TextMessage if m.text.startsWith("/hi") => m.chat }
-      _    <- Scenario.eval { chat.send(BotMessage("Hello. What's your name?")) }
-      name <- Scenario.next { case m: TextMessage => m.text }
-      _    <- Scenario.eval { chat.send(BotMessage(s"Nice to meet you, $name"))}
-    } yield ()
-
-bot.follow(greetings)
+### Getting started
+sbt dependency:
 ```
+libraryDependencies += "org.augustjune" %% "canoe" % "0.0.1"
+```
+Imports:
+```
+import canoe.api._
+import canoe.syntax._
+```
+
+### The problem
+Building interactive chatbots requires maintaining the state of each conversation, 
+with possible interaction across them and/or using shared resources.
+The complexity of this task grows rapidly with the advancement of the bot.
+**canoe** solves this problem by decomposing behavior of the bot into the set of scenarios 
+which the chatbot will follow.
+
+### Example
+Here's a quick example of how the definition of simple bot behavior looks like in **canoe**. 
+More samples can be found [here](https://github.com/augustjune/canoe/tree/master/examples/src/main/scala/samples). 
+```scala
+import canoe.api._
+import canoe.syntax._
+import cats.effect.ConcurrentEffect
+
+def app[F[_]: ConcurrentEffect]: F[Unit] = 
+  TelegramClient.global[F](token).use { implicit client =>
+    Bot.polling[F]
+      .follow(greetings)
+      .compile.drain
+  }
+
+def greetings[F[_]: TelegramClient]: Scenario[F, Unit] =
+    for {
+      chat  <- Scenario.start(command("hi").chat)
+      _     <- Scenario.eval(chat.send("Hello. What's your name?"))
+      name  <- Scenario.next(text)
+      _     <- Scenario.eval(chat.send(s"Nice to meet you, $name"))
+    } yield ()
+```
+
+Regardless of whether you stick with steering the bot using scenarios, 
+you are able to use all Telegram Bot API functionality in a streaming context 
+as it is demonstrated [here](https://github.com/augustjune/canoe/blob/master/examples/src/main/scala/samples/NoScenario.scala).

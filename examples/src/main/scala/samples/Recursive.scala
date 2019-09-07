@@ -5,6 +5,7 @@ import canoe.models.Chat
 import canoe.syntax._
 import cats.effect.{ExitCode, IO, IOApp}
 import cats.syntax.functor._
+import fs2.Stream
 
 /**
   * Example of stack safe self recursive call of Scenario
@@ -14,12 +15,12 @@ object Recursive extends IOApp {
   val token: String = "<your telegram token>"
 
   def run(args: List[String]): IO[ExitCode] =
-    TelegramClient
-      .global[IO](token)
-      .use { implicit client =>
-        Bot.polling[IO].follow(learnNaturals).compile.drain
+    Stream
+      .resource(TelegramClient.global[IO](token))
+      .flatMap { implicit client =>
+        Bot.polling[IO].follow(learnNaturals)
       }
-      .as(ExitCode.Success)
+      .compile.drain.as(ExitCode.Success)
 
   final val FIRST_NATURAL_NUMBER = 0
 

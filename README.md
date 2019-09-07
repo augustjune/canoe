@@ -33,13 +33,13 @@ More samples can be found [here](https://github.com/augustjune/canoe/tree/master
 import canoe.api._
 import canoe.syntax._
 import cats.effect.ConcurrentEffect
+import fs2.Stream
 
 def app[F[_]: ConcurrentEffect]: F[Unit] = 
-  TelegramClient.global[F](token).use { implicit client =>
-    Bot.polling[F]
-      .follow(greetings)
-      .compile.drain
-  }
+  Stream
+    .resource(TelegramClient.global[F](token))
+    .flatMap { implicit client => Bot.polling[F].follow(greetings) }
+    .compile.drain
 
 def greetings[F[_]: TelegramClient]: Scenario[F, Unit] =
     for {
@@ -50,6 +50,6 @@ def greetings[F[_]: TelegramClient]: Scenario[F, Unit] =
     } yield ()
 ```
 
-Regardless of whether you stick with steering the bot using scenarios, 
-you are able to use all Telegram Bot API functionality in a streaming context 
+Regardless of whether you decide to use scenarios for steering the bot, 
+you are still able to use all functionality of Telegram Bot API in a streaming context, 
 as it is demonstrated [here](https://github.com/augustjune/canoe/blob/master/examples/src/main/scala/samples/NoScenario.scala).

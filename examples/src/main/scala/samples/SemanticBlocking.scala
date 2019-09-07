@@ -5,6 +5,7 @@ import canoe.models.Chat
 import canoe.syntax._
 import cats.effect.{ExitCode, IO, IOApp, Timer}
 import cats.syntax.all._
+import fs2.Stream
 
 import scala.concurrent.duration._
 import scala.util.Try
@@ -17,12 +18,12 @@ object SemanticBlocking extends IOApp {
   val token: String = "<your telegram token>"
 
   def run(args: List[String]): IO[ExitCode] =
-    TelegramClient
-      .global[IO](token)
-      .use { implicit client =>
-        Bot.polling[IO].follow(count).compile.drain
+    Stream
+      .resource(TelegramClient.global[IO](token))
+      .flatMap { implicit client =>
+        Bot.polling[IO].follow(count)
       }
-      .as(ExitCode.Success)
+      .compile.drain.as(ExitCode.Success)
 
   def count[F[_]: TelegramClient: Timer]: Scenario[F, Unit] =
     for {

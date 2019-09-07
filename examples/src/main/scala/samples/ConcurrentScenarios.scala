@@ -18,18 +18,16 @@ object ConcurrentScenarios extends IOApp {
   val token: String = "<your telegram token>"
 
   def run(args: List[String]): IO[ExitCode] =
-    TelegramClient
-      .global[IO](token)
-      .use { implicit client =>
+    Stream
+      .resource(TelegramClient.global[IO](token))
+      .flatMap { implicit client =>
         Stream.eval(Semaphore[IO](0)).flatMap { sem =>
-
           // Both scenarios use shared semaphore,
           // so the interaction may be achieved across different chats
-            Bot.polling[IO].follow(pop(sem), push(sem))
-          }
-          .compile.drain
+          Bot.polling[IO].follow(pop(sem), push(sem))
+        }
       }
-      .as(ExitCode.Success)
+      .compile.drain.as(ExitCode.Success)
 
   def pop[F[_]: TelegramClient](semaphore: Semaphore[F]): Scenario[F, Unit] =
     for {

@@ -4,6 +4,7 @@ import canoe.api._
 import canoe.syntax._
 import cats.effect.{ExitCode, IO, IOApp}
 import cats.syntax.functor._
+import fs2.Stream
 
 /**
   * Example of interaction with user and effective external API
@@ -15,12 +16,12 @@ object Interaction extends IOApp {
   val papaJohns: PizzaPlace[IO] = ???
 
   def run(args: List[String]): IO[ExitCode] =
-    TelegramClient
-      .global[IO](token)
-      .use { implicit client =>
-        Bot.polling[IO].follow(pizzaOrders(papaJohns)).compile.drain
+    Stream
+      .resource(TelegramClient.global[IO](token))
+      .flatMap { implicit client =>
+        Bot.polling[IO].follow(pizzaOrders(papaJohns))
       }
-      .as(ExitCode.Success)
+      .compile.drain.as(ExitCode.Success)
 
   trait PizzaPlace[F[_]] {
     def menu: F[List[String]]

@@ -44,11 +44,9 @@ lazy val dependencies =
   libraryDependencies ++= Seq(
     "co.fs2" %% "fs2-core" % fs2Version,
     "org.typelevel" %% "cats-core" % catsCoreVersion,
-    "org.typelevel" %% "cats-free" % catsCoreVersion,
     "org.typelevel" %% "cats-effect" % catsEffectVersion,
     "io.circe" %% "circe-core" % circeVersion,
     "io.circe" %% "circe-generic" % circeVersion,
-    "io.circe" %% "circe-generic-extras" % circeVersion,
     "io.circe" %% "circe-parser" % circeVersion,
     "org.http4s" %% "http4s-blaze-client" % http4sVersion,
     "org.http4s" %% "http4s-circe" % http4sVersion,

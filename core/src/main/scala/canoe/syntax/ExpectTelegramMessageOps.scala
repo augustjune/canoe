@@ -5,7 +5,7 @@ import canoe.models.messages.TelegramMessage
 
 final class ExpectTelegramMessageOps(private val original: Expect[TelegramMessage]) extends AnyVal {
 
-  def chat: Expect[Chat] = original andThen (_.chat)
+  def chat: Expect[Chat] = original.map(_.chat)
 
-  def date: Expect[Int] = original andThen (_.date)
+  def date: Expect[Int] = original.map(_.date)
 }

@@ -18,6 +18,12 @@ class Bot[F[_]] private (source: UpdateSource[F])(implicit F: Concurrent[F]) {
     def filterById(id: Long): Pipe[F, TelegramMessage, TelegramMessage] =
       _.filter(_.chat.id == id)
 
+    def register(idsRef: Ref[F, Set[Long]], id: Long): F[Boolean] =
+      idsRef.modify { ids =>
+        val was = ids.contains(id)
+        ids + id -> was
+      }
+
     def runSingle(scenario: Scenario[F, Unit],
                   idsRef: Ref[F, Set[Long]],
                   topic: Topic[F, Option[Update]]): Stream[F, Nothing] =
@@ -26,10 +32,11 @@ class Bot[F[_]] private (source: UpdateSource[F])(implicit F: Concurrent[F]) {
         .unNone
         .through(pipes.messages)
         .map { m =>
-          Stream.eval(idsRef.get).map(_.contains(m.chat.id)).flatMap {
-            case true => Stream.empty
-            case false =>
-              Stream.eval(idsRef.update(_ + m.chat.id)) >>
+          Stream
+            .eval(register(idsRef, m.chat.id))
+            .flatMap {
+              case true  => Stream.empty
+              case false =>
                 //  Using queue in order to avoid blocking topic publisher
                 Stream.eval(Queue.unbounded[F, TelegramMessage]).flatMap { queue =>
                   val enq = topic
@@ -42,7 +49,7 @@ class Bot[F[_]] private (source: UpdateSource[F])(implicit F: Concurrent[F]) {
 
                   deq.concurrently(enq)
                 }
-          }
+            }
         }
         .parJoinUnbounded
 

@@ -11,7 +11,7 @@ trait Expects {
 
   val text: Expect[String] = textMessage.map(_.text)
 
-  def command(name: String): Expect[TextMessage] = textMessage.startsWith(s"/$name")
+  def command(name: String): Expect[TextMessage] = textMessage.startingWith(s"/$name")
 
   val animationMessage: Expect[AnimationMessage] = { case m: AnimationMessage => m }
 

@@ -22,6 +22,7 @@ lazy val examples = project
 
 lazy val projectSettings = Seq(
   organization := "org.augustjune",
+  sonatypeProfileName := organization.value,
   licenses ++= Seq(("MIT", url("http://opensource.org/licenses/MIT"))),
   homepage := Some(url("https://github.com/augustjune/canoe")),
   developers := List(

@@ -1,7 +1,10 @@
 lazy val canoe = project
   .in(file("."))
   .aggregate(core, examples)
-  .settings(skip in publish := true)
+  .settings(
+    projectSettings,
+    skip.in(publish) := true
+  )
 
 lazy val core = project
   .settings(
@@ -17,12 +20,11 @@ lazy val examples = project
   .dependsOn(core)
   .settings(
     name := "canoe-examples",
-    skip in publish := true
+    skip.in(publish) := true
   )
 
 lazy val projectSettings = Seq(
   organization := "org.augustjune",
-  sonatypeProfileName := organization.value,
   licenses ++= Seq(("MIT", url("http://opensource.org/licenses/MIT"))),
   homepage := Some(url("https://github.com/augustjune/canoe")),
   developers := List(

@@ -35,7 +35,7 @@ lazy val projectSettings = Seq(
 )
 
 val fs2Version = "1.0.5"
-val catsCoreVersion = "1.6.1"
+val catsCoreVersion = "2.0.0"
 val catsEffectVersion = "1.4.0"
 val circeVersion = "0.11.1"
 val http4sVersion = "0.20.10"

@@ -41,7 +41,6 @@ val circeVersion = "0.11.1"
 val http4sVersion = "0.20.10"
 val scalatestVersion = "3.0.8"
 val kindProjectorVersion = "0.10.3"
-val typesafeConfigVersion = "1.3.4"
 
 lazy val dependencies =
   libraryDependencies ++= Seq(
@@ -52,8 +51,7 @@ lazy val dependencies =
     "io.circe" %% "circe-generic" % circeVersion,
     "io.circe" %% "circe-parser" % circeVersion,
     "org.http4s" %% "http4s-blaze-client" % http4sVersion,
-    "org.http4s" %% "http4s-circe" % http4sVersion,
-    "com.typesafe" % "config" % typesafeConfigVersion
+    "org.http4s" %% "http4s-circe" % http4sVersion
   )
 
 lazy val compilerOptions =

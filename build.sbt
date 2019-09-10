@@ -34,7 +34,7 @@ lazy val projectSettings = Seq(
   crossScalaVersions := Seq(scalaVersion.value)
 )
 
-val fs2Version = "1.0.5"
+val fs2Version = "2.0.0"
 val catsCoreVersion = "2.0.0"
 val catsEffectVersion = "2.0.0"
 val circeVersion = "0.11.1"

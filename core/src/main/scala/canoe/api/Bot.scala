@@ -9,7 +9,7 @@ import cats.implicits._
 import fs2.concurrent.{Queue, Topic}
 import fs2.{Pipe, Stream}
 
-class Bot[F[_]] private (source: UpdateSource[F])(implicit F: Concurrent[F]) {
+class Bot[F[_]] private[api] (source: UpdateSource[F])(implicit F: Concurrent[F]) {
 
   def updates: Stream[F, Update] = source.updates
 

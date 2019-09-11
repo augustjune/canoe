@@ -15,7 +15,7 @@ object codecs {
       encoder.mapJson(
         j =>
           parser
-            .parse(printer.pretty(snakeKeys(j)))
+            .parse(printer.print(snakeKeys(j)))
             .getOrElse(throw new RuntimeException("Exception during encoding with snake_case"))
       )
   }

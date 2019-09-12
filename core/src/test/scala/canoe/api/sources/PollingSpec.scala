@@ -1,25 +1,15 @@
 package canoe.api.sources
 
+import canoe.TestIO._
 import canoe.api.TelegramClient
 import canoe.methods.Method
 import canoe.methods.updates.GetUpdates
 import canoe.models.messages.TextMessage
 import canoe.models.{MessageReceived, PrivateChat, Update}
 import cats.effect.IO
-import fs2.Stream
 import org.scalatest.FunSuite
 
 class PollingSpec extends FunSuite {
-
-  implicit class IOStreamOps[A](stream: Stream[IO, A]) {
-    def toList(): List[A] = stream.compile.toList.unsafeRunSync()
-
-    def value(): A = toList().head
-
-    def size(): Int = toList().size
-
-    def run(): Unit = stream.compile.drain.unsafeRunSync()
-  }
 
   def updatesClient: TelegramClient[IO] = new TelegramClient[IO] {
     def execute[Req, Res](request: Req)(implicit M: Method[Req, Res]): IO[Res] =

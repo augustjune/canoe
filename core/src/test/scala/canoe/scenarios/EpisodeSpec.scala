@@ -1,25 +1,15 @@
 package canoe.scenarios
 
+import canoe.TestIO._
 import cats.effect.IO
 import fs2.{Pure, Stream}
 import org.scalatest.FunSuite
 
 class EpisodeSpec extends FunSuite {
 
-  implicit class IOStreamOps[A](stream: Stream[IO, A]) {
-    def toList(): List[A] = stream.compile.toList.unsafeRunSync()
-
-    def value(): A = toList().head
-
-    def size(): Int = toList().size
-
-    def run(): Unit = stream.compile.drain.unsafeRunSync()
-  }
-
   val expected: String = "fire"
 
   val predicate: String => Boolean = _.endsWith(expected)
-
 
   test("Episode.start >>= Episode.next") {
     val episode: Episode[Pure, String, String] =

@@ -1,30 +1,17 @@
 package canoe.api
 
+import canoe.TestIO._
 import canoe.models.messages.TextMessage
 import canoe.models.{MessageReceived, PrivateChat, Update}
 import canoe.syntax._
+import cats.effect.IO
 import cats.effect.concurrent.Ref
-import cats.effect.{ContextShift, IO, Timer}
 import fs2.Stream
 import org.scalatest.FunSuite
 
-import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
 class BotSpec extends FunSuite {
-
-  implicit class IOStreamOps[A](stream: Stream[IO, A]) {
-    def toList(): List[A] = stream.compile.toList.unsafeRunSync()
-
-    def value(): A = toList().head
-
-    def size(): Int = toList().size
-
-    def run(): Unit = stream.compile.drain.unsafeRunSync()
-  }
-
-  implicit val globalContext: ContextShift[IO] = IO.contextShift(ExecutionContext.global)
-  implicit val globalTimer: Timer[IO] = IO.timer(ExecutionContext.global)
   type Message = String
   type ChatId = Int
 
@@ -37,7 +24,6 @@ class BotSpec extends FunSuite {
           })
           .covary[IO]
           .metered(0.1.second)
-          .evalTap(s => IO(println(s"Consumed: $s")))
     }
 
   test("updates returns updates from the source") {
@@ -62,7 +48,7 @@ class BotSpec extends FunSuite {
       "message2" -> 1,
       "message3" -> 1,
       "message5" -> 1,
-      "messag6e" -> 1
+      "message6" -> 1
     )
 
     def scenario(counter: Ref[IO, Int]): Scenario[IO, Unit] =
@@ -113,7 +99,7 @@ class BotSpec extends FunSuite {
     val chatId = 1
     val messages: List[(Message, ChatId)] = List(
       "start" -> chatId,
-      "interupt" -> (chatId + 1),
+      "interrupt" -> (chatId + 1),
       "end" -> chatId
     )
 

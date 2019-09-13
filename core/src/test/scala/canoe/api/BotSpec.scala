@@ -23,7 +23,7 @@ class BotSpec extends FunSuite {
             case ((m, id), i) => MessageReceived(i, TextMessage(-1, PrivateChat(id, None, None, None), -1, m))
           })
           .covary[IO]
-          .metered(0.1.second)
+          .metered(0.2.second)
     }
 
   test("updates returns updates from the source") {

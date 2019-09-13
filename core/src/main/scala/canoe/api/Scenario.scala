@@ -14,5 +14,7 @@ object Scenario {
 
   def eval[F[_], A](fa: F[A]): Scenario[F, A] = Episode.eval(fa)
 
-  def done[F[_]: Applicative]: Scenario[F, Unit] = eval(Applicative[F].unit)
+  def pure[F[_]: Applicative, A](a: A): Scenario[F, A] = eval(Applicative[F].pure(a))
+
+  def done[F[_]: Applicative]: Scenario[F, Unit] = pure(())
 }

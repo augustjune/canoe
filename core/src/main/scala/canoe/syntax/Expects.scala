@@ -37,6 +37,10 @@ trait Expects {
 
   val location: Expect[Location] = locationMessage.map(_.location)
 
+  val photoMessage: Expect[PhotoMessage] = { case m: PhotoMessage => m }
+
+  val photo: Expect[PhotoSize] = photoMessage.map(_.photo.last)
+
   val pollMessage: Expect[PollMessage] = { case m: PollMessage => m }
 
   val poll: Expect[Poll] = pollMessage.map(_.poll)

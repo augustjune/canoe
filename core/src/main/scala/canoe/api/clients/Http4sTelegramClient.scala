@@ -14,7 +14,7 @@ import org.http4s.multipart.{Multipart, Part}
 
 private[api] class Http4sTelegramClient[F[_]: Sync](token: String, client: Client[F]) extends TelegramClient[F] {
 
-  private val botApiUri: Uri = uri"https://api.telegram.org" / s"bot$token"
+  private val botApiUri: Uri = Uri.unsafeFromString("https://api.telegram.org") / s"bot$token"
 
   def execute[Req, Res](request: Req)(implicit M: Method[Req, Res]): F[Res] = {
 
@@ -54,7 +54,7 @@ private[api] class Http4sTelegramClient[F[_]: Sync](token: String, client: Clien
         .map(
           _.toMap
             .filterNot(kv => kv._2.isNull || kv._2.isObject)
-            .mapValues(_.toString())
+            .view.mapValues(_.toString()).toMap
         )
         .getOrElse(Map.empty)
 

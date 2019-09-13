@@ -29,23 +29,23 @@ class CodecsSpec extends FunSuite {
   }
 
   test("encoded snake_case is decoded in camelCase") {
-    val encodedDecoded = decoder.camelCase.decodeJson(encoder.snakeCase(instance)).right.get
+    val encodedDecoded = decoder.camelCase.decodeJson(encoder.snakeCase(instance))
 
-    assert(instance == encodedDecoded)
+    assert(encodedDecoded.contains(instance))
   }
 
   test("either decoder decodes left") {
     val decoder: Decoder[Either[Int, String]] = eitherDecoder(Decoder.decodeInt, Decoder.decodeString)
-    val res = decoder.decodeJson(Json.fromInt(12)).right.get
+    val res = decoder.decodeJson(Json.fromInt(12))
 
-    assert(res.isLeft)
+    assert(res.exists(_.isLeft))
   }
 
   test("either decoder decodes right") {
     val decoder: Decoder[Either[Int, String]] = eitherDecoder(Decoder.decodeInt, Decoder.decodeString)
-    val res = decoder.decodeJson(Json.fromString("dasd")).right.get
+    val res = decoder.decodeJson(Json.fromString("dasd"))
 
-    assert(res.isRight)
+    assert(res.exists(_.isRight))
   }
 
   def allJsonKeys(json: Json): List[String] =

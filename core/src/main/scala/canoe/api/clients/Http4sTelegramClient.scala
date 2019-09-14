@@ -52,9 +52,10 @@ private[api] class Http4sTelegramClient[F[_]: Sync](token: String, client: Clien
         .encoder(action)
         .asObject
         .map(
-          _.toMap
+          _.toIterable
             .filterNot(kv => kv._2.isNull || kv._2.isObject)
-            .view.mapValues(_.toString()).toMap
+            .map { case (k, j) => k -> j.toString }
+            .toMap
         )
         .getOrElse(Map.empty)
 

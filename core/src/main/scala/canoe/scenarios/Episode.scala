@@ -4,7 +4,7 @@ import canoe.scenarios.Episode._
 import cats.instances.list._
 import cats.syntax.all._
 import cats.{Applicative, Monad}
-import fs2.{Pipe, Pull, Stream}
+import fs2.{INothing, Pipe, Pull, Stream}
 
 sealed trait Episode[F[_], -I, +O] extends Pipe[F, I, O] {
 
@@ -71,8 +71,8 @@ object Episode {
 
   def next[F[_], I](p: I => Boolean): Episode[F, I, I] = Next(p)
 
-  implicit def monadInstance[F[_]: Applicative, I]: Monad[Episode[F, I, ?]] =
-    new Monad[Episode[F, I, ?]] {
+  implicit def monadInstance[F[_]: Applicative, I]: Monad[Episode[F, I, *]] =
+    new Monad[Episode[F, I, *]] {
       def pure[A](x: A): Episode[F, I, A] = Eval(Applicative[F].pure(x))
 
       def flatMap[A, B](
@@ -138,7 +138,7 @@ object Episode {
                 case nonEmpty =>
                   nonEmpty
                     .collect { case Some(f) => f }
-                    .traverse(f => Pull.eval(f(m))) >>
+                    .traverse[Pull[F, INothing, *], Unit](f => Pull.eval(f(m))) >>
                     Pull.output1(Cancelled(m) -> rest)
               }
             case None => Pull.done

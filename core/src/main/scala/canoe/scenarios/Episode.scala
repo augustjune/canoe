@@ -6,10 +6,35 @@ import cats.syntax.all._
 import cats.{Applicative, Monad}
 import fs2.{INothing, Pipe, Pull, Stream}
 
-sealed trait Episode[F[_], -I, +O] extends Pipe[F, I, O] {
+/**
+  * Type which represents a description of sequence of elements.
+  *
+  * Such description can be applied to the actual sequence/stream of elements
+  * to find the subsequences which match the description.
+  *
+  * For each partially matched subsequence (such that at least first element was matched)
+  * one of 3 possible results is yielded:
+  *  - Matched(o)   - when the whole episode was matched as a subsequence of input sequence.
+  *                   Contains the result value of type `O`.
+  *  - Missed(i)    - when the episode was started (partially matched) but was not fully matched.
+  *                   Contains the first element of type `I` which didn't match the description.
+  *  - Cancelled(i) - when the episode was cancelled by specific input.
+  *                   Contains the input element of type `I` which caused cancellation.
+  *
+  * Episode forms a monad having Applicative instance for `F`
+  *
+  * @tparam F Effect type
+  * @tparam I Input elements type
+  * @tparam O Result value type
+  */
+sealed trait Episode[F[_], -I, +O] {
 
-  def apply(input: Stream[F, I]): Stream[F, O] =
-    find(this, input, Nil).collect {
+  /**
+    * @return Pipe which produces value `O` for each subsequence of `I` elements
+    *         matching this description, evaluated in `F` effect
+    */
+  def pipe: Pipe[F, I, O] =
+    find(this, _, Nil).collect {
       case (Matched(o), _) => o
     }
 
@@ -21,24 +46,41 @@ sealed trait Episode[F[_], -I, +O] extends Pipe[F, I, O] {
 
   def map[O2](fn: O => O2): Episode[F, I, O2] = Mapped(this, fn)
 
+  /**
+    * @return Episode which is cancellable by the occurrence of input element described
+    *         by predicate `p` at any point after the episode is started and before it is finished
+    */
   def cancelOn[I2 <: I](p: I2 => Boolean): Episode[F, I2, O] =
     Cancellable(this, p, None)
 
   /**
     * @param p Predicate which determines what input value causes cancellation
     * @param cancellation Function which result is going to be evaluated during the cancellation
+    *
+    * @return Episode which is cancellable by the occurrence of input element described
+    *         by predicate `p` at any point after the episode is started and before it is finished,
+    *         and evaluates `cancellation` when such element occurs.
     */
   def cancelWith[I2 <: I](
     p: I2 => Boolean
   )(cancellation: I2 => F[Unit]): Episode[F, I2, O] =
     Cancellable(this, p, Some(cancellation))
 
+  /**
+    * @return Episode which ignores the input element, which causes
+    *         missed result, `n` time and evaluates `fn` for every such element
+    */
   def tolerateN[I2 <: I](n: Int)(fn: I2 => F[Unit]): Episode[F, I2, O] =
     Tolerate(this, Some(n), fn)
 
+  /** Alias for tolerateN(1) **/
   def tolerate[I2 <: I](fn: I2 => F[Unit]): Episode[F, I2, O] =
     tolerateN(1)(fn)
 
+  /**
+    * @return Episode which ignores every input element which causes
+    *         missed result and evaluates `fn` for every such element
+    */
   def tolerateAll[I2 <: I](fn: I2 => F[Unit]): Episode[F, I2, O] =
     Tolerate(this, None, fn)
 }
@@ -94,17 +136,17 @@ object Episode {
         }
     }
 
-  sealed private trait Result[+E, +A] {
-    def map[B](f: A => B): Result[E, B] = this match {
-      case Matched(a)          => Matched(f(a))
+  sealed private trait Result[+I, +O] {
+    def map[O1](f: O => O1): Result[I, O1] = this match {
+      case Matched(o)          => Matched(f(o))
       case same @ Missed(_)    => same
       case same @ Cancelled(_) => same
     }
   }
 
-  private final case class Matched[A](a: A) extends Result[Nothing, A]
-  private final case class Missed[E](message: E) extends Result[E, Nothing]
-  private final case class Cancelled[E](message: E) extends Result[E, Nothing]
+  private final case class Matched[O](o: O) extends Result[Nothing, O]
+  private final case class Missed[I](elem: I) extends Result[I, Nothing]
+  private final case class Cancelled[I](elem: I) extends Result[I, Nothing]
 
   private def find[F[_], I, O](
     episode: Episode[F, I, O],

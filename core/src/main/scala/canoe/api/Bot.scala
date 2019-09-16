@@ -88,7 +88,7 @@ class Bot[F[_]] private[api] (source: UpdateSource[F])(implicit F: Concurrent[F]
                     .through(pipes.messages andThen filterById(m.chat.id))
                     .through(queue.enqueue)
 
-                  val deq = queue.dequeue.through(scenario).drain
+                  val deq = queue.dequeue.through(scenario.pipe).drain
 
                   deq.concurrently(enq)
                 }

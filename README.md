@@ -10,11 +10,13 @@ and allows you to build interactive chatbots using idiomatic Scala code.
 
 ### Getting started
 sbt dependency:
+```scala
+libraryDependencies += "org.augustjune" %% "canoe" % "<version>"
 ```
-libraryDependencies += "org.augustjune" %% "canoe" % "0.0.1"
-```
+You can find the latest version in [releases](https://github.com/augustjune/canoe/releases) tab or by clicking on the maven-central badge.
+
 Imports:
-```
+```scala
 import canoe.api._
 import canoe.syntax._
 ```

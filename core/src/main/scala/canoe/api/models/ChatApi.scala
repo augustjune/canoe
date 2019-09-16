@@ -65,8 +65,8 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
   /**
     * @return Detailed information about the member of this chat
     */
-  def getMember(user: User): F[ChatMember] =
-    client.execute(GetChatMember(chat.id, user.id))
+  def getMember(userId: Int): F[ChatMember] =
+    client.execute(GetChatMember(chat.id, userId))
 
   /**
     * @return number of members of this chat
@@ -74,14 +74,13 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
   def membersCount: F[Int] =
     client.execute(GetChatMembersCount(chat.id))
 
-  // ToDo - add parameters
   /**
     * Kicks a user from this chat
     */
-  def kick(user: User)(implicit F: Applicative[F]): F[Boolean] =
+  def kick(userId: Int, untilDate: Option[Int] = None)(implicit F: Applicative[F]): F[Boolean] =
     chat match {
       case _: PrivateChat => F.pure(false)
-      case _ => client.execute(KickChatMember(chat.id, user.id))
+      case _              => client.execute(KickChatMember(chat.id, userId, untilDate))
     }
 
   /**
@@ -90,28 +89,48 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
   def leave(implicit F: Applicative[F]): F[Boolean] =
     chat match {
       case _: PrivateChat => F.pure(false)
-      case _ => client.execute(LeaveChat(chat.id))
+      case _              => client.execute(LeaveChat(chat.id))
     }
 
-  // ToDo - add parameters
+  private def notFalse(b: Boolean): Option[Boolean] =
+    if (b) Some(true)
+    else None
+
   /**
     * Pins message in this chat, unless it's private chat
     */
-  def pinMessage(message: TelegramMessage)(implicit F: Applicative[F]): F[Boolean] =
+  def pinMessage(messageId: Int, silent: Boolean = true)(implicit F: Applicative[F]): F[Boolean] =
     chat match {
       case _: PrivateChat => F.pure(false)
-      case _ => client.execute(PinChatMessage(chat.id, message.messageId))
+      case _              => client.execute(PinChatMessage(chat.id, messageId, notFalse(silent)))
     }
 
-  // ToDo - add parameters
   /**
     * Promotes or demotes a user in this chat
     * @return
     */
-  def promoteMember(user: User)(implicit F: Applicative[F]): F[Boolean] =
+  def promoteMember(userId: Int,
+                    canChangeInfo: Option[Boolean] = None,
+                    canPostMessages: Option[Boolean] = None,
+                    canEditMessages: Option[Boolean] = None,
+                    canDeleteMessages: Option[Boolean] = None,
+                    canInviteUsers: Option[Boolean] = None,
+                    canRestrictMembers: Option[Boolean] = None,
+                    canPinMessages: Option[Boolean] = None,
+                    canPromoteMembers: Option[Boolean] = None)(implicit F: Applicative[F]): F[Boolean] =
     chat match {
       case _: Supergroup | _: Channel =>
-        client.execute(PromoteChatMember(chat.id, user.id))
+        client.execute(
+          PromoteChatMember(chat.id,
+                            userId,
+                            canChangeInfo,
+                            canPostMessages,
+                            canDeleteMessages,
+                            canInviteUsers,
+                            canRestrictMembers,
+                            canPinMessages,
+                            canPromoteMembers)
+        )
 
       case _ => F.pure(false)
     }
@@ -122,12 +141,12 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
     * The bot must be an administrator in the supergroup
     * and must have the appropriate admin rights
     */
-  def restrictMember(user: User, permissions: ChatPermissions, until: Option[Int] = None)(
+  def restrictMember(userId: Int, permissions: ChatPermissions, until: Option[Int] = None)(
     implicit F: Applicative[F]
   ): F[Boolean] =
     chat match {
       case _: Supergroup =>
-        client.execute(RestrictChatMember(chat.id, user.id, permissions, until))
+        client.execute(RestrictChatMember(chat.id, userId, permissions, until))
 
       case _ => F.pure(false)
     }
@@ -149,14 +168,14 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
   def setTitle(title: String)(implicit F: Applicative[F]): F[Boolean] =
     chat match {
       case _: PrivateChat => F.pure(false)
-      case _ => client.execute(SetChatTitle(chat.id, title))
+      case _              => client.execute(SetChatTitle(chat.id, title))
     }
 
   /**
     * Unbans previously kicked user
     */
-  def unbanMember(user: User): F[Boolean] =
-    client.execute(UnbanChatMember(chat.id, user.id))
+  def unbanMember(userId: Int): F[Boolean] =
+    client.execute(UnbanChatMember(chat.id, userId))
 
   /**
     * Unpins pinned chat message
@@ -164,7 +183,7 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
   def unpinMessage(implicit F: Applicative[F]): F[Boolean] =
     chat match {
       case _: PrivateChat => F.pure(false)
-      case _ => client.execute(UnpinChatMessage(chat.id))
+      case _              => client.execute(UnpinChatMessage(chat.id))
     }
 
   /**

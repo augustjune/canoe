@@ -2,9 +2,10 @@ package canoe.api.models
 
 import canoe.api._
 import canoe.methods.messages._
-import canoe.models.messages.TelegramMessage
+import canoe.models.messages.{PollMessage, TelegramMessage}
 import canoe.models.outgoing._
 import canoe.models.{Chat, InlineKeyboardMarkup, Poll, ReplyMarkup}
+import cats.ApplicativeError
 
 final class MessageApi[F[_]](message: TelegramMessage)(implicit client: TelegramClient[F]) {
 
@@ -65,12 +66,15 @@ final class MessageApi[F[_]](message: TelegramMessage)(implicit client: Telegram
   def editCaption(caption: Option[String]): F[Either[Boolean, TelegramMessage]] =
     client.execute(EditMessageCaption(Some(chatId), Some(messageId), caption = caption))
 
-  // ToDo - handle case, when the message doesn't correspond to the poll
   /**
     * Stops the poll, which is represented by this message.
     *
     * @return On success, the stopped Poll with the final results is returned.
     */
-  def stopPoll(markup: Option[ReplyMarkup] = None): F[Poll] =
-    client.execute(StopPoll(chatId, messageId, markup))
+  def stopPoll(markup: Option[ReplyMarkup] = None)(implicit F: ApplicativeError[F, Throwable]): F[Poll] =
+    message match {
+      case _: PollMessage => client.execute(StopPoll(chatId, messageId, markup))
+      case _              => F.raiseError(new RuntimeException("This message is not a poll"))
+    }
+
 }

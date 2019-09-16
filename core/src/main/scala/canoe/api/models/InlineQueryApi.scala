@@ -6,6 +6,11 @@ import canoe.models.{InlineQuery, InlineQueryResult}
 
 final class InlineQueryApi[F[_]](query: InlineQuery)(implicit client: TelegramClient[F]) {
 
+  /**
+    * Sends the answer to this query
+    *
+    * @param results No more than 50 results per query are allowed
+    */
   def answer(results: Seq[InlineQueryResult],
              switchPmText: Option[String] = None,
              switchPmParameter: Option[String] = None): F[Boolean] =

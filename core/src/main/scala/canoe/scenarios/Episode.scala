@@ -3,7 +3,7 @@ package canoe.scenarios
 import canoe.scenarios.Episode._
 import cats.instances.list._
 import cats.syntax.all._
-import cats.{Applicative, Monad}
+import cats.{Monad, StackSafeMonad}
 import fs2.{INothing, Pipe, Pull, Stream}
 
 /**
@@ -21,7 +21,7 @@ import fs2.{INothing, Pipe, Pull, Stream}
   *  - Cancelled(i) - when the episode was cancelled by specific input.
   *                   Contains the input element of type `I` which caused cancellation.
   *
-  * Episode forms a monad having Applicative instance for `F`
+  * `Episode` forms a monad in `O` with `pure` and `flatMap`
   *
   * @tparam F Effect type
   * @tparam I Input elements type
@@ -117,9 +117,9 @@ object Episode {
 
   def next[F[_], I](p: I => Boolean): Episode[F, I, I] = Next(p)
 
-  implicit def monadInstance[F[_]: Applicative, I]: Monad[Episode[F, I, *]] =
-    new Monad[Episode[F, I, *]] {
-      def pure[A](x: A): Episode[F, I, A] = Eval(Applicative[F].pure(x))
+  implicit def monadInstance[F[_], I]: Monad[Episode[F, I, *]] =
+    new StackSafeMonad[Episode[F, I, *]] {
+      def pure[A](a: A): Episode[F, I, A] = Pure(a)
 
       def flatMap[A, B](
         episode: Episode[F, I, A]
@@ -130,14 +130,6 @@ object Episode {
         episode: Episode[F, I, A]
       )(f: A => B): Episode[F, I, B] =
         episode.map(f)
-
-      def tailRecM[A, B](
-        a: A
-      )(f: A => Episode[F, I, Either[A, B]]): Episode[F, I, B] =
-        flatMap(f(a)) {
-          case Left(a)  => tailRecM(a)(f)
-          case Right(b) => Eval(Applicative[F].pure(b))
-        }
     }
 
   sealed private trait Result[+I, +O] {

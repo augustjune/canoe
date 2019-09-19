@@ -2,7 +2,6 @@ package canoe.api
 
 import canoe.models.messages.TelegramMessage
 import canoe.scenarios.Episode
-import cats.Applicative
 
 object Scenario {
 
@@ -35,7 +34,7 @@ object Scenario {
   /**
     * Lifts pure value to Scenario context
     */
-  def pure[F[_]: Applicative, A](a: A): Scenario[F, A] = eval(Applicative[F].pure(a))
+  def pure[F[_], A](a: A): Scenario[F, A] = Episode.pure(a)
 
-  def done[F[_]: Applicative]: Scenario[F, Unit] = pure(())
+  def done[F[_]]: Scenario[F, Unit] = pure(())
 }

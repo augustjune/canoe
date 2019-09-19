@@ -85,6 +85,8 @@ sealed trait Episode[F[_], -I, +O] {
     Tolerate(this, None, fn)
 }
 
+private final case class Pure[F[_], I, A](a: A) extends Episode[F, I, A]
+
 private final case class Eval[F[_], I, A](fa: F[A]) extends Episode[F, I, A]
 
 private final case class Next[F[_], A](p: A => Boolean) extends Episode[F, A, A]
@@ -106,6 +108,8 @@ private final case class Tolerate[F[_], I, O](episode: Episode[F, I, O], limit: 
     extends Episode[F, I, O]
 
 object Episode {
+
+  def pure[F[_], I, A](a: A): Episode[F, I, A] = Pure(a)
 
   def eval[F[_], I, A](fa: F[A]): Episode[F, I, A] = Eval(fa)
 
@@ -154,6 +158,9 @@ object Episode {
     cancelTokens: List[(I => Boolean, Option[I => F[Unit]])]
   ): Stream[F, (Result[I, O], Stream[F, I])] =
     episode match {
+      case Pure(a) =>
+        Stream(a).covary[F].map(o => Matched(o) -> input)
+
       case Eval(fa) =>
         Stream.eval(fa).map(o => Matched(o) -> input)
 

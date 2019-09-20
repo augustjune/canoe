@@ -43,7 +43,7 @@ val fs2Version = "2.0.0"
 val catsCoreVersion = "2.0.0"
 val catsEffectVersion = "2.0.0"
 val circeVersion = "0.12.1"
-val http4sVersion = "0.21.0-M4"
+val http4sVersion = "0.21.0-M5"
 val scalatestVersion = "3.0.8"
 val kindProjectorVersion = "0.10.3"
 

@@ -44,7 +44,7 @@ sealed trait Episode[F[_], -I, +O] {
   def >>[I2 <: I, O2](e2: => Episode[F, I2, O2]): Episode[F, I2, O2] =
     flatMap(_ => e2)
 
-  def map[O2](fn: O => O2): Episode[F, I, O2] = Mapped(this, fn)
+  def map[O2](fn: O => O2): Episode[F, I, O2] = monadInstance.map(this)(fn)
 
   /**
     * @return Episode which is cancellable by the occurrence of input element described
@@ -96,8 +96,6 @@ private final case class First[F[_], A](p: A => Boolean) extends Episode[F, A, A
 private final case class Bind[F[_], I, O1, O2](episode: Episode[F, I, O1], fn: O1 => Episode[F, I, O2])
     extends Episode[F, I, O2]
 
-private final case class Mapped[F[_], I, O1, O2](episode: Episode[F, I, O1], fn: O1 => O2) extends Episode[F, I, O2]
-
 private final case class Cancellable[F[_], I, O](
   episode: Episode[F, I, O],
   cancelOn: I => Boolean,
@@ -125,14 +123,9 @@ object Episode {
         episode: Episode[F, I, A]
       )(fn: A => Episode[F, I, B]): Episode[F, I, B] =
         episode.flatMap(fn)
-
-      override def map[A, B](
-        episode: Episode[F, I, A]
-      )(f: A => B): Episode[F, I, B] =
-        episode.map(f)
     }
 
-  sealed private trait Result[+I, +O] {
+  private sealed trait Result[+I, +O] {
     def map[O1](f: O => O1): Result[I, O1] = this match {
       case Matched(o)          => Matched(f(o))
       case same @ Missed(_)    => same
@@ -216,11 +209,6 @@ object Episode {
               case Missed(message)    => Stream(Missed(message) -> rest)
               case Cancelled(message) => Stream(Cancelled(message) -> rest)
             }
-        }
-
-      case Mapped(prev, fn) =>
-        find(prev, input, cancelTokens).map {
-          case (result, rest) => result.map(fn) -> rest
         }
     }
 }

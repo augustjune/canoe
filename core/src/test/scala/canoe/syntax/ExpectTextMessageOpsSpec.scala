@@ -2,9 +2,9 @@ package canoe.syntax
 
 import canoe.models.PrivateChat
 import canoe.models.messages.{TelegramMessage, TextMessage}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class ExpectTextMessageOpsSpec extends FunSuite {
+class ExpectTextMessageOpsSpec extends AnyFunSuite {
 
   val anyTextMessage: Expect[TextMessage] = canoe.syntax.textMessage
 

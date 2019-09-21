@@ -3,9 +3,9 @@ package canoe.scenarios
 import canoe.TestIO._
 import cats.effect.IO
 import fs2.{Pure, Stream}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class EpisodeSpec extends FunSuite {
+class EpisodeSpec extends AnyFunSuite {
 
   val expected: String = "fire"
 

@@ -7,11 +7,11 @@ import canoe.syntax._
 import cats.effect.IO
 import cats.effect.concurrent.Ref
 import fs2.Stream
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 import scala.concurrent.duration._
 
-class BotSpec extends FunSuite {
+class BotSpec extends AnyFunSuite {
   type Message = String
   type ChatId = Int
 

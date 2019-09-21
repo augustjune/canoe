@@ -1,8 +1,8 @@
 package canoe.syntax
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class PartialFunctionOpsSpec extends FunSuite {
+class PartialFunctionOpsSpec extends AnyFunSuite {
 
   val evenInt: PartialFunction[Int, Int] = {
     case i if i % 2 == 0 => i

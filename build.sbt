@@ -56,7 +56,8 @@ lazy val dependencies =
     "io.circe" %% "circe-generic" % circeVersion,
     "io.circe" %% "circe-parser" % circeVersion,
     "org.http4s" %% "http4s-blaze-client" % http4sVersion,
-    "org.http4s" %% "http4s-circe" % http4sVersion
+    "org.http4s" %% "http4s-circe" % http4sVersion,
+    "org.typelevel" %% "discipline-scalatest" % "1.0.0-M1"
   )
 
 lazy val compilerOptions =
@@ -78,8 +79,10 @@ lazy val typeSystemEnhancements =
 lazy val tests = {
   val dependencies =
     libraryDependencies ++= Seq(
-      "org.scalatest" %% "scalatest" % scalatestVersion
-    ).map(_ % Test)
+      "org.scalatest" %% "scalatest" % scalatestVersion,
+      "org.typelevel" %% "cats-laws" % catsCoreVersion,
+      "com.github.alexarchambault" %% "scalacheck-shapeless_1.14" % "1.2.3"
+  ).map(_ % Test)
 
   val frameworks =
     testFrameworks := Seq(TestFrameworks.ScalaTest)

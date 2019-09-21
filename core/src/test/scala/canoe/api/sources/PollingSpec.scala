@@ -7,9 +7,9 @@ import canoe.methods.updates.GetUpdates
 import canoe.models.messages.TextMessage
 import canoe.models.{MessageReceived, PrivateChat, Update}
 import cats.effect.IO
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class PollingSpec extends FunSuite {
+class PollingSpec extends AnyFunSuite {
 
   def updatesClient: TelegramClient[IO] = new TelegramClient[IO] {
     def execute[Req, Res](request: Req)(implicit M: Method[Req, Res]): IO[Res] =

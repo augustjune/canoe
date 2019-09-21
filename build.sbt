@@ -22,7 +22,8 @@ lazy val examples = project
   .settings(
     name := "canoe-examples",
     skip.in(publish) := true,
-    projectSettings
+    projectSettings,
+    crossScalaVersions := Seq(scalaVersion.value)
   )
 
 lazy val projectSettings = Seq(
@@ -45,6 +46,8 @@ val catsEffectVersion = "2.0.0"
 val circeVersion = "0.12.1"
 val http4sVersion = "0.21.0-M4"
 val scalatestVersion = "3.0.8"
+val disciplineVersion = "1.0.0-M1"
+val scalacheckShapelessVersion = "1.2.3"
 val kindProjectorVersion = "0.10.3"
 
 lazy val dependencies =
@@ -57,7 +60,7 @@ lazy val dependencies =
     "io.circe" %% "circe-parser" % circeVersion,
     "org.http4s" %% "http4s-blaze-client" % http4sVersion,
     "org.http4s" %% "http4s-circe" % http4sVersion,
-    "org.typelevel" %% "discipline-scalatest" % "1.0.0-M1"
+    "org.typelevel" %% "discipline-scalatest" % disciplineVersion
   )
 
 lazy val compilerOptions =
@@ -69,7 +72,7 @@ lazy val compilerOptions =
     "-language:higherKinds", // Allow higher-kinded types
     "-language:postfixOps", // Allow higher-kinded types
     "-language:implicitConversions" // Allow definition of implicit functions called views
-  )
+  ) ++ (if (scalaBinaryVersion.value.startsWith("2.12")) List("-Ypartial-unification") else Nil)
 
 resolvers += Resolver.sonatypeRepo("releases")
 
@@ -81,7 +84,7 @@ lazy val tests = {
     libraryDependencies ++= Seq(
       "org.scalatest" %% "scalatest" % scalatestVersion,
       "org.typelevel" %% "cats-laws" % catsCoreVersion,
-      "com.github.alexarchambault" %% "scalacheck-shapeless_1.14" % "1.2.3"
+      "com.github.alexarchambault" %% "scalacheck-shapeless_1.14" % scalacheckShapelessVersion
   ).map(_ % Test)
 
   val frameworks =

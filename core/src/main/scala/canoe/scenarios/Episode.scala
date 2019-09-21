@@ -4,7 +4,7 @@ import canoe.scenarios.Episode._
 import cats.instances.list._
 import cats.syntax.all._
 import cats.{Monad, StackSafeMonad}
-import fs2.{INothing, Pipe, Pull, Stream}
+import fs2.{Pipe, Pull, Stream}
 
 /**
   * Type which represents a description of sequence of elements.
@@ -172,7 +172,7 @@ object Episode {
                 case nonEmpty =>
                   nonEmpty
                     .collect { case Some(f) => f }
-                    .traverse[Pull[F, INothing, *], Unit](f => Pull.eval(f(m))) >>
+                    .traverse(f => Pull.eval(f(m))) >>
                     Pull.output1(Cancelled(m) -> rest)
               }
             case None => Pull.done

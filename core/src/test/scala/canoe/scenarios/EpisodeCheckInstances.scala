@@ -1,21 +1,21 @@
 package canoe.scenarios
 
 import canoe.TestIO._
+import cats.Eq
 import cats.effect.IO
 import cats.implicits._
-import cats.{Eq, Id}
 import fs2.Stream
 import org.scalacheck.{Arbitrary, Gen}
 
 object EpisodeCheckInstances {
 
-  implicit def eqEpisode[I: Arbitrary, O]: Eq[Episode[Id, I, O]] = {
+  implicit def eqEpisode[I: Arbitrary, O]: Eq[Episode[IO, I, O]] = {
     val sampleInput: List[I] = Gen.listOf(Arbitrary.arbitrary[I]).sample.get
 
-    def result(ep: Episode[Id, I, O]): List[O] =
-      Stream.emits(sampleInput).through(ep.pipe).covaryId[IO].toList()
+    def result(ep: Episode[IO, I, O]): List[O] =
+      Stream.emits(sampleInput).through(ep.pipe).toList()
 
-    (x: Episode[Id, I, O], y: Episode[Id, I, O]) =>
+    (x: Episode[IO, I, O], y: Episode[IO, I, O]) =>
       result(x) == result(y)
   }
 

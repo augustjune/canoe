@@ -4,7 +4,7 @@ import canoe.api._
 import canoe.models.Chat
 import canoe.syntax._
 import cats.effect.{ExitCode, IO, IOApp, Timer}
-import cats.syntax.all._
+import cats.syntax.functor._
 import fs2.Stream
 
 import scala.concurrent.duration._

@@ -39,7 +39,7 @@ lazy val projectSettings = Seq(
 val scala2_13 = "2.13.0"
 val scala2_12 = "2.12.8"
 
-val fs2Version = "2.0.0"
+val fs2Version = "2.0.1"
 val catsCoreVersion = "2.0.0"
 val catsEffectVersion = "2.0.0"
 val circeVersion = "0.12.1"

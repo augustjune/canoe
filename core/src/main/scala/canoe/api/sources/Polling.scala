@@ -4,18 +4,19 @@ import canoe.api.{TelegramClient, UpdateSource}
 import canoe.methods.updates.GetUpdates
 import canoe.models.Update
 import cats.Functor
+import cats.effect.Timer
 import cats.syntax.functor._
 import fs2.Stream
 
-private[api] class Polling[F[_]: Functor](client: TelegramClient[F]) extends UpdateSource[F] {
+import scala.concurrent.duration.FiniteDuration
 
-  def updates: Stream[F, Update] = pollUpdates(0)
+private[api] class Polling[F[_]: Functor](client: TelegramClient[F]) {
 
-  private def pollUpdates(startOffset: Long): Stream[F, Update] =
+  def pollUpdates(startOffset: Long): Stream[F, List[Update]] =
     Stream(()).repeat
       .covary[F]
       .evalMapAccumulate(startOffset) { case (offset, _) => requestUpdates(offset) }
-      .flatMap { case (_, updates) => Stream.emits(updates) }
+      .map { case (_, updates) => updates }
 
   private def requestUpdates(offset: Long): F[(Long, List[Update])] =
     client
@@ -26,5 +27,21 @@ private[api] class Polling[F[_]: Functor](client: TelegramClient[F]) extends Upd
     updates match {
       case Nil      => None
       case nonEmpty => Some(nonEmpty.map(_.updateId).max)
+    }
+}
+
+object Polling {
+
+  def continual[F[_]: TelegramClient: Functor]: UpdateSource[F] =
+    new Polling[F](implicitly[TelegramClient[F]]) with UpdateSource[F] {
+      def updates: Stream[F, Update] = pollUpdates(0).flatMap(Stream.emits)
+    }
+
+  def metered[F[_]: TelegramClient: Functor: Timer](interval: FiniteDuration): UpdateSource[F] =
+    new Polling[F](implicitly[TelegramClient[F]]) with UpdateSource[F] {
+      def updates: Stream[F, Update] =
+        pollUpdates(0)
+          .metered(interval)
+          .flatMap(Stream.emits)
     }
 }

@@ -130,6 +130,12 @@ object Bot {
   def polling[F[_]: Concurrent: TelegramClient]: Bot[F] =
     new Bot[F](Polling.continual)
 
+  /**
+    * Creates a bot which receives incoming updates using long polling mechanism
+    * with custom polling interval
+    *
+    * See [[https://en.wikipedia.org/wiki/Push_technology#Long_polling wiki]].
+    */
   def polling[F[_]: Concurrent: Timer: TelegramClient](interval: FiniteDuration): Bot[F] =
     new Bot[F](Polling.metered(interval))
 }

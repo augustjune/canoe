@@ -9,6 +9,8 @@ import canoe.models.{MessageReceived, PrivateChat, Update}
 import cats.effect.IO
 import org.scalatest.funsuite.AnyFunSuite
 
+import scala.concurrent.duration.Duration
+
 class PollingSpec extends AnyFunSuite {
 
   def updatesClient: TelegramClient[IO] = new TelegramClient[IO] {
@@ -22,7 +24,7 @@ class PollingSpec extends AnyFunSuite {
       }
   }
 
-  val polling = new Polling(updatesClient)
+  val polling = new Polling(updatesClient, Duration.Zero)
 
   test("polling starts with given offset") {
     assert(polling.pollUpdates(0).take(1).value().head.updateId == 0)

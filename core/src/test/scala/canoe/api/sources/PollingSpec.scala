@@ -9,6 +9,8 @@ import canoe.models.{MessageReceived, PrivateChat, Update}
 import cats.effect.IO
 import org.scalatest.funsuite.AnyFunSuite
 
+import scala.concurrent.duration.Duration
+
 class PollingSpec extends AnyFunSuite {
 
   def updatesClient: TelegramClient[IO] = new TelegramClient[IO] {
@@ -22,19 +24,18 @@ class PollingSpec extends AnyFunSuite {
       }
   }
 
-  val polling = new Polling(updatesClient)
+  val polling = new Polling(updatesClient, Duration.Zero)
 
-  test("polling starts with 0") {
-    assert(polling.updates.take(1).value().updateId == 0)
+  test("polling starts with given offset") {
+    assert(polling.pollUpdates(0).take(1).value().head.updateId == 0)
   }
 
-  test("polling increases each next offset by 1") {
-    val updates = polling.updates.zipWithNext
-      .collect { case (u1, Some(u2)) => u1 -> u2 }
+  test("polling uses last offset increased by 1 for each new call") {
+    val updates = polling.pollUpdates(0).zipWithNext
+      .collect { case (u1, Some(u2)) => u1.last -> u2.head }
       .take(5)
       .toList()
 
     assert(updates.forall { case (u1, u2) => u2.updateId == u1.updateId + 1 })
   }
-
 }

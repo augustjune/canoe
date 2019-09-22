@@ -3,11 +3,13 @@ package canoe.api
 import canoe.api.sources.Polling
 import canoe.models.Update
 import canoe.models.messages.TelegramMessage
-import cats.effect.Concurrent
 import cats.effect.concurrent.Ref
+import cats.effect.{Concurrent, Timer}
 import cats.implicits._
 import fs2.concurrent.{Queue, Topic}
 import fs2.{Pipe, Stream}
+
+import scala.concurrent.duration.FiniteDuration
 
 /**
   * An instance which can communicate with Telegram service and
@@ -125,6 +127,15 @@ object Bot {
     *
     * See [[https://en.wikipedia.org/wiki/Push_technology#Long_polling wiki]].
     */
-  def polling[F[_]](implicit F: Concurrent[F], client: TelegramClient[F]): Bot[F] =
-    new Bot[F](new Polling[F](client))
+  def polling[F[_]: Concurrent: TelegramClient]: Bot[F] =
+    new Bot[F](Polling.continual)
+
+  /**
+    * Creates a bot which receives incoming updates using long polling mechanism
+    * with custom polling interval
+    *
+    * See [[https://en.wikipedia.org/wiki/Push_technology#Long_polling wiki]].
+    */
+  def polling[F[_]: Concurrent: Timer: TelegramClient](interval: FiniteDuration): Bot[F] =
+    new Bot[F](Polling.metered(interval))
 }

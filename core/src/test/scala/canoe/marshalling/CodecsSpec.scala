@@ -3,9 +3,9 @@ package canoe.marshalling
 import canoe.marshalling.codecs._
 import io.circe.generic.semiauto._
 import io.circe.{Decoder, Encoder, Json}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class CodecsSpec extends FunSuite {
+class CodecsSpec extends AnyFunSuite {
 
   case class Inner(longName: String)
   case class Outer(longInt: Int, inner: Inner)

@@ -1,8 +1,8 @@
 package canoe.marshalling
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class CaseStringSpec extends FunSuite {
+class CaseStringSpec extends AnyFunSuite {
 
   val snake: String = "some_snake_case_string"
   val camel: String = "someSnakeCaseString"

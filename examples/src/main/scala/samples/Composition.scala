@@ -3,7 +3,6 @@ package samples
 import canoe.api._
 import canoe.models.Chat
 import canoe.syntax._
-import cats.Applicative
 import cats.effect.{ExitCode, IO, IOApp}
 import cats.syntax.functor._
 import fs2.Stream
@@ -36,21 +35,21 @@ object Composition extends IOApp {
       }
       .compile.drain.as(ExitCode.Success)
 
-  def signup[F[_]: Applicative: TelegramClient](service: Service[F]): Scenario[F, Unit] =
+  def signup[F[_]: TelegramClient](service: Service[F]): Scenario[F, Unit] =
     for {
       chat <- Scenario.start(command("signup").chat)
       user <- registerUser(chat, service).cancelWhen(command("cancel"))
       _    <- Scenario.eval(chat.send(s"Registration completed. Welcome, ${user.name}"))
     } yield ()
 
-  def registerUser[F[_]: Applicative: TelegramClient](chat: Chat, service: Service[F]): Scenario[F, User] =
+  def registerUser[F[_]: TelegramClient](chat: Chat, service: Service[F]): Scenario[F, User] =
     for {
       name <- provideUsername(chat, service)
       pass <- providePass(chat)
       user <- Scenario.eval(service.register(name, pass))
     } yield user
 
-  def provideUsername[F[_]: Applicative: TelegramClient](chat: Chat, service: Service[F]): Scenario[F, String] =
+  def provideUsername[F[_]: TelegramClient](chat: Chat, service: Service[F]): Scenario[F, String] =
     for {
       _      <- Scenario.eval(chat.send("Enter your nickname"))
       nick   <- Scenario.next(text)
@@ -59,7 +58,7 @@ object Composition extends IOApp {
         if (exists)
           Scenario.eval(chat.send("User with such nick already exists. Please try another one")) >>
             provideUsername(chat, service)
-        else Scenario.pure(nick)
+        else Scenario.pure[F, String](nick)
     } yield res
 
   def providePass[F[_]: TelegramClient](chat: Chat): Scenario[F, String] =

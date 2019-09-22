@@ -4,7 +4,7 @@ import canoe.api._
 import canoe.models.Chat
 import canoe.syntax._
 import cats.effect.{ExitCode, IO, IOApp, Timer}
-import cats.syntax.all._
+import cats.syntax.functor._
 import fs2.Stream
 
 import scala.concurrent.duration._
@@ -33,7 +33,7 @@ object SemanticBlocking extends IOApp {
     } yield ()
 
   def repeat[F[_]: TelegramClient: Timer](chat: Chat, i: Int): Scenario[F, Unit] =
-    if (i <= 0) Scenario.eval(chat.send("Done.")).map(_ => ())
+    if (i <= 0) Scenario.eval(chat.send("Done.")).void
     else
       for {
         _ <- Scenario.eval(chat.send(s"$i.."))

@@ -3,8 +3,8 @@ package canoe.scenarios
 import canoe.scenarios.Episode._
 import cats.instances.list._
 import cats.syntax.all._
-import cats.{Applicative, Monad}
-import fs2.{INothing, Pipe, Pull, Stream}
+import cats.{Monad, StackSafeMonad}
+import fs2.{Pipe, Pull, Stream}
 
 /**
   * Type which represents a description of sequence of elements.
@@ -21,7 +21,7 @@ import fs2.{INothing, Pipe, Pull, Stream}
   *  - Cancelled(i) - when the episode was cancelled by specific input.
   *                   Contains the input element of type `I` which caused cancellation.
   *
-  * Episode forms a monad having Applicative instance for `F`
+  * `Episode` forms a monad in `O` with `pure` and `flatMap`
   *
   * @tparam F Effect type
   * @tparam I Input elements type
@@ -44,7 +44,7 @@ sealed trait Episode[F[_], -I, +O] {
   def >>[I2 <: I, O2](e2: => Episode[F, I2, O2]): Episode[F, I2, O2] =
     flatMap(_ => e2)
 
-  def map[O2](fn: O => O2): Episode[F, I, O2] = Mapped(this, fn)
+  def map[O2](fn: O => O2): Episode[F, I, O2] = monadInstance.map(this)(fn)
 
   /**
     * @return Episode which is cancellable by the occurrence of input element described
@@ -85,6 +85,8 @@ sealed trait Episode[F[_], -I, +O] {
     Tolerate(this, None, fn)
 }
 
+private final case class Pure[F[_], I, A](a: A) extends Episode[F, I, A]
+
 private final case class Eval[F[_], I, A](fa: F[A]) extends Episode[F, I, A]
 
 private final case class Next[F[_], A](p: A => Boolean) extends Episode[F, A, A]
@@ -93,8 +95,6 @@ private final case class First[F[_], A](p: A => Boolean) extends Episode[F, A, A
 
 private final case class Bind[F[_], I, O1, O2](episode: Episode[F, I, O1], fn: O1 => Episode[F, I, O2])
     extends Episode[F, I, O2]
-
-private final case class Mapped[F[_], I, O1, O2](episode: Episode[F, I, O1], fn: O1 => O2) extends Episode[F, I, O2]
 
 private final case class Cancellable[F[_], I, O](
   episode: Episode[F, I, O],
@@ -107,36 +107,25 @@ private final case class Tolerate[F[_], I, O](episode: Episode[F, I, O], limit: 
 
 object Episode {
 
+  def pure[F[_], I, A](a: A): Episode[F, I, A] = Pure(a)
+
   def eval[F[_], I, A](fa: F[A]): Episode[F, I, A] = Eval(fa)
 
   def first[F[_], I](p: I => Boolean): Episode[F, I, I] = First(p)
 
   def next[F[_], I](p: I => Boolean): Episode[F, I, I] = Next(p)
 
-  implicit def monadInstance[F[_]: Applicative, I]: Monad[Episode[F, I, *]] =
-    new Monad[Episode[F, I, *]] {
-      def pure[A](x: A): Episode[F, I, A] = Eval(Applicative[F].pure(x))
+  implicit def monadInstance[F[_], I]: Monad[Episode[F, I, *]] =
+    new StackSafeMonad[Episode[F, I, *]] {
+      def pure[A](a: A): Episode[F, I, A] = Pure(a)
 
       def flatMap[A, B](
         episode: Episode[F, I, A]
       )(fn: A => Episode[F, I, B]): Episode[F, I, B] =
         episode.flatMap(fn)
-
-      override def map[A, B](
-        episode: Episode[F, I, A]
-      )(f: A => B): Episode[F, I, B] =
-        episode.map(f)
-
-      def tailRecM[A, B](
-        a: A
-      )(f: A => Episode[F, I, Either[A, B]]): Episode[F, I, B] =
-        flatMap(f(a)) {
-          case Left(a)  => tailRecM(a)(f)
-          case Right(b) => Eval(Applicative[F].pure(b))
-        }
     }
 
-  sealed private trait Result[+I, +O] {
+  private sealed trait Result[+I, +O] {
     def map[O1](f: O => O1): Result[I, O1] = this match {
       case Matched(o)          => Matched(f(o))
       case same @ Missed(_)    => same
@@ -154,6 +143,9 @@ object Episode {
     cancelTokens: List[(I => Boolean, Option[I => F[Unit]])]
   ): Stream[F, (Result[I, O], Stream[F, I])] =
     episode match {
+      case Pure(a) =>
+        Stream(a).covary[F].map(o => Matched(o) -> input)
+
       case Eval(fa) =>
         Stream.eval(fa).map(o => Matched(o) -> input)
 
@@ -180,7 +172,7 @@ object Episode {
                 case nonEmpty =>
                   nonEmpty
                     .collect { case Some(f) => f }
-                    .traverse[Pull[F, INothing, *], Unit](f => Pull.eval(f(m))) >>
+                    .traverse(f => Pull.eval(f(m))) >>
                     Pull.output1(Cancelled(m) -> rest)
               }
             case None => Pull.done
@@ -217,11 +209,6 @@ object Episode {
               case Missed(message)    => Stream(Missed(message) -> rest)
               case Cancelled(message) => Stream(Cancelled(message) -> rest)
             }
-        }
-
-      case Mapped(prev, fn) =>
-        find(prev, input, cancelTokens).map {
-          case (result, rest) => result.map(fn) -> rest
         }
     }
 }

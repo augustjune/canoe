@@ -1,5 +1,6 @@
 package canoe.models
 
+import canoe.marshalling.codecs._
 import canoe.models.messages.TelegramMessage
 import cats.syntax.functor._
 import io.circe.Decoder
@@ -24,7 +25,7 @@ object Update {
       deriveDecoder[CallbackButtonSelected].widen,
       deriveDecoder[ShippingQueryReceived].widen,
       deriveDecoder[PreCheckoutQueryReceived].widen
-    ).reduceLeft(_.or(_))
+    ).reduceLeft(_.or(_)).camelCase
 }
 
 final case class MessageReceived(updateId: Long, message: TelegramMessage) extends Update

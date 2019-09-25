@@ -26,9 +26,9 @@ object Recursive extends IOApp {
 
   def learnNaturals[F[_]: TelegramClient]: Scenario[F, Unit] =
     for {
-      chat  <- Scenario.start(command("naturals").chat)
-      _     <- Scenario.eval(chat.send("Hi. Let's learn what natural numbers are there."))
-      _     <- repeat(chat, FIRST_NATURAL_NUMBER)
+      chat <- Scenario.start(command("naturals").chat)
+      _    <- Scenario.eval(chat.send("Hi. Let's learn what natural numbers are there."))
+      _    <- repeat(chat, FIRST_NATURAL_NUMBER)
     } yield ()
 
   def repeat[F[_]: TelegramClient](chat: Chat, i: Int): Scenario[F, Unit] =

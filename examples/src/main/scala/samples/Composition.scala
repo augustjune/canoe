@@ -54,7 +54,7 @@ object Composition extends IOApp {
       _      <- Scenario.eval(chat.send("Enter your nickname"))
       nick   <- Scenario.next(text)
       exists <- Scenario.eval(service.userExists(nick))
-      res    <-
+      res <-
         if (exists)
           Scenario.eval(chat.send("User with such nick already exists. Please try another one")) >>
             provideUsername(chat, service)
@@ -67,7 +67,7 @@ object Composition extends IOApp {
       pass      <- enterPass(chat)
       _         <- Scenario.eval(chat.send("Repeat your password"))
       reentered <- enterPass(chat)
-      _         <-
+      _ <-
         if (pass == reentered) Scenario.eval(chat.send("Your password is stored."))
         else Scenario.eval(chat.send("Provided passwords don't match. Try again")) >> providePass(chat)
     } yield pass

@@ -55,3 +55,31 @@ def greetings[F[_]: TelegramClient]: Scenario[F, Unit] =
 Regardless of whether you decide to use scenarios for steering the bot, 
 you are still able to use all functionality of Telegram Bot API in a streaming context, 
 as it is demonstrated [here](https://github.com/augustjune/canoe/blob/master/examples/src/main/scala/samples/NoScenario.scala).
+
+### Using webhooks
+**canoe** also provides a support for obtaining messages from Telegram by setting a webhook.
+The same app described above would look this way using webhook version.
+```scala
+import canoe.api._
+import canoe.syntax._
+import cats.effect.ConcurrentEffect
+import fs2.Stream
+
+val url: String = "<your server url>"
+
+def app[F[_]: ConcurrentEffect: Timer]: F[Unit] =
+    Stream
+      .resource(TelegramClient.global[F](token))
+      .flatMap { implicit client =>
+        Stream
+          .resource(Bot.hook[F](url))
+          .flatMap(_.follow(greetings))
+      }
+      .compile.drain
+
+def greetings[F[_]: TelegramClient]: Scenario[F, Unit] = ???  // Scenario stays unchanged
+```
+When using webhook version you have to specify the `url` to which Telegram messages will be sent. 
+This address must be reachable for the Telegram, 
+so in case you're using your local environment, you have to expose your local host to the Internet.
+It can be achieved using **ngrok** simply following this [comprehensive guide](https://developer.github.com/webhooks/configuring/#using-ngrok). 

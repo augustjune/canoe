@@ -19,16 +19,20 @@ class Hook[F[_]](queue: Queue[F, Update]) extends UpdateSource[F] {
 
 object Hook {
 
+  /**
+    * Creates a local server which listens for the incoming updates on provided `port`.
+    */
   def create[F[_]: ConcurrentEffect: Timer](port: Int): Resource[F, Hook[F]] = {
     val dsl = Http4sDsl[F]
     import dsl._
 
-    def app(queue: Queue[F, Update]): HttpApp[F] = HttpRoutes.of[F] {
-      case req @ POST -> Root =>
-        req.decodeWith(jsonOf[F, Update], strict = true) {
-          queue.enqueue1(_) *> Ok()
+    def app(queue: Queue[F, Update]): HttpApp[F] =
+      HttpRoutes
+        .of[F] {
+          case req @ POST -> Root =>
+            req.decodeWith(jsonOf[F, Update], strict = true)(queue.enqueue1(_) *> Ok())
         }
-    }.orNotFound
+        .orNotFound
 
     def server(queue: Queue[F, Update]): Resource[F, Server[F]] =
       BlazeServerBuilder[F].bindHttp(port).withHttpApp(app(queue)).resource

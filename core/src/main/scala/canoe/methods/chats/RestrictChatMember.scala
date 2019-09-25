@@ -10,10 +10,7 @@ import io.circe.{Decoder, Encoder}
   * Use this method to restrict a user in a supergroup.
   * The bot must be an administrator in the supergroup for this to work and must have the appropriate admin rights.
   */
-case class RestrictChatMember(chatId: ChatId,
-                              userId: Int,
-                              permissions: ChatPermissions,
-                              untilDate: Option[Int] = None)
+case class RestrictChatMember(chatId: ChatId, userId: Int, permissions: ChatPermissions, untilDate: Option[Int] = None)
 
 object RestrictChatMember {
   import io.circe.generic.auto._

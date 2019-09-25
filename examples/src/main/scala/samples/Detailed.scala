@@ -37,11 +37,11 @@ object Detailed extends IOApp {
 
   def pizzaOrders[F[_]: TelegramClient](pizzaPlace: PizzaPlace[F]): Scenario[F, Unit] =
     for {
-      chat    <- Scenario.start(command("pizza").chat)    // Defines the start of the scenario with '/pizza' command
-      pizzas  <- Scenario.eval(pizzaPlace.menu)           // Suspend effectful evaluation in Scenario context
-      _       <- Scenario.eval(chat.send(s"We have $pizzas. What kind of pizza you'd like?"))
-      order   <- Scenario.next(text)                      // Defines the next step of the scenario to be a text message
-      _ <-                                                // Depending on the user input bot's reaction is different
+      chat   <- Scenario.start(command("pizza").chat) // Defines the start of the scenario with '/pizza' command
+      pizzas <- Scenario.eval(pizzaPlace.menu)        // Suspend effectful evaluation in Scenario context
+      _      <- Scenario.eval(chat.send(s"We have $pizzas. What kind of pizza you'd like?"))
+      order  <- Scenario.next(text)                   // Defines the next step of the scenario to be a text message
+      _ <-                                            // Depending on the user input bot's reaction is different
         if (pizzas.contains(order)) Scenario.eval(pizzaPlace.order(order)) >> Scenario.eval(chat.send("Done."))
         else Scenario.eval(chat.send("Sorry, we don't serve that kind of pizza."))
     } yield ()

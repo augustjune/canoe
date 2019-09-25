@@ -52,16 +52,16 @@ val kindProjectorVersion = "0.10.3"
 
 lazy val dependencies =
   libraryDependencies ++= Seq(
-    "co.fs2" %% "fs2-core" % fs2Version,
-    "org.typelevel" %% "cats-core" % catsCoreVersion,
-    "org.typelevel" %% "cats-effect" % catsEffectVersion,
-    "io.circe" %% "circe-core" % circeVersion,
-    "io.circe" %% "circe-generic" % circeVersion,
-    "io.circe" %% "circe-parser" % circeVersion,
-    "org.http4s" %% "http4s-dsl" % http4sVersion,
-    "org.http4s" %% "http4s-blaze-client" % http4sVersion,
-    "org.http4s" %% "http4s-blaze-server" % http4sVersion,
-    "org.http4s" %% "http4s-circe" % http4sVersion,
+    "co.fs2"        %% "fs2-core"             % fs2Version,
+    "org.typelevel" %% "cats-core"            % catsCoreVersion,
+    "org.typelevel" %% "cats-effect"          % catsEffectVersion,
+    "io.circe"      %% "circe-core"           % circeVersion,
+    "io.circe"      %% "circe-generic"        % circeVersion,
+    "io.circe"      %% "circe-parser"         % circeVersion,
+    "org.http4s"    %% "http4s-dsl"           % http4sVersion,
+    "org.http4s"    %% "http4s-blaze-client"  % http4sVersion,
+    "org.http4s"    %% "http4s-blaze-server"  % http4sVersion,
+    "org.http4s"    %% "http4s-circe"         % http4sVersion,
     "org.typelevel" %% "discipline-scalatest" % disciplineVersion
   )
 
@@ -84,10 +84,10 @@ lazy val typeSystemEnhancements =
 lazy val tests = {
   val dependencies =
     libraryDependencies ++= Seq(
-      "org.scalatest" %% "scalatest" % scalatestVersion,
-      "org.typelevel" %% "cats-laws" % catsCoreVersion,
+      "org.scalatest"              %% "scalatest"                 % scalatestVersion,
+      "org.typelevel"              %% "cats-laws"                 % catsCoreVersion,
       "com.github.alexarchambault" %% "scalacheck-shapeless_1.14" % scalacheckShapelessVersion
-  ).map(_ % Test)
+    ).map(_ % Test)
 
   val frameworks =
     testFrameworks := Seq(TestFrameworks.ScalaTest)

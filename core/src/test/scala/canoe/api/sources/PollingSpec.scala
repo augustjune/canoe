@@ -13,7 +13,7 @@ import scala.concurrent.duration.Duration
 
 class PollingSpec extends AnyFunSuite {
 
-  def updatesClient: TelegramClient[IO] = new TelegramClient[IO] {
+  implicit val updatesClient: TelegramClient[IO] = new TelegramClient[IO] {
     def execute[Req, Res](request: Req)(implicit M: Method[Req, Res]): IO[Res] =
       if (M.name != GetUpdates.method.name) throw new UnsupportedOperationException
       else {
@@ -24,7 +24,7 @@ class PollingSpec extends AnyFunSuite {
       }
   }
 
-  val polling = new Polling(updatesClient, Duration.Zero)
+  val polling = new Polling(Duration.Zero)
 
   test("polling starts with given offset") {
     assert(polling.pollUpdates(0).take(1).value().head.updateId == 0)

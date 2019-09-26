@@ -4,6 +4,7 @@ import canoe.api.sources.{Hook, Polling}
 import canoe.methods.webhooks.{DeleteWebhook, SetWebhook}
 import canoe.models.messages.TelegramMessage
 import canoe.models.{InputFile, Update}
+import canoe.syntax.methodOps
 import cats.effect.concurrent.Ref
 import cats.effect.{Concurrent, ConcurrentEffect, Resource, Timer}
 import cats.implicits._
@@ -154,7 +155,7 @@ object Bot {
     certificate: Option[InputFile] = None
   )(implicit client: TelegramClient[F], F: ConcurrentEffect[F], T: Timer[F]): Resource[F, Bot[F]] =
     for {
-      _    <- Resource.make(client.execute(SetWebhook(url, certificate)).void)(_ => client.execute(DeleteWebhook).void)
+      _    <- Resource.make(SetWebhook(url, certificate).call.void)(_ => DeleteWebhook.call.void)
       hook <- Hook.create[F](port)
     } yield new Bot[F](hook)
 }

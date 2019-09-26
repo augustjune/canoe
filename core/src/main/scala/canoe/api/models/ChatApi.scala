@@ -7,6 +7,7 @@ import canoe.models.ChatAction.ChatAction
 import canoe.models._
 import canoe.models.messages.TelegramMessage
 import canoe.models.outgoing._
+import canoe.syntax.methodOps
 import cats.Applicative
 
 final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
@@ -18,7 +19,7 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
     * the first message is send by the bot
     */
   def setAction(action: ChatAction): F[Boolean] =
-    client.execute(SendChatAction(chat.id, action))
+    SendChatAction(chat.id, action).call
 
   /**
     * Sets default permissions for all chat members
@@ -29,7 +30,7 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
   def setDefaultPermissions(permissions: ChatPermissions)(implicit F: Applicative[F]): F[Boolean] =
     chat match {
       case _: Group | _: Supergroup =>
-        client.execute(SetChatPermissions(chat.id, permissions))
+        SetChatPermissions(chat.id, permissions).call
       case _ => F.pure(false)
     }
 
@@ -37,13 +38,13 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
     * Deletes the photo of the this chat
     */
   def deletePhoto: F[Boolean] =
-    client.execute(DeleteChatPhoto(chat.id))
+    DeleteChatPhoto(chat.id).call
 
   /**
     * Deletes a group of stickers set for this chat
     */
   def deleteStickerSet: F[Boolean] =
-    client.execute(DeleteChatStickerSet(chat.id))
+    DeleteChatStickerSet(chat.id).call
 
   /**
     * Generates new invite link ofr this chat.
@@ -51,7 +52,7 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
     * Any previously generated link is revoked
     */
   def exportInviteLink: F[String] =
-    client.execute(ExportChatInviteLink(chat.id))
+    ExportChatInviteLink(chat.id).call
 
   /**
     * @return list of administrators of this chat
@@ -59,20 +60,20 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
   def administrators(implicit F: Applicative[F]): F[List[ChatMember]] =
     chat match {
       case _: PrivateChat => F.pure(Nil)
-      case _              => client.execute(GetChatAdministrators(chat.id))
+      case _              => GetChatAdministrators(chat.id).call
     }
 
   /**
     * @return Detailed information about the member of this chat
     */
   def getMember(userId: Int): F[ChatMember] =
-    client.execute(GetChatMember(chat.id, userId))
+    GetChatMember(chat.id, userId).call
 
   /**
     * @return number of members of this chat
     */
   def membersCount: F[Int] =
-    client.execute(GetChatMembersCount(chat.id))
+    GetChatMembersCount(chat.id).call
 
   /**
     * Kicks a user from this chat
@@ -80,7 +81,7 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
   def kick(userId: Int, untilDate: Option[Int] = None)(implicit F: Applicative[F]): F[Boolean] =
     chat match {
       case _: PrivateChat => F.pure(false)
-      case _              => client.execute(KickChatMember(chat.id, userId, untilDate))
+      case _              => KickChatMember(chat.id, userId, untilDate).call
     }
 
   /**
@@ -89,7 +90,7 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
   def leave(implicit F: Applicative[F]): F[Boolean] =
     chat match {
       case _: PrivateChat => F.pure(false)
-      case _              => client.execute(LeaveChat(chat.id))
+      case _              => LeaveChat(chat.id).call
     }
 
   private def notFalse(b: Boolean): Option[Boolean] =
@@ -102,7 +103,7 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
   def pinMessage(messageId: Int, silent: Boolean = true)(implicit F: Applicative[F]): F[Boolean] =
     chat match {
       case _: PrivateChat => F.pure(false)
-      case _              => client.execute(PinChatMessage(chat.id, messageId, notFalse(silent)))
+      case _              => PinChatMessage(chat.id, messageId, notFalse(silent)).call
     }
 
   /**
@@ -120,17 +121,15 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
                     canPromoteMembers: Option[Boolean] = None)(implicit F: Applicative[F]): F[Boolean] =
     chat match {
       case _: Supergroup | _: Channel =>
-        client.execute(
-          PromoteChatMember(chat.id,
-                            userId,
-                            canChangeInfo,
-                            canPostMessages,
-                            canDeleteMessages,
-                            canInviteUsers,
-                            canRestrictMembers,
-                            canPinMessages,
-                            canPromoteMembers)
-        )
+        PromoteChatMember(chat.id,
+                          userId,
+                          canChangeInfo,
+                          canPostMessages,
+                          canDeleteMessages,
+                          canInviteUsers,
+                          canRestrictMembers,
+                          canPinMessages,
+                          canPromoteMembers).call
 
       case _ => F.pure(false)
     }
@@ -146,7 +145,7 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
   ): F[Boolean] =
     chat match {
       case _: Supergroup =>
-        client.execute(RestrictChatMember(chat.id, userId, permissions, until))
+        RestrictChatMember(chat.id, userId, permissions, until).call
 
       case _ => F.pure(false)
     }
@@ -157,7 +156,7 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
   def setDescription(description: String)(implicit F: Applicative[F]): F[Boolean] =
     chat match {
       case _: Group | _: Supergroup | _: Channel =>
-        client.execute(SetChatDescription(chat.id, Option(description)))
+        SetChatDescription(chat.id, Option(description)).call
 
       case _ => F.pure(false)
     }
@@ -168,14 +167,14 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
   def setTitle(title: String)(implicit F: Applicative[F]): F[Boolean] =
     chat match {
       case _: PrivateChat => F.pure(false)
-      case _              => client.execute(SetChatTitle(chat.id, title))
+      case _              => SetChatTitle(chat.id, title).call
     }
 
   /**
     * Unbans previously kicked user
     */
   def unbanMember(userId: Int): F[Boolean] =
-    client.execute(UnbanChatMember(chat.id, userId))
+    UnbanChatMember(chat.id, userId).call
 
   /**
     * Unpins pinned chat message
@@ -183,14 +182,14 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
   def unpinMessage(implicit F: Applicative[F]): F[Boolean] =
     chat match {
       case _: PrivateChat => F.pure(false)
-      case _              => client.execute(UnpinChatMessage(chat.id))
+      case _              => UnpinChatMessage(chat.id).call
     }
 
   /**
     * @return Detailed information about this chat
     */
   def details: F[DetailedChat] =
-    client.execute(GetChat(chat.id))
+    GetChat(chat.id).call
 
   private def nonEmpty(str: String): Option[String] =
     if (str.isEmpty) None
@@ -205,59 +204,51 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
            disableNotification: Option[Boolean] = None): F[TelegramMessage] =
     content match {
       case AnimationContent(animation, caption, duration, width, height, thumb, parseMode) =>
-        client.execute(
-          SendAnimation(chat.id,
-                        animation,
-                        duration,
-                        width,
-                        height,
-                        thumb,
-                        nonEmpty(caption),
-                        parseMode,
-                        disableNotification,
-                        replyToMessageId,
-                        replyMarkup)
-        )
-
-      case AudioContent(audio, caption, duration, parseMode, performer, title) =>
-        client.execute(
-          SendAudio(chat.id,
-                    audio,
-                    duration,
-                    nonEmpty(caption),
-                    parseMode,
-                    performer,
-                    title,
-                    disableNotification,
-                    replyToMessageId,
-                    replyMarkup)
-        )
-
-      case ContactContent(phoneNumber, firstName, lastName, vcard) =>
-        client.execute(
-          SendContact(chat.id,
-                      phoneNumber,
-                      firstName,
-                      lastName,
-                      vcard,
+        SendAnimation(chat.id,
+                      animation,
+                      duration,
+                      width,
+                      height,
+                      thumb,
+                      nonEmpty(caption),
+                      parseMode,
                       disableNotification,
                       replyToMessageId,
-                      replyMarkup)
-        )
+                      replyMarkup).call
+
+      case AudioContent(audio, caption, duration, parseMode, performer, title) =>
+        SendAudio(chat.id,
+                  audio,
+                  duration,
+                  nonEmpty(caption),
+                  parseMode,
+                  performer,
+                  title,
+                  disableNotification,
+                  replyToMessageId,
+                  replyMarkup).call
+
+      case ContactContent(phoneNumber, firstName, lastName, vcard) =>
+        SendContact(chat.id,
+                    phoneNumber,
+                    firstName,
+                    lastName,
+                    vcard,
+                    disableNotification,
+                    replyToMessageId,
+                    replyMarkup).call
 
       case DocumentContent(document, caption, parseMode) =>
-        client.execute(
-          SendDocument(chat.id,
-                       document,
-                       nonEmpty(caption),
-                       parseMode,
-                       disableNotification,
-                       replyToMessageId,
-                       replyMarkup)
-        )
+        SendDocument(chat.id,
+                     document,
+                     nonEmpty(caption),
+                     parseMode,
+                     disableNotification,
+                     replyToMessageId,
+                     replyMarkup).call
 
       case GameContent(gameShortName) =>
-        client.execute(SendGame(chat.id, gameShortName, disableNotification, replyToMessageId, replyMarkup))
+        SendGame(chat.id, gameShortName, disableNotification, replyToMessageId, replyMarkup).call
 
       case InvoiceContent(title,
                           description,
@@ -276,105 +267,83 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
                           needEmail,
                           needShippingAddress,
                           isFlexible) =>
-        client.execute(
-          SendInvoice(
-            chat.id,
-            title,
-            description,
-            payload,
-            providerToken,
-            startParameter,
-            currency,
-            prices,
-            providerData,
-            photoUrl,
-            photoSize,
-            photoWidth,
-            photoHeight,
-            needName,
-            needPhoneNumber,
-            needEmail,
-            needShippingAddress,
-            isFlexible,
-            disableNotification,
-            replyToMessageId,
-            replyMarkup
-          )
-        )
+        SendInvoice(
+          chat.id,
+          title,
+          description,
+          payload,
+          providerToken,
+          startParameter,
+          currency,
+          prices,
+          providerData,
+          photoUrl,
+          photoSize,
+          photoWidth,
+          photoHeight,
+          needName,
+          needPhoneNumber,
+          needEmail,
+          needShippingAddress,
+          isFlexible,
+          disableNotification,
+          replyToMessageId,
+          replyMarkup
+        ).call
 
       case LocationContent(latitude, longitude, livePeriod) =>
-        client.execute(
-          SendLocation(chat.id, latitude, longitude, livePeriod, disableNotification, replyToMessageId, replyMarkup)
-        )
+        SendLocation(chat.id, latitude, longitude, livePeriod, disableNotification, replyToMessageId, replyMarkup).call
 
       case TextContent(text, parseMode, disableWebPagePreview) =>
-        client.execute(
-          SendMessage(chat.id,
-                      text,
-                      parseMode,
-                      disableWebPagePreview,
-                      disableNotification,
-                      replyToMessageId,
-                      replyMarkup)
-        )
+        SendMessage(chat.id, text, parseMode, disableWebPagePreview, disableNotification, replyToMessageId, replyMarkup).call
 
       case PhotoContent(photo, caption, parseMode) =>
-        client.execute(
-          SendPhoto(chat.id, photo, nonEmpty(caption), parseMode, disableNotification, replyToMessageId, replyMarkup)
-        )
+        SendPhoto(chat.id, photo, nonEmpty(caption), parseMode, disableNotification, replyToMessageId, replyMarkup).call
 
       case PollContent(question, options) =>
-        client.execute(SendPoll(chat.id, question, options, disableNotification, replyToMessageId, replyMarkup))
+        SendPoll(chat.id, question, options, disableNotification, replyToMessageId, replyMarkup).call
 
       case StickerContent(sticker) =>
-        client.execute(SendSticker(chat.id, sticker, disableNotification, replyToMessageId, replyMarkup))
+        SendSticker(chat.id, sticker, disableNotification, replyToMessageId, replyMarkup).call
 
       case VenueContent(latitude, longitude, title, address, foursquareId, foursquareType, duration) =>
-        client.execute(
-          SendVenue(chat.id,
-                    latitude,
-                    longitude,
-                    title,
-                    address,
-                    foursquareId,
-                    foursquareType,
-                    duration,
-                    disableNotification,
-                    replyToMessageId,
-                    replyMarkup)
-        )
+        SendVenue(chat.id,
+                  latitude,
+                  longitude,
+                  title,
+                  address,
+                  foursquareId,
+                  foursquareType,
+                  duration,
+                  disableNotification,
+                  replyToMessageId,
+                  replyMarkup).call
 
       case VideoContent(video, caption, duration, width, height, parseMode, supportsStreaming) =>
-        client.execute(
-          SendVideo(chat.id,
-                    video,
-                    duration,
-                    width,
-                    height,
-                    nonEmpty(caption),
-                    parseMode,
-                    supportsStreaming,
-                    disableNotification,
-                    replyToMessageId,
-                    replyMarkup)
-        )
+        SendVideo(chat.id,
+                  video,
+                  duration,
+                  width,
+                  height,
+                  nonEmpty(caption),
+                  parseMode,
+                  supportsStreaming,
+                  disableNotification,
+                  replyToMessageId,
+                  replyMarkup).call
 
       case VideoNoteContent(videoNote, duration, length) =>
-        client.execute(
-          SendVideoNote(chat.id, videoNote, duration, length, disableNotification, replyToMessageId, replyMarkup)
-        )
+        SendVideoNote(chat.id, videoNote, duration, length, disableNotification, replyToMessageId, replyMarkup).call
 
       case VoiceContent(voice, caption, parseMode, duration) =>
-        client.execute(
-          SendVoice(chat.id,
-                    voice,
-                    nonEmpty(caption),
-                    parseMode,
-                    duration,
-                    disableNotification,
-                    replyToMessageId,
-                    replyMarkup)
-        )
+        SendVoice(chat.id,
+                  voice,
+                  nonEmpty(caption),
+                  parseMode,
+                  duration,
+                  disableNotification,
+                  replyToMessageId,
+                  replyMarkup).call
     }
 
   /**
@@ -382,6 +351,6 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
     * @param media Must include 2-10 items
     */
   def sendAlbum(media: List[InputMedia], disableNotification: Boolean = false): F[List[TelegramMessage]] =
-    client.execute(SendMediaGroup(chat.id, media, disableNotification = Some(disableNotification)))
+    SendMediaGroup(chat.id, media, disableNotification = Some(disableNotification)).call
 
 }

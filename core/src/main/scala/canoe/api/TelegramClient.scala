@@ -3,6 +3,8 @@ package canoe.api
 import canoe.api.clients.Http4sTelegramClient
 import canoe.methods.Method
 import cats.effect.{ConcurrentEffect, Resource, Sync}
+import io.chrisdavenport.log4cats.Logger
+import io.chrisdavenport.log4cats.slf4j.Slf4jLogger
 import org.http4s.client.Client
 import org.http4s.client.blaze.BlazeClientBuilder
 
@@ -21,6 +23,8 @@ trait TelegramClient[F[_]] {
 }
 
 object TelegramClient {
+
+  implicit private def defaultLogger[F[_]: Sync]: Logger[F] = Slf4jLogger.getLogger[F]
 
   /**
     * Creates an authorized asynchronous Telegram Bot API client wrapped in Resource.

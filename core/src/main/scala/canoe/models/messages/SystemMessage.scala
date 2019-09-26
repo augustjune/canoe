@@ -21,6 +21,7 @@ object SystemMessage {
       deriveDecoder[MigratedFromGroup].widen,
       deriveDecoder[MigratedToSupergroup].widen,
       deriveDecoder[SuccessfulPaymentMessage].widen,
+      deriveDecoder[GroupChatCreated].widen,
       deriveDecoder[SupergroupCreated].widen,
       deriveDecoder[WebsiteConnected].widen
     ).reduceLeft(_.or(_))
@@ -45,6 +46,9 @@ final case class ChatTitleChanged(messageId: Int, chat: Chat, date: Int, newChat
 final case class MigratedFromGroup(messageId: Int, chat: Chat, date: Int, migrateFromChatId: Long) extends SystemMessage
 
 final case class MigratedToSupergroup(messageId: Int, chat: Chat, date: Int, migrateToChatId: Long)
+    extends SystemMessage
+
+final case class GroupChatCreated(messageId: Int, chat: Chat, date: Int, groupChatCreated: Boolean)
     extends SystemMessage
 
 final case class SupergroupCreated(messageId: Int, chat: Chat, date: Int, supergroupChatCreated: Boolean)

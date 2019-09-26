@@ -14,4 +14,6 @@ package object syntax extends Contents with Expects {
 
   implicit def expectTextMessageOps(textMessage: Expect[TextMessage]): ExpectTextMessageOps =
     new ExpectTextMessageOps(textMessage)
+
+  implicit def methodOps[A](a: A): MethodSyntax[A] = new MethodSyntax[A](a)
 }

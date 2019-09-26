@@ -5,6 +5,7 @@ import canoe.methods.messages._
 import canoe.models.messages.{PollMessage, TelegramMessage}
 import canoe.models.outgoing._
 import canoe.models.{Chat, InlineKeyboardMarkup, Poll, ReplyMarkup}
+import canoe.syntax.methodOps
 import cats.ApplicativeError
 
 final class MessageApi[F[_]](message: TelegramMessage)(implicit client: TelegramClient[F]) {
@@ -23,14 +24,13 @@ final class MessageApi[F[_]](message: TelegramMessage)(implicit client: Telegram
     * - If the bot is an administrator of a group, it can delete any message there.
     * - If the bot has can_delete_messages permission in a supergroup or a channel, it can delete any message there.
     */
-  def delete: F[Boolean] =
-    client.execute(DeleteMessage(chatId, messageId))
+  def delete: F[Boolean] = DeleteMessage(chatId, messageId).call
 
   /**
     * Forwards this message to another chat
     */
   def forward(to: Chat, disableNotification: Option[Boolean] = None): F[TelegramMessage] =
-    client.execute(ForwardMessage(to.id, chatId, disableNotification, messageId))
+    ForwardMessage(to.id, chatId, disableNotification, messageId).call
 
   /**
     * Sends new message as a reply to this message
@@ -47,7 +47,7 @@ final class MessageApi[F[_]](message: TelegramMessage)(implicit client: Telegram
     *         the edited Message is returned, otherwise True is returned.
     */
   def editText(text: String): F[Either[Boolean, TelegramMessage]] =
-    client.execute(EditMessageText(Some(chatId), Some(messageId), text = text))
+    EditMessageText(Some(chatId), Some(messageId), text = text).call
 
   /**
     * Changes the reply markup of this message
@@ -55,7 +55,7 @@ final class MessageApi[F[_]](message: TelegramMessage)(implicit client: Telegram
     *         the edited Message is returned, otherwise True is returned.
     */
   def editReplyMarkup(keyboard: Option[InlineKeyboardMarkup]): F[Either[Boolean, TelegramMessage]] =
-    client.execute(EditMessageReplyMarkup(Some(chatId), Some(messageId), replyMarkup = keyboard))
+    EditMessageReplyMarkup(Some(chatId), Some(messageId), replyMarkup = keyboard).call
 
   /**
     * Changes the caption of this message
@@ -64,7 +64,7 @@ final class MessageApi[F[_]](message: TelegramMessage)(implicit client: Telegram
     *         the edited Message is returned, otherwise True is returned.
     */
   def editCaption(caption: Option[String]): F[Either[Boolean, TelegramMessage]] =
-    client.execute(EditMessageCaption(Some(chatId), Some(messageId), caption = caption))
+    EditMessageCaption(Some(chatId), Some(messageId), caption = caption).call
 
   /**
     * Stops the poll, which is represented by this message.
@@ -73,7 +73,7 @@ final class MessageApi[F[_]](message: TelegramMessage)(implicit client: Telegram
     */
   def stopPoll(markup: Option[ReplyMarkup] = None)(implicit F: ApplicativeError[F, Throwable]): F[Poll] =
     message match {
-      case _: PollMessage => client.execute(StopPoll(chatId, messageId, markup))
+      case _: PollMessage => StopPoll(chatId, messageId, markup).call
       case _              => F.raiseError(new RuntimeException("This message is not a poll"))
     }
 

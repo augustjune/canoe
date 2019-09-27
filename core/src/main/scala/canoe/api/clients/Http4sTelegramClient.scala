@@ -1,6 +1,6 @@
 package canoe.api.clients
 
-import canoe.api.TelegramClient
+import canoe.api.{FailedMethod, ResponseDecodingError, TelegramClient}
 import canoe.methods.Method
 import canoe.models.{InputFile, Response => TelegramResponse}
 import cats.effect.Sync
@@ -27,7 +27,8 @@ private[api] class Http4sTelegramClient[F[_]: Sync: Logger](token: String, clien
 
     client
       .expect[TelegramResponse[Res]](req)
-      .flatMap(handleTelegramResponse)
+      .adaptError { case InvalidMessageBodyFailure(details, _) => ResponseDecodingError(details) }
+      .flatMap(handleTelegramResponse(request, M))
   }
 
   private def prepareRequest[Req, Res](url: Uri, method: Method[Req, Res], action: Req): F[Request[F]] = {
@@ -68,12 +69,9 @@ private[api] class Http4sTelegramClient[F[_]: Sync: Logger](token: String, clien
     Method.POST(multipart, urlWithQueryParams).map(_.withHeaders(multipart.headers))
   }
 
-  private def handleTelegramResponse[A](response: TelegramResponse[A]): F[A] = response match {
+  private def handleTelegramResponse[A, I, C](input: I, m: Method[I, A])(response: TelegramResponse[A]): F[A] = response match {
     case TelegramResponse(true, Some(result), _, _, _) => result.pure[F]
 
-    case TelegramResponse(false, _, description, _, _) =>
-      Sync[F].raiseError[A](new RuntimeException(s"Method execution resulted in error. Description: $description"))
-
-    case other => Sync[F].raiseError[A](new RuntimeException(s"Unexpected response from Telegram service: $other"))
+    case failed => Sync[F].raiseError[A](FailedMethod(m, input, failed))
   }
 }

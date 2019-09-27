@@ -30,7 +30,12 @@ object Hook {
       HttpRoutes
         .of[F] {
           case req @ POST -> Root =>
-            req.decodeWith(jsonOf[F, Update], strict = true)(queue.enqueue1(_) *> Ok())
+            req
+              .decodeWith(jsonOf[F, Update], strict = true)(queue.enqueue1(_) *> Ok())
+              .recoverWith {
+                // ToDo - signal the error
+                case _: InvalidMessageBodyFailure => Ok()
+              }
         }
         .orNotFound
 

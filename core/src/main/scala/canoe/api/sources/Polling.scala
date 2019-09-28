@@ -33,8 +33,8 @@ private[api] class Polling[F[_]: TelegramClient: ApplicativeError[*[_], Throwabl
       .recover {
         case ResponseDecodingError(json) =>
           val updates = successfulUpdates(json)
-          val offset = lastId(updates).map(_ + 1).getOrElse(offset)
-          offset -> updates
+          val nextOffset = lastId(updates).map(_ + 1).getOrElse(offset)
+          nextOffset -> updates
 
         case _: TelegramError => offset -> Nil // Basically try again
       }

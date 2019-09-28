@@ -25,11 +25,18 @@ private[api] class Http4sTelegramClient[F[_]: Sync: Logger](token: String, clien
     implicit val decoder: EntityDecoder[F, TelegramResponse[Res]] =
       jsonOf(Sync[F], TelegramResponse.decoder(M.decoder))
 
-    client
-      .expect[TelegramResponse[Res]](req)
-      .adaptError { case InvalidMessageBodyFailure(details, _) => ResponseDecodingError(details) }
-      .flatMap(handleTelegramResponse(request, M))
+    Logger[F].debug(s"Executing '${M.name}' Telegram method.") *>
+      client
+        .expect[TelegramResponse[Res]](req)
+        .recoverWith { case error: InvalidMessageBodyFailure => handleUnknownEntity(M.name, request, error) }
+        .flatMap(handleTelegramResponse(M, request))
   }
+
+  private def handleUnknownEntity[I, A](method: String, input: I, error: InvalidMessageBodyFailure): F[A] =
+    Logger[F].error(
+      s"Received unknown Telegram entity during execution of '$method' method. \nInput data: $input. \n${error.details}"
+    ) *>
+      Sync[F].raiseError(ResponseDecodingError(error.details.dropWhile(_ != '{')))
 
   private def prepareRequest[Req, Res](url: Uri, method: Method[Req, Res], action: Req): F[Request[F]] = {
     val uploads = method.uploads(action).collect {
@@ -69,9 +76,12 @@ private[api] class Http4sTelegramClient[F[_]: Sync: Logger](token: String, clien
     Method.POST(multipart, urlWithQueryParams).map(_.withHeaders(multipart.headers))
   }
 
-  private def handleTelegramResponse[A, I, C](input: I, m: Method[I, A])(response: TelegramResponse[A]): F[A] = response match {
-    case TelegramResponse(true, Some(result), _, _, _) => result.pure[F]
+  private def handleTelegramResponse[A, I, C](m: Method[I, A], input: I)(response: TelegramResponse[A]): F[A] =
+    response match {
+      case TelegramResponse(true, Some(result), _, _, _) => result.pure[F]
 
-    case failed => Sync[F].raiseError[A](FailedMethod(m, input, failed))
-  }
+      case failed =>
+        Logger[F].error(s"Received failed response from Telegram: $failed. Method name: ${m.name}, input data: $input") *>
+          Sync[F].raiseError[A](FailedMethod(m, input, failed))
+    }
 }

@@ -5,7 +5,7 @@ import canoe.methods.Method
 import canoe.models.UpdateType.UpdateType
 import canoe.models.{InputFile, Update}
 import io.circe.generic.semiauto._
-import io.circe.{Decoder, Encoder}
+import io.circe.{Decoder, Encoder, Json}
 
 /** Use this method to receive incoming updates using long polling (wiki). An Array of Update objects is returned.
   *
@@ -43,4 +43,10 @@ object GetUpdates {
 
       def uploads(request: GetUpdates): List[(String, InputFile)] = Nil
     }
+
+  /**
+    * Decodes a list of updates ignoring ones which could not be decoded
+    */
+  val accumulativeDecoder: Decoder[List[Update]] =
+    Decoder.decodeList[Json].map(_.map(Decoder[Update].decodeJson).collect { case Right(v) => v })
 }

@@ -1,6 +1,6 @@
 package canoe.api.sources
 
-import canoe.api.{TelegramClient, TelegramError, UpdateSource}
+import canoe.api.{ResponseDecodingError, TelegramClient, TelegramError, UpdateSource}
 import canoe.methods.updates.GetUpdates
 import canoe.models.Update
 import canoe.syntax.methodOps
@@ -8,6 +8,7 @@ import cats.ApplicativeError
 import cats.effect.Timer
 import cats.syntax.all._
 import fs2.Stream
+import io.circe.parser.decode
 
 import scala.concurrent.duration._
 
@@ -29,8 +30,17 @@ private[api] class Polling[F[_]: TelegramClient: ApplicativeError[*[_], Throwabl
   private def requestUpdates(offset: Long): F[(Long, List[Update])] =
     GetUpdates(offset = Some(offset), timeout = Some(timeout.toSeconds.toInt)).call
       .map(updates => (lastId(updates).map(_ + 1).getOrElse(offset), updates))
-      .recover { case _: TelegramError => offset + 1 -> List.empty }
-  // ToDo - more accurate offset in case of error
+      .recover {
+        case ResponseDecodingError(json) =>
+          val updates = successfulUpdates(json)
+          val offset = lastId(updates).map(_ + 1).getOrElse(offset)
+          offset -> updates
+
+        case _: TelegramError => offset -> Nil // Basically try again
+      }
+
+  private def successfulUpdates(json: String): List[Update] =
+    decode(json)(GetUpdates.accumulativeDecoder).toOption.getOrElse(Nil)
 
   private def lastId(updates: List[Update]): Option[Long] =
     updates match {
@@ -57,7 +67,9 @@ object Polling {
   /**
     * Polls new batch of updates when consumer is ready and `interval` passed since the last polling
     */
-  def metered[F[_]: TelegramClient: ApplicativeError[*[_], Throwable]: Timer](interval: FiniteDuration): UpdateSource[F] =
+  def metered[F[_]: TelegramClient: ApplicativeError[*[_], Throwable]: Timer](
+    interval: FiniteDuration
+  ): UpdateSource[F] =
     new Polling[F](longPollTimeout) with UpdateSource[F] {
       def updates: Stream[F, Update] =
         pollUpdates(0).metered(interval).flatMap(Stream.emits)

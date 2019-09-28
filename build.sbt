@@ -64,8 +64,7 @@ lazy val dependencies =
     "org.http4s"        %% "http4s-blaze-server" % http4sVersion,
     "org.http4s"        %% "http4s-circe"        % http4sVersion,
     "io.chrisdavenport" %% "log4cats-core"       % log4catsVersion,
-    "io.chrisdavenport" %% "log4cats-slf4j"      % log4catsVersion,
-    "ch.qos.logback" % "logback-classic" % "1.2.3"
+    "io.chrisdavenport" %% "log4cats-slf4j"      % log4catsVersion
   )
 
 lazy val compilerOptions =

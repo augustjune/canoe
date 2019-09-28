@@ -1,13 +1,14 @@
 package canoe.api.sources
 
-import canoe.api.{TelegramClient, UpdateSource}
+import canoe.api.{ResponseDecodingError, TelegramClient, TelegramError, UpdateSource}
 import canoe.methods.updates.GetUpdates
 import canoe.models.Update
 import canoe.syntax.methodOps
-import cats.Functor
+import cats.ApplicativeError
 import cats.effect.Timer
-import cats.syntax.functor._
+import cats.syntax.all._
 import fs2.Stream
+import io.circe.parser.decode
 
 import scala.concurrent.duration._
 
@@ -18,7 +19,7 @@ import scala.concurrent.duration._
   *                before it sends the response when there's no updates.
   *                Enables [[https://en.wikipedia.org/wiki/Push_technology#Long_polling long polling]].
   */
-private[api] class Polling[F[_]: TelegramClient: Functor](timeout: FiniteDuration) {
+private[api] class Polling[F[_]: TelegramClient: ApplicativeError[*[_], Throwable]](timeout: FiniteDuration) {
 
   def pollUpdates(startOffset: Long): Stream[F, List[Update]] =
     Stream(()).repeat
@@ -29,6 +30,17 @@ private[api] class Polling[F[_]: TelegramClient: Functor](timeout: FiniteDuratio
   private def requestUpdates(offset: Long): F[(Long, List[Update])] =
     GetUpdates(offset = Some(offset), timeout = Some(timeout.toSeconds.toInt)).call
       .map(updates => (lastId(updates).map(_ + 1).getOrElse(offset), updates))
+      .recover {
+        case ResponseDecodingError(json) =>
+          val updates = successfulUpdates(json)
+          val nextOffset = lastId(updates).map(_ + 1).getOrElse(offset)
+          nextOffset -> updates
+
+        case _: TelegramError => offset -> Nil // Basically try again
+      }
+
+  private def successfulUpdates(json: String): List[Update] =
+    decode(json)(GetUpdates.accumulativeDecoder).toOption.getOrElse(Nil)
 
   private def lastId(updates: List[Update]): Option[Long] =
     updates match {
@@ -47,7 +59,7 @@ object Polling {
   /**
     * Polls new batch of updates whenever consumer is ready
     */
-  def continual[F[_]: TelegramClient: Functor]: UpdateSource[F] =
+  def continual[F[_]: TelegramClient: ApplicativeError[*[_], Throwable]]: UpdateSource[F] =
     new Polling[F](longPollTimeout) with UpdateSource[F] {
       def updates: Stream[F, Update] = pollUpdates(0).flatMap(Stream.emits)
     }
@@ -55,7 +67,9 @@ object Polling {
   /**
     * Polls new batch of updates when consumer is ready and `interval` passed since the last polling
     */
-  def metered[F[_]: TelegramClient: Functor: Timer](interval: FiniteDuration): UpdateSource[F] =
+  def metered[F[_]: TelegramClient: ApplicativeError[*[_], Throwable]: Timer](
+    interval: FiniteDuration
+  ): UpdateSource[F] =
     new Polling[F](longPollTimeout) with UpdateSource[F] {
       def updates: Stream[F, Update] =
         pollUpdates(0).metered(interval).flatMap(Stream.emits)

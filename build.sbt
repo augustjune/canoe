@@ -45,6 +45,7 @@ val catsCoreVersion = "2.0.0"
 val catsEffectVersion = "2.0.0"
 val circeVersion = "0.12.1"
 val http4sVersion = "0.21.0-M5"
+val log4catsVersion = "1.0.0"
 val scalatestVersion = "3.0.8"
 val disciplineVersion = "1.0.0-M1"
 val scalacheckShapelessVersion = "1.2.3"
@@ -52,17 +53,18 @@ val kindProjectorVersion = "0.10.3"
 
 lazy val dependencies =
   libraryDependencies ++= Seq(
-    "co.fs2"        %% "fs2-core"             % fs2Version,
-    "org.typelevel" %% "cats-core"            % catsCoreVersion,
-    "org.typelevel" %% "cats-effect"          % catsEffectVersion,
-    "io.circe"      %% "circe-core"           % circeVersion,
-    "io.circe"      %% "circe-generic"        % circeVersion,
-    "io.circe"      %% "circe-parser"         % circeVersion,
-    "org.http4s"    %% "http4s-dsl"           % http4sVersion,
-    "org.http4s"    %% "http4s-blaze-client"  % http4sVersion,
-    "org.http4s"    %% "http4s-blaze-server"  % http4sVersion,
-    "org.http4s"    %% "http4s-circe"         % http4sVersion,
-    "org.typelevel" %% "discipline-scalatest" % disciplineVersion
+    "co.fs2"            %% "fs2-core"            % fs2Version,
+    "org.typelevel"     %% "cats-core"           % catsCoreVersion,
+    "org.typelevel"     %% "cats-effect"         % catsEffectVersion,
+    "io.circe"          %% "circe-core"          % circeVersion,
+    "io.circe"          %% "circe-generic"       % circeVersion,
+    "io.circe"          %% "circe-parser"        % circeVersion,
+    "org.http4s"        %% "http4s-dsl"          % http4sVersion,
+    "org.http4s"        %% "http4s-blaze-client" % http4sVersion,
+    "org.http4s"        %% "http4s-blaze-server" % http4sVersion,
+    "org.http4s"        %% "http4s-circe"        % http4sVersion,
+    "io.chrisdavenport" %% "log4cats-core"       % log4catsVersion,
+    "io.chrisdavenport" %% "log4cats-slf4j"      % log4catsVersion
   )
 
 lazy val compilerOptions =
@@ -86,6 +88,7 @@ lazy val tests = {
     libraryDependencies ++= Seq(
       "org.scalatest"              %% "scalatest"                 % scalatestVersion,
       "org.typelevel"              %% "cats-laws"                 % catsCoreVersion,
+      "org.typelevel"              %% "discipline-scalatest"      % disciplineVersion,
       "com.github.alexarchambault" %% "scalacheck-shapeless_1.14" % scalacheckShapelessVersion
     ).map(_ % Test)
 

@@ -1,10 +1,8 @@
 package canoe.api
 
 import canoe.api.sources.{Hook, Polling}
-import canoe.methods.webhooks.{DeleteWebhook, SetWebhook}
 import canoe.models.messages.TelegramMessage
 import canoe.models.{InputFile, Update}
-import canoe.syntax.methodOps
 import cats.effect.concurrent.Ref
 import cats.effect.{Concurrent, ConcurrentEffect, Resource, Timer}
 import cats.implicits._
@@ -146,16 +144,13 @@ object Bot {
     * After the bot is used, the webhook is deleted even in case of interruptions or errors.
     *
     * @param url         HTTPS url to which updates will be sent
-    * @param port        port which will be used for listening for the incoming updates
-    * @param certificate public key of self-signed certificate (including BEGIN and END portions)
+    * @param port        Port which will be used for listening for the incoming updates
+    * @param certificate Public key of self-signed certificate (including BEGIN and END portions)
     */
-  def hook[F[_]](
+  def hook[F[_]: TelegramClient: ConcurrentEffect: Timer](
     url: String,
     port: Int = 8443,
     certificate: Option[InputFile] = None
-  )(implicit client: TelegramClient[F], F: ConcurrentEffect[F], T: Timer[F]): Resource[F, Bot[F]] =
-    for {
-      _    <- Resource.make(SetWebhook(url, certificate).call.void)(_ => DeleteWebhook.call.void)
-      hook <- Hook.create[F](port)
-    } yield new Bot[F](hook)
+  ): Resource[F, Bot[F]] =
+    Hook.install(url, port, certificate).map(new Bot(_))
 }

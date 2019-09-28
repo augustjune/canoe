@@ -1,18 +1,20 @@
 package canoe.api.clients
 
-import canoe.api.TelegramClient
+import canoe.api.{FailedMethod, ResponseDecodingError, TelegramClient}
 import canoe.methods.Method
 import canoe.models.{InputFile, Response => TelegramResponse}
 import cats.effect.Sync
 import cats.syntax.all._
 import fs2.Stream
+import io.chrisdavenport.log4cats.Logger
 import org.http4s._
 import org.http4s.circe._
 import org.http4s.client.Client
 import org.http4s.client.dsl.Http4sClientDsl._
 import org.http4s.multipart.{Multipart, Part}
 
-private[api] class Http4sTelegramClient[F[_]: Sync](token: String, client: Client[F]) extends TelegramClient[F] {
+private[api] class Http4sTelegramClient[F[_]: Sync: Logger](token: String, client: Client[F])
+    extends TelegramClient[F] {
 
   private val botApiUri: Uri = Uri.unsafeFromString("https://api.telegram.org") / s"bot$token"
 
@@ -23,10 +25,18 @@ private[api] class Http4sTelegramClient[F[_]: Sync](token: String, client: Clien
     implicit val decoder: EntityDecoder[F, TelegramResponse[Res]] =
       jsonOf(Sync[F], TelegramResponse.decoder(M.decoder))
 
-    client
-      .expect[TelegramResponse[Res]](req)
-      .flatMap(handleTelegramResponse)
+    Logger[F].debug(s"Executing '${M.name}' Telegram method.") *>
+      client
+        .expect[TelegramResponse[Res]](req)
+        .recoverWith { case error: InvalidMessageBodyFailure => handleUnknownEntity(M.name, request, error) }
+        .flatMap(handleTelegramResponse(M, request))
   }
+
+  private def handleUnknownEntity[I, A](method: String, input: I, error: InvalidMessageBodyFailure): F[A] =
+    Logger[F].error(
+      s"Received unknown Telegram entity during execution of '$method' method. \nInput data: $input. \n${error.details}"
+    ) *>
+      Sync[F].raiseError(ResponseDecodingError(error.details.dropWhile(_ != '{')))
 
   private def prepareRequest[Req, Res](url: Uri, method: Method[Req, Res], action: Req): F[Request[F]] = {
     val uploads = method.uploads(action).collect {
@@ -66,12 +76,12 @@ private[api] class Http4sTelegramClient[F[_]: Sync](token: String, client: Clien
     Method.POST(multipart, urlWithQueryParams).map(_.withHeaders(multipart.headers))
   }
 
-  private def handleTelegramResponse[A](response: TelegramResponse[A]): F[A] = response match {
-    case TelegramResponse(true, Some(result), _, _, _) => result.pure[F]
+  private def handleTelegramResponse[A, I, C](m: Method[I, A], input: I)(response: TelegramResponse[A]): F[A] =
+    response match {
+      case TelegramResponse(true, Some(result), _, _, _) => result.pure[F]
 
-    case TelegramResponse(false, _, description, _, _) =>
-      Sync[F].raiseError[A](new RuntimeException(s"Method execution resulted in error. Description: $description"))
-
-    case other => Sync[F].raiseError[A](new RuntimeException(s"Unexpected response from Telegram service: $other"))
-  }
+      case failed =>
+        Logger[F].error(s"Received failed response from Telegram: $failed. Method name: ${m.name}, input data: $input") *>
+          Sync[F].raiseError[A](FailedMethod(m, input, failed))
+    }
 }

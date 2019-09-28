@@ -3,24 +3,27 @@ package canoe.api
 import canoe.api.clients.Http4sTelegramClient
 import canoe.methods.Method
 import cats.effect.{ConcurrentEffect, Resource, Sync}
+import io.chrisdavenport.log4cats.Logger
+import io.chrisdavenport.log4cats.slf4j.Slf4jLogger
 import org.http4s.client.Client
 import org.http4s.client.blaze.BlazeClientBuilder
 
 import scala.concurrent.ExecutionContext
 
 /**
-  * Client which is able to execute Telegram Bot API methods
-  * in effect `F`
+  * Client which is able to execute Telegram Bot API methods in effect `F`.
   */
 trait TelegramClient[F[_]] {
 
   /**
-    * Transforms request into result using implicit method definition as a contract
+    * Transforms request into result using implicit method definition as a contract.
     */
   def execute[Req, Res](request: Req)(implicit M: Method[Req, Res]): F[Res]
 }
 
 object TelegramClient {
+
+  private implicit def defaultLogger[F[_]: Sync]: Logger[F] = Slf4jLogger.getLogger[F]
 
   /**
     * Creates an authorized asynchronous Telegram Bot API client wrapped in Resource.
@@ -42,7 +45,7 @@ object TelegramClient {
     apply(token, scala.concurrent.ExecutionContext.global)
 
   /**
-    * Creates an authorized asynchronous Telegram Bot API out of http4s Client
+    * Creates an authorized asynchronous Telegram Bot API out of http4s Client.
     *
     * @param token Telegram bot token
     */

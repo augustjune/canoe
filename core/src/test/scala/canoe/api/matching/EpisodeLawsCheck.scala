@@ -1,6 +1,6 @@
-package canoe.scenarios
+package canoe.api.matching
 
-import canoe.scenarios.EpisodeCheckInstances._
+import canoe.api.matching.EpisodeCheckInstances._
 import cats.effect.IO
 import cats.implicits._
 import cats.laws.discipline.MonadTests

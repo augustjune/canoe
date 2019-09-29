@@ -1,7 +1,7 @@
 package canoe.api
 
+import canoe.api.matching.Episode
 import canoe.models.messages.TelegramMessage
-import canoe.scenarios.Episode
 import canoe.syntax.Expect
 import cats.{Monad, StackSafeMonad}
 import fs2.Pipe
@@ -65,14 +65,6 @@ final class Scenario[F[_], A] private (private val episode: Episode[F, TelegramM
 
 object Scenario {
 
-  implicit def monadInstance[F[_]]: Monad[Scenario[F, *]] =
-    new StackSafeMonad[Scenario[F, *]] {
-      def pure[A](a: A): Scenario[F, A] = Scenario.pure(a)
-
-      def flatMap[A, B](scenario: Scenario[F, A])(fn: A => Scenario[F, B]): Scenario[F, B] =
-        scenario.flatMap(fn)
-    }
-
   /**
     * Defines the beginning of the scenario.
     *
@@ -107,4 +99,12 @@ object Scenario {
     new Scenario[F, A](Episode.pure(a))
 
   def done[F[_]]: Scenario[F, Unit] = pure(())
+
+  implicit def monadInstance[F[_]]: Monad[Scenario[F, *]] =
+    new StackSafeMonad[Scenario[F, *]] {
+      def pure[A](a: A): Scenario[F, A] = Scenario.pure(a)
+
+      def flatMap[A, B](scenario: Scenario[F, A])(fn: A => Scenario[F, B]): Scenario[F, B] =
+        scenario.flatMap(fn)
+    }
 }

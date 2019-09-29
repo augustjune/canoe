@@ -44,7 +44,7 @@ sealed trait Episode[F[_], -I, +O] {
   def >>[I2 <: I, O2](e2: => Episode[F, I2, O2]): Episode[F, I2, O2] =
     flatMap(_ => e2)
 
-  def map[O2](fn: O => O2): Episode[F, I, O2] = monadInstance.map(this)(fn)
+  def map[O2](fn: O => O2): Episode[F, I, O2] = flatMap(fn.andThen(Pure(_)))
 
   /**
     * @return Episode which is cancellable by the occurrence of input element described

@@ -38,7 +38,7 @@ object Composition extends IOApp {
   def signup[F[_]: TelegramClient](service: Service[F]): Scenario[F, Unit] =
     for {
       chat <- Scenario.start(command("signup").chat)
-      user <- registerUser(chat, service).cancelWhen(command("cancel"))
+      user <- registerUser(chat, service).cancelOn(command("cancel"))
       _    <- Scenario.eval(chat.send(s"Registration completed. Welcome, ${user.name}"))
     } yield ()
 

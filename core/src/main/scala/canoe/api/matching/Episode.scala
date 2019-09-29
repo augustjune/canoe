@@ -1,6 +1,6 @@
-package canoe.scenarios
+package canoe.api.matching
 
-import canoe.scenarios.Episode._
+import canoe.api.matching.Episode._
 import cats.instances.list._
 import cats.syntax.all._
 import cats.{Monad, StackSafeMonad}
@@ -27,7 +27,7 @@ import fs2.{Pipe, Pull, Stream}
   * @tparam I Input elements type
   * @tparam O Result value type
   */
-sealed trait Episode[F[_], -I, +O] {
+private[api] sealed trait Episode[F[_], -I, +O] {
 
   /**
     * @return Pipe which produces value `O` for each subsequence of `I` elements
@@ -41,10 +41,7 @@ sealed trait Episode[F[_], -I, +O] {
   def flatMap[I2 <: I, O2](fn: O => Episode[F, I2, O2]): Episode[F, I2, O2] =
     Bind(this, fn)
 
-  def >>[I2 <: I, O2](e2: => Episode[F, I2, O2]): Episode[F, I2, O2] =
-    flatMap(_ => e2)
-
-  def map[O2](fn: O => O2): Episode[F, I, O2] = monadInstance.map(this)(fn)
+  def map[O2](fn: O => O2): Episode[F, I, O2] = flatMap(fn.andThen(Pure(_)))
 
   /**
     * @return Episode which is cancellable by the occurrence of input element described
@@ -72,10 +69,6 @@ sealed trait Episode[F[_], -I, +O] {
     */
   def tolerateN[I2 <: I](n: Int)(fn: I2 => F[Unit]): Episode[F, I2, O] =
     Tolerate(this, Some(n), fn)
-
-  /** Alias for tolerateN(1) **/
-  def tolerate[I2 <: I](fn: I2 => F[Unit]): Episode[F, I2, O] =
-    tolerateN(1)(fn)
 
   /**
     * @return Episode which ignores every input element which causes
@@ -107,15 +100,15 @@ private final case class Tolerate[F[_], I, O](episode: Episode[F, I, O], limit: 
 
 object Episode {
 
-  def pure[F[_], I, A](a: A): Episode[F, I, A] = Pure(a)
+  private[api] def pure[F[_], I, A](a: A): Episode[F, I, A] = Pure(a)
 
-  def eval[F[_], I, A](fa: F[A]): Episode[F, I, A] = Eval(fa)
+  private[api] def eval[F[_], I, A](fa: F[A]): Episode[F, I, A] = Eval(fa)
 
-  def first[F[_], I](p: I => Boolean): Episode[F, I, I] = First(p)
+  private[api] def first[F[_], I](p: I => Boolean): Episode[F, I, I] = First(p)
 
-  def next[F[_], I](p: I => Boolean): Episode[F, I, I] = Next(p)
+  private[api] def next[F[_], I](p: I => Boolean): Episode[F, I, I] = Next(p)
 
-  implicit def monadInstance[F[_], I]: Monad[Episode[F, I, *]] =
+  private[api] implicit def monadInstance[F[_], I]: Monad[Episode[F, I, *]] =
     new StackSafeMonad[Episode[F, I, *]] {
       def pure[A](a: A): Episode[F, I, A] = Pure(a)
 

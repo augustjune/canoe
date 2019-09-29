@@ -1,9 +1,8 @@
-package canoe.scenarios
+package canoe.api.matching
 
 import canoe.TestIO._
 import cats.Eq
 import cats.effect.IO
-import cats.implicits._
 import fs2.Stream
 import org.scalacheck.{Arbitrary, Gen}
 

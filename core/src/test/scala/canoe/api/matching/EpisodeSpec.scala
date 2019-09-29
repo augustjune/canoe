@@ -1,4 +1,4 @@
-package canoe.scenarios
+package canoe.api.matching
 
 import canoe.TestIO._
 import cats.effect.IO
@@ -112,20 +112,11 @@ class EpisodeSpec extends AnyFunSuite {
 
   test("Episode.next#tolerate doesn't skip the element if it matches") {
     val episode: Episode[IO, String, String] =
-      Episode.next(predicate).tolerate(_ => IO.unit)
+      Episode.next(predicate).tolerateN(1)(_ => IO.unit)
 
     val input = Stream(s"1.$expected", s"2.$expected")
 
     assert(input.through(episode.pipe).toList().head.startsWith("1"))
-  }
-
-  test("Episode.next#tolerate skips the element if it doesn't match") {
-    val episode: Episode[IO, String, String] =
-      Episode.next(predicate).tolerate(_ => IO.unit)
-
-    val input = Stream("1", s"2.$expected")
-
-    assert(input.through(episode.pipe).toList().head.startsWith("2"))
   }
 
   test("Episode.next#tolerateN skips up to N elements if they don't match") {

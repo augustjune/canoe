@@ -47,7 +47,7 @@ val circeVersion = "0.12.2"
 val http4sVersion = "0.21.0-M5"
 val log4catsVersion = "1.0.0"
 val scalatestVersion = "3.0.8"
-val disciplineVersion = "1.0.0-M1"
+val disciplineVersion = "1.0.0-RC1"
 val scalacheckShapelessVersion = "1.2.3"
 val kindProjectorVersion = "0.10.3"
 

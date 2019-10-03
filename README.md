@@ -63,7 +63,7 @@ Full example may be found [here](https://github.com/augustjune/canoe/blob/master
 ```scala
 import canoe.api._
 import canoe.syntax._
-import cats.effect.ConcurrentEffect
+import cats.effect.{ConcurrentEffect, Timer}
 import fs2.Stream
 
 val url: String = "<your server url>"

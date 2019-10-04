@@ -1,14 +1,31 @@
 package canoe.models
 
-/** Contains information about why a request was unsuccessful.
-  *
-  * @param migrateToChatId  Integer Optional. The group has been migrated to a supergroup with the specified identifier.
-  *                         This number may be greater than 32 bits and some programming languages may have
-  *                         difficulty/silent defects in interpreting it.
-  *                         But it is smaller than 52 bits, so a signed 64 bit integer or double-precision float type are safe for storing this identifier.
-  * @param retryAfter       Integer Optional. In case of exceeding flood control, the number of seconds left to wait before the request can be repeated
+import cats.syntax.functor._
+import io.circe.Decoder
+import io.circe.generic.semiauto._
+
+/**
+  * Contains information about why a request was unsuccessful.
   */
-case class ResponseParameters(
-  migrateToChatId: Option[Long] = None,
-  retryAfter: Option[Int] = None
-)
+sealed trait ResponseParameters extends Product
+
+object ResponseParameters {
+
+  implicit val updateDecoder: Decoder[ResponseParameters] =
+    List[Decoder[ResponseParameters]](
+      deriveDecoder[ChatMigration].widen,
+      deriveDecoder[ExceededFloodControl].widen
+    ).reduceLeft(_.or(_))
+}
+
+/**
+  * The group has been migrated to a supergroup with the specified identifier.
+  */
+final case class ChatMigration(migrateToChatId: Long) extends ResponseParameters
+
+/**
+  * Flood control was exceeded.
+  *
+  * @param retryAfter The number of seconds left to wait before the request can be repeated
+  */
+final case class ExceededFloodControl(retryAfter: Int) extends ResponseParameters

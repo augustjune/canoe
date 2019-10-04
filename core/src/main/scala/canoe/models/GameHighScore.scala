@@ -1,13 +1,8 @@
 package canoe.models
 
-/** This object represents one row of the high scores table for a game.
+/**
+  * One row of the high scores table for a game.
   *
-  * @param position  Integer Position in high score table for the game
-  * @param user      User User
-  * @param score     Integer Score
+  * @param position  Position in high score table for the game
   */
-case class GameHighScore(
-  position: Long,
-  user: User,
-  score: Long
-)
+case class GameHighScore(position: Long, user: User, score: Long)

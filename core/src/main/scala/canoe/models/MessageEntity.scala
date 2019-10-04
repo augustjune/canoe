@@ -1,22 +1,73 @@
 package canoe.models
 
-import canoe.models.MessageEntityType.MessageEntityType
+import io.circe.Decoder
+import io.circe.generic.semiauto._
 
-/** This object represents one special entity in a text message.
-  *
+/**
+  * Represents one special entity in a text message.
   * For example, hashtags, usernames, URLs, etc.
-  *
-  * @param type    String Type of the entity.
-  *                One of mention (@username), hashtag, bot_command, url, email, bold (bold text), italic (italic text),
-  *                code (monowidth string), pre (monowidth block), text_link (for clickable text URLs),
-  *                text_mention (for users without usernames)
-  * @param offset  Integer Offset in UTF-16 code units to the start of the entity
-  * @param length  Integer Length of the entity in UTF-16 code units
-  * @param url     String Optional For "text_link" only, url that will be opened after user taps on the text
-  * @param user    User Optional. For "text_mention" only, the mentioned user
   */
-case class MessageEntity(`type`: MessageEntityType,
-                         offset: Int,
-                         length: Int,
-                         url: Option[String] = None,
-                         user: Option[User] = None)
+sealed trait MessageEntity {
+  def offset: Int
+  def length: Int
+}
+
+object MessageEntity {
+  import io.circe.generic.auto._
+
+  implicit val chatDecoder: Decoder[MessageEntity] = Decoder.instance[MessageEntity] { cursor =>
+    cursor
+      .get[String]("type")
+      .map {
+        case "mention"      => deriveDecoder[Mention]
+        case "hashtag"      => deriveDecoder[Hashtag]
+        case "cashtag"      => deriveDecoder[Cashtag]
+        case "url"          => deriveDecoder[Url]
+        case "email"        => deriveDecoder[Email]
+        case "phone_number" => deriveDecoder[PhoneNumber]
+        case "bold"         => deriveDecoder[Bold]
+        case "italic"       => deriveDecoder[Italic]
+        case "code"         => deriveDecoder[Code]
+        case "pre"          => deriveDecoder[Pre]
+        case "text_link"    => deriveDecoder[TextLink]
+        case "text_mention" => deriveDecoder[TextMention]
+        case _              => deriveDecoder[Unknown]
+      }
+      .flatMap(_.tryDecode(cursor))
+  }
+
+  /** '@username' */
+  case class Mention(offset: Int, length: Int) extends MessageEntity
+
+  case class Hashtag(offset: Int, length: Int) extends MessageEntity
+
+  case class Cashtag(offset: Int, length: Int) extends MessageEntity
+
+  case class BotCommand(offset: Int, length: Int) extends MessageEntity
+
+  case class Url(offset: Int, length: Int) extends MessageEntity
+
+  case class Email(offset: Int, length: Int) extends MessageEntity
+
+  case class PhoneNumber(offset: Int, length: Int) extends MessageEntity
+
+  /** Bold text */
+  case class Bold(offset: Int, length: Int) extends MessageEntity
+
+  /** Italic text */
+  case class Italic(offset: Int, length: Int) extends MessageEntity
+
+  /** Monowidth string */
+  case class Code(offset: Int, length: Int) extends MessageEntity
+
+  /** Monowidth block */
+  case class Pre(offset: Int, length: Int) extends MessageEntity
+
+  /** Clickable text URLs */
+  case class TextLink(offset: Int, length: Int, url: String) extends MessageEntity
+
+  /** Users without username */
+  case class TextMention(offset: Int, length: Int, user: User) extends MessageEntity
+
+  case class Unknown(offset: Int, length: Int) extends MessageEntity
+}

@@ -6,9 +6,13 @@ import canoe.models.{ChatId, InputFile}
 import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
-/** Use this method to get the number of members in a chat. Returns Int on success.
+/**
+  * Use this method to get the number of members in a chat.
   *
-  * @param chatId Integer or String Unique identifier for the target chat or username of the target supergroup or channel (in the format @channelusername)
+  * Returns Int on success.
+  *
+  * @param chatId Unique identifier for the target chat or username of the target channel
+  *               (in the format @channelusername)
   */
 case class GetChatMembersCount(chatId: ChatId)
 

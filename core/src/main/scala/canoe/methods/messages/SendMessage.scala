@@ -8,7 +8,8 @@ import canoe.models.{ChatId, InputFile, ReplyMarkup}
 import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
-/** Use this method to send text messages.
+/**
+  * Use this method to send text messages.
   * On success, the sent Message is returned.
   *
   * ==Formatting options==
@@ -40,14 +41,14 @@ import io.circe.{Decoder, Encoder}
   * All numerical HTML entities are supported.
   * The API currently supports only the following named HTML entities: &lt;, &gt;, &amp; and &quot;.
   *
-  * @param chatId                Integer or String Unique identifier for the target chat or username of the target channel (in the format @channelusername)
-  * @param text                  String Text of the message to be sent
-  * @param parseMode             String Optional Send Markdown or HTML, if you want Telegram apps to show bold, italic, fixed-width text or inline URLs in your bot's message.
-  * @param disableWebPagePreview Boolean Optional Disables link previews for links in this message
-  * @param disableNotification   Boolean Optional Sends the message silently.
+  * @param chatId                Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+  * @param text                  Text of the message to be sent
+  * @param parseMode             Parse mode of input text (Markdown or HTML)
+  * @param disableWebPagePreview Disables link previews for links in this message
+  * @param disableNotification   Sends the message silently.
   *                              iOS users will not receive a notification, Android users will receive a notification with no sound.
-  * @param replyToMessageId      Integer Optional If the message is a reply, ID of the original message
-  * @param replyMarkup           InlineKeyboardMarkup or ReplyKeyboardMarkup or ReplyKeyboardHide or ForceReply Optional Additional interface options.
+  * @param replyToMessageId      If the message is a reply, ID of the original message
+  * @param replyMarkup           Additional interface options.
   *                              A JSON-serialized object for an inline keyboard, custom reply keyboard,
   *                              instructions to hide reply keyboard or to force a reply from the user.
   */

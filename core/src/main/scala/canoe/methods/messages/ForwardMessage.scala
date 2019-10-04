@@ -7,17 +7,22 @@ import canoe.models.{ChatId, InputFile}
 import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
-/** Use this method to forward messages of any kind. On success, the sent Message is returned.
+/**
+  * Use this method to forward messages of any kind.
+  * On success, the sent Message is returned.
   *
-  * @param chatId              Integer or String Unique identifier for the target chat or username of the target channel (in the format @channelusername)
-  * @param fromChatId          Integer or String Unique identifier for the chat where the original message was sent (or channel username in the format @channelusername)
-  * @param disableNotification Boolean Optional Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
-  * @param messageId           Integer Unique message identifier
+  * @param chatId              Unique identifier for the target chat or username of the target channel
+  *                            (in the format @channelusername)
+  * @param fromChatId          Unique identifier for the chat where the original message was sent
+  *                            (or channel username in the format @channelusername)
+  * @param messageId           Unique message identifier
+  * @param disableNotification Sends the message silently. iOS users will not receive a notification,
+  *                            Android users will receive a notification with no sound.
   */
 case class ForwardMessage(chatId: ChatId,
                           fromChatId: ChatId,
-                          disableNotification: Option[Boolean] = None,
-                          messageId: Int)
+                          messageId: Int,
+                          disableNotification: Option[Boolean] = None)
 
 object ForwardMessage {
 

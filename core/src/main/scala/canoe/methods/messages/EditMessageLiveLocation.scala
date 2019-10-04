@@ -10,25 +10,50 @@ import io.circe.{Decoder, Encoder}
 /**
   * Use this method to edit live location messages sent by the bot or via the bot (for inline bots).
   * A location can be edited until its live_period expires or editing is explicitly disabled by a call to stopMessageLiveLocation.
-  * On success, if the edited message was sent by the bot,
-  * the edited Message is returned, otherwise True is returned.
   *
-  * @param chatId           Integer or String Optional	Required if inline_message_id is not specified. Unique identifier for the target chat or username of the target channel (in the format @channelusername)
-  * @param messageId        Integer	Optional Required if inline_message_id is not specified. Identifier of the sent message
-  * @param inlineMessageId  String	Optional Required if chat_id and message_id are not specified. Identifier of the inline message
-  * @param latitude         Float number Yes Latitude of new location
-  * @param longitude        Float number Yes	Longitude of new location
-  * @param replyMarkup      InlineKeyboardMarkup Optional A JSON-serialized object for a new inline keyboard.
+  * Use methods in companion object in order to construct the value of this class.
+  *
+  * @param chatId          Unique identifier for the target chat or username of the target channel
+  *                        (in the format @channelusername)
+  *                        Required if 'inlineMessageId' is not specified.
+  * @param messageId       Identifier of the sent message.
+  *                        Required if 'inlineMessageId' is not specified.
+  * @param inlineMessageId Identifier of the inline message.
+  *                        Required if 'chatId' and 'messageId' are not specified.
+  * @param latitude        Latitude of new location
+  * @param longitude       Longitude of new location
+  * @param replyMarkup     Additional interface options.
+  *                        A JSON-serialized object for an inline keyboard, custom reply keyboard,
+  *                        instructions to hide reply keyboard or to force a reply from the user.
   */
-case class EditMessageLiveLocation(chatId: Option[ChatId] = None,
-                                   messageId: Option[Int] = None,
-                                   inlineMessageId: Option[Int] = None,
-                                   latitude: Option[Double] = None,
-                                   longitude: Option[Double] = None,
-                                   replyMarkup: Option[InlineKeyboardMarkup] = None)
+case class EditMessageLiveLocation private (chatId: Option[ChatId],
+                                            messageId: Option[Int],
+                                            inlineMessageId: Option[Int],
+                                            latitude: Double,
+                                            longitude: Double,
+                                            replyMarkup: Option[InlineKeyboardMarkup] = None)
 
 object EditMessageLiveLocation {
   import io.circe.generic.auto._
+
+  /**
+    * For the messages sent directed by the bot
+    */
+  def direct(chatId: ChatId,
+             messageId: Int,
+             lat: Double,
+             long: Double,
+             replyMarkup: Option[InlineKeyboardMarkup] = None): EditMessageLiveLocation =
+    EditMessageLiveLocation(Some(chatId), Some(messageId), None, lat, long, replyMarkup)
+
+  /**
+    * For the inlined messages sent via the bot
+    */
+  def inlined(inlineMessageId: Int,
+              lat: Double,
+              long: Double,
+              replyMarkup: Option[InlineKeyboardMarkup] = None): EditMessageLiveLocation =
+    EditMessageLiveLocation(None, None, Some(inlineMessageId), lat, long, replyMarkup)
 
   implicit val method: Method[EditMessageLiveLocation, Either[Boolean, TelegramMessage]] =
     new Method[EditMessageLiveLocation, Either[Boolean, TelegramMessage]] {

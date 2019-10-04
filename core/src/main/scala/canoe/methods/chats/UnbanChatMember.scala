@@ -6,12 +6,16 @@ import canoe.models.{ChatId, InputFile}
 import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
-/** Use this method to unban a previously kicked user in a supergroup.
+/**
+  * Use this method to unban a previously kicked user in a supergroup.
   * The user will not return to the group automatically, but will be able to join via link, etc.
-  * The bot must be an administrator in the group for this to work. Returns True on success.
   *
-  * @param chatId Integer or String Unique identifier for the target group or username of the target supergroup (in the format @supergroupusername)
-  * @param userId Integer Unique identifier of the target user
+  * The bot must be an administrator in the group for this to work.
+  * Returns True on success.
+  *
+  * @param chatId Unique identifier for the target chat or username of the target channel
+  *               (in the format @channelusername)
+  * @param userId Unique identifier of the target user
   */
 case class UnbanChatMember(chatId: ChatId, userId: Int)
 

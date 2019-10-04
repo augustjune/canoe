@@ -8,9 +8,10 @@ import io.circe.{Decoder, Encoder}
 
 /**
   * Use this method to delete a sticker from a set created by the bot.
+  *
   * Returns True on success.
   *
-  * @param sticker String	File identifier of the sticker
+  * @param sticker   Sticker's fileId
   */
 case class DeleteStickerFromSet(sticker: String)
 

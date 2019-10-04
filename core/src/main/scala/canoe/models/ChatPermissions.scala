@@ -1,5 +1,9 @@
 package canoe.models
 
+// ToDo - describe what None value means
+/**
+  * Describes actions that a non-administrator user is allowed to take in a chat.
+  */
 case class ChatPermissions(canSendMessages: Option[Boolean] = None,
                            canSendMediaMessages: Option[Boolean] = None,
                            canSendPolls: Option[Boolean] = None,

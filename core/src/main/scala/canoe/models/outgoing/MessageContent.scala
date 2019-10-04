@@ -20,7 +20,8 @@ case class AudioContent(audio: InputFile,
                         duration: Option[Int] = None,
                         parseMode: Option[ParseMode] = None,
                         performer: Option[String] = None,
-                        title: Option[String] = None)
+                        title: Option[String] = None,
+                        thumb: Option[InputFile] = None)
     extends MessageContent
 
 case class ContactContent(phoneNumber: String,
@@ -29,7 +30,10 @@ case class ContactContent(phoneNumber: String,
                           vcard: Option[String] = None)
     extends MessageContent
 
-case class DocumentContent(document: InputFile, caption: String = "", parseMode: Option[ParseMode] = None)
+case class DocumentContent(document: InputFile,
+                           thumb: Option[InputFile] = None,
+                           caption: String = "",
+                           parseMode: Option[ParseMode] = None)
     extends MessageContent
 
 case class GameContent(gameShortName: String) extends MessageContent
@@ -70,8 +74,7 @@ case class VenueContent(latitude: Double,
                         title: String,
                         address: String,
                         foursquareId: Option[String] = None,
-                        foursquareType: Option[String] = None,
-                        duration: Option[String] = None)
+                        foursquareType: Option[String] = None)
     extends MessageContent
 
 case class VideoContent(video: InputFile,
@@ -79,6 +82,7 @@ case class VideoContent(video: InputFile,
                         duration: Option[Int] = None,
                         width: Option[Int] = None,
                         height: Option[Int] = None,
+                        thumb: Option[InputFile] = None,
                         parseMode: Option[ParseMode] = None,
                         supportsStreaming: Option[Boolean] = None)
     extends MessageContent

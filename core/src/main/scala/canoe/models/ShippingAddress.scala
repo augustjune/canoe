@@ -15,12 +15,12 @@ import canoe.models.CountryCode.CountryCode
   *     .toMap
   * }}}
   *
-  * @param countryCode  String ISO 3166-1 alpha-2 country code
-  * @param state        String State, if applicable
-  * @param city         String City
-  * @param streetLine1  String First line for the address
-  * @param streetLine2  String Second line for the address
-  * @param postCode     String Address post code
+  * @param countryCode  ISO 3166-1 alpha-2 country code
+  * @param state        State, if applicable
+  * @param city         City
+  * @param streetLine1  First line for the address
+  * @param streetLine2  Second line for the address
+  * @param postCode     Address post code
   */
 case class ShippingAddress(countryCode: CountryCode,
                            state: String,

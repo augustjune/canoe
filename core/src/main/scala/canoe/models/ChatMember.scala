@@ -17,7 +17,7 @@ object ChatMember {
       .map {
         case MemberStatus.Creator       => deriveDecoder[ChatCreator]
         case MemberStatus.Administrator => deriveDecoder[ChatAdministrator]
-        case MemberStatus.Member        => deriveDecoder[CurrentMember]
+        case MemberStatus.Member        => deriveDecoder[OrdinaryMember]
         case MemberStatus.Restricted    => deriveDecoder[RestrictedMember]
         case MemberStatus.Left          => deriveDecoder[LeftMember]
         case MemberStatus.Kicked        => deriveDecoder[KickedMember]
@@ -28,32 +28,32 @@ object ChatMember {
 
 case class ChatCreator(user: User) extends ChatMember
 
-case class ChatAdministrator(user: User,
-                             canBeEdited: Boolean,
-                             canChangeInfo: Boolean,
-                             canPostMessages: Boolean,
-                             canEditMessages: Boolean,
-                             canDeleteMessages: Boolean,
-                             canInviteUsers: Boolean,
-                             canRestrictMembers: Boolean,
-                             canPinMessages: Boolean,
-                             canPromoteMembers: Boolean)
-    extends ChatMember
-
-case class CurrentMember(user: User) extends ChatMember
-
-case class RestrictedMember(user: User,
-                            untilDate: Int,
-                            isMember: Boolean,
-                            canChangeInfo: Boolean,
-                            canInviteUsers: Boolean,
-                            canPinMessages: Boolean,
-                            canSendMessages: Boolean,
-                            canSendMediaMessages: Boolean,
-                            canSendOtherMessages: Boolean,
-                            canAddWebPagePreviews: Boolean)
-    extends ChatMember
+case class OrdinaryMember(user: User) extends ChatMember
 
 case class LeftMember(user: User) extends ChatMember
 
-case class KickedMember(user: User, untilDate: Int) extends ChatMember
+case class KickedMember(user: User, untilDate: Option[Int]) extends ChatMember
+
+case class ChatAdministrator(user: User,
+                             canBeEdited: Option[Boolean],
+                             canChangeInfo: Option[Boolean],
+                             canPostMessages: Option[Boolean],
+                             canEditMessages: Option[Boolean],
+                             canDeleteMessages: Option[Boolean],
+                             canRestrictMembers: Option[Boolean],
+                             canPromoteMembers: Option[Boolean],
+                             canInviteUsers: Option[Boolean],
+                             canPinMessages: Option[Boolean])
+    extends ChatMember
+
+case class RestrictedMember(user: User,
+                            untilDate: Option[Int],
+                            isMember: Option[Boolean],
+                            canChangeInfo: Option[Boolean],
+                            canInviteUsers: Option[Boolean],
+                            canPinMessages: Option[Boolean],
+                            canSendMessages: Option[Boolean],
+                            canSendMediaMessages: Option[Boolean],
+                            canSendOtherMessages: Option[Boolean],
+                            canAddWebPagePreviews: Option[Boolean])
+    extends ChatMember

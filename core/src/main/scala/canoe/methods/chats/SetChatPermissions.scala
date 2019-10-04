@@ -6,6 +6,15 @@ import canoe.models.{ChatId, ChatPermissions, InputFile}
 import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
+/**
+  * Use this method to set default chat permissions for all members.
+  * The bot must be an administrator in the group or a supergroup for this to work
+  * and must have the can_restrict_members admin rights.
+  *
+  * @param chatId      Unique identifier for the target chat or username of the target channel
+  *                    (in the format @channelusername)
+  * @param permissions New default chat permissions
+  */
 case class SetChatPermissions(chatId: ChatId, permissions: ChatPermissions)
 
 object SetChatPermissions {

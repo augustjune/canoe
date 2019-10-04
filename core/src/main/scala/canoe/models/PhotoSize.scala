@@ -1,10 +1,6 @@
 package canoe.models
 
-/** This object represents one size of a photo or a file / sticker thumbnail.
-  *
-  * @param fileId    Unique identifier for this file
-  * @param width     Photo width
-  * @param height    Photo height
-  * @param fileSize  Optional File size
+/**
+  * Version of a photo or a file / sticker thumbnail of specifi1c size.
   */
-case class PhotoSize(fileId: String, width: Int, height: Int, fileSize: Option[Int] = None)
+case class PhotoSize(fileId: String, width: Int, height: Int, fileSize: Option[Int])

@@ -11,10 +11,13 @@ import io.circe.{Decoder, Encoder}
   * Use this method to send a group of photos or videos as an album.
   * On success, an array of the sent Messages is returned.
   *
-  * @param chatId              Integer or String Unique identifier for the target chat or username of the target channel (in the format @channelusername)
-  * @param media               Array of InputMedia A JSON-serialized array describing photos and videos to be sent, must include 2–10 items
-  * @param disableNotification Boolean Optional Sends the messages silently. Users will receive a notification with no sound.
-  * @param replyToMessageId    Integer Optional If the messages are a reply, ID of the original message
+  * @param chatId              Unique identifier for the target chat or username of the target channel
+  *                            (in the format @channelusername)
+  * @param media               List of photos and videos to be sent, must include 2–10 items
+  * @param disableNotification Sends the message silently.
+  *                            iOS users will not receive a notification,
+  *                            Android users will receive a notification with no sound
+  * @param replyToMessageId    If the message is a reply, ID of the original message
   */
 case class SendMediaGroup(chatId: ChatId,
                           media: List[InputMedia],

@@ -11,6 +11,9 @@ sealed trait Chat {
 
 object Chat {
 
+  /**
+    * Decodes chat based on the `type` value of the input Json
+    */
   implicit val chatDecoder: Decoder[Chat] = Decoder.instance[Chat] { cursor =>
     cursor
       .get[ChatType]("type")
@@ -27,8 +30,8 @@ object Chat {
 case class PrivateChat(id: Long, username: Option[String], firstName: Option[String], lastName: Option[String])
     extends Chat
 
-case class Group(id: Long, title: String, username: Option[String]) extends Chat
+case class Group(id: Long, title: Option[String]) extends Chat
 
-case class Supergroup(id: Long, title: String) extends Chat
+case class Supergroup(id: Long, title: Option[String], username: Option[String]) extends Chat
 
-case class Channel(id: Long, title: String, username: Option[String]) extends Chat
+case class Channel(id: Long, title: Option[String], username: Option[String]) extends Chat

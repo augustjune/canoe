@@ -6,10 +6,14 @@ import canoe.models.{ChatId, ChatMember, InputFile}
 import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
-/** Use this method to get information about a member of a chat. Returns a ChatMember object on success.
+/**
+  * Use this method to get information about a member of a chat.
   *
-  * @param chatId Integer or String Unique identifier for the target chat or username of the target supergroup or channel (in the format @channelusername)
-  * @param userId Integer Unique identifier of the target user
+  * Returns a ChatMember object on success.
+  *
+  * @param chatId Unique identifier for the target chat or username of the target channel
+  *               (in the format @channelusername)
+  * @param userId Unique identifier of the target user
   */
 case class GetChatMember(chatId: ChatId, userId: Int)
 

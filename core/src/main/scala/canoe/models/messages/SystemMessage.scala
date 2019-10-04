@@ -6,7 +6,7 @@ import io.circe.Decoder
 import io.circe.generic.auto._
 import io.circe.generic.semiauto.deriveDecoder
 
-sealed trait SystemMessage extends TelegramMessage
+sealed trait SystemMessage extends TelegramMessage with Product
 
 object SystemMessage {
 

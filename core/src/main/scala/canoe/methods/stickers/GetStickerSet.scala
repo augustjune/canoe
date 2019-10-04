@@ -8,9 +8,10 @@ import io.circe.{Decoder, Encoder}
 
 /**
   * Use this method to get a sticker set.
+  *
   * On success, a StickerSet object is returned.
   *
-  * @param name  String Name of the sticker set
+  * @param name Name of the sticker set
   */
 case class GetStickerSet(name: String)
 

@@ -30,7 +30,7 @@ final class MessageApi[F[_]](message: TelegramMessage)(implicit client: Telegram
     * Forwards this message to another chat
     */
   def forward(to: Chat, disableNotification: Option[Boolean] = None): F[TelegramMessage] =
-    ForwardMessage(to.id, chatId, disableNotification, messageId).call
+    ForwardMessage(to.id, chatId, messageId, disableNotification).call
 
   /**
     * Sends new message as a reply to this message
@@ -47,7 +47,7 @@ final class MessageApi[F[_]](message: TelegramMessage)(implicit client: Telegram
     *         the edited Message is returned, otherwise True is returned.
     */
   def editText(text: String): F[Either[Boolean, TelegramMessage]] =
-    EditMessageText(Some(chatId), Some(messageId), text = text).call
+    EditMessageText.direct(chatId, messageId, text = text).call
 
   /**
     * Changes the reply markup of this message
@@ -55,7 +55,7 @@ final class MessageApi[F[_]](message: TelegramMessage)(implicit client: Telegram
     *         the edited Message is returned, otherwise True is returned.
     */
   def editReplyMarkup(keyboard: Option[InlineKeyboardMarkup]): F[Either[Boolean, TelegramMessage]] =
-    EditMessageReplyMarkup(Some(chatId), Some(messageId), replyMarkup = keyboard).call
+    EditMessageReplyMarkup.direct(chatId, messageId, replyMarkup = keyboard).call
 
   /**
     * Changes the caption of this message
@@ -64,14 +64,14 @@ final class MessageApi[F[_]](message: TelegramMessage)(implicit client: Telegram
     *         the edited Message is returned, otherwise True is returned.
     */
   def editCaption(caption: Option[String]): F[Either[Boolean, TelegramMessage]] =
-    EditMessageCaption(Some(chatId), Some(messageId), caption = caption).call
+    EditMessageCaption.direct(chatId, messageId, caption = caption).call
 
   /**
     * Stops the poll, which is represented by this message.
     *
     * @return On success, the stopped Poll with the final results is returned.
     */
-  def stopPoll(markup: Option[ReplyMarkup] = None)(implicit F: ApplicativeError[F, Throwable]): F[Poll] =
+  def stopPoll(markup: Option[InlineKeyboardMarkup] = None)(implicit F: ApplicativeError[F, Throwable]): F[Poll] =
     message match {
       case _: PollMessage => StopPoll(chatId, messageId, markup).call
       case _              => F.raiseError(new RuntimeException("This message is not a poll"))

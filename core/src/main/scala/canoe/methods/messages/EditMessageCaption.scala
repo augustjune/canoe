@@ -9,34 +9,56 @@ import io.circe.generic.auto._
 import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 
-/** Use this method to edit captions of messages sent by the bot or via the bot (for inline bots).
-  * On success, if edited message is sent by the bot, the edited Message is returned, otherwise True is returned.
+/**
+  * Use this method to edit captions of messages sent by the bot or via the bot (for inline bots).
   *
-  * @param chatId          Integer or String No Required if inline_message_id is not specified. Unique identifier for the target chat or username of the target channel (in the format @channelusername)
-  * @param messageId       Integer No Required if inline_message_id is not specified. Unique identifier of the sent message
-  * @param inlineMessageId String No Required if chat_id and message_id are not specified. Identifier of the inline message
-  * @param caption         String Optional New caption of the message
-  * @param parseMode       String Optional Send Markdown or HTML, if you want Telegram apps to show bold, italic,
-  *                        fixed-width text or inline URLs in the media caption.
-  * @param replyMarkup     InlineKeyboardMarkup Optional A JSON-serialized object for an inline keyboard.
+  * On success, if edited message is sent by the bot, the edited Message is returned,
+  * otherwise True is returned.
+  *
+  * Use methods in companion object in order to construct the value of this class.
+  *
+  * @param chatId          Unique identifier for the target chat or username of the target channel
+  *                        (in the format @channelusername).
+  *                        Required if 'inlineMessageId' is not specified.
+  * @param messageId       Unique identifier of the sent message.
+  *                        Required if 'inlineMessageId' is not specified.
+  * @param inlineMessageId Identifier of the inline message.
+  *                        Required if 'chatId' and 'messageId' are not specified.
+  * @param caption         New caption of the message
+  * @param parseMode       Parse mode of input text (Markdown or HTML)
+  * @param replyMarkup     Additional interface options.
+  *                        A JSON-serialized object for an inline keyboard, custom reply keyboard,
+  *                        instructions to hide reply keyboard or to force a reply from the user.
   */
-case class EditMessageCaption(chatId: Option[ChatId] = None,
-                              messageId: Option[Int] = None,
-                              inlineMessageId: Option[String] = None,
-                              caption: Option[String] = None,
-                              parseMode: Option[ParseMode] = None,
-                              replyMarkup: Option[ReplyMarkup] = None) {
-
-  if (inlineMessageId.isEmpty) {
-    require(chatId.isDefined, "Required if inlineMessageId is not specified")
-    require(messageId.isDefined, "Required if inlineMessageId is not specified")
-  }
-
-  if (chatId.isEmpty && messageId.isEmpty)
-    require(inlineMessageId.isDefined, "Required if chatId and messageId are not specified")
-}
+case class EditMessageCaption private (chatId: Option[ChatId],
+                                       messageId: Option[Int],
+                                       inlineMessageId: Option[String],
+                                       caption: Option[String] = None,
+                                       parseMode: Option[ParseMode] = None,
+                                       replyMarkup: Option[ReplyMarkup] = None)
 
 object EditMessageCaption {
+
+  /**
+    * For the messages sent directed by the bot
+    */
+  def direct(chatId: ChatId,
+             messageId: Int,
+             caption: Option[String],
+             parseMode: Option[ParseMode] = None,
+             disableWebPagePreview: Option[Boolean] = None,
+             replyMarkup: Option[ReplyMarkup] = None): EditMessageCaption =
+    EditMessageCaption(Some(chatId), Some(messageId), None, caption, parseMode, replyMarkup)
+
+  /**
+    * For the inlined messages sent via the bot
+    */
+  def inlined(inlineMessageId: String,
+              caption: Option[String],
+              parseMode: Option[ParseMode] = None,
+              disableWebPagePreview: Option[Boolean] = None,
+              replyMarkup: Option[ReplyMarkup] = None): EditMessageCaption =
+    EditMessageCaption(None, None, Some(inlineMessageId), caption, parseMode, replyMarkup)
 
   implicit val method: Method[EditMessageCaption, Either[Boolean, TelegramMessage]] =
     new Method[EditMessageCaption, Either[Boolean, TelegramMessage]] {

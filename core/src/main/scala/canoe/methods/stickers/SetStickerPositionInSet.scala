@@ -8,10 +8,11 @@ import io.circe.{Decoder, Encoder}
 
 /**
   * Use this method to move a sticker in a set created by the bot to a specific position.
+  *
   * Returns True on success.
   *
-  * @param sticker   String File identifier of the sticker
-  * @param position  Integer New sticker position in the set, zero-based
+  * @param sticker   Sticker's fileId
+  * @param position  New sticker position in the set, zero-based
   */
 case class SetStickerPositionInSet(sticker: String, position: Int)
 

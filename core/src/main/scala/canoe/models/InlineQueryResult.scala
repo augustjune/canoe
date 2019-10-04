@@ -31,191 +31,188 @@ sealed trait InlineQueryResult {
   def replyMarkup: Option[InlineKeyboardMarkup]
 }
 
-/** Represents a link to an article or web page.
+/**
+  * Link to an article or web page.
   *
-  * @param type                 String Type of the result, must be article
-  * @param id                   String Unique identifier for this result, 1-64 Bytes
-  * @param title                String Title of the result
-  * @param input_message_content  InputMessageContent Content of the message to be sent
-  * @param replyMarkup          InlineKeyboardMarkup Optional Inline keyboard attached to the message
-  * @param url                  String Optional URL of the result
-  * @param hideUrl              Boolean Optional Pass True, if you don't want the URL to be shown in the message
-  * @param description          String Optional Short description of the result
-  * @param thumbUrl             String Optional Url of the thumbnail for the result
-  * @param thumbWidth           Integer Optional Thumbnail width
-  * @param thumbHeight          Integer Optional Thumbnail height
+  * @param type                 Type of the result, must be article
+  * @param id                   Unique identifier for this result, 1-64 Bytes
+  * @param title                Title of the result
+  * @param inputMessageContent  Content of the message to be sent
+  * @param replyMarkup          Inline keyboard attached to the message
+  * @param url                  URL of the result
+  * @param hideUrl              Pass True, if you don't want the URL to be shown in the message
+  * @param description          Short description of the result
+  * @param thumbUrl             Url of the thumbnail for the result
+  * @param thumbWidth           Thumbnail width
+  * @param thumbHeight          Thumbnail height
   */
-case class InlineQueryResultArticle(
-  id: String,
-  title: String,
-  input_message_content: InputMessageContent,
-  replyMarkup: Option[InlineKeyboardMarkup] = None,
-  url: Option[String] = None,
-  hideUrl: Option[Boolean] = None,
-  description: Option[String] = None,
-  thumbUrl: Option[String] = None,
-  thumbWidth: Option[Int] = None,
-  thumbHeight: Option[Int] = None,
-  `type`: String = "article"
-) extends InlineQueryResult
+case class InlineQueryResultArticle(id: String,
+                                    title: String,
+                                    inputMessageContent: InputMessageContent,
+                                    replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                    url: Option[String] = None,
+                                    hideUrl: Option[Boolean] = None,
+                                    description: Option[String] = None,
+                                    thumbUrl: Option[String] = None,
+                                    thumbWidth: Option[Int] = None,
+                                    thumbHeight: Option[Int] = None,
+                                    `type`: String = "article")
+    extends InlineQueryResult
 
-/** Represents a link to a photo.
+/**
+  * Link to a photo.
   *
   * By default, this photo will be sent by the user with optional caption.
   * Alternatively, you can use input_message_content to send a message with the specified content instead of the photo.
   *
-  * @param type                 String Type of the result, must be photo
-  * @param id                   String Unique identifier for this result, 1-64 bytes
-  * @param photoUrl             String A valid URL of the photo. Photo must be in jpeg format. Photo size must not exceed 5MB
-  * @param thumbUrl             String URL of the thumbnail for the photo
-  * @param photoWidth           Integer Optional Width of the photo
-  * @param photoHeight          Integer Optional Height of the photo
-  * @param title                String Optional Title for the result
-  * @param description          String Optional Short description of the result
-  * @param caption              String Optional Caption of the photo to be sent, 0-200 characters
-  * @param parseMode            String Optional Send Markdown or HTML, if you want Telegram apps to show bold, italic,
-  *                             fixed-width text or inline URLs in the media caption.
-  * @param replyMarkup          InlineKeyboardMarkup Optional Inline keyboard attached to the message
-  * @param inputMessageContent  InputMessageContent Optional Content of the message to be sent instead of the photo
+  * @param type                Type of the result, must be photo
+  * @param id                  Unique identifier for this result, 1-64 bytes
+  * @param photoUrl            A valid URL of the photo. Photo must be in jpeg format. Photo size must not exceed 5MB
+  * @param thumbUrl            URL of the thumbnail for the photo
+  * @param photoWidth          Width of the photo
+  * @param photoHeight         Height of the photo
+  * @param title               Title for the result
+  * @param description         Short description of the result
+  * @param caption             Caption of the photo to be sent, 0-200 characters
+  * @param parseMode           Parse mode of captured text (Markdown or HTML)
+  * @param replyMarkup         Inline keyboard attached to the message
+  * @param inputMessageContent Content of the message to be sent instead of the photo
   */
-case class InlineQueryResultPhoto(
-  id: String,
-  photoUrl: String,
-  thumbUrl: String,
-  photoWidth: Option[Int] = None,
-  photoHeight: Option[Int] = None,
-  title: Option[String] = None,
-  description: Option[String] = None,
-  caption: Option[String] = None,
-  parseMode: Option[ParseMode] = None,
-  replyMarkup: Option[InlineKeyboardMarkup] = None,
-  inputMessageContent: Option[InputMessageContent] = None,
-  `type`: String = "photo"
-) extends InlineQueryResult
+case class InlineQueryResultPhoto(id: String,
+                                  photoUrl: String,
+                                  thumbUrl: String,
+                                  photoWidth: Option[Int] = None,
+                                  photoHeight: Option[Int] = None,
+                                  title: Option[String] = None,
+                                  description: Option[String] = None,
+                                  caption: Option[String] = None,
+                                  parseMode: Option[ParseMode] = None,
+                                  replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                  inputMessageContent: Option[InputMessageContent] = None,
+                                  `type`: String = "photo")
+    extends InlineQueryResult
 
-/** Represents a Game.
-  *
-  * @param type           String Type of the result, must be game
-  * @param id             String Unique identifier for this result, 1-64 bytes
-  * @param gameShortName  String Short name of the game
-  * @param replyMarkup    InlineKeyboardMarkup Optional. Inline keyboard attached to the message
+/**
+  * Game.
   *
   * Note:
-  *   This will only work in Telegram versions released after October 1, 2016.
-  *   Older clients will not display any inline results if a game result is among them.
+  * This will only work in Telegram versions released after October 1, 2016.
+  * Older clients will not display any inline results if a game result is among them.
+  *
+  * @param type          Type of the result, must be game
+  * @param id            Unique identifier for this result, 1-64 bytes
+  * @param gameShortName Short name of the game
+  * @param replyMarkup   Inline keyboard attached to the message
+  *
   */
-case class InlineQueryResultGame(
-  id: String,
-  gameShortName: String,
-  replyMarkup: Option[InlineKeyboardMarkup] = None,
-  `type`: String = "game"
-) extends InlineQueryResult
+case class InlineQueryResultGame(id: String,
+                                 gameShortName: String,
+                                 replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                 `type`: String = "game")
+    extends InlineQueryResult
 
-/** Represents a link to an animated GIF file.
+/**
+  * Link to an animated GIF file.
   *
   * By default, this animated GIF file will be sent by the user with optional caption.
   * Alternatively, you can use input_message_content to send a message with the specified content instead of the animation.
   *
-  * @param type                 String Type of the result, must be gif
-  * @param id                   String Unique identifier for this result, 1-64 bytes
-  * @param gifUrl               String A valid URL for the GIF file. File size must not exceed 1MB
-  * @param gifWidth             Integer Optional Width of the GIF
-  * @param gifHeight            Integer Optional Height of the GIF
-  * @param gifDuration          Integer Optional. Duration of the GIF
-  * @param thumbUrl             String URL of the static thumbnail for the result (jpeg or gif)
-  * @param title                String Optional Title for the result
-  * @param caption              String Optional Caption of the GIF file to be sent, 0-200 characters
-  * @param parseMode            String Optional Send Markdown or HTML, if you want Telegram apps to show bold, italic,
-  *                             fixed-width text or inline URLs in the media caption.
-  * @param replyMarkup          InlineKeyboardMarkup Optional Inline keyboard attached to the message
-  * @param inputMessageContent  InputMessageContent Optional Content of the message to be sent instead of the GIF animation
+  * @param type                Type of the result, must be gif
+  * @param id                  Unique identifier for this result, 1-64 bytes
+  * @param gifUrl              A valid URL for the GIF file. File size must not exceed 1MB
+  * @param gifWidth            Width of the GIF
+  * @param gifHeight           Height of the GIF
+  * @param gifDuration         Duration of the GIF
+  * @param thumbUrl            URL of the static thumbnail for the result (jpeg or gif)
+  * @param title               Title for the result
+  * @param caption             Caption of the GIF file to be sent, 0-200 characters
+  * @param parseMode           Parse mode of captured text (Markdown or HTML)
+  * @param replyMarkup         Inline keyboard attached to the message
+  * @param inputMessageContent Content of the message to be sent instead of the GIF animation
   */
-case class InlineQueryResultGif(
-  id: String,
-  gifUrl: String,
-  gifWidth: Option[Int] = None,
-  gifHeight: Option[Int] = None,
-  gifDuration: Option[Int] = None,
-  thumbUrl: String,
-  title: Option[String] = None,
-  caption: Option[String] = None,
-  parseMode: Option[ParseMode] = None,
-  replyMarkup: Option[InlineKeyboardMarkup] = None,
-  inputMessageContent: Option[InputMessageContent] = None,
-  `type`: String = "gif"
-) extends InlineQueryResult
+case class InlineQueryResultGif(id: String,
+                                gifUrl: String,
+                                gifWidth: Option[Int] = None,
+                                gifHeight: Option[Int] = None,
+                                gifDuration: Option[Int] = None,
+                                thumbUrl: String,
+                                title: Option[String] = None,
+                                caption: Option[String] = None,
+                                parseMode: Option[ParseMode] = None,
+                                replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                inputMessageContent: Option[InputMessageContent] = None,
+                                `type`: String = "gif")
+    extends InlineQueryResult
 
-/** Represents a link to a video animation (H.264/MPEG-4 AVC video without sound).
+/**
+  * Link to a video animation (H.264/MPEG-4 AVC video without sound).
   *
   * By default, this animated MPEG-4 file will be sent by the user with optional caption.
   * Alternatively, you can use input_message_content to send a message with the specified content instead of the animation.
   *
-  * @param type                 String Type of the result, must be mpeg4_gif
-  * @param id                   String Unique identifier for this result, 1-64 bytes
-  * @param mpeg4Url             String A valid URL for the MP4 file. File size must not exceed 1MB
-  * @param mpeg4Width           Integer Optional Video width
-  * @param mpeg4Height          Integer Optional Video height
-  * @param mpeg4Duration       Integer Optional. Video duration
-  * @param thumbUrl             String URL of the static thumbnail (jpeg or gif) for the result
-  * @param title                String Optional Title for the result
-  * @param caption              String Optional Caption of the MPEG-4 file to be sent, 0-200 characters
-  * @param parseMode            String Optional Send Markdown or HTML, if you want Telegram apps to show bold, italic,
-  *                             fixed-width text or inline URLs in the media caption.
-  * @param replyMarkup          InlineKeyboardMarkup Optional Inline keyboard attached to the message
-  * @param inputMessageContent  InputMessageContent Optional Content of the message to be sent instead of the video animation
+  * @param type                Type of the result, must be mpeg4_gif
+  * @param id                  Unique identifier for this result, 1-64 bytes
+  * @param mpeg4Url            A valid URL for the MP4 file. File size must not exceed 1MB
+  * @param mpeg4Width          Video width
+  * @param mpeg4Height         Video height
+  * @param mpeg4Duration       Video duration
+  * @param thumbUrl            URL of the static thumbnail (jpeg or gif) for the result
+  * @param title               Title for the result
+  * @param caption             Caption of the MPEG-4 file to be sent, 0-200 characters
+  * @param parseMode           Parse mode of captured text (Markdown or HTML)
+  * @param replyMarkup         Inline keyboard attached to the message
+  * @param inputMessageContent Content of the message to be sent instead of the video animation
   */
-case class InlineQueryResultMpeg4Gif(
-  id: String,
-  mpeg4Url: String,
-  mpeg4Width: Option[Int] = None,
-  mpeg4Height: Option[Int] = None,
-  mpeg4Duration: Option[Int] = None,
-  thumbUrl: String,
-  title: Option[String] = None,
-  caption: Option[String] = None,
-  parseMode: Option[ParseMode] = None,
-  replyMarkup: Option[InlineKeyboardMarkup] = None,
-  inputMessageContent: Option[InputMessageContent] = None,
-  `type`: String = "mpeg4_gif"
-) extends InlineQueryResult
+case class InlineQueryResultMpeg4Gif(id: String,
+                                     mpeg4Url: String,
+                                     mpeg4Width: Option[Int] = None,
+                                     mpeg4Height: Option[Int] = None,
+                                     mpeg4Duration: Option[Int] = None,
+                                     thumbUrl: String,
+                                     title: Option[String] = None,
+                                     caption: Option[String] = None,
+                                     parseMode: Option[ParseMode] = None,
+                                     replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                     inputMessageContent: Option[InputMessageContent] = None,
+                                     `type`: String = "mpeg4_gif")
+    extends InlineQueryResult
 
-/** Represents a link to a page containing an embedded video player or a video file.
+/**
+  * Link to a page containing an embedded video player or a video file.
   *
   * By default, this video file will be sent by the user with an optional caption.
   * Alternatively, you can use input_message_content to send a message with the specified content instead of the video.
   *
-  * @param type                 String Type of the result, must be video
-  * @param id                   String Unique identifier for this result, 1-64 bytes
-  * @param videoUrl             String A valid URL for the embedded video player or video file
-  * @param mimeType             String Mime type of the content of video url, "text/html" or "video/mp4"
-  * @param thumbUrl             String URL of the thumbnail (jpeg only) for the video
-  * @param title                String Title for the result
-  * @param caption              String Optional Caption of the video to be sent, 0-200 characters
-  * @param parseMode            String Optional Send Markdown or HTML, if you want Telegram apps to show bold, italic,
-  *                             fixed-width text or inline URLs in the media caption.
-  * @param videoWidth           Integer Optional Video width
-  * @param videoHeight          Integer Optional Video height
-  * @param videoDuration        Integer Optional Video duration in seconds
-  * @param description          String Optional Short description of the result
-  * @param replyMarkup          InlineKeyboardMarkup Optional Inline keyboard attached to the message
-  * @param inputMessageContent  InputMessageContent Optional Content of the message to be sent instead of the video
+  * @param type                Type of the result, must be video
+  * @param id                  Unique identifier for this result, 1-64 bytes
+  * @param videoUrl            A valid URL for the embedded video player or video file
+  * @param mimeType            Mime type of the content of video url, "text/html" or "video/mp4"
+  * @param thumbUrl            URL of the thumbnail (jpeg only) for the video
+  * @param title               Title for the result
+  * @param caption             Caption of the video to be sent, 0-200 characters
+  * @param parseMode           Parse mode of captured text (Markdown or HTML)
+  * @param videoWidth          Video width
+  * @param videoHeight         Video height
+  * @param videoDuration       Video duration in seconds
+  * @param description         Short description of the result
+  * @param replyMarkup         Inline keyboard attached to the message
+  * @param inputMessageContent Content of the message to be sent instead of the video
   */
-case class InlineQueryResultVideo(
-  id: String,
-  videoUrl: String,
-  mimeType: String,
-  thumbUrl: String,
-  title: Option[String] = None,
-  caption: Option[String] = None,
-  parseMode: Option[ParseMode] = None,
-  videoWidth: Option[Int] = None,
-  videoHeight: Option[Int] = None,
-  videoDuration: Option[Int] = None,
-  description: Option[String] = None,
-  replyMarkup: Option[InlineKeyboardMarkup] = None,
-  inputMessageContent: Option[InputMessageContent] = None,
-  `type`: String = "video"
-) extends InlineQueryResult
+case class InlineQueryResultVideo(id: String,
+                                  videoUrl: String,
+                                  mimeType: String,
+                                  thumbUrl: String,
+                                  title: Option[String] = None,
+                                  caption: Option[String] = None,
+                                  parseMode: Option[ParseMode] = None,
+                                  videoWidth: Option[Int] = None,
+                                  videoHeight: Option[Int] = None,
+                                  videoDuration: Option[Int] = None,
+                                  description: Option[String] = None,
+                                  replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                  inputMessageContent: Option[InputMessageContent] = None,
+                                  `type`: String = "video")
+    extends InlineQueryResult
 
 /** Represents a link to an mp3 audio file. By default, this audio file will be sent by the user.
   *
@@ -233,400 +230,391 @@ case class InlineQueryResultVideo(
   * @param replyMarkup          InlineKeyboardMarkup Optional Inline keyboard attached to the message
   * @param inputMessageContent  InputMessageContent Optional Content of the message to be sent instead of the audio
   *
-  * Note: This will only work in Telegram versions released after 9 April, 2016. Older clients will ignore them.
   */
-case class InlineQueryResultAudio(
-  id: String,
-  audioUrl: String,
-  title: String,
-  caption: Option[String] = None,
-  parseMode: Option[ParseMode] = None,
-  performer: Option[String] = None,
-  audioDuration: Option[Int] = None,
-  replyMarkup: Option[InlineKeyboardMarkup] = None,
-  inputMessageContent: Option[InputMessageContent] = None,
-  `type`: String = "audio"
-) extends InlineQueryResult
+case class InlineQueryResultAudio(id: String,
+                                  audioUrl: String,
+                                  title: String,
+                                  caption: Option[String] = None,
+                                  parseMode: Option[ParseMode] = None,
+                                  performer: Option[String] = None,
+                                  audioDuration: Option[Int] = None,
+                                  replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                  inputMessageContent: Option[InputMessageContent] = None,
+                                  `type`: String = "audio")
+    extends InlineQueryResult
 
-/** Represents a link to a voice recording in an .ogg container encoded with OPUS.
+/**
+  * Link to a voice recording in an .ogg container encoded with OPUS.
   *
   * By default, this voice recording will be sent by the user.
   * Alternatively, you can use input_message_content to send a message with the specified content instead of the the voice message.
   *
-  * @param type                 String Type of the result, must be voice
-  * @param id                   String Unique identifier for this result, 1-64 bytes
-  * @param voiceUrl             String A valid URL for the voice recording
-  * @param title                String Recording title
-  * @param caption              String Optional. Caption, 0-200 characters
-  * @param parseMode            String Optional Send Markdown or HTML, if you want Telegram apps to show bold, italic,
-  *                             fixed-width text or inline URLs in the media caption.
-  * @param voiceDuration        Integer Optional Recording duration in seconds
-  * @param replyMarkup          InlineKeyboardMarkup Optional Inline keyboard attached to the message
-  * @param inputMessageContent  InputMessageContent Optional Content of the message to be sent instead of the voice recording
-  *
   * Note: This will only work in Telegram versions released after 9 April, 2016. Older clients will ignore them.
+  *
+  * @param type                Type of the result, must be voice
+  * @param id                  Unique identifier for this result, 1-64 bytes
+  * @param voiceUrl            A valid URL for the voice recording
+  * @param title               Recording title
+  * @param caption             Caption, 0-200 characters
+  * @param parseMode           Parse mode of captured text (Markdown or HTML)
+  * @param voiceDuration       Recording duration in seconds
+  * @param replyMarkup         Inline keyboard attached to the message
+  * @param inputMessageContent Content of the message to be sent instead of the voice recording
   */
-case class InlineQueryResultVoice(
-  id: String,
-  voiceUrl: String,
-  title: String,
-  caption: Option[String] = None,
-  parseMode: Option[ParseMode] = None,
-  voiceDuration: Option[Int] = None,
-  replyMarkup: Option[InlineKeyboardMarkup] = None,
-  inputMessageContent: Option[InputMessageContent] = None,
-  `type`: String = "voice"
-) extends InlineQueryResult
+case class InlineQueryResultVoice(id: String,
+                                  voiceUrl: String,
+                                  title: String,
+                                  caption: Option[String] = None,
+                                  parseMode: Option[ParseMode] = None,
+                                  voiceDuration: Option[Int] = None,
+                                  replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                  inputMessageContent: Option[InputMessageContent] = None,
+                                  `type`: String = "voice")
+    extends InlineQueryResult
 
-/** Represents a link to a file.
+/**
+  * Link to a file.
   *
   * By default, this file will be sent by the user with an optional caption.
   * Alternatively, you can use input_message_content to send a message with the specified content instead of the file.
   * Currently, only .PDF and .ZIP files can be sent using this method.
   *
-  * @param type                 String Type of the result, must be document
-  * @param id                   String Unique identifier for this result, 1-64 bytes
-  * @param title                String Title for the result
-  * @param caption              String Optional Caption of the document to be sent, 0-200 characters
-  * @param parseMode            String Optional Send Markdown or HTML, if you want Telegram apps to show bold, italic,
-  *                             fixed-width text or inline URLs in the media caption.
-  * @param documentUrl          String A valid URL for the file
-  * @param mimeType             String Mime type of the content of the file, either "application/pdf" or "application/zip"
-  * @param description          String Optional Short description of the result
-  * @param replyMarkup          InlineKeyboardMarkup Optional Inline keyboard attached to the message
-  * @param inputMessageContent  InputMessageContent Optional Content of the message to be sent instead of the file
-  * @param thumbUrl             String Optional URL of the thumbnail (jpeg only) for the file
-  * @param thumbWidth           Integer Optional Thumbnail width
-  * @param thumbHeight          Integer Optional Thumbnail height
+  * @param type                Type of the result, must be document
+  * @param id                  Unique identifier for this result, 1-64 bytes
+  * @param title               Title for the result
+  * @param caption             Caption of the document to be sent, 0-200 characters
+  * @param parseMode           Parse mode of captured text (Markdown or HTML)
+  * @param documentUrl         A valid URL for the file
+  * @param mimeType            Mime type of the content of the file, either "application/pdf" or "application/zip"
+  * @param description         Short description of the result
+  * @param replyMarkup         Inline keyboard attached to the message
+  * @param inputMessageContent Content of the message to be sent instead of the file
+  * @param thumbUrl            URL of the thumbnail (jpeg only) for the file
+  * @param thumbWidth          Thumbnail width
+  * @param thumbHeight         Thumbnail height
   */
-case class InlineQueryResultDocument(
-  id: String,
-  title: String,
-  caption: Option[String] = None,
-  parseMode: Option[ParseMode] = None,
-  documentUrl: Option[String] = None,
-  mimeType: String, // either "application/pdf" or "application/zip"
-  description: Option[String] = None,
-  replyMarkup: Option[InlineKeyboardMarkup] = None,
-  inputMessageContent: Option[InputMessageContent] = None,
-  thumbUrl: Option[String] = None,
-  thumbWidth: Option[Int] = None,
-  thumbHeight: Option[Int] = None,
-  `type`: String = "document"
-) extends InlineQueryResult
+case class InlineQueryResultDocument(id: String,
+                                     title: String,
+                                     caption: Option[String] = None,
+                                     parseMode: Option[ParseMode] = None,
+                                     documentUrl: Option[String] = None,
+                                     mimeType: String, // either "application/pdf" or "application/zip"
+                                     description: Option[String] = None,
+                                     replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                     inputMessageContent: Option[InputMessageContent] = None,
+                                     thumbUrl: Option[String] = None,
+                                     thumbWidth: Option[Int] = None,
+                                     thumbHeight: Option[Int] = None,
+                                     `type`: String = "document")
+    extends InlineQueryResult
 
-/** Represents a location on a map.
+/**
+  * Location on a map.
   *
   * By default, the location will be sent by the user.
   * Alternatively, you can use input_message_content to send a message with the specified content instead of the location.
   *
-  * @param type                 String Type of the result, must be location
-  * @param id                   String Unique identifier for this result, 1-64 Bytes
-  * @param latitude             Float number Location latitude in degrees
-  * @param longitude            Float number Location longitude in degrees
-  * @param title                String Location title
-  * @param replyMarkup          InlineKeyboardMarkup Optional Inline keyboard attached to the message
-  * @param inputMessageContent  InputMessageContent Optional Content of the message to be sent instead of the location
-  * @param thumbUrl             String Optional Url of the thumbnail for the result
-  * @param thumbWidth           Integer Optional Thumbnail width
-  * @param thumbHeight          Integer Optional Thumbnail height
-  *
   * Note: This will only work in Telegram versions released after 9 April, 2016. Older clients will ignore them.
+  *
+  * @param type                Type of the result, must be location
+  * @param id                  Unique identifier for this result, 1-64 Bytes
+  * @param latitude            Location latitude in degrees
+  * @param longitude           Location longitude in degrees
+  * @param title               Location title
+  * @param livePeriod          Period in seconds for which the location can be updated, should be between 60 and 86400.
+  * @param replyMarkup         Inline keyboard attached to the message
+  * @param inputMessageContent Content of the message to be sent instead of the location
+  * @param thumbUrl            Url of the thumbnail for the result
+  * @param thumbWidth          Thumbnail width
+  * @param thumbHeight         Thumbnail height
   */
-case class InlineQueryResultLocation(
-  id: String,
-  latitude: Double,
-  longitude: Double,
-  title: String,
-  replyMarkup: Option[InlineKeyboardMarkup] = None,
-  inputMessageContent: Option[InputMessageContent] = None,
-  thumbUrl: Option[String] = None,
-  thumbWidth: Option[Int] = None,
-  thumbHeight: Option[Int] = None,
-  `type`: String = "location"
-) extends InlineQueryResult
+case class InlineQueryResultLocation(id: String,
+                                     latitude: Double,
+                                     longitude: Double,
+                                     title: String,
+                                     livePeriod: Option[Int] = None,
+                                     replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                     inputMessageContent: Option[InputMessageContent] = None,
+                                     thumbUrl: Option[String] = None,
+                                     thumbWidth: Option[Int] = None,
+                                     thumbHeight: Option[Int] = None,
+                                     `type`: String = "location")
+    extends InlineQueryResult
 
-/** Represents a venue.
+/**
+  * Venue.
   *
   * By default, the venue will be sent by the user.
   * Alternatively, you can use input_message_content to send a message with the specified content instead of the venue.
   *
-  * @param type                 String Type of the result, must be venue
-  * @param id                   String Unique identifier for this result, 1-64 Bytes
-  * @param latitude             Float Latitude of the venue location in degrees
-  * @param longitude            Float Longitude of the venue location in degrees
-  * @param title                String Title of the venue
-  * @param address              String Address of the venue
-  * @param foursquareId         String Optional Foursquare identifier of the venue if known
-  * @param foursquareType       String Optional. Foursquare type of the venue, if known. (For example, “arts_entertainment/default”, “arts_entertainment/aquarium” or “food/icecream”.)
-  * @param replyMarkup          InlineKeyboardMarkup Optional Inline keyboard attached to the message
-  * @param inputMessageContent  InputMessageContent Optional Content of the message to be sent instead of the venue
-  * @param thumbUrl             String Optional Url of the thumbnail for the result
-  * @param thumbWidth           Integer Optional Thumbnail width
-  * @param thumbHeight          Integer Optional Thumbnail height
-  *
   * Note: This will only work in Telegram versions released after 9 April, 2016. Older clients will ignore them.
+  *
+  * @param type                Type of the result, must be venue
+  * @param id                  Unique identifier for this result, 1-64 Bytes
+  * @param latitude            Latitude of the venue location in degrees
+  * @param longitude           Longitude of the venue location in degrees
+  * @param title               Title of the venue
+  * @param address             Address of the venue
+  * @param foursquareId        Foursquare identifier of the venue if known
+  * @param foursquareType      Foursquare type of the venue, if known.
+  *                            For example, “arts_entertainment/default”, “arts_entertainment/aquarium” or “food/icecream”.
+  * @param replyMarkup         Inline keyboard attached to the message
+  * @param inputMessageContent Content of the message to be sent instead of the venue
+  * @param thumbUrl            Url of the thumbnail for the result
+  * @param thumbWidth          Thumbnail width
+  * @param thumbHeight         Thumbnail height
   */
-case class InlineQueryResultVenue(
-  id: String,
-  latitude: Double,
-  longitude: Double,
-  title: String,
-  address: String,
-  foursquareId: Option[String] = None,
-  foursquareType: Option[String] = None,
-  replyMarkup: Option[InlineKeyboardMarkup] = None,
-  inputMessageContent: Option[InputMessageContent] = None,
-  thumbUrl: Option[String] = None,
-  thumbWidth: Option[Int] = None,
-  thumbHeight: Option[Int] = None,
-  `type`: String = "venue"
-) extends InlineQueryResult
+case class InlineQueryResultVenue(id: String,
+                                  latitude: Double,
+                                  longitude: Double,
+                                  title: String,
+                                  address: String,
+                                  foursquareId: Option[String] = None,
+                                  foursquareType: Option[String] = None,
+                                  replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                  inputMessageContent: Option[InputMessageContent] = None,
+                                  thumbUrl: Option[String] = None,
+                                  thumbWidth: Option[Int] = None,
+                                  thumbHeight: Option[Int] = None,
+                                  `type`: String = "venue")
+    extends InlineQueryResult
 
-/** Represents a contact with a phone number.
+/**
+  * Contact with a phone number.
   *
   * By default, this contact will be sent by the user.
   * Alternatively, you can use input_message_content to send a message with the specified content instead of the contact.
   *
-  * @param type                 String Type of the result, must be contact
-  * @param id                   String Unique identifier for this result, 1-64 Bytes
-  * @param phoneNumber          String Contact's phone number
-  * @param firstName            String Contact's first name
-  * @param lastName             String Optional Contact's last name
-  * @param vcard                String Optional. Additional data about the contact in the form of a vCard, 0-2048 bytes
-  * @param replyMarkup          InlineKeyboardMarkup Optional Inline keyboard attached to the message
-  * @param inputMessageContent  InputMessageContent Optional Content of the message to be sent instead of the contact
-  * @param thumbUrl             String Optional Url of the thumbnail for the result
-  * @param thumbWidth           Integer Optional Thumbnail width
-  * @param thumbHeight          Integer Optional Thumbnail height
-  *
   * Note: This will only work in Telegram versions released after 9 April, 2016. Older clients will ignore them.
+  *
+  * @param type                Type of the result, must be contact
+  * @param id                  Unique identifier for this result, 1-64 Bytes
+  * @param phoneNumber         Contact's phone number
+  * @param firstName           Contact's first name
+  * @param lastName            Contact's last name
+  * @param vcard               Additional data about the contact in the form of a vCard, 0-2048 bytes
+  * @param replyMarkup         Inline keyboard attached to the message
+  * @param inputMessageContent Content of the message to be sent instead of the contact
+  * @param thumbUrl            Url of the thumbnail for the result
+  * @param thumbWidth          Thumbnail width
+  * @param thumbHeight         Thumbnail height
   */
-case class InlineQueryResultContact(
-  id: String,
-  phoneNumber: String,
-  firstName: String,
-  lastName: Option[String] = None,
-  vcard: Option[String] = None,
-  replyMarkup: Option[InlineKeyboardMarkup] = None,
-  inputMessageContent: Option[InputMessageContent] = None,
-  thumbUrl: Option[String] = None,
-  thumbWidth: Option[Int] = None,
-  thumbHeight: Option[Int] = None,
-  `type`: String = "contact"
-) extends InlineQueryResult
+case class InlineQueryResultContact(id: String,
+                                    phoneNumber: String,
+                                    firstName: String,
+                                    lastName: Option[String] = None,
+                                    vcard: Option[String] = None,
+                                    replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                    inputMessageContent: Option[InputMessageContent] = None,
+                                    thumbUrl: Option[String] = None,
+                                    thumbWidth: Option[Int] = None,
+                                    thumbHeight: Option[Int] = None,
+                                    `type`: String = "contact")
+    extends InlineQueryResult
 
-/** Represents a link to a photo stored on the Telegram servers.
+/**
+  * Link to a photo stored on the Telegram servers.
   *
   * By default, this photo will be sent by the user with an optional caption.
   * Alternatively, you can use input_message_content to send a message with the specified content instead of the photo.
   *
-  * @param type                 String Type of the result, must be photo
-  * @param id                   String Unique identifier for this result, 1-64 bytes
-  * @param photoFileId          String A valid file identifier of the photo
-  * @param title                String Optional Title for the result
-  * @param description          String Optional Short description of the result
-  * @param caption              String Optional Caption of the photo to be sent, 0-200 characters
-  * @param parseMode            String Optional Send Markdown or HTML, if you want Telegram apps to show bold, italic,
-  *                             fixed-width text or inline URLs in the media caption.
-  * @param replyMarkup          InlineKeyboardMarkup Optional Inline keyboard attached to the message
-  * @param inputMessageContent  InputMessageContent Optional Content of the message to be sent instead of the photo
+  * @param type                Type of the result, must be photo
+  * @param id                  Unique identifier for this result, 1-64 bytes
+  * @param photoFileId         A valid file identifier of the photo
+  * @param title               Title for the result
+  * @param description         Short description of the result
+  * @param caption             Caption of the photo to be sent, 0-200 characters
+  * @param parseMode           Parse mode of captured text (Markdown or HTML)
+  * @param replyMarkup         Inline keyboard attached to the message
+  * @param inputMessageContent Content of the message to be sent instead of the photo
   */
-case class InlineQueryResultCachedPhoto(
-  id: String,
-  photoFileId: String,
-  title: Option[String] = None,
-  description: Option[String] = None,
-  caption: Option[String] = None,
-  parseMode: Option[ParseMode] = None,
-  replyMarkup: Option[InlineKeyboardMarkup] = None,
-  inputMessageContent: Option[InputMessageContent] = None,
-  `type`: String = "photo"
-) extends InlineQueryResult
+case class InlineQueryResultCachedPhoto(id: String,
+                                        photoFileId: String,
+                                        title: Option[String] = None,
+                                        description: Option[String] = None,
+                                        caption: Option[String] = None,
+                                        parseMode: Option[ParseMode] = None,
+                                        replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                        inputMessageContent: Option[InputMessageContent] = None,
+                                        `type`: String = "photo")
+    extends InlineQueryResult
 
-/** Represents a link to an animated GIF file stored on the Telegram servers.
+/**
+  * Link to an animated GIF file stored on the Telegram servers.
   *
   * By default, this animated GIF file will be sent by the user with an optional caption.
   * Alternatively, you can use input_message_content to send a message with specified content instead of the animation.
   *
-  * @param type                 String Type of the result, must be gif
-  * @param id String            Unique identifier for this result, 1-64 bytes
-  * @param gifFileId            String A valid file identifier for the GIF file
-  * @param title                String Optional Title for the result
-  * @param caption              String Optional Caption of the GIF file to be sent, 0-200 characters
-  * @param parseMode            String Optional Send Markdown or HTML, if you want Telegram apps to show bold, italic,
-  *                             fixed-width text or inline URLs in the media caption.
-  * @param replyMarkup          InlineKeyboardMarkup Optional An Inline keyboard attached to the message
-  * @param inputMessageContent  InputMessageContent Optional Content of the message to be sent instead of the GIF animation
+  * @param type                Type of the result, must be gif
+  * @param id                  String            Unique identifier for this result, 1-64 bytes
+  * @param gifFileId           A valid file identifier for the GIF file
+  * @param title               Title for the result
+  * @param caption             Caption of the GIF file to be sent, 0-200 characters
+  * @param parseMode           Parse mode of captured text (Markdown or HTML)
+  * @param replyMarkup         An Inline keyboard attached to the message
+  * @param inputMessageContent Content of the message to be sent instead of the GIF animation
   */
-case class InlineQueryResultCachedGif(
-  id: String,
-  gifFileId: String,
-  title: Option[String] = None,
-  caption: Option[String] = None,
-  parseMode: Option[ParseMode] = None,
-  replyMarkup: Option[InlineKeyboardMarkup] = None,
-  inputMessageContent: Option[InputMessageContent] = None,
-  `type`: String = "gif"
-) extends InlineQueryResult
+case class InlineQueryResultCachedGif(id: String,
+                                      gifFileId: String,
+                                      title: Option[String] = None,
+                                      caption: Option[String] = None,
+                                      parseMode: Option[ParseMode] = None,
+                                      replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                      inputMessageContent: Option[InputMessageContent] = None,
+                                      `type`: String = "gif")
+    extends InlineQueryResult
 
-/** Represents a link to a video animation (H.264/MPEG-4 AVC video without sound) stored on the Telegram servers.
+/**
+  * Link to a video animation (H.264/MPEG-4 AVC video without sound) stored on the Telegram servers.
   *
   * By default, this animated MPEG-4 file will be sent by the user with an optional caption.
   * Alternatively, you can use input_message_content to send a message with the specified content instead of the animation.
   *
-  * @param type                 String Type of the result, must be mpeg4_gif
-  * @param id                   String Unique identifier for this result, 1-64 bytes
-  * @param mpeg4FileId          String A valid file identifier for the MP4 file
-  * @param title                String Optional Title for the result
-  * @param caption              String Optional Caption of the MPEG-4 file to be sent, 0-200 characters
-  * @param parseMode            String Optional Send Markdown or HTML, if you want Telegram apps to show bold, italic,
-  *                             fixed-width text or inline URLs in the media caption.
-  * @param replyMarkup          InlineKeyboardMarkup Optional An Inline keyboard attached to the message
-  * @param inputMessageContent  InputMessageContent Optional Content of the message to be sent instead of the video animation
+  * @param type                Type of the result, must be mpeg4_gif
+  * @param id                  Unique identifier for this result, 1-64 bytes
+  * @param mpeg4FileId         A valid file identifier for the MP4 file
+  * @param title               Title for the result
+  * @param caption             Caption of the MPEG-4 file to be sent, 0-200 characters
+  * @param parseMode           Parse mode of captured text (Markdown or HTML)
+  * @param replyMarkup         An Inline keyboard attached to the message
+  * @param inputMessageContent Content of the message to be sent instead of the video animation
   */
-case class InlineQueryResultCachedMpeg4Gif(
-  id: String,
-  mpeg4FileId: String,
-  title: Option[String] = None,
-  caption: Option[String] = None,
-  parseMode: Option[ParseMode] = None,
-  replyMarkup: Option[InlineKeyboardMarkup] = None,
-  inputMessageContent: Option[InputMessageContent] = None,
-  `type`: String = "mpeg4_gif"
-) extends InlineQueryResult
+case class InlineQueryResultCachedMpeg4Gif(id: String,
+                                           mpeg4FileId: String,
+                                           title: Option[String] = None,
+                                           caption: Option[String] = None,
+                                           parseMode: Option[ParseMode] = None,
+                                           replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                           inputMessageContent: Option[InputMessageContent] = None,
+                                           `type`: String = "mpeg4_gif")
+    extends InlineQueryResult
 
-/** Represents a link to a sticker stored on the Telegram servers.
+/**
+  * Link to a sticker stored on the Telegram servers.
   *
   * By default, this sticker will be sent by the user.
   * Alternatively, you can use input_message_content to send a message with the specified content instead of the sticker.
   *
-  * @param type String Type of the result, must be sticker
-  * @param id String Unique identifier for this result, 1-64 bytes
-  * @param stickerFileId String A valid file identifier of the sticker
-  * @param replyMarkup InlineKeyboardMarkup Optional An Inline keyboard attached to the message
-  * @param inputMessageContent InputMessageContent Optional Content of the message to be sent instead of the sticker
-  *
   * Note: This will only work in Telegram versions released after 9 April, 2016. Older clients will ignore them.
+  *
+  * @param type                Type of the result, must be sticker
+  * @param id                  Unique identifier for this result, 1-64 bytes
+  * @param stickerFileId       A valid file identifier of the sticker
+  * @param replyMarkup         An Inline keyboard attached to the message
+  * @param inputMessageContent Content of the message to be sent instead of the sticker
   */
-case class InlineQueryResultCachedSticker(
-  id: String,
-  stickerFileId: String,
-  replyMarkup: Option[InlineKeyboardMarkup] = None,
-  inputMessageContent: Option[InputMessageContent] = None,
-  `type`: String = "sticker"
-) extends InlineQueryResult
+case class InlineQueryResultCachedSticker(id: String,
+                                          stickerFileId: String,
+                                          replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                          inputMessageContent: Option[InputMessageContent] = None,
+                                          `type`: String = "sticker")
+    extends InlineQueryResult
 
-/** Represents a link to a file stored on the Telegram servers.
+/**
+  * Link to a file stored on the Telegram servers.
   *
   * By default, this file will be sent by the user with an optional caption.
   * Alternatively, you can use input_message_content to send a message with the specified content instead of the file.
   * Currently, only pdf-files and zip archives can be sent using this method.
   *
-  * @param type                 String Type of the result, must be document
-  * @param id                   String Unique identifier for this result, 1-64 bytes
-  * @param title                String Title for the result
-  * @param documentFileId       String A valid file identifier for the file
-  * @param description          String Optional Short description of the result
-  * @param caption              String Optional Caption of the document to be sent, 0-200 characters
-  * @param parseMode            String Optional Send Markdown or HTML, if you want Telegram apps to show bold, italic,
-  *                             fixed-width text or inline URLs in the media caption.
-  * @param replyMarkup          InlineKeyboardMarkup Optional An Inline keyboard attached to the message
-  * @param inputMessageContent  InputMessageContent Optional Content of the message to be sent instead of the file
-  *
   * Note: This will only work in Telegram versions released after 9 April, 2016. Older clients will ignore them.
+  *
+  * @param type                Type of the result, must be document
+  * @param id                  Unique identifier for this result, 1-64 bytes
+  * @param title               Title for the result
+  * @param documentFileId      A valid file identifier for the file
+  * @param description         Short description of the result
+  * @param caption             Caption of the document to be sent, 0-200 characters
+  * @param parseMode           Parse mode of captured text (Markdown or HTML)
+  * @param replyMarkup         An Inline keyboard attached to the message
+  * @param inputMessageContent Content of the message to be sent instead of the file
   */
-case class InlineQueryResultCachedDocument(
-  id: String,
-  title: String,
-  documentFileId: String,
-  description: Option[String] = None,
-  caption: Option[String] = None,
-  parseMode: Option[ParseMode] = None,
-  replyMarkup: Option[InlineKeyboardMarkup] = None,
-  inputMessageContent: Option[InputMessageContent] = None,
-  `type`: String = "document"
-) extends InlineQueryResult
+case class InlineQueryResultCachedDocument(id: String,
+                                           title: String,
+                                           documentFileId: String,
+                                           description: Option[String] = None,
+                                           caption: Option[String] = None,
+                                           parseMode: Option[ParseMode] = None,
+                                           replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                           inputMessageContent: Option[InputMessageContent] = None,
+                                           `type`: String = "document")
+    extends InlineQueryResult
 
-/** Represents a link to a video file stored on the Telegram servers.
+/**
+  * Link to a video file stored on the Telegram servers.
   *
   * By default, this video file will be sent by the user with an optional caption.
   * Alternatively, you can use input_message_content to send a message with the specified content instead of the video.
   *
-  * @param type                 String Type of the result, must be video
-  * @param id                   String Unique identifier for this result, 1-64 bytes
-  * @param videoFileId          String A valid file identifier for the video file
-  * @param title                String Title for the result
-  * @param description          String Optional Short description of the result
-  * @param caption              String Optional Caption of the video to be sent, 0-200 characters
-  * @param parseMode            String Optional Send Markdown or HTML, if you want Telegram apps to show bold, italic,
-  *                             fixed-width text or inline URLs in the media caption.
-  * @param replyMarkup          InlineKeyboardMarkup Optional An Inline keyboard attached to the message
-  * @param inputMessageContent  InputMessageContent Optional Content of the message to be sent instead of the video
+  * @param type                Type of the result, must be video
+  * @param id                  Unique identifier for this result, 1-64 bytes
+  * @param videoFileId         A valid file identifier for the video file
+  * @param title               Title for the result
+  * @param description         Short description of the result
+  * @param caption             Caption of the video to be sent, 0-200 characters
+  * @param parseMode           Parse mode of captured text (Markdown or HTML)
+  * @param replyMarkup         An Inline keyboard attached to the message
+  * @param inputMessageContent Content of the message to be sent instead of the video
   */
-case class InlineQueryResultCachedVideo(
-  id: String,
-  videoFileId: String,
-  title: String,
-  description: Option[String] = None,
-  caption: Option[String] = None,
-  parseMode: Option[ParseMode] = None,
-  replyMarkup: Option[InlineKeyboardMarkup] = None,
-  inputMessageContent: Option[InputMessageContent] = None,
-  `type`: String = "video"
-) extends InlineQueryResult
+case class InlineQueryResultCachedVideo(id: String,
+                                        videoFileId: String,
+                                        title: String,
+                                        description: Option[String] = None,
+                                        caption: Option[String] = None,
+                                        parseMode: Option[ParseMode] = None,
+                                        replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                        inputMessageContent: Option[InputMessageContent] = None,
+                                        `type`: String = "video")
+    extends InlineQueryResult
 
-/** InlineQueryResultCachedVoice
+/**
+  * Link to a voice message stored on the Telegram servers.
   *
-  * Represents a link to a voice message stored on the Telegram servers.
   * By default, this voice message will be sent by the user.
   * Alternatively, you can use input_message_content to send a message with the specified content instead of the voice message.
   *
-  * @param type                 String Type of the result, must be voice
-  * @param id                   String Unique identifier for this result, 1-64 bytes
-  * @param voiceFileId          String A valid file identifier for the voice message
-  * @param title                String Voice message title
-  * @param caption              String Optional. Caption, 0-200 characters
-  * @param parseMode            String Optional Send Markdown or HTML, if you want Telegram apps to show bold, italic,
-  *                             fixed-width text or inline URLs in the media caption.
-  * @param replyMarkup          InlineKeyboardMarkup Optional An Inline keyboard attached to the message
-  * @param inputMessageContent  InputMessageContent Optional Content of the message to be sent instead of the voice message
-  *
   * Note: This will only work in Telegram versions released after 9 April, 2016. Older clients will ignore them.
+  *
+  * @param type                Type of the result, must be voice
+  * @param id                  Unique identifier for this result, 1-64 bytes
+  * @param voiceFileId         A valid file identifier for the voice message
+  * @param title               Voice message title
+  * @param caption             Caption, 0-200 characters
+  * @param parseMode           Parse mode of captured text (Markdown or HTML)
+  * @param replyMarkup         An Inline keyboard attached to the message
+  * @param inputMessageContent Content of the message to be sent instead of the voice message
   */
-case class InlineQueryResultCachedVoice(
-  id: String,
-  voiceFileId: String,
-  title: String,
-  caption: Option[String] = None,
-  parseMode: Option[ParseMode] = None,
-  replyMarkup: Option[InlineKeyboardMarkup] = None,
-  inputMessageContent: Option[InputMessageContent] = None,
-  `type`: String = "voice"
-) extends InlineQueryResult
+case class InlineQueryResultCachedVoice(id: String,
+                                        voiceFileId: String,
+                                        title: String,
+                                        caption: Option[String] = None,
+                                        parseMode: Option[ParseMode] = None,
+                                        replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                        inputMessageContent: Option[InputMessageContent] = None,
+                                        `type`: String = "voice")
+    extends InlineQueryResult
 
-/** Represents a link to an mp3 audio file stored on the Telegram servers.
+/**
+  * Link to an mp3 audio file stored on the Telegram servers.
   *
   * By default, this audio file will be sent by the user.
   * Alternatively, you can use input_message_content to send a message with the specified content instead of the audio.
   *
-  * @param type                 String Type of the result, must be audio
-  * @param id                   String Unique identifier for this result, 1-64 bytes
-  * @param audioFileId          String A valid file identifier for the audio file
-  * @param caption              String Optional. Caption, 0-200 characters
-  * @param parseMode            String Optional Send Markdown or HTML, if you want Telegram apps to show bold, italic,
-  *                             fixed-width text or inline URLs in the media caption.
-  * @param replyMarkup          InlineKeyboardMarkup Optional An Inline keyboard attached to the message
-  * @param inputMessageContent  InputMessageContent Optional Content of the message to be sent instead of the audio
-  *
   * Note: This will only work in Telegram versions released after 9 April, 2016. Older clients will ignore them.
+  *
+  * @param type                Type of the result, must be audio
+  * @param id                  Unique identifier for this result, 1-64 bytes
+  * @param audioFileId         A valid file identifier for the audio file
+  * @param caption             Caption, 0-200 characters
+  * @param parseMode           Parse mode of captured text (Markdown or HTML)
+  * @param replyMarkup         An Inline keyboard attached to the message
+  * @param inputMessageContent Content of the message to be sent instead of the audio
   */
-case class InlineQueryResultCachedAudio(
-  id: String,
-  audioFileId: String,
-  caption: Option[String] = None,
-  parseMode: Option[ParseMode] = None,
-  replyMarkup: Option[InlineKeyboardMarkup] = None,
-  inputMessageContent: Option[InputMessageContent] = None,
-  `type`: String = "audio"
-) extends InlineQueryResult
+case class InlineQueryResultCachedAudio(id: String,
+                                        audioFileId: String,
+                                        caption: Option[String] = None,
+                                        parseMode: Option[ParseMode] = None,
+                                        replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                        inputMessageContent: Option[InputMessageContent] = None,
+                                        `type`: String = "audio")
+    extends InlineQueryResult

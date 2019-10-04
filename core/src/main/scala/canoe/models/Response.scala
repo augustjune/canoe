@@ -4,7 +4,8 @@ import canoe.marshalling.codecs._
 import io.circe.Decoder
 import io.circe.generic.semiauto.deriveDecoder
 
-/** Telegram Bot API Response object
+/**
+  * Telegram Bot API Response object
   *
   * The response contains a JSON object. If 'ok' equals true, the request was successful and the result of the query can be found in the 'result' field.
   * In case of an unsuccessful request, 'ok' equals false and the error is explained in the 'description'.
@@ -17,10 +18,10 @@ import io.circe.generic.semiauto.deriveDecoder
   * @tparam R Expected result type
   */
 case class Response[R](ok: Boolean,
-                       result: Option[R] = None,
-                       description: Option[String] = None,
-                       errorCode: Option[Int] = None,
-                       parameters: Option[ResponseParameters] = None)
+                       result: Option[R],
+                       description: Option[String],
+                       errorCode: Option[Int],
+                       parameters: Option[ResponseParameters])
 
 object Response {
   import io.circe.generic.auto._

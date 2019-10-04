@@ -6,7 +6,6 @@ import io.circe.{Decoder, Encoder}
   * The part of the face relative to which the mask should be placed.
   * One of "forehead", "eyes", "mouth", or "chin".
   */
-// ToDo - update
 object MaskPositionType extends Enumeration {
   type MaskPositionType = Value
   val Forehead, Eyes, Mouth, Chin = Value

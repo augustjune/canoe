@@ -12,7 +12,7 @@ final class InlineQueryApi[F[_]](query: InlineQuery)(implicit client: TelegramCl
     *
     * @param results No more than 50 results per query are allowed
     */
-  def answer(results: Seq[InlineQueryResult],
+  def answer(results: List[InlineQueryResult],
              switchPmText: Option[String] = None,
              switchPmParameter: Option[String] = None): F[Boolean] =
     AnswerInlineQuery(query.id, results, switchPmText = switchPmText, switchPmParameter = switchPmParameter).call

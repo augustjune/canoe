@@ -19,7 +19,7 @@ import io.circe.{Decoder, Encoder}
   *               (in the format @channelusername)
   * @param photo  New chat photo
   */
-case class SetChatPhoto(chatId: ChatId, photo: InputFile)
+final case class SetChatPhoto(chatId: ChatId, photo: InputFile)
 
 object SetChatPhoto {
 

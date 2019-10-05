@@ -10,10 +10,10 @@ package canoe.models
   * @param mimeType  Mime type of a file as defined by sender
   * @param fileSize  File size
   */
-case class Video(fileId: String,
-                 width: Int,
-                 height: Int,
-                 duration: Int,
-                 thumb: Option[PhotoSize],
-                 mimeType: Option[String],
-                 fileSize: Option[Int])
+final case class Video(fileId: String,
+                       width: Int,
+                       height: Int,
+                       duration: Int,
+                       thumb: Option[PhotoSize],
+                       mimeType: Option[String],
+                       fileSize: Option[Int])

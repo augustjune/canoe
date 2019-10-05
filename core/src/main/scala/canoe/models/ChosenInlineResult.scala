@@ -11,8 +11,8 @@ package canoe.models
   *                         Will be also received in callback queries and can be used to edit the message.
   * @param query            The query that was used to obtain the result
   */
-case class ChosenInlineResult(resultId: String,
-                              from: User,
-                              location: Option[Location],
-                              inlineMessageId: Option[String],
-                              query: String)
+final case class ChosenInlineResult(resultId: String,
+                                    from: User,
+                                    location: Option[Location],
+                                    inlineMessageId: Option[String],
+                                    query: String)

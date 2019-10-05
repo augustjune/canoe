@@ -9,7 +9,7 @@ import scala.language.implicitConversions
   */
 object CountryCode extends Enumeration {
   type CountryCode = Value
-  sealed case class Country(code: String, englishName: String) extends Val(code)
+  final case class Country private (code: String, englishName: String) extends Val(code)
 
   implicit def valueToCountry(v: Value): Country = v.asInstanceOf[Country]
 

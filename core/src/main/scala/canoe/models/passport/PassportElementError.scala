@@ -16,11 +16,11 @@ sealed trait PassportElementError extends Product
   * @param message   Error message
   * @param source    Error source, must be 'data'
   */
-case class PassportElementErrorDataField(`type`: String,
-                                         fieldName: String,
-                                         dataHash: String,
-                                         message: String,
-                                         source: String = "data")
+final case class PassportElementErrorDataField(`type`: String,
+                                               fieldName: String,
+                                               dataHash: String,
+                                               message: String,
+                                               source: String = "data")
     extends PassportElementError
 
 /**
@@ -33,10 +33,10 @@ case class PassportElementErrorDataField(`type`: String,
   * @param fileHash Base64-encoded hash of the file with the front side of the document
   * @param message  Error message
   */
-case class PassportElementErrorFrontSide(`type`: String,
-                                         fileHash: String,
-                                         message: String,
-                                         source: String = "front_side")
+final case class PassportElementErrorFrontSide(`type`: String,
+                                               fileHash: String,
+                                               message: String,
+                                               source: String = "front_side")
     extends PassportElementError
 
 /**
@@ -49,10 +49,10 @@ case class PassportElementErrorFrontSide(`type`: String,
   * @param message  Error message
   * @param source   Error source, must be 'reverse_side'
   */
-case class PassportElementErrorReverseSide(`type`: String,
-                                           fileHash: String,
-                                           message: String,
-                                           source: String = "reverse_side")
+final case class PassportElementErrorReverseSide(`type`: String,
+                                                 fileHash: String,
+                                                 message: String,
+                                                 source: String = "reverse_side")
     extends PassportElementError
 
 /**
@@ -65,7 +65,10 @@ case class PassportElementErrorReverseSide(`type`: String,
   * @param message  Error message
   * @param source   Error source, must be 'selfie'
   */
-case class PassportElementErrorSelfie(`type`: String, fileHash: String, message: String, source: String = "selfie")
+final case class PassportElementErrorSelfie(`type`: String,
+                                            fileHash: String,
+                                            message: String,
+                                            source: String = "selfie")
     extends PassportElementError
 
 /**
@@ -78,7 +81,7 @@ case class PassportElementErrorSelfie(`type`: String, fileHash: String, message:
   * @param message  Error message
   * @param source   Error source, must be 'file'
   */
-case class PassportElementErrorFile(`type`: String, fileHash: String, message: String, source: String = "file")
+final case class PassportElementErrorFile(`type`: String, fileHash: String, message: String, source: String = "file")
     extends PassportElementError
 
 /**
@@ -91,10 +94,10 @@ case class PassportElementErrorFile(`type`: String, fileHash: String, message: S
   * @param message    Error message
   * @param source     Error source, must be 'files'
   */
-case class PassportElementErrorFiles(`type`: String,
-                                     fileHashes: List[String],
-                                     message: String,
-                                     source: String = "files")
+final case class PassportElementErrorFiles(`type`: String,
+                                           fileHashes: List[String],
+                                           message: String,
+                                           source: String = "files")
     extends PassportElementError
 
 /**
@@ -108,10 +111,10 @@ case class PassportElementErrorFiles(`type`: String,
   * @param fileHash Base64-encoded file hash
   * @param message  Error message
   */
-case class PassportElementErrorTranslationFile(`type`: String,
-                                               fileHash: String,
-                                               message: String,
-                                               source: String = "translation_file")
+final case class PassportElementErrorTranslationFile(`type`: String,
+                                                     fileHash: String,
+                                                     message: String,
+                                                     source: String = "translation_file")
     extends PassportElementError
 
 /**
@@ -125,10 +128,10 @@ case class PassportElementErrorTranslationFile(`type`: String,
   * @param message    Error message
   * @param source     Error source, must be 'translation_files'
   */
-case class PassportElementErrorTranslationFiles(`type`: String,
-                                                fileHashes: List[String],
-                                                message: String,
-                                                source: String = "translation_files")
+final case class PassportElementErrorTranslationFiles(`type`: String,
+                                                      fileHashes: List[String],
+                                                      message: String,
+                                                      source: String = "translation_files")
     extends PassportElementError
 
 /**
@@ -140,8 +143,8 @@ case class PassportElementErrorTranslationFiles(`type`: String,
   * @param message      Error message
   * @param source       Error source, must be 'unspecified'
   */
-case class PassportElementErrorUnspecified(`type`: String,
-                                           element_hash: String,
-                                           message: String,
-                                           source: String = "unspecified")
+final case class PassportElementErrorUnspecified(`type`: String,
+                                                 element_hash: String,
+                                                 message: String,
+                                                 source: String = "unspecified")
     extends PassportElementError

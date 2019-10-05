@@ -27,16 +27,16 @@ import io.circe.{Decoder, Encoder}
   *                           of his own privileges or demote administrators that he has promoted,
   *                           directly or indirectly (promoted by administrators that were appointed by him)
   */
-case class PromoteChatMember(chatId: ChatId,
-                             userId: Int,
-                             canChangeInfo: Option[Boolean] = None,
-                             canPostMessages: Option[Boolean] = None,
-                             canEditMessages: Option[Boolean] = None,
-                             canDeleteMessages: Option[Boolean] = None,
-                             canInviteUsers: Option[Boolean] = None,
-                             canRestrictMembers: Option[Boolean] = None,
-                             canPinMessages: Option[Boolean] = None,
-                             canPromoteMembers: Option[Boolean] = None)
+final case class PromoteChatMember(chatId: ChatId,
+                                   userId: Int,
+                                   canChangeInfo: Option[Boolean] = None,
+                                   canPostMessages: Option[Boolean] = None,
+                                   canEditMessages: Option[Boolean] = None,
+                                   canDeleteMessages: Option[Boolean] = None,
+                                   canInviteUsers: Option[Boolean] = None,
+                                   canRestrictMembers: Option[Boolean] = None,
+                                   canPinMessages: Option[Boolean] = None,
+                                   canPromoteMembers: Option[Boolean] = None)
 
 object PromoteChatMember {
 

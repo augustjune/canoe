@@ -26,14 +26,14 @@ import io.circe.{Decoder, Encoder}
   *                            instructions to hide reply keyboard or to force a reply from the user.
   *
   */
-case class SendContact(chatId: ChatId,
-                       phoneNumber: String,
-                       firstName: String,
-                       lastName: Option[String] = None,
-                       vcard: Option[String] = None,
-                       disableNotification: Option[Boolean] = None,
-                       replyToMessageId: Option[Int] = None,
-                       replyMarkup: Option[ReplyMarkup] = None)
+final case class SendContact(chatId: ChatId,
+                             phoneNumber: String,
+                             firstName: String,
+                             lastName: Option[String] = None,
+                             vcard: Option[String] = None,
+                             disableNotification: Option[Boolean] = None,
+                             replyToMessageId: Option[Int] = None,
+                             replyMarkup: Option[ReplyMarkup] = None)
 
 object SendContact {
   import io.circe.generic.auto._

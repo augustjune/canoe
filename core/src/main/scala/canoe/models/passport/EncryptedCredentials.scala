@@ -10,4 +10,4 @@ package canoe.models.passport
   * @param hash   Base64-encoded data hash for data authentication
   * @param secret Base64-encoded secret, encrypted with the bot's public RSA key, required for data decryption
   */
-case class EncryptedCredentials(data: String, hash: String, secret: String)
+final case class EncryptedCredentials(data: String, hash: String, secret: String)

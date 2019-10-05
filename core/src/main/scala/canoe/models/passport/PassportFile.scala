@@ -8,4 +8,4 @@ package canoe.models.passport
   * @param fileSize File size
   * @param fileDate Unix time when the file was uploaded
   */
-case class PassportFile(fileId: String, fileSize: Int, fileDate: Int)
+final case class PassportFile(fileId: String, fileSize: Int, fileDate: Int)

@@ -16,7 +16,7 @@ import io.circe.{Decoder, Encoder}
   * @param messageId   Identifier of the original message with the poll
   * @param replyMarkup New inline keyboard.
   */
-case class StopPoll(chatId: ChatId, messageId: Int, replyMarkup: Option[InlineKeyboardMarkup] = None)
+final case class StopPoll(chatId: ChatId, messageId: Int, replyMarkup: Option[InlineKeyboardMarkup] = None)
 
 object StopPoll {
   import io.circe.generic.auto._

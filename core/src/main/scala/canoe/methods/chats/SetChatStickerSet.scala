@@ -20,7 +20,7 @@ import io.circe.{Decoder, Encoder}
   *                       (in the format @channelusername)
   * @param stickerSetName Name of the sticker set to be set as the group sticker set
   */
-case class SetChatStickerSet(chatId: ChatId, stickerSetName: String)
+final case class SetChatStickerSet(chatId: ChatId, stickerSetName: String)
 
 object SetChatStickerSet {
 

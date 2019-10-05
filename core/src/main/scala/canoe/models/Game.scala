@@ -13,9 +13,9 @@ package canoe.models
   * @param textEntities  Special entities that appear in text, such as usernames, URLs, bot commands, etc.
   * @param animation     Animation that will be displayed in the game message in chats. Can be uploaded via BotFather
   */
-case class Game(title: String,
-                description: String,
-                photo: List[PhotoSize],
-                text: Option[String],
-                textEntities: Option[List[MessageEntity]],
-                animation: Option[Animation])
+final case class Game(title: String,
+                      description: String,
+                      photo: List[PhotoSize],
+                      text: Option[String],
+                      textEntities: Option[List[MessageEntity]],
+                      animation: Option[Animation])

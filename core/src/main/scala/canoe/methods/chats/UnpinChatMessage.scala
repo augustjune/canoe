@@ -18,7 +18,7 @@ import io.circe.{Decoder, Encoder}
   * @param chatId Unique identifier for the target chat or username of the target channel
   *               (in the format @channelusername)
   */
-case class UnpinChatMessage(chatId: ChatId)
+final case class UnpinChatMessage(chatId: ChatId)
 
 object UnpinChatMessage {
 

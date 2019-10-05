@@ -19,10 +19,10 @@ import io.circe.{Decoder, Encoder}
   *                            Android users will receive a notification with no sound
   * @param replyToMessageId    If the message is a reply, ID of the original message
   */
-case class SendMediaGroup(chatId: ChatId,
-                          media: List[InputMedia],
-                          disableNotification: Option[Boolean] = None,
-                          replyToMessageId: Option[Int] = None)
+final case class SendMediaGroup(chatId: ChatId,
+                                media: List[InputMedia],
+                                disableNotification: Option[Boolean] = None,
+                                replyToMessageId: Option[Int] = None)
 
 object SendMediaGroup {
   import io.circe.generic.auto._

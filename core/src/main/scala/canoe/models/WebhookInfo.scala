@@ -9,9 +9,9 @@ package canoe.models
   * @param lastErrorDate         Unix time for the most recent error that happened when trying to deliver an update via webhook
   * @param lastErrorMessage      Error message in human-readable format for the most recent error that happened when trying to deliver an update via webhook
   */
-case class WebhookInfo(url: String,
-                       hasCustomCertificate: Boolean,
-                       pendingUpdateCount: Int,
-                       lastErrorDate: Option[Int] = None,
-                       lastErrorMessage: Option[String] = None,
-                       maxConnections: Int)
+final case class WebhookInfo(url: String,
+                             hasCustomCertificate: Boolean,
+                             pendingUpdateCount: Int,
+                             lastErrorDate: Option[Int] = None,
+                             lastErrorMessage: Option[String] = None,
+                             maxConnections: Int)

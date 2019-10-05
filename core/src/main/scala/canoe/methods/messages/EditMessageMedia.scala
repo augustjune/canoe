@@ -31,11 +31,11 @@ import io.circe.{Decoder, Encoder}
   * @param media           New media content of the message
   * @param replyMarkup     New inline keyboard.
   */
-case class EditMessageMedia private (chatId: Option[ChatId],
-                                     messageId: Option[Int],
-                                     inlineMessageId: Option[String],
-                                     media: InputMedia,
-                                     replyMarkup: Option[InlineKeyboardMarkup] = None)
+final case class EditMessageMedia private (chatId: Option[ChatId],
+                                           messageId: Option[Int],
+                                           inlineMessageId: Option[String],
+                                           media: InputMedia,
+                                           replyMarkup: Option[InlineKeyboardMarkup] = None)
 
 object EditMessageMedia {
   import io.circe.generic.auto._

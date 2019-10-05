@@ -9,8 +9,8 @@ package canoe.models
   * @param mimeType MIME type of the file as defined by sender
   * @param fileSize File size
   */
-case class Document(fileId: String,
-                    thumb: Option[PhotoSize],
-                    fileName: Option[String],
-                    mimeType: Option[String],
-                    fileSize: Option[Int])
+final case class Document(fileId: String,
+                          thumb: Option[PhotoSize],
+                          fileName: Option[String],
+                          mimeType: Option[String],
+                          fileSize: Option[Int])

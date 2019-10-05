@@ -22,11 +22,11 @@ import io.circe.{Decoder, Encoder}
   *                            If empty, one 'Play game_title' button will be shown.
   *                            If not empty, the first button must launch the game.
   */
-case class SendGame(chatId: Long,
-                    gameShortName: String,
-                    disableNotification: Option[Boolean] = None,
-                    replyToMessageId: Option[Int] = None,
-                    replyMarkup: Option[ReplyMarkup] = None)
+final case class SendGame(chatId: Long,
+                          gameShortName: String,
+                          disableNotification: Option[Boolean] = None,
+                          replyToMessageId: Option[Int] = None,
+                          replyMarkup: Option[ReplyMarkup] = None)
 
 object SendGame {
   import io.circe.generic.auto._

@@ -19,7 +19,7 @@ import io.circe.{Decoder, Encoder}
   *               (in the format @channelusername)
   * @param title  New chat title, 1-255 characters
   */
-case class SetChatTitle(chatId: ChatId, title: String)
+final case class SetChatTitle(chatId: ChatId, title: String)
 
 object SetChatTitle {
 

@@ -11,4 +11,4 @@ package canoe.models
   * @param query     Text of the query
   * @param offset    Offset of the results to be returned, can be controlled by the bot
   */
-case class InlineQuery(id: String, from: User, location: Option[Location], query: String, offset: String)
+final case class InlineQuery(id: String, from: User, location: Option[Location], query: String, offset: String)

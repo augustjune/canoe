@@ -25,13 +25,13 @@ import io.circe.{Decoder, Encoder}
   * @param containsMasks Pass True, if a set of mask stickers should be created
   * @param maskPosition  Position where the mask should be placed on faces
   */
-case class CreateNewStickerSet(userId: Int,
-                               name: String,
-                               title: String,
-                               pngSticker: InputFile,
-                               emojis: String,
-                               containsMasks: Option[Boolean] = None,
-                               maskPosition: Option[MaskPosition] = None)
+final case class CreateNewStickerSet(userId: Int,
+                                     name: String,
+                                     title: String,
+                                     pngSticker: InputFile,
+                                     emojis: String,
+                                     containsMasks: Option[Boolean] = None,
+                                     maskPosition: Option[MaskPosition] = None)
 
 object CreateNewStickerSet {
   import io.circe.generic.auto._

@@ -19,10 +19,10 @@ import io.circe.{Decoder, Encoder}
   * @param disableNotification Sends the message silently. iOS users will not receive a notification,
   *                            Android users will receive a notification with no sound.
   */
-case class ForwardMessage(chatId: ChatId,
-                          fromChatId: ChatId,
-                          messageId: Int,
-                          disableNotification: Option[Boolean] = None)
+final case class ForwardMessage(chatId: ChatId,
+                                fromChatId: ChatId,
+                                messageId: Int,
+                                disableNotification: Option[Boolean] = None)
 
 object ForwardMessage {
 

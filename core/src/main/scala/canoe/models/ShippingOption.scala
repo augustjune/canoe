@@ -5,4 +5,4 @@ package canoe.models
   * @param title  Option title
   * @param prices List of price portions
   */
-case class ShippingOption(id: String, title: String, prices: List[LabeledPrice])
+final case class ShippingOption(id: String, title: String, prices: List[LabeledPrice])

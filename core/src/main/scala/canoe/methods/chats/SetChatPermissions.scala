@@ -15,7 +15,7 @@ import io.circe.{Decoder, Encoder}
   *                    (in the format @channelusername)
   * @param permissions New default chat permissions
   */
-case class SetChatPermissions(chatId: ChatId, permissions: ChatPermissions)
+final case class SetChatPermissions(chatId: ChatId, permissions: ChatPermissions)
 
 object SetChatPermissions {
   import io.circe.generic.auto._

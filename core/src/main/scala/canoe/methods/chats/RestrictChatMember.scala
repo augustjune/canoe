@@ -18,7 +18,10 @@ import io.circe.{Decoder, Encoder}
   *                    If user is banned for more than 366 days or less than 30 seconds from the current time
   *                    they are considered to be banned forever
   */
-case class RestrictChatMember(chatId: ChatId, userId: Int, permissions: ChatPermissions, untilDate: Option[Int] = None)
+final case class RestrictChatMember(chatId: ChatId,
+                                    userId: Int,
+                                    permissions: ChatPermissions,
+                                    untilDate: Option[Int] = None)
 
 object RestrictChatMember {
   import io.circe.generic.auto._

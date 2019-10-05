@@ -21,10 +21,10 @@ sealed trait ReplyMarkup
   *                         1) users that are @mentioned in the text of the Message object;
   *                         2) if the bot's message is a reply (has replyToMessage_id), sender of the original message.
   */
-case class ReplyKeyboardMarkup(keyboard: Seq[Seq[KeyboardButton]],
-                               resizeKeyboard: Option[Boolean] = None,
-                               oneTimeKeyboard: Option[Boolean] = None,
-                               selective: Option[Boolean] = None)
+final case class ReplyKeyboardMarkup(keyboard: Seq[Seq[KeyboardButton]],
+                                     resizeKeyboard: Option[Boolean] = None,
+                                     oneTimeKeyboard: Option[Boolean] = None,
+                                     selective: Option[Boolean] = None)
     extends ReplyMarkup
 
 object ReplyKeyboardMarkup {
@@ -72,7 +72,8 @@ object ReplyKeyboardMarkup {
   *   A user votes in a poll, bot returns confirmation message in reply to the vote and removes the keyboard
   *   for that user, while still showing the keyboard with poll options to users who haven't voted yet.
   */
-case class ReplyKeyboardRemove(removeKeyboard: Boolean = true, selective: Option[Boolean] = None) extends ReplyMarkup
+final case class ReplyKeyboardRemove(removeKeyboard: Boolean = true, selective: Option[Boolean] = None)
+    extends ReplyMarkup
 
 /** This object represents an inline keyboard that appears right next to the message it belongs to.
   *
@@ -88,7 +89,7 @@ case class ReplyKeyboardRemove(removeKeyboard: Boolean = true, selective: Option
   *
   * @param inlineKeyboard Array of Array of InlineKeyboardButton Array of button rows, each represented by an Array of InlineKeyboardButton objects
   */
-case class InlineKeyboardMarkup(inlineKeyboard: Seq[Seq[InlineKeyboardButton]]) extends ReplyMarkup
+final case class InlineKeyboardMarkup(inlineKeyboard: Seq[Seq[InlineKeyboardButton]]) extends ReplyMarkup
 
 object InlineKeyboardMarkup {
 
@@ -110,7 +111,6 @@ object InlineKeyboardMarkup {
   def singleColumn(buttonColumn: Seq[InlineKeyboardButton]): InlineKeyboardMarkup =
     InlineKeyboardMarkup(buttonColumn.map(Seq(_)))
 }
-
 
 /** Upon receiving a message with this object, Telegram clients will display a reply interface to the user (act as if the
   * user has selected the bot's message and tapped 'Reply').
@@ -134,4 +134,4 @@ object InlineKeyboardMarkup {
   *                    1) users that are @mentioned in the text of the Message object;
   *                    2) if the bot's message is a reply (has replyToMessage_id), sender of the original message.
   */
-case class ForceReply(forceReply: Boolean = true, selective: Option[Boolean] = None) extends ReplyMarkup
+final case class ForceReply(forceReply: Boolean = true, selective: Option[Boolean] = None) extends ReplyMarkup

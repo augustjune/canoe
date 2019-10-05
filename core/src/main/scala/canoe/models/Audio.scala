@@ -11,10 +11,10 @@ package canoe.models
   * @param fileSize  File size
   * @param thumb     Thumbnail of the album cover to which the music file belongs
   */
-case class Audio(fileId: String,
-                 duration: Int,
-                 performer: Option[String],
-                 title: Option[String],
-                 mimeType: Option[String],
-                 fileSize: Option[Int],
-                 thumb: Option[PhotoSize])
+final case class Audio(fileId: String,
+                       duration: Int,
+                       performer: Option[String],
+                       title: Option[String],
+                       mimeType: Option[String],
+                       fileSize: Option[Int],
+                       thumb: Option[PhotoSize])

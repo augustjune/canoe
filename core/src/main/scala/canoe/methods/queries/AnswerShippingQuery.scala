@@ -25,10 +25,10 @@ import io.circe.{Decoder, Encoder}
   *                        Telegram will display this message to the user.
   *                        Required if ok is False.
   */
-case class AnswerShippingQuery private (shippingQueryId: String,
-                                        ok: Boolean,
-                                        shippingOptions: Option[List[ShippingOption]] = None,
-                                        errorMessage: Option[String] = None)
+final case class AnswerShippingQuery private (shippingQueryId: String,
+                                              ok: Boolean,
+                                              shippingOptions: Option[List[ShippingOption]] = None,
+                                              errorMessage: Option[String] = None)
 
 object AnswerShippingQuery {
   import io.circe.generic.auto._

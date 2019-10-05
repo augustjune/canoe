@@ -11,9 +11,9 @@ package canoe.models
   * @param requestLocation  Boolean Optional If True, the user's current location will be sent when the button is pressed.
   *                         Available in private chats only
   */
-case class KeyboardButton private (text: String,
-                                   requestContact: Option[Boolean] = None,
-                                   requestLocation: Option[Boolean] = None)
+final case class KeyboardButton private (text: String,
+                                         requestContact: Option[Boolean] = None,
+                                         requestLocation: Option[Boolean] = None)
 
 object KeyboardButton {
 

@@ -32,13 +32,13 @@ import io.circe.{Decoder, Encoder}
   *                          Once done, the bot can offer a switch_inline button so that the user can easily return
   *                          to the chat where they wanted to use the bot's inline capabilities.
   */
-case class AnswerInlineQuery(inlineQueryId: String,
-                             results: List[InlineQueryResult],
-                             cacheTime: Option[Int] = None,
-                             isPersonal: Option[Boolean] = None,
-                             nextOffset: Option[String] = None,
-                             switchPmText: Option[String] = None,
-                             switchPmParameter: Option[String] = None)
+final case class AnswerInlineQuery(inlineQueryId: String,
+                                   results: List[InlineQueryResult],
+                                   cacheTime: Option[Int] = None,
+                                   isPersonal: Option[Boolean] = None,
+                                   nextOffset: Option[String] = None,
+                                   switchPmText: Option[String] = None,
+                                   switchPmParameter: Option[String] = None)
 
 object AnswerInlineQuery {
   import io.circe.generic.auto._

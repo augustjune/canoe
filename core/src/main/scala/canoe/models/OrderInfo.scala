@@ -6,4 +6,4 @@ package canoe.models
   * @param email            User email
   * @param shippingAddress  User shipping address
   */
-case class OrderInfo(name: String, phoneNumber: String, email: String, shippingAddress: ShippingAddress)
+final case class OrderInfo(name: String, phoneNumber: String, email: String, shippingAddress: ShippingAddress)

@@ -24,10 +24,10 @@ import io.circe.{Decoder, Encoder}
   *                        A JSON-serialized object for an inline keyboard, custom reply keyboard,
   *                        instructions to hide reply keyboard or to force a reply from the user.
   */
-case class StopMessageLiveLocation private (chatId: Option[ChatId],
-                                            messageId: Option[Int],
-                                            inlineMessageId: Option[Int],
-                                            replyMarkup: Option[InlineKeyboardMarkup] = None)
+final case class StopMessageLiveLocation private (chatId: Option[ChatId],
+                                                  messageId: Option[Int],
+                                                  inlineMessageId: Option[Int],
+                                                  replyMarkup: Option[InlineKeyboardMarkup] = None)
 
 object StopMessageLiveLocation {
   import io.circe.generic.auto._

@@ -8,4 +8,4 @@ package canoe.models
   * @param options  List of poll options
   * @param isClosed True, if the poll is closed
   */
-case class Poll(id: String, question: String, options: List[PollOption], isClosed: Boolean)
+final case class Poll(id: String, question: String, options: List[PollOption], isClosed: Boolean)

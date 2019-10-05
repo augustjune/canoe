@@ -8,4 +8,4 @@ package canoe.models
   * @param invoicePayload   Bot specified invoice payload
   * @param shippingAddress  User specified shipping address
   */
-case class ShippingQuery(id: String, from: User, invoicePayload: String, shippingAddress: ShippingAddress)
+final case class ShippingQuery(id: String, from: User, invoicePayload: String, shippingAddress: ShippingAddress)

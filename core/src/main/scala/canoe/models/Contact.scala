@@ -9,8 +9,8 @@ package canoe.models
   * @param userId      Contact's user identifier in Telegram
   * @param vcard       Additional data about the contact in the form of a [[https://en.wikipedia.org/wiki/VCard vCard]]
   */
-case class Contact(phoneNumber: String,
-                   firstName: String,
-                   lastName: Option[String],
-                   userId: Option[Int],
-                   vcard: Option[String])
+final case class Contact(phoneNumber: String,
+                         firstName: String,
+                         lastName: Option[String],
+                         userId: Option[Int],
+                         vcard: Option[String])

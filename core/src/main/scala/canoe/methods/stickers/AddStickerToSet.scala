@@ -16,11 +16,11 @@ import io.circe.{Decoder, Encoder}
   * @param emojis       One or more emoji corresponding to the sticker
   * @param maskPosition Optional Position where the mask should be placed on faces
   */
-case class AddStickerToSet(userId: Int,
-                           name: String,
-                           pngSticker: InputFile,
-                           emojis: String,
-                           maskPosition: Option[MaskPosition] = None)
+final case class AddStickerToSet(userId: Int,
+                                 name: String,
+                                 pngSticker: InputFile,
+                                 emojis: String,
+                                 maskPosition: Option[MaskPosition] = None)
 
 object AddStickerToSet {
   import io.circe.generic.auto._

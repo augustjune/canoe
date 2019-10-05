@@ -30,13 +30,13 @@ import io.circe.{Decoder, Encoder}
   *                              A JSON-serialized object for an inline keyboard, custom reply keyboard,
   *                              instructions to hide reply keyboard or to force a reply from the user.
   */
-case class EditMessageText private (chatId: Option[ChatId],
-                                    messageId: Option[Int],
-                                    inlineMessageId: Option[String],
-                                    text: String,
-                                    parseMode: Option[ParseMode] = None,
-                                    disableWebPagePreview: Option[Boolean] = None,
-                                    replyMarkup: Option[ReplyMarkup] = None)
+final case class EditMessageText private (chatId: Option[ChatId],
+                                          messageId: Option[Int],
+                                          inlineMessageId: Option[String],
+                                          text: String,
+                                          parseMode: Option[ParseMode] = None,
+                                          disableWebPagePreview: Option[Boolean] = None,
+                                          replyMarkup: Option[ReplyMarkup] = None)
 
 object EditMessageText {
   import io.circe.generic.auto._

@@ -17,11 +17,11 @@ import io.circe.generic.semiauto.deriveDecoder
   * @param errorCode   Optional Integer Error code
   * @tparam R Expected result type
   */
-case class Response[R](ok: Boolean,
-                       result: Option[R],
-                       description: Option[String],
-                       errorCode: Option[Int],
-                       parameters: Option[ResponseParameters])
+final case class Response[R](ok: Boolean,
+                             result: Option[R],
+                             description: Option[String],
+                             errorCode: Option[Int],
+                             parameters: Option[ResponseParameters])
 
 object Response {
   import io.circe.generic.auto._

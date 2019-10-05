@@ -35,17 +35,17 @@ import io.circe.{Decoder, Encoder}
   *                            A JSON-serialized object for an inline keyboard, custom reply keyboard,
   *                            instructions to hide reply keyboard or to force a reply from the user.
   */
-case class SendAudio(chatId: ChatId,
-                     audio: InputFile,
-                     duration: Option[Int] = None,
-                     caption: Option[String] = None,
-                     parseMode: Option[ParseMode] = None,
-                     performer: Option[String] = None,
-                     title: Option[String] = None,
-                     thumb: Option[InputFile] = None,
-                     disableNotification: Option[Boolean] = None,
-                     replyToMessageId: Option[Int] = None,
-                     replyMarkup: Option[ReplyMarkup] = None)
+final case class SendAudio(chatId: ChatId,
+                           audio: InputFile,
+                           duration: Option[Int] = None,
+                           caption: Option[String] = None,
+                           parseMode: Option[ParseMode] = None,
+                           performer: Option[String] = None,
+                           title: Option[String] = None,
+                           thumb: Option[InputFile] = None,
+                           disableNotification: Option[Boolean] = None,
+                           replyToMessageId: Option[Int] = None,
+                           replyMarkup: Option[ReplyMarkup] = None)
 
 object SendAudio {
   import io.circe.generic.auto._

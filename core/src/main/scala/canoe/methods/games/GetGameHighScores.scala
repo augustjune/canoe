@@ -26,10 +26,10 @@ import io.circe.{Decoder, Encoder}
   * @param inlineMessageId Identifier of the inline message.
   *                        Required if 'chatId' and 'messageId' are not specified.
   */
-case class GetGameHighScores private (userId: Int,
-                                      chatId: Option[ChatId] = None,
-                                      messageId: Option[Int] = None,
-                                      inlineMessageId: Option[String] = None)
+final case class GetGameHighScores private (userId: Int,
+                                            chatId: Option[ChatId] = None,
+                                            messageId: Option[Int] = None,
+                                            inlineMessageId: Option[String] = None)
 
 object GetGameHighScores {
   import io.circe.generic.auto._

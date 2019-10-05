@@ -14,4 +14,8 @@ import canoe.models.Currency.Currency
   *                       See the exp parameter in currencies.json, it shows the number of digits past the decimal point
   *                       for each currency (2 for the majority of currencies).
   */
-case class Invoice(title: String, description: String, startParameter: String, currency: Currency, totalAmount: Long)
+final case class Invoice(title: String,
+                         description: String,
+                         startParameter: String,
+                         currency: Currency,
+                         totalAmount: Long)

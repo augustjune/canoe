@@ -27,13 +27,13 @@ import io.circe.{Decoder, Encoder}
   *                            A JSON-serialized object for an inline keyboard, custom reply keyboard,
   *                            instructions to hide reply keyboard or to force a reply from the user.
   */
-case class SendPhoto(chatId: ChatId,
-                     photo: InputFile,
-                     caption: Option[String] = None,
-                     parseMode: Option[ParseMode] = None,
-                     disableNotification: Option[Boolean] = None,
-                     replyToMessageId: Option[Int] = None,
-                     replyMarkup: Option[ReplyMarkup] = None)
+final case class SendPhoto(chatId: ChatId,
+                           photo: InputFile,
+                           caption: Option[String] = None,
+                           parseMode: Option[ParseMode] = None,
+                           disableNotification: Option[Boolean] = None,
+                           replyToMessageId: Option[Int] = None,
+                           replyMarkup: Option[ReplyMarkup] = None)
 
 object SendPhoto {
   import io.circe.generic.auto._

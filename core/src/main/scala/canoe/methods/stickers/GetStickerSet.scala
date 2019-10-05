@@ -13,7 +13,7 @@ import io.circe.{Decoder, Encoder}
   *
   * @param name Name of the sticker set
   */
-case class GetStickerSet(name: String)
+final case class GetStickerSet(name: String)
 
 object GetStickerSet {
 

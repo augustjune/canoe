@@ -22,9 +22,9 @@ import canoe.models.CountryCode.CountryCode
   * @param streetLine2  Second line for the address
   * @param postCode     Address post code
   */
-case class ShippingAddress(countryCode: CountryCode,
-                           state: String,
-                           city: String,
-                           streetLine1: String,
-                           streetLine2: String,
-                           postCode: String)
+final case class ShippingAddress(countryCode: CountryCode,
+                                 state: String,
+                                 city: String,
+                                 streetLine1: String,
+                                 streetLine2: String,
+                                 postCode: String)

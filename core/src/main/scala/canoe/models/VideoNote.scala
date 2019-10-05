@@ -9,8 +9,4 @@ package canoe.models
   * @param thumb    Video thumbnail
   * @param fileSize File size
   */
-case class VideoNote(fileId: String,
-                     length: Int,
-                     duration: Int,
-                     thumb: Option[PhotoSize],
-                     fileSize: Option[Int])
+final case class VideoNote(fileId: String, length: Int, duration: Int, thumb: Option[PhotoSize], fileSize: Option[Int])

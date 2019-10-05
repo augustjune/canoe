@@ -14,7 +14,7 @@ import io.circe.{Decoder, Encoder}
   * @param sticker   Sticker's fileId
   * @param position  New sticker position in the set, zero-based
   */
-case class SetStickerPositionInSet(sticker: String, position: Int)
+final case class SetStickerPositionInSet(sticker: String, position: Int)
 
 object SetStickerPositionInSet {
 

@@ -10,9 +10,9 @@ package canoe.models
   * @param username     User's or bot's username
   * @param languageCode IETF language tag of the user's language
   */
-case class User(id: Int,
-                isBot: Boolean,
-                firstName: String,
-                lastName: Option[String],
-                username: Option[String],
-                languageCode: Option[String])
+final case class User(id: Int,
+                      isBot: Boolean,
+                      firstName: String,
+                      lastName: Option[String],
+                      username: Option[String],
+                      languageCode: Option[String])

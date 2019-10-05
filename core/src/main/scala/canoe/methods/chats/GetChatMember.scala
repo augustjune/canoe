@@ -15,7 +15,7 @@ import io.circe.{Decoder, Encoder}
   *               (in the format @channelusername)
   * @param userId Unique identifier of the target user
   */
-case class GetChatMember(chatId: ChatId, userId: Int)
+final case class GetChatMember(chatId: ChatId, userId: Int)
 
 object GetChatMember {
 

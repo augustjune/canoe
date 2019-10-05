@@ -31,10 +31,10 @@ import io.circe.{Decoder, Encoder}
   *
   *                       NEW! If you're having any trouble setting up webhooks, please check out this [[https://core.telegram.org/bots/webhooks amazing guide to Webhooks]].
   */
-case class SetWebhook(url: String,
-                      certificate: Option[InputFile] = None,
-                      maxConnections: Option[Int] = None,
-                      allowedUpdates: Option[Seq[UpdateType]] = None)
+final case class SetWebhook(url: String,
+                            certificate: Option[InputFile] = None,
+                            maxConnections: Option[Int] = None,
+                            allowedUpdates: Option[Seq[UpdateType]] = None)
 
 object SetWebhook {
 

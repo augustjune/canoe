@@ -5,4 +5,4 @@ package canoe.models
   *
   * @param position  Position in high score table for the game
   */
-case class GameHighScore(position: Long, user: User, score: Long)
+final case class GameHighScore(position: Long, user: User, score: Long)

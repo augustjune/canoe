@@ -15,10 +15,10 @@ import canoe.models.Currency.Currency
   * @param telegramPaymentChargeId Telegram payment identifier
   * @param providerPaymentChargeId Provider payment identifier
   */
-case class SuccessfulPayment(currency: Currency,
-                             totalAmount: Long,
-                             invoicePayload: String,
-                             shippingOptionId: Option[String],
-                             orderInfo: Option[OrderInfo],
-                             telegramPaymentChargeId: String,
-                             providerPaymentChargeId: String)
+final case class SuccessfulPayment(currency: Currency,
+                                   totalAmount: Long,
+                                   invoicePayload: String,
+                                   shippingOptionId: Option[String],
+                                   orderInfo: Option[OrderInfo],
+                                   telegramPaymentChargeId: String,
+                                   providerPaymentChargeId: String)

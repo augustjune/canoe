@@ -26,7 +26,7 @@ import io.circe.{Decoder, Encoder}
   *                  (in the format @channelusername).
   * @param messageId Identifier of the message to delete
   */
-case class DeleteMessage(chatId: ChatId, messageId: Int)
+final case class DeleteMessage(chatId: ChatId, messageId: Int)
 
 object DeleteMessage {
 

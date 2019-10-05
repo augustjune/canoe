@@ -25,10 +25,10 @@ import io.circe.{Decoder, Encoder}
   *                        Required if 'chatId' and 'messageId' are not specified.
   * @param replyMarkup     New inline keyboard.
   */
-case class EditMessageReplyMarkup private (chatId: Option[ChatId],
-                                           messageId: Option[Int],
-                                           inlineMessageId: Option[String],
-                                           replyMarkup: Option[InlineKeyboardMarkup] = None)
+final case class EditMessageReplyMarkup private (chatId: Option[ChatId],
+                                                 messageId: Option[Int],
+                                                 inlineMessageId: Option[String],
+                                                 replyMarkup: Option[InlineKeyboardMarkup] = None)
 
 object EditMessageReplyMarkup {
   import io.circe.generic.auto._
@@ -36,16 +36,13 @@ object EditMessageReplyMarkup {
   /**
     * For the messages sent directed by the bot
     */
-  def direct(chatId: ChatId,
-             messageId: Int,
-             replyMarkup: Option[InlineKeyboardMarkup] = None): EditMessageReplyMarkup =
+  def direct(chatId: ChatId, messageId: Int, replyMarkup: Option[InlineKeyboardMarkup] = None): EditMessageReplyMarkup =
     EditMessageReplyMarkup(Some(chatId), Some(messageId), None, replyMarkup)
 
   /**
     * For the inlined messages sent via the bot
     */
-  def inlined(inlineMessageId: String,
-              replyMarkup: Option[InlineKeyboardMarkup] = None): EditMessageReplyMarkup =
+  def inlined(inlineMessageId: String, replyMarkup: Option[InlineKeyboardMarkup] = None): EditMessageReplyMarkup =
     EditMessageReplyMarkup(None, None, Some(inlineMessageId), replyMarkup)
 
   implicit val method: Method[EditMessageReplyMarkup, Either[Boolean, TelegramMessage]] =

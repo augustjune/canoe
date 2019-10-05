@@ -29,13 +29,13 @@ import io.circe.{Decoder, Encoder}
   * @param inlineMessageId    Identifier of the inline message.
   *                           Required if 'chatId' and 'messageId' are not specified.
   */
-case class SetGameScore private (userId: Int,
-                                 score: Long,
-                                 force: Option[Boolean] = None,
-                                 disableEditMessage: Option[Boolean] = None,
-                                 chatId: Option[ChatId] = None,
-                                 messageId: Option[Int] = None,
-                                 inlineMessageId: Option[String] = None)
+final case class SetGameScore private (userId: Int,
+                                       score: Long,
+                                       force: Option[Boolean] = None,
+                                       disableEditMessage: Option[Boolean] = None,
+                                       chatId: Option[ChatId] = None,
+                                       messageId: Option[Int] = None,
+                                       inlineMessageId: Option[String] = None)
 
 object SetGameScore {
 

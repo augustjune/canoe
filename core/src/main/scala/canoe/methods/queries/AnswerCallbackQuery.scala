@@ -33,11 +33,11 @@ import io.circe.{Decoder, Encoder}
   *                        Defaults to 0.
   *
   */
-case class AnswerCallbackQuery(callbackQueryId: String,
-                               text: Option[String] = None,
-                               showAlert: Option[Boolean] = None,
-                               url: Option[String] = None,
-                               cacheTime: Option[Int] = None)
+final case class AnswerCallbackQuery(callbackQueryId: String,
+                                     text: Option[String] = None,
+                                     showAlert: Option[Boolean] = None,
+                                     url: Option[String] = None,
+                                     cacheTime: Option[Int] = None)
 
 object AnswerCallbackQuery {
 

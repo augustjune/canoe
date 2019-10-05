@@ -13,7 +13,7 @@ import io.circe.{Decoder, Encoder}
   *
   * @param sticker   Sticker's fileId
   */
-case class DeleteStickerFromSet(sticker: String)
+final case class DeleteStickerFromSet(sticker: String)
 
 object DeleteStickerFromSet {
 

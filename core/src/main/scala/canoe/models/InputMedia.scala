@@ -23,9 +23,9 @@ sealed trait InputMedia extends Product {
   *
   */
 final case class InputMediaPhoto(media: InputFile,
-                           caption: Option[String] = None,
-                           parseMode: Option[ParseMode] = None,
-                           `type`: String = "photo")
+                                 caption: Option[String] = None,
+                                 parseMode: Option[ParseMode] = None,
+                                 `type`: String = "photo")
     extends InputMedia
 
 /**
@@ -41,13 +41,13 @@ final case class InputMediaPhoto(media: InputFile,
   * @param supportsStreaming Pass True, if the uploaded video is suitable for streaming
   */
 final case class InputMediaVideo(media: InputFile,
-                           caption: Option[String] = None,
-                           width: Option[Int] = None,
-                           height: Option[Int] = None,
-                           duration: Option[Int] = None,
-                           parseMode: Option[ParseMode] = None,
-                           supportsStreaming: Option[Boolean] = None,
-                           `type`: String = "video")
+                                 caption: Option[String] = None,
+                                 width: Option[Int] = None,
+                                 height: Option[Int] = None,
+                                 duration: Option[Int] = None,
+                                 parseMode: Option[ParseMode] = None,
+                                 supportsStreaming: Option[Boolean] = None,
+                                 `type`: String = "video")
     extends InputMedia
 
 /**
@@ -63,13 +63,13 @@ final case class InputMediaVideo(media: InputFile,
   * @param duration  Animation duration
   */
 final case class InputMediaAnimation(media: InputFile,
-                               thumb: Option[InputFile] = None,
-                               caption: Option[String] = None,
-                               parseMode: Option[ParseMode] = None,
-                               width: Option[Int] = None,
-                               height: Option[Int] = None,
-                               duration: Option[Int] = None,
-                               `type`: String = "animation")
+                                     thumb: Option[InputFile] = None,
+                                     caption: Option[String] = None,
+                                     parseMode: Option[ParseMode] = None,
+                                     width: Option[Int] = None,
+                                     height: Option[Int] = None,
+                                     duration: Option[Int] = None,
+                                     `type`: String = "animation")
     extends InputMedia
 
 /**
@@ -85,13 +85,13 @@ final case class InputMediaAnimation(media: InputFile,
   * @param title     Title of the audio
   */
 final case class InputMediaAudio(media: InputFile,
-                           thumb: Option[InputFile] = None,
-                           caption: Option[String] = None,
-                           parseMode: Option[ParseMode] = None,
-                           duration: Option[Int] = None,
-                           performer: Option[String] = None,
-                           title: Option[String] = None,
-                           `type`: String = "audio")
+                                 thumb: Option[InputFile] = None,
+                                 caption: Option[String] = None,
+                                 parseMode: Option[ParseMode] = None,
+                                 duration: Option[Int] = None,
+                                 performer: Option[String] = None,
+                                 title: Option[String] = None,
+                                 `type`: String = "audio")
     extends InputMedia
 
 /**
@@ -104,8 +104,8 @@ final case class InputMediaAudio(media: InputFile,
   * @param parseMode Parse mode of input text
   */
 final case class InputMediaDocument(media: InputFile,
-                              thumb: Option[InputFile] = None,
-                              caption: Option[String] = None,
-                              parseMode: Option[ParseMode] = None,
-                              `type`: String = "document")
+                                    thumb: Option[InputFile] = None,
+                                    caption: Option[String] = None,
+                                    parseMode: Option[ParseMode] = None,
+                                    `type`: String = "document")
     extends InputMedia

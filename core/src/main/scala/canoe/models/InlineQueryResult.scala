@@ -46,17 +46,17 @@ sealed trait InlineQueryResult {
   * @param thumbWidth           Thumbnail width
   * @param thumbHeight          Thumbnail height
   */
-case class InlineQueryResultArticle(id: String,
-                                    title: String,
-                                    inputMessageContent: InputMessageContent,
-                                    replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                    url: Option[String] = None,
-                                    hideUrl: Option[Boolean] = None,
-                                    description: Option[String] = None,
-                                    thumbUrl: Option[String] = None,
-                                    thumbWidth: Option[Int] = None,
-                                    thumbHeight: Option[Int] = None,
-                                    `type`: String = "article")
+final case class InlineQueryResultArticle(id: String,
+                                          title: String,
+                                          inputMessageContent: InputMessageContent,
+                                          replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                          url: Option[String] = None,
+                                          hideUrl: Option[Boolean] = None,
+                                          description: Option[String] = None,
+                                          thumbUrl: Option[String] = None,
+                                          thumbWidth: Option[Int] = None,
+                                          thumbHeight: Option[Int] = None,
+                                          `type`: String = "article")
     extends InlineQueryResult
 
 /**
@@ -78,18 +78,18 @@ case class InlineQueryResultArticle(id: String,
   * @param replyMarkup         Inline keyboard attached to the message
   * @param inputMessageContent Content of the message to be sent instead of the photo
   */
-case class InlineQueryResultPhoto(id: String,
-                                  photoUrl: String,
-                                  thumbUrl: String,
-                                  photoWidth: Option[Int] = None,
-                                  photoHeight: Option[Int] = None,
-                                  title: Option[String] = None,
-                                  description: Option[String] = None,
-                                  caption: Option[String] = None,
-                                  parseMode: Option[ParseMode] = None,
-                                  replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                  inputMessageContent: Option[InputMessageContent] = None,
-                                  `type`: String = "photo")
+final case class InlineQueryResultPhoto(id: String,
+                                        photoUrl: String,
+                                        thumbUrl: String,
+                                        photoWidth: Option[Int] = None,
+                                        photoHeight: Option[Int] = None,
+                                        title: Option[String] = None,
+                                        description: Option[String] = None,
+                                        caption: Option[String] = None,
+                                        parseMode: Option[ParseMode] = None,
+                                        replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                        inputMessageContent: Option[InputMessageContent] = None,
+                                        `type`: String = "photo")
     extends InlineQueryResult
 
 /**
@@ -105,10 +105,10 @@ case class InlineQueryResultPhoto(id: String,
   * @param replyMarkup   Inline keyboard attached to the message
   *
   */
-case class InlineQueryResultGame(id: String,
-                                 gameShortName: String,
-                                 replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                 `type`: String = "game")
+final case class InlineQueryResultGame(id: String,
+                                       gameShortName: String,
+                                       replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                       `type`: String = "game")
     extends InlineQueryResult
 
 /**
@@ -130,18 +130,18 @@ case class InlineQueryResultGame(id: String,
   * @param replyMarkup         Inline keyboard attached to the message
   * @param inputMessageContent Content of the message to be sent instead of the GIF animation
   */
-case class InlineQueryResultGif(id: String,
-                                gifUrl: String,
-                                gifWidth: Option[Int] = None,
-                                gifHeight: Option[Int] = None,
-                                gifDuration: Option[Int] = None,
-                                thumbUrl: String,
-                                title: Option[String] = None,
-                                caption: Option[String] = None,
-                                parseMode: Option[ParseMode] = None,
-                                replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                inputMessageContent: Option[InputMessageContent] = None,
-                                `type`: String = "gif")
+final case class InlineQueryResultGif(id: String,
+                                      gifUrl: String,
+                                      gifWidth: Option[Int] = None,
+                                      gifHeight: Option[Int] = None,
+                                      gifDuration: Option[Int] = None,
+                                      thumbUrl: String,
+                                      title: Option[String] = None,
+                                      caption: Option[String] = None,
+                                      parseMode: Option[ParseMode] = None,
+                                      replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                      inputMessageContent: Option[InputMessageContent] = None,
+                                      `type`: String = "gif")
     extends InlineQueryResult
 
 /**
@@ -163,18 +163,18 @@ case class InlineQueryResultGif(id: String,
   * @param replyMarkup         Inline keyboard attached to the message
   * @param inputMessageContent Content of the message to be sent instead of the video animation
   */
-case class InlineQueryResultMpeg4Gif(id: String,
-                                     mpeg4Url: String,
-                                     mpeg4Width: Option[Int] = None,
-                                     mpeg4Height: Option[Int] = None,
-                                     mpeg4Duration: Option[Int] = None,
-                                     thumbUrl: String,
-                                     title: Option[String] = None,
-                                     caption: Option[String] = None,
-                                     parseMode: Option[ParseMode] = None,
-                                     replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                     inputMessageContent: Option[InputMessageContent] = None,
-                                     `type`: String = "mpeg4_gif")
+final case class InlineQueryResultMpeg4Gif(id: String,
+                                           mpeg4Url: String,
+                                           mpeg4Width: Option[Int] = None,
+                                           mpeg4Height: Option[Int] = None,
+                                           mpeg4Duration: Option[Int] = None,
+                                           thumbUrl: String,
+                                           title: Option[String] = None,
+                                           caption: Option[String] = None,
+                                           parseMode: Option[ParseMode] = None,
+                                           replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                           inputMessageContent: Option[InputMessageContent] = None,
+                                           `type`: String = "mpeg4_gif")
     extends InlineQueryResult
 
 /**
@@ -198,20 +198,20 @@ case class InlineQueryResultMpeg4Gif(id: String,
   * @param replyMarkup         Inline keyboard attached to the message
   * @param inputMessageContent Content of the message to be sent instead of the video
   */
-case class InlineQueryResultVideo(id: String,
-                                  videoUrl: String,
-                                  mimeType: String,
-                                  thumbUrl: String,
-                                  title: Option[String] = None,
-                                  caption: Option[String] = None,
-                                  parseMode: Option[ParseMode] = None,
-                                  videoWidth: Option[Int] = None,
-                                  videoHeight: Option[Int] = None,
-                                  videoDuration: Option[Int] = None,
-                                  description: Option[String] = None,
-                                  replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                  inputMessageContent: Option[InputMessageContent] = None,
-                                  `type`: String = "video")
+final case class InlineQueryResultVideo(id: String,
+                                        videoUrl: String,
+                                        mimeType: String,
+                                        thumbUrl: String,
+                                        title: Option[String] = None,
+                                        caption: Option[String] = None,
+                                        parseMode: Option[ParseMode] = None,
+                                        videoWidth: Option[Int] = None,
+                                        videoHeight: Option[Int] = None,
+                                        videoDuration: Option[Int] = None,
+                                        description: Option[String] = None,
+                                        replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                        inputMessageContent: Option[InputMessageContent] = None,
+                                        `type`: String = "video")
     extends InlineQueryResult
 
 /** Represents a link to an mp3 audio file. By default, this audio file will be sent by the user.
@@ -231,16 +231,16 @@ case class InlineQueryResultVideo(id: String,
   * @param inputMessageContent  InputMessageContent Optional Content of the message to be sent instead of the audio
   *
   */
-case class InlineQueryResultAudio(id: String,
-                                  audioUrl: String,
-                                  title: String,
-                                  caption: Option[String] = None,
-                                  parseMode: Option[ParseMode] = None,
-                                  performer: Option[String] = None,
-                                  audioDuration: Option[Int] = None,
-                                  replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                  inputMessageContent: Option[InputMessageContent] = None,
-                                  `type`: String = "audio")
+final case class InlineQueryResultAudio(id: String,
+                                        audioUrl: String,
+                                        title: String,
+                                        caption: Option[String] = None,
+                                        parseMode: Option[ParseMode] = None,
+                                        performer: Option[String] = None,
+                                        audioDuration: Option[Int] = None,
+                                        replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                        inputMessageContent: Option[InputMessageContent] = None,
+                                        `type`: String = "audio")
     extends InlineQueryResult
 
 /**
@@ -261,15 +261,15 @@ case class InlineQueryResultAudio(id: String,
   * @param replyMarkup         Inline keyboard attached to the message
   * @param inputMessageContent Content of the message to be sent instead of the voice recording
   */
-case class InlineQueryResultVoice(id: String,
-                                  voiceUrl: String,
-                                  title: String,
-                                  caption: Option[String] = None,
-                                  parseMode: Option[ParseMode] = None,
-                                  voiceDuration: Option[Int] = None,
-                                  replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                  inputMessageContent: Option[InputMessageContent] = None,
-                                  `type`: String = "voice")
+final case class InlineQueryResultVoice(id: String,
+                                        voiceUrl: String,
+                                        title: String,
+                                        caption: Option[String] = None,
+                                        parseMode: Option[ParseMode] = None,
+                                        voiceDuration: Option[Int] = None,
+                                        replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                        inputMessageContent: Option[InputMessageContent] = None,
+                                        `type`: String = "voice")
     extends InlineQueryResult
 
 /**
@@ -293,19 +293,19 @@ case class InlineQueryResultVoice(id: String,
   * @param thumbWidth          Thumbnail width
   * @param thumbHeight         Thumbnail height
   */
-case class InlineQueryResultDocument(id: String,
-                                     title: String,
-                                     caption: Option[String] = None,
-                                     parseMode: Option[ParseMode] = None,
-                                     documentUrl: Option[String] = None,
-                                     mimeType: String, // either "application/pdf" or "application/zip"
-                                     description: Option[String] = None,
-                                     replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                     inputMessageContent: Option[InputMessageContent] = None,
-                                     thumbUrl: Option[String] = None,
-                                     thumbWidth: Option[Int] = None,
-                                     thumbHeight: Option[Int] = None,
-                                     `type`: String = "document")
+final case class InlineQueryResultDocument(id: String,
+                                           title: String,
+                                           caption: Option[String] = None,
+                                           parseMode: Option[ParseMode] = None,
+                                           documentUrl: Option[String] = None,
+                                           mimeType: String, // either "application/pdf" or "application/zip"
+                                           description: Option[String] = None,
+                                           replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                           inputMessageContent: Option[InputMessageContent] = None,
+                                           thumbUrl: Option[String] = None,
+                                           thumbWidth: Option[Int] = None,
+                                           thumbHeight: Option[Int] = None,
+                                           `type`: String = "document")
     extends InlineQueryResult
 
 /**
@@ -328,17 +328,17 @@ case class InlineQueryResultDocument(id: String,
   * @param thumbWidth          Thumbnail width
   * @param thumbHeight         Thumbnail height
   */
-case class InlineQueryResultLocation(id: String,
-                                     latitude: Double,
-                                     longitude: Double,
-                                     title: String,
-                                     livePeriod: Option[Int] = None,
-                                     replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                     inputMessageContent: Option[InputMessageContent] = None,
-                                     thumbUrl: Option[String] = None,
-                                     thumbWidth: Option[Int] = None,
-                                     thumbHeight: Option[Int] = None,
-                                     `type`: String = "location")
+final case class InlineQueryResultLocation(id: String,
+                                           latitude: Double,
+                                           longitude: Double,
+                                           title: String,
+                                           livePeriod: Option[Int] = None,
+                                           replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                           inputMessageContent: Option[InputMessageContent] = None,
+                                           thumbUrl: Option[String] = None,
+                                           thumbWidth: Option[Int] = None,
+                                           thumbHeight: Option[Int] = None,
+                                           `type`: String = "location")
     extends InlineQueryResult
 
 /**
@@ -364,19 +364,19 @@ case class InlineQueryResultLocation(id: String,
   * @param thumbWidth          Thumbnail width
   * @param thumbHeight         Thumbnail height
   */
-case class InlineQueryResultVenue(id: String,
-                                  latitude: Double,
-                                  longitude: Double,
-                                  title: String,
-                                  address: String,
-                                  foursquareId: Option[String] = None,
-                                  foursquareType: Option[String] = None,
-                                  replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                  inputMessageContent: Option[InputMessageContent] = None,
-                                  thumbUrl: Option[String] = None,
-                                  thumbWidth: Option[Int] = None,
-                                  thumbHeight: Option[Int] = None,
-                                  `type`: String = "venue")
+final case class InlineQueryResultVenue(id: String,
+                                        latitude: Double,
+                                        longitude: Double,
+                                        title: String,
+                                        address: String,
+                                        foursquareId: Option[String] = None,
+                                        foursquareType: Option[String] = None,
+                                        replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                        inputMessageContent: Option[InputMessageContent] = None,
+                                        thumbUrl: Option[String] = None,
+                                        thumbWidth: Option[Int] = None,
+                                        thumbHeight: Option[Int] = None,
+                                        `type`: String = "venue")
     extends InlineQueryResult
 
 /**
@@ -399,17 +399,17 @@ case class InlineQueryResultVenue(id: String,
   * @param thumbWidth          Thumbnail width
   * @param thumbHeight         Thumbnail height
   */
-case class InlineQueryResultContact(id: String,
-                                    phoneNumber: String,
-                                    firstName: String,
-                                    lastName: Option[String] = None,
-                                    vcard: Option[String] = None,
-                                    replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                    inputMessageContent: Option[InputMessageContent] = None,
-                                    thumbUrl: Option[String] = None,
-                                    thumbWidth: Option[Int] = None,
-                                    thumbHeight: Option[Int] = None,
-                                    `type`: String = "contact")
+final case class InlineQueryResultContact(id: String,
+                                          phoneNumber: String,
+                                          firstName: String,
+                                          lastName: Option[String] = None,
+                                          vcard: Option[String] = None,
+                                          replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                          inputMessageContent: Option[InputMessageContent] = None,
+                                          thumbUrl: Option[String] = None,
+                                          thumbWidth: Option[Int] = None,
+                                          thumbHeight: Option[Int] = None,
+                                          `type`: String = "contact")
     extends InlineQueryResult
 
 /**
@@ -428,15 +428,15 @@ case class InlineQueryResultContact(id: String,
   * @param replyMarkup         Inline keyboard attached to the message
   * @param inputMessageContent Content of the message to be sent instead of the photo
   */
-case class InlineQueryResultCachedPhoto(id: String,
-                                        photoFileId: String,
-                                        title: Option[String] = None,
-                                        description: Option[String] = None,
-                                        caption: Option[String] = None,
-                                        parseMode: Option[ParseMode] = None,
-                                        replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                        inputMessageContent: Option[InputMessageContent] = None,
-                                        `type`: String = "photo")
+final case class InlineQueryResultCachedPhoto(id: String,
+                                              photoFileId: String,
+                                              title: Option[String] = None,
+                                              description: Option[String] = None,
+                                              caption: Option[String] = None,
+                                              parseMode: Option[ParseMode] = None,
+                                              replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                              inputMessageContent: Option[InputMessageContent] = None,
+                                              `type`: String = "photo")
     extends InlineQueryResult
 
 /**
@@ -454,14 +454,14 @@ case class InlineQueryResultCachedPhoto(id: String,
   * @param replyMarkup         An Inline keyboard attached to the message
   * @param inputMessageContent Content of the message to be sent instead of the GIF animation
   */
-case class InlineQueryResultCachedGif(id: String,
-                                      gifFileId: String,
-                                      title: Option[String] = None,
-                                      caption: Option[String] = None,
-                                      parseMode: Option[ParseMode] = None,
-                                      replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                      inputMessageContent: Option[InputMessageContent] = None,
-                                      `type`: String = "gif")
+final case class InlineQueryResultCachedGif(id: String,
+                                            gifFileId: String,
+                                            title: Option[String] = None,
+                                            caption: Option[String] = None,
+                                            parseMode: Option[ParseMode] = None,
+                                            replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                            inputMessageContent: Option[InputMessageContent] = None,
+                                            `type`: String = "gif")
     extends InlineQueryResult
 
 /**
@@ -479,14 +479,14 @@ case class InlineQueryResultCachedGif(id: String,
   * @param replyMarkup         An Inline keyboard attached to the message
   * @param inputMessageContent Content of the message to be sent instead of the video animation
   */
-case class InlineQueryResultCachedMpeg4Gif(id: String,
-                                           mpeg4FileId: String,
-                                           title: Option[String] = None,
-                                           caption: Option[String] = None,
-                                           parseMode: Option[ParseMode] = None,
-                                           replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                           inputMessageContent: Option[InputMessageContent] = None,
-                                           `type`: String = "mpeg4_gif")
+final case class InlineQueryResultCachedMpeg4Gif(id: String,
+                                                 mpeg4FileId: String,
+                                                 title: Option[String] = None,
+                                                 caption: Option[String] = None,
+                                                 parseMode: Option[ParseMode] = None,
+                                                 replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                                 inputMessageContent: Option[InputMessageContent] = None,
+                                                 `type`: String = "mpeg4_gif")
     extends InlineQueryResult
 
 /**
@@ -503,11 +503,11 @@ case class InlineQueryResultCachedMpeg4Gif(id: String,
   * @param replyMarkup         An Inline keyboard attached to the message
   * @param inputMessageContent Content of the message to be sent instead of the sticker
   */
-case class InlineQueryResultCachedSticker(id: String,
-                                          stickerFileId: String,
-                                          replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                          inputMessageContent: Option[InputMessageContent] = None,
-                                          `type`: String = "sticker")
+final case class InlineQueryResultCachedSticker(id: String,
+                                                stickerFileId: String,
+                                                replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                                inputMessageContent: Option[InputMessageContent] = None,
+                                                `type`: String = "sticker")
     extends InlineQueryResult
 
 /**
@@ -529,15 +529,15 @@ case class InlineQueryResultCachedSticker(id: String,
   * @param replyMarkup         An Inline keyboard attached to the message
   * @param inputMessageContent Content of the message to be sent instead of the file
   */
-case class InlineQueryResultCachedDocument(id: String,
-                                           title: String,
-                                           documentFileId: String,
-                                           description: Option[String] = None,
-                                           caption: Option[String] = None,
-                                           parseMode: Option[ParseMode] = None,
-                                           replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                           inputMessageContent: Option[InputMessageContent] = None,
-                                           `type`: String = "document")
+final case class InlineQueryResultCachedDocument(id: String,
+                                                 title: String,
+                                                 documentFileId: String,
+                                                 description: Option[String] = None,
+                                                 caption: Option[String] = None,
+                                                 parseMode: Option[ParseMode] = None,
+                                                 replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                                 inputMessageContent: Option[InputMessageContent] = None,
+                                                 `type`: String = "document")
     extends InlineQueryResult
 
 /**
@@ -556,15 +556,15 @@ case class InlineQueryResultCachedDocument(id: String,
   * @param replyMarkup         An Inline keyboard attached to the message
   * @param inputMessageContent Content of the message to be sent instead of the video
   */
-case class InlineQueryResultCachedVideo(id: String,
-                                        videoFileId: String,
-                                        title: String,
-                                        description: Option[String] = None,
-                                        caption: Option[String] = None,
-                                        parseMode: Option[ParseMode] = None,
-                                        replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                        inputMessageContent: Option[InputMessageContent] = None,
-                                        `type`: String = "video")
+final case class InlineQueryResultCachedVideo(id: String,
+                                              videoFileId: String,
+                                              title: String,
+                                              description: Option[String] = None,
+                                              caption: Option[String] = None,
+                                              parseMode: Option[ParseMode] = None,
+                                              replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                              inputMessageContent: Option[InputMessageContent] = None,
+                                              `type`: String = "video")
     extends InlineQueryResult
 
 /**
@@ -584,14 +584,14 @@ case class InlineQueryResultCachedVideo(id: String,
   * @param replyMarkup         An Inline keyboard attached to the message
   * @param inputMessageContent Content of the message to be sent instead of the voice message
   */
-case class InlineQueryResultCachedVoice(id: String,
-                                        voiceFileId: String,
-                                        title: String,
-                                        caption: Option[String] = None,
-                                        parseMode: Option[ParseMode] = None,
-                                        replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                        inputMessageContent: Option[InputMessageContent] = None,
-                                        `type`: String = "voice")
+final case class InlineQueryResultCachedVoice(id: String,
+                                              voiceFileId: String,
+                                              title: String,
+                                              caption: Option[String] = None,
+                                              parseMode: Option[ParseMode] = None,
+                                              replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                              inputMessageContent: Option[InputMessageContent] = None,
+                                              `type`: String = "voice")
     extends InlineQueryResult
 
 /**
@@ -610,11 +610,11 @@ case class InlineQueryResultCachedVoice(id: String,
   * @param replyMarkup         An Inline keyboard attached to the message
   * @param inputMessageContent Content of the message to be sent instead of the audio
   */
-case class InlineQueryResultCachedAudio(id: String,
-                                        audioFileId: String,
-                                        caption: Option[String] = None,
-                                        parseMode: Option[ParseMode] = None,
-                                        replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                        inputMessageContent: Option[InputMessageContent] = None,
-                                        `type`: String = "audio")
+final case class InlineQueryResultCachedAudio(id: String,
+                                              audioFileId: String,
+                                              caption: Option[String] = None,
+                                              parseMode: Option[ParseMode] = None,
+                                              replyMarkup: Option[InlineKeyboardMarkup] = None,
+                                              inputMessageContent: Option[InputMessageContent] = None,
+                                              `type`: String = "audio")
     extends InlineQueryResult

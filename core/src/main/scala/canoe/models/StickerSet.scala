@@ -6,8 +6,8 @@ package canoe.models
   * @param containsMasks  True, if the sticker set contains masks
   * @param stickers       List of all set stickers
   */
-case class StickerSet(name: String,
-                      title: String,
-                      isAnimated: Boolean,
-                      containsMasks: Boolean,
-                      stickers: List[Sticker])
+final case class StickerSet(name: String,
+                            title: String,
+                            isAnimated: Boolean,
+                            containsMasks: Boolean,
+                            stickers: List[Sticker])

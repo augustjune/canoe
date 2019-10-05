@@ -24,11 +24,11 @@ import io.circe.{Decoder, Encoder}
   *                            A JSON-serialized object for an inline keyboard, custom reply keyboard,
   *                            instructions to hide reply keyboard or to force a reply from the user.
   */
-case class SendSticker(chatId: ChatId,
-                       sticker: InputFile,
-                       disableNotification: Option[Boolean] = None,
-                       replyToMessageId: Option[Int] = None,
-                       replyMarkup: Option[ReplyMarkup] = None)
+final case class SendSticker(chatId: ChatId,
+                             sticker: InputFile,
+                             disableNotification: Option[Boolean] = None,
+                             replyToMessageId: Option[Int] = None,
+                             replyMarkup: Option[ReplyMarkup] = None)
 
 object SendSticker {
   import io.circe.generic.auto._

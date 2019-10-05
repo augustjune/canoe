@@ -18,7 +18,7 @@ import io.circe.{Decoder, Encoder}
   *                    (in the format @channelusername)
   * @param description New chat description, 0-255 characters
   */
-case class SetChatDescription(chatId: ChatId, description: Option[String] = None)
+final case class SetChatDescription(chatId: ChatId, description: Option[String] = None)
 
 object SetChatDescription {
 

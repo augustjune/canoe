@@ -6,4 +6,4 @@ package canoe.models.passport
   * @param data        Documents and other Telegram Passport elements that was shared with the bot
   * @param credentials Encrypted credentials required to decrypt the data
   */
-case class PassportData(data: List[EncryptedPassportElement], credentials: EncryptedCredentials)
+final case class PassportData(data: List[EncryptedPassportElement], credentials: EncryptedCredentials)

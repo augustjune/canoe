@@ -24,14 +24,14 @@ package canoe.models
   *
   * NOTE: This type of button must always be the first button in the first row.
   */
-case class InlineKeyboardButton private (text: String,
-                                         callbackData: Option[String] = None,
-                                         url: Option[String] = None,
-                                         loginUrl: Option[LoginUrl] = None,
-                                         switchInlineQuery: Option[String] = None,
-                                         switchInlineQueryCurrentChat: Option[String] = None,
-                                         callbackGame: Option[CallbackGame] = None,
-                                         pay: Option[Boolean] = None) {
+final case class InlineKeyboardButton private (text: String,
+                                               callbackData: Option[String] = None,
+                                               url: Option[String] = None,
+                                               loginUrl: Option[LoginUrl] = None,
+                                               switchInlineQuery: Option[String] = None,
+                                               switchInlineQueryCurrentChat: Option[String] = None,
+                                               callbackGame: Option[CallbackGame] = None,
+                                               pay: Option[Boolean] = None) {
   require(
     Seq[Option[_]](
       callbackData,

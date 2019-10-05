@@ -23,7 +23,7 @@ import io.circe.{Decoder, Encoder}
   *               (in the format @channelusername)
   * @param action Type of action to broadcast
   */
-case class SendChatAction(chatId: ChatId, action: ChatAction)
+final case class SendChatAction(chatId: ChatId, action: ChatAction)
 
 object SendChatAction {
 

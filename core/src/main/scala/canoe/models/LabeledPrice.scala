@@ -9,4 +9,4 @@ package canoe.models
   *               See the exp parameter in currencies.json, it shows the number of digits past the decimal point
   *               for each currency (2 for the majority of currencies).
   */
-case class LabeledPrice(label: String, amount: Long)
+final case class LabeledPrice(label: String, amount: Long)

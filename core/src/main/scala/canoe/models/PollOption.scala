@@ -6,4 +6,4 @@ package canoe.models
   * @param text        Option text, 1-100 characters
   * @param voterCount  Number of users that voted for this option
   */
-case class PollOption(text: String, voterCount: Int)
+final case class PollOption(text: String, voterCount: Int)

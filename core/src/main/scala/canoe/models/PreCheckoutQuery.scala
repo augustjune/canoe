@@ -16,10 +16,10 @@ import canoe.models.Currency.Currency
   * @param shippingOptionId  Identifier of the shipping option chosen by the user
   * @param orderInfo         Order info provided by the user
   */
-case class PreCheckoutQuery(id: String,
-                            from: User,
-                            currency: Currency,
-                            totalAmount: Long,
-                            invoicePayload: String,
-                            shippingOptionId: Option[String],
-                            orderInfo: Option[OrderInfo])
+final case class PreCheckoutQuery(id: String,
+                                  from: User,
+                                  currency: Currency,
+                                  totalAmount: Long,
+                                  invoicePayload: String,
+                                  shippingOptionId: Option[String],
+                                  orderInfo: Option[OrderInfo])

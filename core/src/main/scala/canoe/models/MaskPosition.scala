@@ -13,4 +13,4 @@ import canoe.models.MaskPositionType.MaskPositionType
   *                For example, 1.0 will place the mask just below the default mask position.
   * @param scale   Mask scaling coefficient. For example, 2.0 means double size.
   */
-case class MaskPosition(point: MaskPositionType, xShift: Double, yShift: Double, scale: Double)
+final case class MaskPosition(point: MaskPositionType, xShift: Double, yShift: Double, scale: Double)

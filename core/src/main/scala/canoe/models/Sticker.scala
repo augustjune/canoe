@@ -10,12 +10,12 @@ package canoe.models
   * @param maskPosition	 For mask stickers, the position where the mask should be placed
   * @param fileSize      File size
   */
-case class Sticker(fileId: String,
-                   width: Int,
-                   height: Int,
-                   isAnimated: Boolean,
-                   thumb: Option[PhotoSize],
-                   emoji: Option[String],
-                   setName: Option[String],
-                   maskPosition: Option[MaskPosition],
-                   fileSize: Option[Int])
+final case class Sticker(fileId: String,
+                         width: Int,
+                         height: Int,
+                         isAnimated: Boolean,
+                         thumb: Option[PhotoSize],
+                         emoji: Option[String],
+                         setName: Option[String],
+                         maskPosition: Option[MaskPosition],
+                         fileSize: Option[Int])

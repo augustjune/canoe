@@ -11,7 +11,7 @@ package canoe.models
   * Maximum file size to download is 20 MB
   *
   * @param fileId    Unique identifier for this file
-  * @param fileSize  Optional File size, if known
-  * @param filePath  Optional File path. Use https://api.telegram.org/file/bot<token>/<file_path> to get the file.
+  * @param fileSize  File size, if known
+  * @param filePath  File path. Use https://api.telegram.org/file/bot<token>/<file_path> to get the file.
   */
 final case class File(fileId: String, fileSize: Option[Int], filePath: Option[String])

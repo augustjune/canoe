@@ -214,21 +214,21 @@ final case class InlineQueryResultVideo(id: String,
                                         `type`: String = "video")
     extends InlineQueryResult
 
-/** Represents a link to an mp3 audio file. By default, this audio file will be sent by the user.
+/**
+  * Link to an mp3 audio file. By default, this audio file will be sent by the user.
   *
   * Alternatively, you can use input_message_content to send a message with the specified content instead of the audio.
   *
-  * @param type                 String Type of the result, must be audio
-  * @param id                   String Unique identifier for this result, 1-64 bytes
-  * @param audioUrl             String A valid URL for the audio file
-  * @param title                String Title
-  * @param caption              String Optional. Caption, 0-200 characters
-  * @param parseMode            String Optional Send Markdown or HTML, if you want Telegram apps to show bold, italic,
-  *                             fixed-width text or inline URLs in the media caption.
-  * @param performer            String Optional Performer
-  * @param audioDuration        Integer Optional Audio duration in seconds
-  * @param replyMarkup          InlineKeyboardMarkup Optional Inline keyboard attached to the message
-  * @param inputMessageContent  InputMessageContent Optional Content of the message to be sent instead of the audio
+  * @param type                Type of the result, must be audio
+  * @param id                  Unique identifier for this result, 1-64 bytes
+  * @param audioUrl            A valid URL for the audio file
+  * @param title               Title
+  * @param caption             Caption, 0-200 characters
+  * @param parseMode           Parse mode of captured text (Markdown or HTML)
+  * @param performer           Performer
+  * @param audioDuration       Audio duration in seconds
+  * @param replyMarkup         Inline keyboard attached to the message
+  * @param inputMessageContent Content of the message to be sent instead of the audio
   *
   */
 final case class InlineQueryResultAudio(id: String,

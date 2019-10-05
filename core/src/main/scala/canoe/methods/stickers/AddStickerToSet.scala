@@ -14,7 +14,7 @@ import io.circe.{Decoder, Encoder}
   * @param name         Sticker set name
   * @param pngSticker   Png image with the sticker, must be up to 512 kilobytes in size, dimensions must not exceed 512px, and either width or height must be exactly 512px. Pass a file_id as a String to send a file that already exists on the Telegram servers, pass an HTTP URL as a String for Telegram to get a file from the Internet, or upload a new one using multipart/form-data. More info on Sending Files »
   * @param emojis       One or more emoji corresponding to the sticker
-  * @param maskPosition Optional Position where the mask should be placed on faces
+  * @param maskPosition Position where the mask should be placed on faces
   */
 final case class AddStickerToSet(userId: Int,
                                  name: String,

@@ -11,10 +11,10 @@ import io.circe.generic.semiauto.deriveDecoder
   * In case of an unsuccessful request, 'ok' equals false and the error is explained in the 'description'.
   * An Integer 'error_code' field is also returned, but its contents are subject to change in the future.
   *
-  * @param ok          Boolean Signals if the request was successful
-  * @param result      Optional R Contains the response in a type-safely way
-  * @param description Optional String A human-readable description of the result
-  * @param errorCode   Optional Integer Error code
+  * @param ok          Signals if the request was successful
+  * @param result      Contains the response in a type-safely way
+  * @param description A human-readable description of the result
+  * @param errorCode   Error code
   * @tparam R Expected result type
   */
 final case class Response[R](ok: Boolean,

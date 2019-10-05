@@ -13,38 +13,41 @@ import canoe.models.ParseMode.ParseMode
 // ToDo - naming is confusing with more widely used MessageContent
 sealed trait InputMessageContent
 
-/** Represents the content of a text message to be sent as the result of an inline query.
+/**
+  * Content of a text message to be sent as the result of an inline query.
   *
-  * @param messageText            String Text of the message to be sent, 1-4096 characters
-  * @param parseMode              String Optional Send Markdown or HTML, if you want Telegram apps to show bold,
-  *                               italic, fixed-width text or inline URLs in your bot's message.
-  * @param disableWebPagePreview  Boolean Optional Disables link previews for links in the sent message
+  * @param messageText           Text of the message to be sent, 1-4096 characters
+  * @param parseMode             Parse mode of captured text (Markdown or HTML)
+  * @param disableWebPagePreview Disables link previews for links in the sent message
   */
 final case class InputTextMessageContent(messageText: String,
                                          parseMode: Option[ParseMode] = None,
                                          disableWebPagePreview: Option[Boolean] = None)
     extends InputMessageContent
 
-/** Represents the content of a location message to be sent as the result of an inline query.
+/** 
+  * Content of a location message to be sent as the result of an inline query.
   *
   * ''Note:''
   *   This will only work in Telegram versions released after 9 April, 2016. Older clients will ignore them.
   *
-  * @param latitude   Float Latitude of the location in degrees
-  * @param longitude  Float Longitude of the location in degrees
+  * @param latitude   Latitude of the location in degrees
+  * @param longitude  Longitude of the location in degrees
   */
 final case class InputLocationMessageContent(latitude: Double, longitude: Double) extends InputMessageContent
 
-/** Represents the content of a venue message to be sent as the result of an inline query.
-  *
-  * @param latitude       Float Latitude of the venue in degrees
-  * @param longitude      Float Longitude of the venue in degrees
-  * @param title          String Name of the venue
-  * @param address        String Address of the venue
-  * @param foursquareId   String Optional Foursquare identifier of the venue, if known
-  * @param foursquareType String Optional. Foursquare type of the venue, if known. (For example, “arts_entertainment/default”, “arts_entertainment/aquarium” or “food/icecream”.)
+/**
+  * Content of a venue message to be sent as the result of an inline query.
   *
   * Note: This will only work in Telegram versions released after 9 April, 2016. Older clients will ignore them.
+  *
+  * @param latitude       Latitude of the venue in degrees
+  * @param longitude      Longitude of the venue in degrees
+  * @param title          Name of the venue
+  * @param address        Address of the venue
+  * @param foursquareId   Foursquare identifier of the venue, if known
+  * @param foursquareType Foursquare type of the venue, if known.
+  *                       For example, “arts_entertainment/default”, “arts_entertainment/aquarium” or “food/icecream”.
   */
 final case class InputVenueMessageContent(latitude: Double,
                                           longitude: Double,
@@ -54,15 +57,16 @@ final case class InputVenueMessageContent(latitude: Double,
                                           foursquareType: Option[String] = None)
     extends InputMessageContent
 
-/** Represents the content of a contact message to be sent as the result of an inline query.
+/**
+  * Content of a contact message to be sent as the result of an inline query.
   *
   * ''Note:''
-  *   This will only work in Telegram versions released after 9 April, 2016. Older clients will ignore them.
+  * This will only work in Telegram versions released after 9 April, 2016. Older clients will ignore them.
   *
-  * @param phoneNumber  String Contact's phone number
-  * @param firstName    String Contact's first name
-  * @param lastName     String Optional Contact's last name
-  * @param vcard        String Optional. Additional data about the contact in the form of a vCard, 0-2048 bytes
+  * @param phoneNumber Contact's phone number
+  * @param firstName   Contact's first name
+  * @param lastName    Contact's last name
+  * @param vcard       Additional data about the contact in the form of a vCard, 0-2048 bytes
   */
 final case class InputContactMessageContent(phoneNumber: String,
                                             firstName: String,

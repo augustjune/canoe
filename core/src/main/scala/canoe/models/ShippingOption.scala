@@ -1,14 +1,8 @@
 package canoe.models
 
 /**
-  * This object represents one shipping option.
-  *
-  * @param id     String Shipping option identifier
-  * @param title  String Option title
-  * @param prices Array of LabeledPrice List of price portions
+  * @param id     Shipping option identifier
+  * @param title  Option title
+  * @param prices List of price portions
   */
-case class ShippingOption(
-  id: String,
-  title: String,
-  prices: Array[LabeledPrice]
-)
+final case class ShippingOption(id: String, title: String, prices: List[LabeledPrice])

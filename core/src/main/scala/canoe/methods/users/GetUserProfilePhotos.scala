@@ -6,13 +6,16 @@ import canoe.models.{InputFile, UserProfilePhotos}
 import io.circe.generic.semiauto._
 import io.circe.{Decoder, Encoder}
 
-/** Use this method to get a list of profile pictures for a user. Returns a UserProfilePhotos object.
+/**
+  * Use this method to get a list of profile pictures for a user.
   *
-  * @param userId Integer Unique identifier of the target user
-  * @param offset Integer Optional Sequential number of the first photo to be returned. By default, all photos are returned.
-  * @param limit  Integer Optional Limits the number of photos to be retrieved. Values between 1-100 are accepted. Defaults to 100.
+  * @param userId Unique identifier of the target user
+  * @param offset Sequential number of the first photo to be returned.
+  *               By default, all photos are returned.
+  * @param limit  Limits the number of photos to be retrieved.
+  *               Values between 1-100 are accepted. Defaults to 100.
   */
-case class GetUserProfilePhotos(userId: Int, offset: Option[Int] = None, limit: Option[Int] = None)
+final case class GetUserProfilePhotos(userId: Int, offset: Option[Int] = None, limit: Option[Int] = None)
 
 object GetUserProfilePhotos {
   import io.circe.generic.auto._

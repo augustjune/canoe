@@ -10,17 +10,17 @@ import scala.language.implicitConversions
 object Currency extends Enumeration {
   type Currency = Value
 
-  sealed case class TelegramCurrency(code: String,
-                                     title: String,
-                                     symbol: String,
-                                     native: String,
-                                     thousandsSep: String,
-                                     decimalSep: String,
-                                     symbolLeft: Boolean,
-                                     spaceBetween: Boolean,
-                                     exp: Int,
-                                     minAmount: Long,
-                                     maxAmount: Long)
+  final case class TelegramCurrency private (code: String,
+                                             title: String,
+                                             symbol: String,
+                                             native: String,
+                                             thousandsSep: String,
+                                             decimalSep: String,
+                                             symbolLeft: Boolean,
+                                             spaceBetween: Boolean,
+                                             exp: Int,
+                                             minAmount: Long,
+                                             maxAmount: Long)
       extends Val(code)
 
   implicit def valueToCurrency(v: Value): TelegramCurrency = v.asInstanceOf[TelegramCurrency]

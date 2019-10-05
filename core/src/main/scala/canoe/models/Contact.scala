@@ -1,17 +1,16 @@
 package canoe.models
 
-/** This object represents a phone contact.
+/**
+  * Represents a phone contact.
   *
-  * @param phoneNumber  Contact's phone number
-  * @param firstName    Contact's first name
-  * @param lastName     Optional Contact's last name
-  * @param userId       Optional Contact's user identifier in Telegram
-  * @param vcard        String Optional. Additional data about the contact in the form of a vCard
+  * @param phoneNumber Contact's phone number
+  * @param firstName   Contact's first name
+  * @param lastName    Contact's last name
+  * @param userId      Contact's user identifier in Telegram
+  * @param vcard       Additional data about the contact in the form of a [[https://en.wikipedia.org/wiki/VCard vCard]]
   */
-case class Contact(
-  phoneNumber: String,
-  firstName: String,
-  lastName: Option[String] = None,
-  userId: Option[Int] = None,
-  vcard: Option[String] = None
-)
+final case class Contact(phoneNumber: String,
+                         firstName: String,
+                         lastName: Option[String],
+                         userId: Option[Int],
+                         vcard: Option[String])

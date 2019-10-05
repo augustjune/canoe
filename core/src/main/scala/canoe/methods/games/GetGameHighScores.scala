@@ -6,26 +6,45 @@ import canoe.models.{ChatId, GameHighScore, InputFile}
 import io.circe.generic.semiauto._
 import io.circe.{Decoder, Encoder}
 
-/** Use this method to get data for high score tables.
+/**
+  * Use this method to get data for high score tables.
+  *
   * Will return the score of the specified user and several of his neighbors in a game.
-  * On success, returns an Array of GameHighScore objects.
+  * On success, returns a list of GameHighScore objects.
   *
   * This method will currently return scores for the target user, plus two of his closest neighbors on each side.
   * Will also return the top three users if the user and his neighbors are not among them.
   * Please note that this behavior is subject to change.
+
+  * Use methods in companion object in order to construct the value of this class.
   *
-  * @param userId          Integer Yes Target user id
-  * @param chatId          Integer or String Optional Required if inline_message_id is not specified. Unique identifier for the target chat (or username of the target channel in the format @channelusername)
-  * @param messageId       Integer Optional Required if inline_message_id is not specified. Unique identifier of the sent message
-  * @param inlineMessageId String Optional Required if chat_id and message_id are not specified. Identifier of the inline message
+  * @param userId          Target user id
+  * @param chatId          Unique identifier for the target chat (or username of the target channel in the format @channelusername).
+  *                        Required if 'inlineMessageId' is not specified.
+  * @param messageId       Unique identifier of the sent message.
+  *                        Required if 'inlineMessageId' is not specified.
+  * @param inlineMessageId Identifier of the inline message.
+  *                        Required if 'chatId' and 'messageId' are not specified.
   */
-case class GetGameHighScores(userId: Int,
-                             chatId: Option[ChatId] = None,
-                             messageId: Option[Int] = None,
-                             inlineMessageId: Option[String] = None)
+final case class GetGameHighScores private (userId: Int,
+                                            chatId: Option[ChatId] = None,
+                                            messageId: Option[Int] = None,
+                                            inlineMessageId: Option[String] = None)
 
 object GetGameHighScores {
   import io.circe.generic.auto._
+
+  /**
+    * For the messages sent directed by the bot
+    */
+  def direct(chatId: ChatId, messageId: Int, userId: Int): GetGameHighScores =
+    GetGameHighScores(userId, Some(chatId), Some(messageId))
+
+  /**
+    * For the inlined messages sent via the bot
+    */
+  def inlined(inlineMessageId: String, userId: Int): GetGameHighScores =
+    GetGameHighScores(userId, inlineMessageId = Some(inlineMessageId))
 
   implicit val method: Method[GetGameHighScores, List[GameHighScore]] =
     new Method[GetGameHighScores, List[GameHighScore]] {

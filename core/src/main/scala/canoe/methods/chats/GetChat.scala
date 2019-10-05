@@ -6,12 +6,16 @@ import canoe.models.{ChatId, DetailedChat, InputFile}
 import io.circe.generic.semiauto._
 import io.circe.{Decoder, Encoder}
 
-/** Use this method to get up to date information about the chat (current name of the user for one-on-one conversations, current username of a user, group or channel, etc.).
-  * Returns a Chat object on success.
+/**
+  * Use this method to get up to date information about the chat (current name of the user
+  * for one-on-one conversations, current username of a user, group or channel, etc.)
   *
-  * @param chatId Integer or String Unique identifier for the target chat or username of the target supergroup or channel (in the format @channelusername)
+  * Returns a DetailedChat object on success.
+  *
+  * @param chatId Unique identifier for the target chat or username of the target channel
+  *               (in the format @channelusername)
   */
-case class GetChat(chatId: ChatId)
+final case class GetChat(chatId: ChatId)
 
 object GetChat {
   import io.circe.generic.auto._

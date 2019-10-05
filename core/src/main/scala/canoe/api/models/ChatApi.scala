@@ -216,7 +216,7 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
                       replyToMessageId,
                       replyMarkup).call
 
-      case AudioContent(audio, caption, duration, parseMode, performer, title) =>
+      case AudioContent(audio, caption, duration, parseMode, performer, title, thumb) =>
         SendAudio(chat.id,
                   audio,
                   duration,
@@ -224,6 +224,7 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
                   parseMode,
                   performer,
                   title,
+                  thumb,
                   disableNotification,
                   replyToMessageId,
                   replyMarkup).call
@@ -238,9 +239,10 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
                     replyToMessageId,
                     replyMarkup).call
 
-      case DocumentContent(document, caption, parseMode) =>
+      case DocumentContent(document, thumb, caption, parseMode) =>
         SendDocument(chat.id,
                      document,
+                     thumb,
                      nonEmpty(caption),
                      parseMode,
                      disableNotification,
@@ -306,7 +308,7 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
       case StickerContent(sticker) =>
         SendSticker(chat.id, sticker, disableNotification, replyToMessageId, replyMarkup).call
 
-      case VenueContent(latitude, longitude, title, address, foursquareId, foursquareType, duration) =>
+      case VenueContent(latitude, longitude, title, address, foursquareId, foursquareType) =>
         SendVenue(chat.id,
                   latitude,
                   longitude,
@@ -314,17 +316,17 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
                   address,
                   foursquareId,
                   foursquareType,
-                  duration,
                   disableNotification,
                   replyToMessageId,
                   replyMarkup).call
 
-      case VideoContent(video, caption, duration, width, height, parseMode, supportsStreaming) =>
+      case VideoContent(video, caption, duration, width, height, thumb, parseMode, supportsStreaming) =>
         SendVideo(chat.id,
                   video,
                   duration,
                   width,
                   height,
+                  thumb,
                   nonEmpty(caption),
                   parseMode,
                   supportsStreaming,

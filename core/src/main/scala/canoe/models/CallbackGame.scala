@@ -1,6 +1,7 @@
 package canoe.models
 
-/** A placeholder, currently holds no information. Use BotFather to set up your game.
+/**
+  * A placeholder, currently holds no information.
   */
 sealed trait CallbackGame
 

@@ -5,7 +5,8 @@ import canoe.models.{InputFile, User}
 import io.circe.generic.semiauto._
 import io.circe.{Decoder, Encoder, Json}
 
-/** A simple method for testing your bot's auth token. Requires no parameters.
+/**
+  * A simple method for testing your bot's auth token. Requires no parameters.
   * Returns basic information about the bot in form of a User object.
   */
 case object GetMe {

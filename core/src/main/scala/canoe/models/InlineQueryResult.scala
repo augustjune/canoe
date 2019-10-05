@@ -48,7 +48,7 @@ sealed trait InlineQueryResult {
   */
 final case class InlineQueryResultArticle(id: String,
                                           title: String,
-                                          inputMessageContent: InputMessageContent,
+                                          inputMessageContent: InlineQueryResultContent,
                                           replyMarkup: Option[InlineKeyboardMarkup] = None,
                                           url: Option[String] = None,
                                           hideUrl: Option[Boolean] = None,
@@ -88,7 +88,7 @@ final case class InlineQueryResultPhoto(id: String,
                                         caption: Option[String] = None,
                                         parseMode: Option[ParseMode] = None,
                                         replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                        inputMessageContent: Option[InputMessageContent] = None,
+                                        inputMessageContent: Option[InlineQueryResultContent] = None,
                                         `type`: String = "photo")
     extends InlineQueryResult
 
@@ -140,7 +140,7 @@ final case class InlineQueryResultGif(id: String,
                                       caption: Option[String] = None,
                                       parseMode: Option[ParseMode] = None,
                                       replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                      inputMessageContent: Option[InputMessageContent] = None,
+                                      inputMessageContent: Option[InlineQueryResultContent] = None,
                                       `type`: String = "gif")
     extends InlineQueryResult
 
@@ -173,7 +173,7 @@ final case class InlineQueryResultMpeg4Gif(id: String,
                                            caption: Option[String] = None,
                                            parseMode: Option[ParseMode] = None,
                                            replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                           inputMessageContent: Option[InputMessageContent] = None,
+                                           inputMessageContent: Option[InlineQueryResultContent] = None,
                                            `type`: String = "mpeg4_gif")
     extends InlineQueryResult
 
@@ -210,7 +210,7 @@ final case class InlineQueryResultVideo(id: String,
                                         videoDuration: Option[Int] = None,
                                         description: Option[String] = None,
                                         replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                        inputMessageContent: Option[InputMessageContent] = None,
+                                        inputMessageContent: Option[InlineQueryResultContent] = None,
                                         `type`: String = "video")
     extends InlineQueryResult
 
@@ -239,7 +239,7 @@ final case class InlineQueryResultAudio(id: String,
                                         performer: Option[String] = None,
                                         audioDuration: Option[Int] = None,
                                         replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                        inputMessageContent: Option[InputMessageContent] = None,
+                                        inputMessageContent: Option[InlineQueryResultContent] = None,
                                         `type`: String = "audio")
     extends InlineQueryResult
 
@@ -268,7 +268,7 @@ final case class InlineQueryResultVoice(id: String,
                                         parseMode: Option[ParseMode] = None,
                                         voiceDuration: Option[Int] = None,
                                         replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                        inputMessageContent: Option[InputMessageContent] = None,
+                                        inputMessageContent: Option[InlineQueryResultContent] = None,
                                         `type`: String = "voice")
     extends InlineQueryResult
 
@@ -301,7 +301,7 @@ final case class InlineQueryResultDocument(id: String,
                                            mimeType: String, // either "application/pdf" or "application/zip"
                                            description: Option[String] = None,
                                            replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                           inputMessageContent: Option[InputMessageContent] = None,
+                                           inputMessageContent: Option[InlineQueryResultContent] = None,
                                            thumbUrl: Option[String] = None,
                                            thumbWidth: Option[Int] = None,
                                            thumbHeight: Option[Int] = None,
@@ -334,7 +334,7 @@ final case class InlineQueryResultLocation(id: String,
                                            title: String,
                                            livePeriod: Option[Int] = None,
                                            replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                           inputMessageContent: Option[InputMessageContent] = None,
+                                           inputMessageContent: Option[InlineQueryResultContent] = None,
                                            thumbUrl: Option[String] = None,
                                            thumbWidth: Option[Int] = None,
                                            thumbHeight: Option[Int] = None,
@@ -372,7 +372,7 @@ final case class InlineQueryResultVenue(id: String,
                                         foursquareId: Option[String] = None,
                                         foursquareType: Option[String] = None,
                                         replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                        inputMessageContent: Option[InputMessageContent] = None,
+                                        inputMessageContent: Option[InlineQueryResultContent] = None,
                                         thumbUrl: Option[String] = None,
                                         thumbWidth: Option[Int] = None,
                                         thumbHeight: Option[Int] = None,
@@ -405,7 +405,7 @@ final case class InlineQueryResultContact(id: String,
                                           lastName: Option[String] = None,
                                           vcard: Option[String] = None,
                                           replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                          inputMessageContent: Option[InputMessageContent] = None,
+                                          inputMessageContent: Option[InlineQueryResultContent] = None,
                                           thumbUrl: Option[String] = None,
                                           thumbWidth: Option[Int] = None,
                                           thumbHeight: Option[Int] = None,
@@ -435,7 +435,7 @@ final case class InlineQueryResultCachedPhoto(id: String,
                                               caption: Option[String] = None,
                                               parseMode: Option[ParseMode] = None,
                                               replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                              inputMessageContent: Option[InputMessageContent] = None,
+                                              inputMessageContent: Option[InlineQueryResultContent] = None,
                                               `type`: String = "photo")
     extends InlineQueryResult
 
@@ -460,7 +460,7 @@ final case class InlineQueryResultCachedGif(id: String,
                                             caption: Option[String] = None,
                                             parseMode: Option[ParseMode] = None,
                                             replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                            inputMessageContent: Option[InputMessageContent] = None,
+                                            inputMessageContent: Option[InlineQueryResultContent] = None,
                                             `type`: String = "gif")
     extends InlineQueryResult
 
@@ -485,7 +485,7 @@ final case class InlineQueryResultCachedMpeg4Gif(id: String,
                                                  caption: Option[String] = None,
                                                  parseMode: Option[ParseMode] = None,
                                                  replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                                 inputMessageContent: Option[InputMessageContent] = None,
+                                                 inputMessageContent: Option[InlineQueryResultContent] = None,
                                                  `type`: String = "mpeg4_gif")
     extends InlineQueryResult
 
@@ -506,7 +506,7 @@ final case class InlineQueryResultCachedMpeg4Gif(id: String,
 final case class InlineQueryResultCachedSticker(id: String,
                                                 stickerFileId: String,
                                                 replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                                inputMessageContent: Option[InputMessageContent] = None,
+                                                inputMessageContent: Option[InlineQueryResultContent] = None,
                                                 `type`: String = "sticker")
     extends InlineQueryResult
 
@@ -536,7 +536,7 @@ final case class InlineQueryResultCachedDocument(id: String,
                                                  caption: Option[String] = None,
                                                  parseMode: Option[ParseMode] = None,
                                                  replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                                 inputMessageContent: Option[InputMessageContent] = None,
+                                                 inputMessageContent: Option[InlineQueryResultContent] = None,
                                                  `type`: String = "document")
     extends InlineQueryResult
 
@@ -563,7 +563,7 @@ final case class InlineQueryResultCachedVideo(id: String,
                                               caption: Option[String] = None,
                                               parseMode: Option[ParseMode] = None,
                                               replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                              inputMessageContent: Option[InputMessageContent] = None,
+                                              inputMessageContent: Option[InlineQueryResultContent] = None,
                                               `type`: String = "video")
     extends InlineQueryResult
 
@@ -590,7 +590,7 @@ final case class InlineQueryResultCachedVoice(id: String,
                                               caption: Option[String] = None,
                                               parseMode: Option[ParseMode] = None,
                                               replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                              inputMessageContent: Option[InputMessageContent] = None,
+                                              inputMessageContent: Option[InlineQueryResultContent] = None,
                                               `type`: String = "voice")
     extends InlineQueryResult
 
@@ -615,6 +615,6 @@ final case class InlineQueryResultCachedAudio(id: String,
                                               caption: Option[String] = None,
                                               parseMode: Option[ParseMode] = None,
                                               replyMarkup: Option[InlineKeyboardMarkup] = None,
-                                              inputMessageContent: Option[InputMessageContent] = None,
+                                              inputMessageContent: Option[InlineQueryResultContent] = None,
                                               `type`: String = "audio")
     extends InlineQueryResult

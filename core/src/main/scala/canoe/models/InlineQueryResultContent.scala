@@ -2,16 +2,10 @@ package canoe.models
 
 import canoe.models.ParseMode.ParseMode
 
-/** This object represents the content of a message to be sent as a result of an inline query.
-  *
-  * Telegram clients currently support the following 4 types:
-  *   InputTextMessageContent
-  *   InputLocationMessageContent
-  *   InputVenueMessageContent
-  *   InputContactMessageContent
+/**
+  * Content of a message to be sent as a result of an inline query.
   */
-// ToDo - naming is confusing with more widely used MessageContent
-sealed trait InputMessageContent
+sealed trait InlineQueryResultContent
 
 /**
   * Content of a text message to be sent as the result of an inline query.
@@ -20,12 +14,12 @@ sealed trait InputMessageContent
   * @param parseMode             Parse mode of captured text (Markdown or HTML)
   * @param disableWebPagePreview Disables link previews for links in the sent message
   */
-final case class InputTextMessageContent(messageText: String,
-                                         parseMode: Option[ParseMode] = None,
-                                         disableWebPagePreview: Option[Boolean] = None)
-    extends InputMessageContent
+final case class InlineQueryResultTextContent(messageText: String,
+                                              parseMode: Option[ParseMode] = None,
+                                              disableWebPagePreview: Option[Boolean] = None)
+    extends InlineQueryResultContent
 
-/** 
+/**
   * Content of a location message to be sent as the result of an inline query.
   *
   * ''Note:''
@@ -34,7 +28,7 @@ final case class InputTextMessageContent(messageText: String,
   * @param latitude   Latitude of the location in degrees
   * @param longitude  Longitude of the location in degrees
   */
-final case class InputLocationMessageContent(latitude: Double, longitude: Double) extends InputMessageContent
+final case class InlineQueryResultLocationContent(latitude: Double, longitude: Double) extends InlineQueryResultContent
 
 /**
   * Content of a venue message to be sent as the result of an inline query.
@@ -49,13 +43,13 @@ final case class InputLocationMessageContent(latitude: Double, longitude: Double
   * @param foursquareType Foursquare type of the venue, if known.
   *                       For example, “arts_entertainment/default”, “arts_entertainment/aquarium” or “food/icecream”.
   */
-final case class InputVenueMessageContent(latitude: Double,
-                                          longitude: Double,
-                                          title: String,
-                                          address: String,
-                                          foursquareId: Option[String] = None,
-                                          foursquareType: Option[String] = None)
-    extends InputMessageContent
+final case class InlineQueryResultVenueContent(latitude: Double,
+                                               longitude: Double,
+                                               title: String,
+                                               address: String,
+                                               foursquareId: Option[String] = None,
+                                               foursquareType: Option[String] = None)
+    extends InlineQueryResultContent
 
 /**
   * Content of a contact message to be sent as the result of an inline query.
@@ -68,8 +62,8 @@ final case class InputVenueMessageContent(latitude: Double,
   * @param lastName    Contact's last name
   * @param vcard       Additional data about the contact in the form of a vCard, 0-2048 bytes
   */
-final case class InputContactMessageContent(phoneNumber: String,
-                                            firstName: String,
-                                            lastName: Option[String] = None,
-                                            vcard: Option[String] = None)
-    extends InputMessageContent
+final case class InlineQueryResultContactContent(phoneNumber: String,
+                                                 firstName: String,
+                                                 lastName: Option[String] = None,
+                                                 vcard: Option[String] = None)
+    extends InlineQueryResultContent

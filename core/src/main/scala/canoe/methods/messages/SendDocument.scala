@@ -3,9 +3,9 @@ package canoe.methods.messages
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.ParseMode.ParseMode
-import canoe.models.messages.TelegramMessage
+import canoe.models.messages.DocumentMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto._
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -40,14 +40,14 @@ final case class SendDocument(chatId: ChatId,
 object SendDocument {
   import io.circe.generic.auto._
 
-  implicit val method: Method[SendDocument, TelegramMessage] =
-    new Method[SendDocument, TelegramMessage] {
+  implicit val method: Method[SendDocument, DocumentMessage] =
+    new Method[SendDocument, DocumentMessage] {
 
       def name: String = "sendDocument"
 
       def encoder: Encoder[SendDocument] = deriveEncoder[SendDocument].snakeCase
 
-      def decoder: Decoder[TelegramMessage] = TelegramMessage.telegramMessageDecoder
+      def decoder: Decoder[DocumentMessage] = deriveDecoder[DocumentMessage]
 
       def uploads(request: SendDocument): List[(String, InputFile)] =
         List("document" -> request.document)

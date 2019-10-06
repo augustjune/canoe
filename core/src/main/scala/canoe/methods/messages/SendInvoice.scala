@@ -3,9 +3,9 @@ package canoe.methods.messages
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.Currency.Currency
-import canoe.models.messages.TelegramMessage
+import canoe.models.messages.InvoiceMessage
 import canoe.models.{InputFile, LabeledPrice, ReplyMarkup}
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto._
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -64,14 +64,14 @@ final case class SendInvoice(chatId: Long,
 object SendInvoice {
   import io.circe.generic.auto._
 
-  implicit val method: Method[SendInvoice, TelegramMessage] =
-    new Method[SendInvoice, TelegramMessage] {
+  implicit val method: Method[SendInvoice, InvoiceMessage] =
+    new Method[SendInvoice, InvoiceMessage] {
 
       def name: String = "sendInvoice"
 
       def encoder: Encoder[SendInvoice] = deriveEncoder[SendInvoice].snakeCase
 
-      def decoder: Decoder[TelegramMessage] = TelegramMessage.telegramMessageDecoder
+      def decoder: Decoder[InvoiceMessage] = deriveDecoder[InvoiceMessage]
 
       def uploads(request: SendInvoice): List[(String, InputFile)] = Nil
     }

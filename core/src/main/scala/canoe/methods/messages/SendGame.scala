@@ -2,9 +2,9 @@ package canoe.methods.messages
 
 import canoe.marshalling.codecs._
 import canoe.methods.Method
-import canoe.models.messages.TelegramMessage
+import canoe.models.messages.GameMessage
 import canoe.models.{InputFile, ReplyMarkup}
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto._
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -31,14 +31,14 @@ final case class SendGame(chatId: Long,
 object SendGame {
   import io.circe.generic.auto._
 
-  implicit val method: Method[SendGame, TelegramMessage] =
-    new Method[SendGame, TelegramMessage] {
+  implicit val method: Method[SendGame, GameMessage] =
+    new Method[SendGame, GameMessage] {
 
       def name: String = "sendGame"
 
       def encoder: Encoder[SendGame] = deriveEncoder[SendGame].snakeCase
 
-      def decoder: Decoder[TelegramMessage] = TelegramMessage.telegramMessageDecoder
+      def decoder: Decoder[GameMessage] = deriveDecoder[GameMessage]
 
       def uploads(request: SendGame): List[(String, InputFile)] = Nil
     }

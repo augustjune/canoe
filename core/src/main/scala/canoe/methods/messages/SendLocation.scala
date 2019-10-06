@@ -2,9 +2,9 @@ package canoe.methods.messages
 
 import canoe.marshalling.codecs._
 import canoe.methods.Method
-import canoe.models.messages.TelegramMessage
+import canoe.models.messages.LocationMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto._
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -36,14 +36,14 @@ final case class SendLocation(chatId: ChatId,
 object SendLocation {
   import io.circe.generic.auto._
 
-  implicit val method: Method[SendLocation, TelegramMessage] =
-    new Method[SendLocation, TelegramMessage] {
+  implicit val method: Method[SendLocation, LocationMessage] =
+    new Method[SendLocation, LocationMessage] {
 
       def name: String = "sendLocation"
 
       def encoder: Encoder[SendLocation] = deriveEncoder[SendLocation].snakeCase
 
-      def decoder: Decoder[TelegramMessage] = TelegramMessage.telegramMessageDecoder
+      def decoder: Decoder[LocationMessage] = deriveDecoder[LocationMessage]
 
       def uploads(request: SendLocation): List[(String, InputFile)] = Nil
     }

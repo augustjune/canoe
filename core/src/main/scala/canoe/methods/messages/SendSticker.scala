@@ -2,7 +2,7 @@ package canoe.methods.messages
 
 import canoe.marshalling.codecs._
 import canoe.methods.Method
-import canoe.models.messages.TelegramMessage
+import canoe.models.messages.StickerMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
 import io.circe.generic.semiauto._
 import io.circe.{Decoder, Encoder}
@@ -33,14 +33,14 @@ final case class SendSticker(chatId: ChatId,
 object SendSticker {
   import io.circe.generic.auto._
 
-  implicit val method: Method[SendSticker, TelegramMessage] =
-    new Method[SendSticker, TelegramMessage] {
+  implicit val method: Method[SendSticker, StickerMessage] =
+    new Method[SendSticker, StickerMessage] {
 
       def name: String = "sendSticker"
 
       def encoder: Encoder[SendSticker] = deriveEncoder[SendSticker].snakeCase
 
-      def decoder: Decoder[TelegramMessage] = TelegramMessage.telegramMessageDecoder
+      def decoder: Decoder[StickerMessage] = deriveDecoder[StickerMessage]
 
       def uploads(request: SendSticker): List[(String, InputFile)] =
         List("sticker" -> request.sticker)

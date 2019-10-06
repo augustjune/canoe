@@ -2,9 +2,9 @@ package canoe.methods.messages
 
 import canoe.marshalling.codecs._
 import canoe.methods.Method
-import canoe.models.messages.TelegramMessage
+import canoe.models.messages.PollMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto._
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -25,7 +25,7 @@ import io.circe.{Decoder, Encoder}
   */
 final case class SendPoll(chatId: ChatId,
                           question: String,
-                          options: Array[String],
+                          options: List[String],
                           disableNotification: Option[Boolean] = None,
                           replyToMessageId: Option[Int] = None,
                           replyMarkup: Option[ReplyMarkup] = None)
@@ -33,14 +33,14 @@ final case class SendPoll(chatId: ChatId,
 object SendPoll {
   import io.circe.generic.auto._
 
-  implicit val method: Method[SendPoll, TelegramMessage] =
-    new Method[SendPoll, TelegramMessage] {
+  implicit val method: Method[SendPoll, PollMessage] =
+    new Method[SendPoll, PollMessage] {
 
       def name: String = "sendPoll"
 
       def encoder: Encoder[SendPoll] = deriveEncoder[SendPoll].snakeCase
 
-      def decoder: Decoder[TelegramMessage] = TelegramMessage.telegramMessageDecoder
+      def decoder: Decoder[PollMessage] = deriveDecoder[PollMessage]
 
       def uploads(request: SendPoll): List[(String, InputFile)] = Nil
     }

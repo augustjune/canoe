@@ -24,30 +24,30 @@ import io.circe.{Decoder, Encoder}
   *                        A JSON-serialized object for an inline keyboard, custom reply keyboard,
   *                        instructions to hide reply keyboard or to force a reply from the user.
   */
-final case class StopMessageLiveLocation private (chatId: Option[ChatId],
-                                                  messageId: Option[Int],
-                                                  inlineMessageId: Option[Int],
-                                                  replyMarkup: Option[InlineKeyboardMarkup] = None)
+final class StopMessageLiveLocation private (val chatId: Option[ChatId],
+                                             val messageId: Option[Int],
+                                             val inlineMessageId: Option[Int],
+                                             val replyMarkup: Option[InlineKeyboardMarkup] = None)
 
 object StopMessageLiveLocation {
-  import io.circe.generic.auto._
 
   /**
-    * Use this constructor in order to stop live location of the message sent directly by the bot
+    * For the messages sent directed by the bot
     */
-  def sentByBot(chatId: ChatId,
-                messageId: Int,
-                replyMarkup: Option[InlineKeyboardMarkup] = None): StopMessageLiveLocation =
-    StopMessageLiveLocation(Some(chatId), Some(messageId), None, replyMarkup)
+  def direct(chatId: ChatId,
+             messageId: Int,
+             replyMarkup: Option[InlineKeyboardMarkup] = None): StopMessageLiveLocation =
+    new StopMessageLiveLocation(Some(chatId), Some(messageId), None, replyMarkup)
 
   /**
-    * Use this constructor in order to stop live location of the message sent via the bot as inline message
+    * For the inlined messages sent via the bot
     */
-  def sentViaBot(inlineMessageId: Int, replyMarkup: Option[InlineKeyboardMarkup] = None): StopMessageLiveLocation =
-    StopMessageLiveLocation(None, None, Some(inlineMessageId), replyMarkup)
+  def inlined(inlineMessageId: Int, replyMarkup: Option[InlineKeyboardMarkup] = None): StopMessageLiveLocation =
+    new StopMessageLiveLocation(None, None, Some(inlineMessageId), replyMarkup)
 
   implicit val method: Method[StopMessageLiveLocation, Either[Boolean, TelegramMessage]] =
     new Method[StopMessageLiveLocation, Either[Boolean, TelegramMessage]] {
+      import io.circe.generic.auto._
 
       def name: String = "stopMessageLiveLocation"
 

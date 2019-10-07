@@ -30,16 +30,15 @@ import io.circe.{Decoder, Encoder}
   *                              A JSON-serialized object for an inline keyboard, custom reply keyboard,
   *                              instructions to hide reply keyboard or to force a reply from the user.
   */
-final case class EditMessageText private (chatId: Option[ChatId],
-                                          messageId: Option[Int],
-                                          inlineMessageId: Option[String],
-                                          text: String,
-                                          parseMode: Option[ParseMode] = None,
-                                          disableWebPagePreview: Option[Boolean] = None,
-                                          replyMarkup: Option[ReplyMarkup] = None)
+final class EditMessageText private (val chatId: Option[ChatId],
+                                     val messageId: Option[Int],
+                                     val inlineMessageId: Option[String],
+                                     val text: String,
+                                     val parseMode: Option[ParseMode] = None,
+                                     val disableWebPagePreview: Option[Boolean] = None,
+                                     val replyMarkup: Option[ReplyMarkup] = None)
 
 object EditMessageText {
-  import io.circe.generic.auto._
 
   /**
     * For the messages sent directed by the bot
@@ -50,7 +49,7 @@ object EditMessageText {
              parseMode: Option[ParseMode] = None,
              disableWebPagePreview: Option[Boolean] = None,
              replyMarkup: Option[ReplyMarkup] = None): EditMessageText =
-    EditMessageText(Some(chatId), Some(messageId), None, text, parseMode, disableWebPagePreview, replyMarkup)
+    new EditMessageText(Some(chatId), Some(messageId), None, text, parseMode, disableWebPagePreview, replyMarkup)
 
   /**
     * For the inlined messages sent via the bot
@@ -60,10 +59,11 @@ object EditMessageText {
               parseMode: Option[ParseMode] = None,
               disableWebPagePreview: Option[Boolean] = None,
               replyMarkup: Option[ReplyMarkup] = None): EditMessageText =
-    EditMessageText(None, None, Some(inlineMessageId), text, parseMode, disableWebPagePreview, replyMarkup)
+    new EditMessageText(None, None, Some(inlineMessageId), text, parseMode, disableWebPagePreview, replyMarkup)
 
   implicit val method: Method[EditMessageText, Either[Boolean, TelegramMessage]] =
     new Method[EditMessageText, Either[Boolean, TelegramMessage]] {
+      import io.circe.generic.auto._
 
       def name: String = "editMessageText"
 

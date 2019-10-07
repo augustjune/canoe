@@ -30,12 +30,12 @@ import io.circe.{Decoder, Encoder}
   *                        A JSON-serialized object for an inline keyboard, custom reply keyboard,
   *                        instructions to hide reply keyboard or to force a reply from the user.
   */
-final case class EditMessageCaption private (chatId: Option[ChatId],
-                                             messageId: Option[Int],
-                                             inlineMessageId: Option[String],
-                                             caption: Option[String] = None,
-                                             parseMode: Option[ParseMode] = None,
-                                             replyMarkup: Option[ReplyMarkup] = None)
+final class EditMessageCaption private (val chatId: Option[ChatId],
+                                        val messageId: Option[Int],
+                                        val inlineMessageId: Option[String],
+                                        val caption: Option[String] = None,
+                                        val parseMode: Option[ParseMode] = None,
+                                        val replyMarkup: Option[ReplyMarkup] = None)
 
 object EditMessageCaption {
 
@@ -48,7 +48,7 @@ object EditMessageCaption {
              parseMode: Option[ParseMode] = None,
              disableWebPagePreview: Option[Boolean] = None,
              replyMarkup: Option[ReplyMarkup] = None): EditMessageCaption =
-    EditMessageCaption(Some(chatId), Some(messageId), None, caption, parseMode, replyMarkup)
+    new EditMessageCaption(Some(chatId), Some(messageId), None, caption, parseMode, replyMarkup)
 
   /**
     * For the inlined messages sent via the bot
@@ -58,7 +58,7 @@ object EditMessageCaption {
               parseMode: Option[ParseMode] = None,
               disableWebPagePreview: Option[Boolean] = None,
               replyMarkup: Option[ReplyMarkup] = None): EditMessageCaption =
-    EditMessageCaption(None, None, Some(inlineMessageId), caption, parseMode, replyMarkup)
+    new EditMessageCaption(None, None, Some(inlineMessageId), caption, parseMode, replyMarkup)
 
   implicit val method: Method[EditMessageCaption, Either[Boolean, TelegramMessage]] =
     new Method[EditMessageCaption, Either[Boolean, TelegramMessage]] {

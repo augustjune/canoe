@@ -33,13 +33,32 @@ import io.circe.{Decoder, Encoder}
   *                        Defaults to 0.
   *
   */
-final case class AnswerCallbackQuery(callbackQueryId: String,
-                                     text: Option[String] = None,
-                                     showAlert: Option[Boolean] = None,
-                                     url: Option[String] = None,
-                                     cacheTime: Option[Int] = None)
+final class AnswerCallbackQuery private (val callbackQueryId: String,
+                                         val text: Option[String] = None,
+                                         val showAlert: Option[Boolean] = None,
+                                         val url: Option[String] = None,
+                                         val cacheTime: Option[Int] = None)
 
 object AnswerCallbackQuery {
+
+  /**
+    * Notification answer which shows provided text at the top of the chat screen
+    */
+  def notification(queryId: String, text: String): AnswerCallbackQuery =
+    new AnswerCallbackQuery(queryId, text = Some(text))
+
+  /**
+    * Alert answer which shows provided text in a pop-up form
+    */
+  def alert(queryId: String, text: String): AnswerCallbackQuery =
+    new AnswerCallbackQuery(queryId, text = Some(text), showAlert = Some(true))
+
+  /**
+    * Answer which redirects the user to the provided address.
+    * Example: you can redirect a user to your bot using `telegram.me/your_bot?start=XXXX`
+    */
+  def redirect(queryId: String, url: String): AnswerCallbackQuery =
+    new AnswerCallbackQuery(queryId, url = Some(url))
 
   implicit val method: Method[AnswerCallbackQuery, Boolean] =
     new Method[AnswerCallbackQuery, Boolean] {

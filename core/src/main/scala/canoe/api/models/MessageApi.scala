@@ -2,13 +2,12 @@ package canoe.api.models
 
 import canoe.api._
 import canoe.methods.messages._
-import canoe.models.messages.{PollMessage, TelegramMessage}
+import canoe.models.messages.TelegramMessage
 import canoe.models.outgoing._
-import canoe.models.{Chat, InlineKeyboardMarkup, Poll, ReplyMarkup}
+import canoe.models.{Chat, InlineKeyboardMarkup, ReplyMarkup}
 import canoe.syntax.methodOps
-import cats.ApplicativeError
 
-final class MessageApi[F[_]](message: TelegramMessage)(implicit client: TelegramClient[F]) {
+final class MessageApi[F[_]: TelegramClient](message: TelegramMessage) {
 
   private def chatId: Long = message.chat.id
   private def messageId: Int = message.messageId
@@ -35,9 +34,9 @@ final class MessageApi[F[_]](message: TelegramMessage)(implicit client: Telegram
   /**
     * Sends new message as a reply to this message
     */
-  def reply(content: MessageContent,
-            replyMarkup: Option[ReplyMarkup] = None,
-            disableNotification: Option[Boolean] = None): F[TelegramMessage] =
+  def reply[M](content: MessageContent[M],
+               replyMarkup: Option[ReplyMarkup] = None,
+               disableNotification: Boolean = false): F[M] =
     message.chat.send(content, Some(messageId), replyMarkup, disableNotification)
 
   /**
@@ -63,18 +62,6 @@ final class MessageApi[F[_]](message: TelegramMessage)(implicit client: Telegram
     * @return On success, if edited message is sent by the bot,
     *         the edited Message is returned, otherwise True is returned.
     */
-  def editCaption(caption: Option[String]): F[Either[Boolean, TelegramMessage]] =
-    EditMessageCaption.direct(chatId, messageId, caption = caption).call
-
-  /**
-    * Stops the poll, which is represented by this message.
-    *
-    * @return On success, the stopped Poll with the final results is returned.
-    */
-  def stopPoll(markup: Option[InlineKeyboardMarkup] = None)(implicit F: ApplicativeError[F, Throwable]): F[Poll] =
-    message match {
-      case _: PollMessage => StopPoll(chatId, messageId, markup).call
-      case _              => F.raiseError(new RuntimeException("This message is not a poll"))
-    }
-
+  def editCaption(caption: String): F[Either[Boolean, TelegramMessage]] =
+    EditMessageCaption.direct(chatId, messageId, caption = Some(caption)).call
 }

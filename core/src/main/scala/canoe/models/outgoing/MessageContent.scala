@@ -5,6 +5,11 @@ import canoe.models.ParseMode.ParseMode
 import canoe.models.messages._
 import canoe.models.{InputFile, LabeledPrice}
 
+/**
+  * The content of the message which is going to be sent by the bot.
+  *
+  * @tparam A Type of message which is going to be the result of sending this content to the Telegram
+  */
 sealed trait MessageContent[A]
 
 final case class AnimationContent(animation: InputFile,
@@ -45,7 +50,7 @@ final case class InvoiceContent(title: String,
                                 providerToken: String,
                                 startParameter: String,
                                 currency: Currency,
-                                prices: Array[LabeledPrice],
+                                prices: Seq[LabeledPrice],
                                 providerData: Option[String] = None,
                                 photoUrl: Option[String] = None,
                                 photoSize: Option[Int] = None,

@@ -13,15 +13,6 @@ import cats.Applicative
 final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
 
   /**
-    * Sets the status of the bot for this chat
-    *
-    * The action is set for 5 seconds or until
-    * the first message is send by the bot
-    */
-  def setAction(action: ChatAction): F[Boolean] =
-    SendChatAction(chat.id, action).call
-
-  /**
     * Sets default permissions for all chat members
     *
     * The bot must be an administrator in the group or a supergroup
@@ -78,7 +69,7 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
   /**
     * Kicks a user from this chat
     */
-  def kick(userId: Int, untilDate: Option[Int] = None)(implicit F: Applicative[F]): F[Boolean] =
+  def kickUser(userId: Int, untilDate: Option[Int] = None)(implicit F: Applicative[F]): F[Boolean] =
     chat match {
       case _: PrivateChat => F.pure(false)
       case _              => KickChatMember(chat.id, userId, untilDate).call
@@ -108,7 +99,6 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
 
   /**
     * Promotes or demotes a user in this chat
-    * @return
     */
   def promoteMember(userId: Int,
                     canChangeInfo: Option[Boolean] = None,
@@ -149,6 +139,15 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
 
       case _ => F.pure(false)
     }
+
+  /**
+    * Sets the status of the bot for this chat
+    *
+    * The action is set for 5 seconds or until
+    * the first message is send by the bot
+    */
+  def setAction(action: ChatAction): F[Boolean] =
+    SendChatAction(chat.id, action).call
 
   /**
     * Changes the description of this chat if it's a group, a supergroup or a channel
@@ -198,10 +197,11 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
   /**
     * Sends a message to this chat
     */
-  def send(content: MessageContent,
-           replyToMessageId: Option[Int] = None,
-           replyMarkup: Option[ReplyMarkup] = None,
-           disableNotification: Option[Boolean] = None): F[TelegramMessage] =
+  def send[M](content: MessageContent[M],
+              replyToMessageId: Option[Int] = None,
+              replyMarkup: Option[ReplyMarkup] = None,
+              disableNotification: Boolean = false): F[M] =
+    // Casting the result type due to the lack of type inference in M type parameter
     content match {
       case AnimationContent(animation, caption, duration, width, height, thumb, parseMode) =>
         SendAnimation(chat.id,
@@ -212,9 +212,9 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
                       thumb,
                       nonEmpty(caption),
                       parseMode,
-                      disableNotification,
+                      notFalse(disableNotification),
                       replyToMessageId,
-                      replyMarkup).call
+                      replyMarkup).call.asInstanceOf[F[M]]
 
       case AudioContent(audio, caption, duration, parseMode, performer, title, thumb) =>
         SendAudio(chat.id,
@@ -225,9 +225,9 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
                   performer,
                   title,
                   thumb,
-                  disableNotification,
+                  notFalse(disableNotification),
                   replyToMessageId,
-                  replyMarkup).call
+                  replyMarkup).call.asInstanceOf[F[M]]
 
       case ContactContent(phoneNumber, firstName, lastName, vcard) =>
         SendContact(chat.id,
@@ -235,9 +235,9 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
                     firstName,
                     lastName,
                     vcard,
-                    disableNotification,
+                    notFalse(disableNotification),
                     replyToMessageId,
-                    replyMarkup).call
+                    replyMarkup).call.asInstanceOf[F[M]]
 
       case DocumentContent(document, thumb, caption, parseMode) =>
         SendDocument(chat.id,
@@ -245,12 +245,12 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
                      thumb,
                      nonEmpty(caption),
                      parseMode,
-                     disableNotification,
+                     notFalse(disableNotification),
                      replyToMessageId,
-                     replyMarkup).call
+                     replyMarkup).call.asInstanceOf[F[M]]
 
       case GameContent(gameShortName) =>
-        SendGame(chat.id, gameShortName, disableNotification, replyToMessageId, replyMarkup).call
+        SendGame(chat.id, gameShortName, notFalse(disableNotification), replyToMessageId, replyMarkup).call.asInstanceOf[F[M]]
 
       case InvoiceContent(title,
                           description,
@@ -288,25 +288,29 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
           needEmail,
           needShippingAddress,
           isFlexible,
-          disableNotification,
+          notFalse(disableNotification),
           replyToMessageId,
           replyMarkup
-        ).call
+        ).call.asInstanceOf[F[M]]
 
       case LocationContent(latitude, longitude, livePeriod) =>
-        SendLocation(chat.id, latitude, longitude, livePeriod, disableNotification, replyToMessageId, replyMarkup).call
+        SendLocation(chat.id, latitude, longitude, livePeriod, notFalse(disableNotification), replyToMessageId, replyMarkup).call
+          .asInstanceOf[F[M]]
 
       case TextContent(text, parseMode, disableWebPagePreview) =>
-        SendMessage(chat.id, text, parseMode, disableWebPagePreview, disableNotification, replyToMessageId, replyMarkup).call
+        SendMessage(chat.id, text, parseMode, disableWebPagePreview, notFalse(disableNotification), replyToMessageId, replyMarkup).call
+          .asInstanceOf[F[M]]
 
       case PhotoContent(photo, caption, parseMode) =>
-        SendPhoto(chat.id, photo, nonEmpty(caption), parseMode, disableNotification, replyToMessageId, replyMarkup).call
+        SendPhoto(chat.id, photo, nonEmpty(caption), parseMode, notFalse(disableNotification), replyToMessageId, replyMarkup).call
+          .asInstanceOf[F[M]]
 
       case PollContent(question, options) =>
-        SendPoll(chat.id, question, options, disableNotification, replyToMessageId, replyMarkup).call
+        SendPoll(chat.id, question, options, notFalse(disableNotification), replyToMessageId, replyMarkup).call
+          .asInstanceOf[F[M]]
 
       case StickerContent(sticker) =>
-        SendSticker(chat.id, sticker, disableNotification, replyToMessageId, replyMarkup).call
+        SendSticker(chat.id, sticker, notFalse(disableNotification), replyToMessageId, replyMarkup).call.asInstanceOf[F[M]]
 
       case VenueContent(latitude, longitude, title, address, foursquareId, foursquareType) =>
         SendVenue(chat.id,
@@ -316,9 +320,9 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
                   address,
                   foursquareId,
                   foursquareType,
-                  disableNotification,
+                  notFalse(disableNotification),
                   replyToMessageId,
-                  replyMarkup).call
+                  replyMarkup).call.asInstanceOf[F[M]]
 
       case VideoContent(video, caption, duration, width, height, thumb, parseMode, supportsStreaming) =>
         SendVideo(chat.id,
@@ -330,12 +334,13 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
                   nonEmpty(caption),
                   parseMode,
                   supportsStreaming,
-                  disableNotification,
+                  notFalse(disableNotification),
                   replyToMessageId,
-                  replyMarkup).call
+                  replyMarkup).call.asInstanceOf[F[M]]
 
       case VideoNoteContent(videoNote, duration, length) =>
-        SendVideoNote(chat.id, videoNote, duration, length, disableNotification, replyToMessageId, replyMarkup).call
+        SendVideoNote(chat.id, videoNote, duration, length, notFalse(disableNotification), replyToMessageId, replyMarkup).call
+          .asInstanceOf[F[M]]
 
       case VoiceContent(voice, caption, parseMode, duration) =>
         SendVoice(chat.id,
@@ -343,9 +348,9 @@ final class ChatApi[F[_]](chat: Chat)(implicit client: TelegramClient[F]) {
                   nonEmpty(caption),
                   parseMode,
                   duration,
-                  disableNotification,
+                  notFalse(disableNotification),
                   replyToMessageId,
-                  replyMarkup).call
+                  replyMarkup).call.asInstanceOf[F[M]]
     }
 
   /**

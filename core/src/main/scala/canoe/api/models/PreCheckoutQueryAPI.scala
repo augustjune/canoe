@@ -5,12 +5,18 @@ import canoe.methods.queries.AnswerPreCheckoutQuery
 import canoe.models.PreCheckoutQuery
 import canoe.syntax.methodOps
 
-final class PreCheckoutQueryAPI[F[_]: TelegramClient](query: PreCheckoutQuery) {
+/**
+  * Telegram API for the pre checkout query.
+  * Offers a convenient access to the related Telegram methods in OO style.
+  *
+  * It is a conscious decision to provide this API via extension methods.
+  */
+final class PreCheckoutQueryAPI(private val query: PreCheckoutQuery) extends AnyVal {
 
   /**
     * Signals that the bot is ready to proceed with the order.
     */
-  def confirm: F[Boolean] =
+  def confirm[F[_]: TelegramClient]: F[Boolean] =
     AnswerPreCheckoutQuery.positive(query.id).call
 
   /**
@@ -18,6 +24,6 @@ final class PreCheckoutQueryAPI[F[_]: TelegramClient](query: PreCheckoutQuery) {
     *
     * @param message Human readable form that explains the reason for failure
     */
-  def reject(message: String): F[Boolean] =
+  def reject[F[_]: TelegramClient](message: String): F[Boolean] =
     AnswerPreCheckoutQuery.negative(query.id, message).call
 }

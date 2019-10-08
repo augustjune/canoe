@@ -1,32 +1,35 @@
 package canoe
 
 import canoe.api.models._
-import canoe.models.messages.{LocationMessage, PollMessage, TelegramMessage}
 import canoe.models._
+import canoe.models.messages.{LocationMessage, PollMessage, TelegramMessage}
 
+/**
+  * Contains implicit conversions to the API classes of particular Telegram models
+  */
 package object api {
 
-  implicit def chatApi[F[_]: TelegramClient](chat: Chat): ChatApi[F] =
-    new ChatApi[F](chat)
+  implicit def chatApi(chat: Chat): ChatApi =
+    new ChatApi(chat)
 
-  implicit def messageApi[F[_]: TelegramClient](message: TelegramMessage): MessageApi[F] =
-    new MessageApi[F](message)
+  implicit def messageApi(message: TelegramMessage): MessageApi =
+    new MessageApi(message)
 
-  implicit def pollApi[F[_]: TelegramClient](message: PollMessage): PollMessageApi[F] =
-    new PollMessageApi[F](message)
+  implicit def pollApi(message: PollMessage): PollMessageApi =
+    new PollMessageApi(message)
 
-  implicit def liveLocationApi[F[_]: TelegramClient](message: LocationMessage): LiveLocationAPI[F] =
-    new LiveLocationAPI[F](message)
+  implicit def liveLocationApi(message: LocationMessage): LiveLocationAPI =
+    new LiveLocationAPI(message)
 
-  implicit def inlineQueryApi[F[_]: TelegramClient](query: InlineQuery): InlineQueryApi[F] =
-    new InlineQueryApi[F](query)
+  implicit def inlineQueryApi(query: InlineQuery): InlineQueryApi =
+    new InlineQueryApi(query)
 
-  implicit def callbackQueryApi[F[_]: TelegramClient](query: CallbackQuery): CallbackQueryAPI[F] =
-    new CallbackQueryAPI[F](query)
+  implicit def callbackQueryApi(query: CallbackQuery): CallbackQueryAPI =
+    new CallbackQueryAPI(query)
 
-  implicit def preCheckoutQueryApi[F[_]: TelegramClient](query: PreCheckoutQuery): PreCheckoutQueryAPI[F] =
-    new PreCheckoutQueryAPI[F](query)
+  implicit def preCheckoutQueryApi(query: PreCheckoutQuery): PreCheckoutQueryAPI =
+    new PreCheckoutQueryAPI(query)
 
-  implicit def shippingQueryApi[F[_]: TelegramClient](query: ShippingQuery): ShippingQueryAPI[F] =
-    new ShippingQueryAPI[F](query)
+  implicit def shippingQueryApi(query: ShippingQuery): ShippingQueryAPI =
+    new ShippingQueryAPI(query)
 }

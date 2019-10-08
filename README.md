@@ -3,6 +3,7 @@ canoe
 
 [![Build Status](https://travis-ci.org/augustjune/canoe.svg?branch=master)](https://travis-ci.org/augustjune/canoe)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.augustjune/canoe_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.augustjune/canoe_2.12)
+[![Gitter](https://badges.gitter.im/augustjune-canoe/community.svg)](https://gitter.im/augustjune-canoe/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
     
 ### Overview
 **canoe** provides a purely functional streaming interface over [Telegram Bot API](https://core.telegram.org/bots/api) 

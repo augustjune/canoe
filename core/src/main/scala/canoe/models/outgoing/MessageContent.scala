@@ -2,9 +2,15 @@ package canoe.models.outgoing
 
 import canoe.models.Currency.Currency
 import canoe.models.ParseMode.ParseMode
+import canoe.models.messages._
 import canoe.models.{InputFile, LabeledPrice}
 
-sealed trait MessageContent
+/**
+  * The content of the message which is going to be sent by the bot.
+  *
+  * @tparam A Type of message which is going to be the result of sending this content to the Telegram
+  */
+sealed trait MessageContent[A]
 
 final case class AnimationContent(animation: InputFile,
                                   caption: String = "",
@@ -13,7 +19,7 @@ final case class AnimationContent(animation: InputFile,
                                   height: Option[Int] = None,
                                   thumb: Option[InputFile] = None,
                                   parseMode: Option[ParseMode] = None)
-    extends MessageContent
+    extends MessageContent[AnimationMessage]
 
 final case class AudioContent(audio: InputFile,
                               caption: String = "",
@@ -22,21 +28,21 @@ final case class AudioContent(audio: InputFile,
                               performer: Option[String] = None,
                               title: Option[String] = None,
                               thumb: Option[InputFile] = None)
-    extends MessageContent
+    extends MessageContent[AudioMessage]
 
 final case class ContactContent(phoneNumber: String,
                                 firstName: String,
                                 lastName: Option[String] = None,
                                 vcard: Option[String] = None)
-    extends MessageContent
+    extends MessageContent[ContactMessage]
 
 final case class DocumentContent(document: InputFile,
                                  thumb: Option[InputFile] = None,
                                  caption: String = "",
                                  parseMode: Option[ParseMode] = None)
-    extends MessageContent
+    extends MessageContent[DocumentMessage]
 
-final case class GameContent(gameShortName: String) extends MessageContent
+final case class GameContent(gameShortName: String) extends MessageContent[GameMessage]
 
 final case class InvoiceContent(title: String,
                                 description: String,
@@ -44,7 +50,7 @@ final case class InvoiceContent(title: String,
                                 providerToken: String,
                                 startParameter: String,
                                 currency: Currency,
-                                prices: Array[LabeledPrice],
+                                prices: Seq[LabeledPrice],
                                 providerData: Option[String] = None,
                                 photoUrl: Option[String] = None,
                                 photoSize: Option[Int] = None,
@@ -55,22 +61,22 @@ final case class InvoiceContent(title: String,
                                 needEmail: Option[Boolean] = None,
                                 needShippingAddress: Option[Boolean] = None,
                                 isFlexible: Option[Boolean] = None)
-    extends MessageContent
+    extends MessageContent[InvoiceMessage]
 
 final case class LocationContent(latitude: Double, longitude: Double, livePeriod: Option[Int] = None)
-    extends MessageContent
+    extends MessageContent[LocationMessage]
 
 final case class TextContent(text: String,
                              parseMode: Option[ParseMode] = None,
                              disableWebPagePreview: Option[Boolean] = None)
-    extends MessageContent
+    extends MessageContent[TextMessage]
 
 final case class PhotoContent(photo: InputFile, caption: String = "", parseMode: Option[ParseMode] = None)
-    extends MessageContent
+    extends MessageContent[PhotoMessage]
 
-final case class PollContent(question: String, options: Array[String]) extends MessageContent
+final case class PollContent(question: String, options: List[String]) extends MessageContent[PollMessage]
 
-final case class StickerContent(sticker: InputFile) extends MessageContent
+final case class StickerContent(sticker: InputFile) extends MessageContent[StickerMessage]
 
 final case class VenueContent(latitude: Double,
                               longitude: Double,
@@ -78,7 +84,7 @@ final case class VenueContent(latitude: Double,
                               address: String,
                               foursquareId: Option[String] = None,
                               foursquareType: Option[String] = None)
-    extends MessageContent
+    extends MessageContent[VenueMessage]
 
 final case class VideoContent(video: InputFile,
                               caption: String = "",
@@ -88,13 +94,13 @@ final case class VideoContent(video: InputFile,
                               thumb: Option[InputFile] = None,
                               parseMode: Option[ParseMode] = None,
                               supportsStreaming: Option[Boolean] = None)
-    extends MessageContent
+    extends MessageContent[VideoMessage]
 
 final case class VideoNoteContent(videoNote: InputFile, duration: Option[Int] = None, length: Option[Int] = None)
-    extends MessageContent
+    extends MessageContent[VideoNoteMessage]
 
 final case class VoiceContent(voice: InputFile,
                               caption: String = "",
                               parseMode: Option[ParseMode] = None,
                               duration: Option[Int] = None)
-    extends MessageContent
+    extends MessageContent[VoiceMessage]

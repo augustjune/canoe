@@ -29,16 +29,16 @@ import io.circe.{Decoder, Encoder}
   *                            Telegram will display this message to the user.
   *                            Required if ok is False.
   */
-final case class AnswerPreCheckoutQuery private (preCheckoutQueryId: String,
-                                                 ok: Boolean,
-                                                 errorMessage: Option[String] = None)
+final class AnswerPreCheckoutQuery private (val preCheckoutQueryId: String,
+                                            val ok: Boolean,
+                                            val errorMessage: Option[String] = None)
 
 object AnswerPreCheckoutQuery {
 
-  def positive(queryId: String): AnswerPreCheckoutQuery = AnswerPreCheckoutQuery(queryId, ok = true)
+  def positive(queryId: String): AnswerPreCheckoutQuery = new AnswerPreCheckoutQuery(queryId, ok = true)
 
   def negative(queryId: String, message: String): AnswerPreCheckoutQuery =
-    AnswerPreCheckoutQuery(queryId, ok = false, Some(message))
+    new AnswerPreCheckoutQuery(queryId, ok = false, Some(message))
 
   implicit val method: Method[AnswerPreCheckoutQuery, Boolean] =
     new Method[AnswerPreCheckoutQuery, Boolean] {

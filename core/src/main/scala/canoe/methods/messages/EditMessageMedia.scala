@@ -31,14 +31,13 @@ import io.circe.{Decoder, Encoder}
   * @param media           New media content of the message
   * @param replyMarkup     New inline keyboard.
   */
-final case class EditMessageMedia private (chatId: Option[ChatId],
-                                           messageId: Option[Int],
-                                           inlineMessageId: Option[String],
-                                           media: InputMedia,
-                                           replyMarkup: Option[InlineKeyboardMarkup] = None)
+final class EditMessageMedia private (val chatId: Option[ChatId],
+                                      val messageId: Option[Int],
+                                      val inlineMessageId: Option[String],
+                                      val media: InputMedia,
+                                      val replyMarkup: Option[InlineKeyboardMarkup] = None)
 
 object EditMessageMedia {
-  import io.circe.generic.auto._
 
   /**
     * For the messages sent directed by the bot
@@ -47,7 +46,7 @@ object EditMessageMedia {
              messageId: Int,
              media: InputMedia,
              replyMarkup: Option[InlineKeyboardMarkup] = None): EditMessageMedia =
-    EditMessageMedia(Some(chatId), Some(messageId), None, media, replyMarkup)
+    new EditMessageMedia(Some(chatId), Some(messageId), None, media, replyMarkup)
 
   /**
     * For the inlined messages sent via the bot
@@ -55,10 +54,11 @@ object EditMessageMedia {
   def inlined(inlineMessageId: String,
               media: InputMedia,
               replyMarkup: Option[InlineKeyboardMarkup] = None): EditMessageMedia =
-    EditMessageMedia(None, None, Some(inlineMessageId), media, replyMarkup)
+    new EditMessageMedia(None, None, Some(inlineMessageId), media, replyMarkup)
 
   implicit val method: Method[EditMessageMedia, Either[Boolean, TelegramMessage]] =
     new Method[EditMessageMedia, Either[Boolean, TelegramMessage]] {
+      import io.circe.generic.auto._
 
       def name: String = "editMessageMedia"
 

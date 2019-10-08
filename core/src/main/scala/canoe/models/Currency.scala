@@ -10,17 +10,17 @@ import scala.language.implicitConversions
 object Currency extends Enumeration {
   type Currency = Value
 
-  final case class TelegramCurrency private (code: String,
-                                             title: String,
-                                             symbol: String,
-                                             native: String,
-                                             thousandsSep: String,
-                                             decimalSep: String,
-                                             symbolLeft: Boolean,
-                                             spaceBetween: Boolean,
-                                             exp: Int,
-                                             minAmount: Long,
-                                             maxAmount: Long)
+  final class TelegramCurrency private[Currency] (val code: String,
+                                                  val title: String,
+                                                  val symbol: String,
+                                                  val native: String,
+                                                  val thousandsSep: String,
+                                                  val decimalSep: String,
+                                                  val symbolLeft: Boolean,
+                                                  val spaceBetween: Boolean,
+                                                  val exp: Int,
+                                                  val minAmount: Long,
+                                                  val maxAmount: Long)
       extends Val(code)
 
   implicit def valueToCurrency(v: Value): TelegramCurrency = v.asInstanceOf[TelegramCurrency]
@@ -31,7 +31,7 @@ object Currency extends Enumeration {
   implicit val currencyDecoder: Decoder[Currency] =
     Decoder[String].map(a => Currency.withName(a))
 
-  val AED = TelegramCurrency(
+  val AED = new TelegramCurrency(
     code = "AED",
     title = "United Arab Emirates Dirham",
     symbol = "AED",
@@ -44,7 +44,7 @@ object Currency extends Enumeration {
     minAmount = 367,
     maxAmount = 3672902
   )
-  val AFN = TelegramCurrency(
+  val AFN = new TelegramCurrency(
     code = "AFN",
     title = "Afghan Afghani",
     symbol = "AFN",
@@ -57,7 +57,7 @@ object Currency extends Enumeration {
     minAmount = 6805,
     maxAmount = 68050003
   )
-  val ALL = TelegramCurrency(
+  val ALL = new TelegramCurrency(
     code = "ALL",
     title = "Albanian Lek",
     symbol = "ALL",
@@ -70,7 +70,7 @@ object Currency extends Enumeration {
     minAmount = 12048,
     maxAmount = 99999999
   )
-  val AMD = TelegramCurrency(
+  val AMD = new TelegramCurrency(
     code = "AMD",
     title = "Armenian Dram",
     symbol = "AMD",
@@ -83,7 +83,7 @@ object Currency extends Enumeration {
     minAmount = 48264,
     maxAmount = 99999999
   )
-  val ARS = TelegramCurrency(
+  val ARS = new TelegramCurrency(
     code = "ARS",
     title = "Argentine Peso",
     symbol = "ARS",
@@ -96,7 +96,7 @@ object Currency extends Enumeration {
     minAmount = 1598,
     maxAmount = 15989000
   )
-  val AUD = TelegramCurrency(
+  val AUD = new TelegramCurrency(
     code = "AUD",
     title = "Australian Dollar",
     symbol = "AU$",
@@ -109,7 +109,7 @@ object Currency extends Enumeration {
     minAmount = 134,
     maxAmount = 1340978
   )
-  val AZN = TelegramCurrency(
+  val AZN = new TelegramCurrency(
     code = "AZN",
     title = "Azerbaijani Manat",
     symbol = "AZN",
@@ -122,7 +122,7 @@ object Currency extends Enumeration {
     minAmount = 170,
     maxAmount = 1701797
   )
-  val BAM = TelegramCurrency(
+  val BAM = new TelegramCurrency(
     code = "BAM",
     title = "Bosnia & Herzegovina Convertible Mark",
     symbol = "BAM",
@@ -135,7 +135,7 @@ object Currency extends Enumeration {
     minAmount = 174,
     maxAmount = 1749798
   )
-  val BDT = TelegramCurrency(
+  val BDT = new TelegramCurrency(
     code = "BDT",
     title = "Bangladeshi Taka",
     symbol = "BDT",
@@ -148,7 +148,7 @@ object Currency extends Enumeration {
     minAmount = 8063,
     maxAmount = 80639999
   )
-  val BGN = TelegramCurrency(
+  val BGN = new TelegramCurrency(
     code = "BGN",
     title = "Bulgarian Lev",
     symbol = "BGN",
@@ -161,7 +161,7 @@ object Currency extends Enumeration {
     minAmount = 175,
     maxAmount = 1757396
   )
-  val BND = TelegramCurrency(
+  val BND = new TelegramCurrency(
     code = "BND",
     title = "Brunei Dollar",
     symbol = "BND",
@@ -174,7 +174,7 @@ object Currency extends Enumeration {
     minAmount = 138,
     maxAmount = 1384199
   )
-  val BOB = TelegramCurrency(
+  val BOB = new TelegramCurrency(
     code = "BOB",
     title = "Bolivian Boliviano",
     symbol = "BOB",
@@ -187,7 +187,7 @@ object Currency extends Enumeration {
     minAmount = 689,
     maxAmount = 6897970
   )
-  val BRL = TelegramCurrency(
+  val BRL = new TelegramCurrency(
     code = "BRL",
     title = "Brazilian Real",
     symbol = "R$",
@@ -200,7 +200,7 @@ object Currency extends Enumeration {
     minAmount = 328,
     maxAmount = 3289402
   )
-  val CAD = TelegramCurrency(
+  val CAD = new TelegramCurrency(
     code = "CAD",
     title = "Canadian Dollar",
     symbol = "CA$",
@@ -213,7 +213,7 @@ object Currency extends Enumeration {
     minAmount = 135,
     maxAmount = 1356697
   )
-  val CHF = TelegramCurrency(
+  val CHF = new TelegramCurrency(
     code = "CHF",
     title = "Swiss Franc",
     symbol = "CHF",
@@ -226,7 +226,7 @@ object Currency extends Enumeration {
     minAmount = 97,
     maxAmount = 974860
   )
-  val CLP = TelegramCurrency(
+  val CLP = new TelegramCurrency(
     code = "CLP",
     title = "Chilean Peso",
     symbol = "CLP",
@@ -239,7 +239,7 @@ object Currency extends Enumeration {
     minAmount = 670,
     maxAmount = 6704500
   )
-  val CNY = TelegramCurrency(
+  val CNY = new TelegramCurrency(
     code = "CNY",
     title = "Chinese Renminbi Yuan",
     symbol = "CN\u00a5",
@@ -252,7 +252,7 @@ object Currency extends Enumeration {
     minAmount = 688,
     maxAmount = 6886994
   )
-  val COP = TelegramCurrency(
+  val COP = new TelegramCurrency(
     code = "COP",
     title = "Colombian Peso",
     symbol = "COP",
@@ -265,7 +265,7 @@ object Currency extends Enumeration {
     minAmount = 289400,
     maxAmount = 99999999
   )
-  val CRC = TelegramCurrency(
+  val CRC = new TelegramCurrency(
     code = "CRC",
     title = "Costa Rican Col\u00f3n",
     symbol = "CRC",
@@ -278,7 +278,7 @@ object Currency extends Enumeration {
     minAmount = 56971,
     maxAmount = 99999999
   )
-  val CZK = TelegramCurrency(
+  val CZK = new TelegramCurrency(
     code = "CZK",
     title = "Czech Koruna",
     symbol = "CZK",
@@ -291,7 +291,7 @@ object Currency extends Enumeration {
     minAmount = 2370,
     maxAmount = 23700607
   )
-  val DKK = TelegramCurrency(
+  val DKK = new TelegramCurrency(
     code = "DKK",
     title = "Danish Krone",
     symbol = "DKK",
@@ -304,7 +304,7 @@ object Currency extends Enumeration {
     minAmount = 664,
     maxAmount = 6648170
   )
-  val DOP = TelegramCurrency(
+  val DOP = new TelegramCurrency(
     code = "DOP",
     title = "Dominican Peso",
     symbol = "DOP",
@@ -317,7 +317,7 @@ object Currency extends Enumeration {
     minAmount = 4684,
     maxAmount = 46849998
   )
-  val DZD = TelegramCurrency(
+  val DZD = new TelegramCurrency(
     code = "DZD",
     title = "Algerian Dinar",
     symbol = "DZD",
@@ -330,7 +330,7 @@ object Currency extends Enumeration {
     minAmount = 10814,
     maxAmount = 99999999
   )
-  val EGP = TelegramCurrency(
+  val EGP = new TelegramCurrency(
     code = "EGP",
     title = "Egyptian Pound",
     symbol = "EGP",
@@ -343,7 +343,7 @@ object Currency extends Enumeration {
     minAmount = 1806,
     maxAmount = 18069857
   )
-  val EUR = TelegramCurrency(
+  val EUR = new TelegramCurrency(
     code = "EUR",
     title = "Euro",
     symbol = "\u20ac",
@@ -356,7 +356,7 @@ object Currency extends Enumeration {
     minAmount = 89,
     maxAmount = 893101
   )
-  val GBP = TelegramCurrency(
+  val GBP = new TelegramCurrency(
     code = "GBP",
     title = "British Pound",
     symbol = "\u00a3",
@@ -369,7 +369,7 @@ object Currency extends Enumeration {
     minAmount = 76,
     maxAmount = 767960
   )
-  val GEL = TelegramCurrency(
+  val GEL = new TelegramCurrency(
     code = "GEL",
     title = "Georgian Lari",
     symbol = "GEL",
@@ -382,7 +382,7 @@ object Currency extends Enumeration {
     minAmount = 239,
     maxAmount = 2398597
   )
-  val GTQ = TelegramCurrency(
+  val GTQ = new TelegramCurrency(
     code = "GTQ",
     title = "Guatemalan Quetzal",
     symbol = "GTQ",
@@ -395,7 +395,7 @@ object Currency extends Enumeration {
     minAmount = 733,
     maxAmount = 7338500
   )
-  val HKD = TelegramCurrency(
+  val HKD = new TelegramCurrency(
     code = "HKD",
     title = "Hong Kong Dollar",
     symbol = "HK$",
@@ -408,7 +408,7 @@ object Currency extends Enumeration {
     minAmount = 778,
     maxAmount = 7783120
   )
-  val HNL = TelegramCurrency(
+  val HNL = new TelegramCurrency(
     code = "HNL",
     title = "Honduran Lempira",
     symbol = "HNL",
@@ -421,7 +421,7 @@ object Currency extends Enumeration {
     minAmount = 2337,
     maxAmount = 23378007
   )
-  val HRK = TelegramCurrency(
+  val HRK = new TelegramCurrency(
     code = "HRK",
     title = "Croatian Kuna",
     symbol = "HRK",
@@ -434,7 +434,7 @@ object Currency extends Enumeration {
     minAmount = 661,
     maxAmount = 6610096
   )
-  val HUF = TelegramCurrency(
+  val HUF = new TelegramCurrency(
     code = "HUF",
     title = "Hungarian Forint",
     symbol = "HUF",
@@ -447,7 +447,7 @@ object Currency extends Enumeration {
     minAmount = 27601,
     maxAmount = 99999999
   )
-  val IDR = TelegramCurrency(
+  val IDR = new TelegramCurrency(
     code = "IDR",
     title = "Indonesian Rupiah",
     symbol = "IDR",
@@ -460,7 +460,7 @@ object Currency extends Enumeration {
     minAmount = 1330800,
     maxAmount = 99999999
   )
-  val ILS = TelegramCurrency(
+  val ILS = new TelegramCurrency(
     code = "ILS",
     title = "Israeli New Sheqel",
     symbol = "\u20aa",
@@ -473,7 +473,7 @@ object Currency extends Enumeration {
     minAmount = 357,
     maxAmount = 3578899
   )
-  val INR = TelegramCurrency(
+  val INR = new TelegramCurrency(
     code = "INR",
     title = "Indian Rupee",
     symbol = "\u20b9",
@@ -486,7 +486,7 @@ object Currency extends Enumeration {
     minAmount = 6457,
     maxAmount = 64579002
   )
-  val ISK = TelegramCurrency(
+  val ISK = new TelegramCurrency(
     code = "ISK",
     title = "Icelandic Kr\u00f3na",
     symbol = "ISK",
@@ -499,7 +499,7 @@ object Currency extends Enumeration {
     minAmount = 100,
     maxAmount = 1003000
   )
-  val JMD = TelegramCurrency(
+  val JMD = new TelegramCurrency(
     code = "JMD",
     title = "Jamaican Dollar",
     symbol = "JMD",
@@ -512,7 +512,7 @@ object Currency extends Enumeration {
     minAmount = 12850,
     maxAmount = 99999999
   )
-  val JPY = TelegramCurrency(
+  val JPY = new TelegramCurrency(
     code = "JPY",
     title = "Japanese Yen",
     symbol = "\u00a5",
@@ -525,7 +525,7 @@ object Currency extends Enumeration {
     minAmount = 111,
     maxAmount = 1112750
   )
-  val KES = TelegramCurrency(
+  val KES = new TelegramCurrency(
     code = "KES",
     title = "Kenyan Shilling",
     symbol = "KES",
@@ -538,7 +538,7 @@ object Currency extends Enumeration {
     minAmount = 10301,
     maxAmount = 99999999
   )
-  val KGS = TelegramCurrency(
+  val KGS = new TelegramCurrency(
     code = "KGS",
     title = "Kyrgyzstani Som",
     symbol = "KGS",
@@ -551,7 +551,7 @@ object Currency extends Enumeration {
     minAmount = 6788,
     maxAmount = 67888038
   )
-  val KRW = TelegramCurrency(
+  val KRW = new TelegramCurrency(
     code = "KRW",
     title = "South Korean Won",
     symbol = "\u20a9",
@@ -564,7 +564,7 @@ object Currency extends Enumeration {
     minAmount = 1117,
     maxAmount = 11173199
   )
-  val KZT = TelegramCurrency(
+  val KZT = new TelegramCurrency(
     code = "KZT",
     title = "Kazakhstani Tenge",
     symbol = "KZT",
@@ -577,7 +577,7 @@ object Currency extends Enumeration {
     minAmount = 31282,
     maxAmount = 99999999
   )
-  val LBP = TelegramCurrency(
+  val LBP = new TelegramCurrency(
     code = "LBP",
     title = "Lebanese Pound",
     symbol = "LBP",
@@ -590,7 +590,7 @@ object Currency extends Enumeration {
     minAmount = 150569,
     maxAmount = 99999999
   )
-  val LKR = TelegramCurrency(
+  val LKR = new TelegramCurrency(
     code = "LKR",
     title = "Sri Lankan Rupee",
     symbol = "LKR",
@@ -603,7 +603,7 @@ object Currency extends Enumeration {
     minAmount = 15239,
     maxAmount = 99999999
   )
-  val MAD = TelegramCurrency(
+  val MAD = new TelegramCurrency(
     code = "MAD",
     title = "Moroccan Dirham",
     symbol = "MAD",
@@ -616,7 +616,7 @@ object Currency extends Enumeration {
     minAmount = 975,
     maxAmount = 9753502
   )
-  val MDL = TelegramCurrency(
+  val MDL = new TelegramCurrency(
     code = "MDL",
     title = "Moldovan Leu",
     symbol = "MDL",
@@ -629,7 +629,7 @@ object Currency extends Enumeration {
     minAmount = 1824,
     maxAmount = 18245001
   )
-  val MNT = TelegramCurrency(
+  val MNT = new TelegramCurrency(
     code = "MNT",
     title = "Mongolian T\u00f6gr\u00f6g",
     symbol = "MNT",
@@ -642,7 +642,7 @@ object Currency extends Enumeration {
     minAmount = 241300,
     maxAmount = 99999999
   )
-  val MUR = TelegramCurrency(
+  val MUR = new TelegramCurrency(
     code = "MUR",
     title = "Mauritian Rupee",
     symbol = "MUR",
@@ -655,7 +655,7 @@ object Currency extends Enumeration {
     minAmount = 3498,
     maxAmount = 34980537
   )
-  val MVR = TelegramCurrency(
+  val MVR = new TelegramCurrency(
     code = "MVR",
     title = "Maldivian Rufiyaa",
     symbol = "MVR",
@@ -668,7 +668,7 @@ object Currency extends Enumeration {
     minAmount = 1550,
     maxAmount = 15502797
   )
-  val MXN = TelegramCurrency(
+  val MXN = new TelegramCurrency(
     code = "MXN",
     title = "Mexican Peso",
     symbol = "MX$",
@@ -681,7 +681,7 @@ object Currency extends Enumeration {
     minAmount = 1865,
     maxAmount = 18656498
   )
-  val MYR = TelegramCurrency(
+  val MYR = new TelegramCurrency(
     code = "MYR",
     title = "Malaysian Ringgit",
     symbol = "MYR",
@@ -694,7 +694,7 @@ object Currency extends Enumeration {
     minAmount = 432,
     maxAmount = 4320162
   )
-  val MZN = TelegramCurrency(
+  val MZN = new TelegramCurrency(
     code = "MZN",
     title = "Mozambican Metical",
     symbol = "MZN",
@@ -707,7 +707,7 @@ object Currency extends Enumeration {
     minAmount = 7044,
     maxAmount = 70440002
   )
-  val NGN = TelegramCurrency(
+  val NGN = new TelegramCurrency(
     code = "NGN",
     title = "Nigerian Naira",
     symbol = "NGN",
@@ -720,7 +720,7 @@ object Currency extends Enumeration {
     minAmount = 31500,
     maxAmount = 99999999
   )
-  val NIO = TelegramCurrency(
+  val NIO = new TelegramCurrency(
     code = "NIO",
     title = "Nicaraguan C\u00f3rdoba",
     symbol = "NIO",
@@ -733,7 +733,7 @@ object Currency extends Enumeration {
     minAmount = 2987,
     maxAmount = 29874103
   )
-  val NOK = TelegramCurrency(
+  val NOK = new TelegramCurrency(
     code = "NOK",
     title = "Norwegian Krone",
     symbol = "NOK",
@@ -746,7 +746,7 @@ object Currency extends Enumeration {
     minAmount = 838,
     maxAmount = 8383597
   )
-  val NPR = TelegramCurrency(
+  val NPR = new TelegramCurrency(
     code = "NPR",
     title = "Nepalese Rupee",
     symbol = "NPR",
@@ -759,7 +759,7 @@ object Currency extends Enumeration {
     minAmount = 10219,
     maxAmount = 99999999
   )
-  val NZD = TelegramCurrency(
+  val NZD = new TelegramCurrency(
     code = "NZD",
     title = "New Zealand Dollar",
     symbol = "NZ$",
@@ -772,7 +772,7 @@ object Currency extends Enumeration {
     minAmount = 144,
     maxAmount = 1445703
   )
-  val PAB = TelegramCurrency(
+  val PAB = new TelegramCurrency(
     code = "PAB",
     title = "Panamanian Balboa",
     symbol = "PAB",
@@ -785,7 +785,7 @@ object Currency extends Enumeration {
     minAmount = 100,
     maxAmount = 1000000
   )
-  val PEN = TelegramCurrency(
+  val PEN = new TelegramCurrency(
     code = "PEN",
     title = "Peruvian Nuevo Sol",
     symbol = "PEN",
@@ -798,7 +798,7 @@ object Currency extends Enumeration {
     minAmount = 327,
     maxAmount = 3277498
   )
-  val PHP = TelegramCurrency(
+  val PHP = new TelegramCurrency(
     code = "PHP",
     title = "Philippine Peso",
     symbol = "PHP",
@@ -811,7 +811,7 @@ object Currency extends Enumeration {
     minAmount = 4963,
     maxAmount = 49639999
   )
-  val PKR = TelegramCurrency(
+  val PKR = new TelegramCurrency(
     code = "PKR",
     title = "Pakistani Rupee",
     symbol = "PKR",
@@ -824,7 +824,7 @@ object Currency extends Enumeration {
     minAmount = 10466,
     maxAmount = 99999999
   )
-  val PLN = TelegramCurrency(
+  val PLN = new TelegramCurrency(
     code = "PLN",
     title = "Polish Z\u0142oty",
     symbol = "PLN",
@@ -837,7 +837,7 @@ object Currency extends Enumeration {
     minAmount = 375,
     maxAmount = 3754502
   )
-  val PYG = TelegramCurrency(
+  val PYG = new TelegramCurrency(
     code = "PYG",
     title = "Paraguayan Guaran\u00ed",
     symbol = "PYG",
@@ -850,7 +850,7 @@ object Currency extends Enumeration {
     minAmount = 5577,
     maxAmount = 55770000
   )
-  val QAR = TelegramCurrency(
+  val QAR = new TelegramCurrency(
     code = "QAR",
     title = "Qatari Riyal",
     symbol = "QAR",
@@ -863,7 +863,7 @@ object Currency extends Enumeration {
     minAmount = 364,
     maxAmount = 3641102
   )
-  val RON = TelegramCurrency(
+  val RON = new TelegramCurrency(
     code = "RON",
     title = "Romanian Leu",
     symbol = "RON",
@@ -876,7 +876,7 @@ object Currency extends Enumeration {
     minAmount = 407,
     maxAmount = 4071901
   )
-  val RSD = TelegramCurrency(
+  val RSD = new TelegramCurrency(
     code = "RSD",
     title = "Serbian Dinar",
     symbol = "RSD",
@@ -889,7 +889,7 @@ object Currency extends Enumeration {
     minAmount = 11043,
     maxAmount = 99999999
   )
-  val RUB = TelegramCurrency(
+  val RUB = new TelegramCurrency(
     code = "RUB",
     title = "Russian Ruble",
     symbol = "RUB",
@@ -902,7 +902,7 @@ object Currency extends Enumeration {
     minAmount = 5704,
     maxAmount = 57040501
   )
-  val SAR = TelegramCurrency(
+  val SAR = new TelegramCurrency(
     code = "SAR",
     title = "Saudi Riyal",
     symbol = "SAR",
@@ -915,7 +915,7 @@ object Currency extends Enumeration {
     minAmount = 375,
     maxAmount = 3750101
   )
-  val SEK = TelegramCurrency(
+  val SEK = new TelegramCurrency(
     code = "SEK",
     title = "Swedish Krona",
     symbol = "SEK",
@@ -928,7 +928,7 @@ object Currency extends Enumeration {
     minAmount = 874,
     maxAmount = 8747560
   )
-  val SGD = TelegramCurrency(
+  val SGD = new TelegramCurrency(
     code = "SGD",
     title = "Singapore Dollar",
     symbol = "SGD",
@@ -941,7 +941,7 @@ object Currency extends Enumeration {
     minAmount = 138,
     maxAmount = 1384602
   )
-  val THB = TelegramCurrency(
+  val THB = new TelegramCurrency(
     code = "THB",
     title = "Thai Baht",
     symbol = "\u0e3f",
@@ -954,7 +954,7 @@ object Currency extends Enumeration {
     minAmount = 3431,
     maxAmount = 34319739
   )
-  val TJS = TelegramCurrency(
+  val TJS = new TelegramCurrency(
     code = "TJS",
     title = "Tajikistani Somoni",
     symbol = "TJS",
@@ -967,7 +967,7 @@ object Currency extends Enumeration {
     minAmount = 849,
     maxAmount = 8498496
   )
-  val TRY = TelegramCurrency(
+  val TRY = new TelegramCurrency(
     code = "TRY",
     title = "Turkish Lira",
     symbol = "TRY",
@@ -980,7 +980,7 @@ object Currency extends Enumeration {
     minAmount = 358,
     maxAmount = 3587700
   )
-  val TTD = TelegramCurrency(
+  val TTD = new TelegramCurrency(
     code = "TTD",
     title = "Trinidad and Tobago Dollar",
     symbol = "TTD",
@@ -993,7 +993,7 @@ object Currency extends Enumeration {
     minAmount = 669,
     maxAmount = 6699498
   )
-  val TWD = TelegramCurrency(
+  val TWD = new TelegramCurrency(
     code = "TWD",
     title = "New Taiwan Dollar",
     symbol = "NT$",
@@ -1006,7 +1006,7 @@ object Currency extends Enumeration {
     minAmount = 2999,
     maxAmount = 29997045
   )
-  val TZS = TelegramCurrency(
+  val TZS = new TelegramCurrency(
     code = "TZS",
     title = "Tanzanian Shilling",
     symbol = "TZS",
@@ -1019,7 +1019,7 @@ object Currency extends Enumeration {
     minAmount = 223000,
     maxAmount = 99999999
   )
-  val UAH = TelegramCurrency(
+  val UAH = new TelegramCurrency(
     code = "UAH",
     title = "Ukrainian Hryvnia",
     symbol = "UAH",
@@ -1032,7 +1032,7 @@ object Currency extends Enumeration {
     minAmount = 2634,
     maxAmount = 26341499
   )
-  val UGX = TelegramCurrency(
+  val UGX = new TelegramCurrency(
     code = "UGX",
     title = "Ugandan Shilling",
     symbol = "UGX",
@@ -1045,7 +1045,7 @@ object Currency extends Enumeration {
     minAmount = 3617,
     maxAmount = 36170002
   )
-  val USD = TelegramCurrency(
+  val USD = new TelegramCurrency(
     code = "USD",
     title = "United States Dollar",
     symbol = "$",
@@ -1058,7 +1058,7 @@ object Currency extends Enumeration {
     minAmount = 100,
     maxAmount = 1000000
   )
-  val UYU = TelegramCurrency(
+  val UYU = new TelegramCurrency(
     code = "UYU",
     title = "Uruguayan Peso",
     symbol = "UYU",
@@ -1071,7 +1071,7 @@ object Currency extends Enumeration {
     minAmount = 2832,
     maxAmount = 28320095
   )
-  val UZS = TelegramCurrency(
+  val UZS = new TelegramCurrency(
     code = "UZS",
     title = "Uzbekistani Som",
     symbol = "UZS",
@@ -1084,7 +1084,7 @@ object Currency extends Enumeration {
     minAmount = 379000,
     maxAmount = 99999999
   )
-  val VND = TelegramCurrency(
+  val VND = new TelegramCurrency(
     code = "VND",
     title = "Vietnamese \u0110\u1ed3ng",
     symbol = "\u20ab",
@@ -1097,7 +1097,7 @@ object Currency extends Enumeration {
     minAmount = 22670,
     maxAmount = 99999999
   )
-  val YER = TelegramCurrency(
+  val YER = new TelegramCurrency(
     code = "YER",
     title = "Yemeni Rial",
     symbol = "YER",
@@ -1110,7 +1110,7 @@ object Currency extends Enumeration {
     minAmount = 24994,
     maxAmount = 99999999
   )
-  val ZAR = TelegramCurrency(
+  val ZAR = new TelegramCurrency(
     code = "ZAR",
     title = "South African Rand",
     symbol = "ZAR",

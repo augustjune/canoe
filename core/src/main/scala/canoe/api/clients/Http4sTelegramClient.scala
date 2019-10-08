@@ -36,7 +36,7 @@ private[api] class Http4sTelegramClient[F[_]: Sync: Logger](token: String, clien
     Logger[F].error(
       s"Received unknown Telegram entity during execution of '$method' method. \nInput data: $input. \n${error.details}"
     ) *>
-      Sync[F].raiseError(ResponseDecodingError(error.details.dropWhile(_ != '{')))
+      ResponseDecodingError(error.details.dropWhile(_ != '{')).raiseError[F, A]
 
   private def prepareRequest[Req, Res](url: Uri, method: Method[Req, Res], action: Req): F[Request[F]] = {
     val uploads = method.uploads(action).collect {
@@ -82,6 +82,6 @@ private[api] class Http4sTelegramClient[F[_]: Sync: Logger](token: String, clien
 
       case failed =>
         Logger[F].error(s"Received failed response from Telegram: $failed. Method name: ${m.name}, input data: $input") *>
-          Sync[F].raiseError[A](FailedMethod(m, input, failed))
+          FailedMethod(m, input, failed).raiseError[F, A]
     }
 }

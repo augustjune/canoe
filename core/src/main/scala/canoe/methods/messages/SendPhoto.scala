@@ -3,9 +3,9 @@ package canoe.methods.messages
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.ParseMode.ParseMode
-import canoe.models.messages.TelegramMessage
+import canoe.models.messages.PhotoMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto._
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -38,14 +38,14 @@ final case class SendPhoto(chatId: ChatId,
 object SendPhoto {
   import io.circe.generic.auto._
 
-  implicit val method: Method[SendPhoto, TelegramMessage] =
-    new Method[SendPhoto, TelegramMessage] {
+  implicit val method: Method[SendPhoto, PhotoMessage] =
+    new Method[SendPhoto, PhotoMessage] {
 
       def name: String = "sendPhoto"
 
       def encoder: Encoder[SendPhoto] = deriveEncoder[SendPhoto].snakeCase
 
-      def decoder: Decoder[TelegramMessage] = TelegramMessage.telegramMessageDecoder
+      def decoder: Decoder[PhotoMessage] = deriveDecoder[PhotoMessage]
 
       def uploads(request: SendPhoto): List[(String, InputFile)] =
         List("photo" -> request.photo)

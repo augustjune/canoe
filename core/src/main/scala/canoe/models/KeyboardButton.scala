@@ -1,5 +1,8 @@
 package canoe.models
 
+import io.circe.Encoder
+import io.circe.generic.semiauto.deriveEncoder
+
 /**
   * Button of the reply keyboard.
   * For simple text buttons String can be used instead of this object to specify text of the button.
@@ -12,9 +15,9 @@ package canoe.models
   * @param requestLocation If True, the user's current location will be sent when the button is pressed.
   *                        Available in private chats only
   */
-final case class KeyboardButton private (text: String,
-                                         requestContact: Option[Boolean] = None,
-                                         requestLocation: Option[Boolean] = None)
+final class KeyboardButton private (val text: String,
+                                    val requestContact: Option[Boolean] = None,
+                                    val requestLocation: Option[Boolean] = None)
 
 object KeyboardButton {
 
@@ -23,7 +26,7 @@ object KeyboardButton {
     *
     * @param text Text of the button
     */
-  def text(text: String): KeyboardButton = KeyboardButton(text)
+  def text(text: String): KeyboardButton = new KeyboardButton(text)
 
   /**
     * The user's phone number will be sent as a contact when the button is pressed.
@@ -32,7 +35,7 @@ object KeyboardButton {
     * @param text Text of the button
     */
   def requestLocation(text: String): KeyboardButton =
-    KeyboardButton(text, requestLocation = Some(true))
+    new KeyboardButton(text, requestLocation = Some(true))
 
   /**
     * The user's current location will be sent when the button is pressed.
@@ -41,5 +44,7 @@ object KeyboardButton {
     * @param text Text of the button.
     */
   def requestContact(text: String): KeyboardButton =
-    KeyboardButton(text, requestContact = Some(true))
+    new KeyboardButton(text, requestContact = Some(true))
+
+  implicit val encoderInstance: Encoder[KeyboardButton] = deriveEncoder[KeyboardButton]
 }

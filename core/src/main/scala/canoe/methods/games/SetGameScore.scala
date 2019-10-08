@@ -29,13 +29,13 @@ import io.circe.{Decoder, Encoder}
   * @param inlineMessageId    Identifier of the inline message.
   *                           Required if 'chatId' and 'messageId' are not specified.
   */
-final case class SetGameScore private (userId: Int,
-                                       score: Long,
-                                       force: Option[Boolean] = None,
-                                       disableEditMessage: Option[Boolean] = None,
-                                       chatId: Option[ChatId] = None,
-                                       messageId: Option[Int] = None,
-                                       inlineMessageId: Option[String] = None)
+final class SetGameScore private (val userId: Int,
+                                  val score: Long,
+                                  val force: Option[Boolean] = None,
+                                  val disableEditMessage: Option[Boolean] = None,
+                                  val chatId: Option[ChatId] = None,
+                                  val messageId: Option[Int] = None,
+                                  val inlineMessageId: Option[String] = None)
 
 object SetGameScore {
 
@@ -48,7 +48,7 @@ object SetGameScore {
              score: Long,
              force: Option[Boolean] = None,
              disableEditMessage: Option[Boolean] = None): SetGameScore =
-    SetGameScore(userId, score, force, disableEditMessage, Some(chatId), Some(messageId))
+    new SetGameScore(userId, score, force, disableEditMessage, Some(chatId), Some(messageId))
 
   /**
     * For the inlined messages sent via the bot
@@ -58,7 +58,7 @@ object SetGameScore {
               score: Long,
               force: Option[Boolean] = None,
               disableEditMessage: Option[Boolean] = None): SetGameScore =
-    SetGameScore(userId, score, force, disableEditMessage, inlineMessageId = Some(inlineMessageId))
+    new SetGameScore(userId, score, force, disableEditMessage, inlineMessageId = Some(inlineMessageId))
 
   implicit val method: Method[SetGameScore, Either[Boolean, TelegramMessage]] =
     new Method[SetGameScore, Either[Boolean, TelegramMessage]] {

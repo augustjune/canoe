@@ -2,9 +2,9 @@ package canoe.methods.messages
 
 import canoe.marshalling.codecs._
 import canoe.methods.Method
-import canoe.models.messages.TelegramMessage
+import canoe.models.messages.VideoNoteMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto._
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -36,14 +36,14 @@ final case class SendVideoNote(chatId: ChatId,
 object SendVideoNote {
   import io.circe.generic.auto._
 
-  implicit val method: Method[SendVideoNote, TelegramMessage] =
-    new Method[SendVideoNote, TelegramMessage] {
+  implicit val method: Method[SendVideoNote, VideoNoteMessage] =
+    new Method[SendVideoNote, VideoNoteMessage] {
 
       def name: String = "sendVideoNote"
 
       def encoder: Encoder[SendVideoNote] = deriveEncoder[SendVideoNote].snakeCase
 
-      def decoder: Decoder[TelegramMessage] = TelegramMessage.telegramMessageDecoder
+      def decoder: Decoder[VideoNoteMessage] = deriveDecoder[VideoNoteMessage]
 
       def uploads(request: SendVideoNote): List[(String, InputFile)] =
         List("videoNote" -> request.videoNote)

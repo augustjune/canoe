@@ -33,7 +33,7 @@ import io.circe.{Decoder, Encoder}
   *                          to the chat where they wanted to use the bot's inline capabilities.
   */
 final case class AnswerInlineQuery(inlineQueryId: String,
-                                   results: List[InlineQueryResult],
+                                   results: Seq[InlineQueryResult],
                                    cacheTime: Option[Int] = None,
                                    isPersonal: Option[Boolean] = None,
                                    nextOffset: Option[String] = None,

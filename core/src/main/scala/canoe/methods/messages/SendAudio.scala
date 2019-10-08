@@ -3,9 +3,9 @@ package canoe.methods.messages
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.ParseMode.ParseMode
-import canoe.models.messages.TelegramMessage
+import canoe.models.messages.AudioMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto._
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -50,14 +50,14 @@ final case class SendAudio(chatId: ChatId,
 object SendAudio {
   import io.circe.generic.auto._
 
-  implicit val method: Method[SendAudio, TelegramMessage] =
-    new Method[SendAudio, TelegramMessage] {
+  implicit val method: Method[SendAudio, AudioMessage] =
+    new Method[SendAudio, AudioMessage] {
 
       def name: String = "sendAudio"
 
       def encoder: Encoder[SendAudio] = deriveEncoder[SendAudio].snakeCase
 
-      def decoder: Decoder[TelegramMessage] = TelegramMessage.telegramMessageDecoder
+      def decoder: Decoder[AudioMessage] = deriveDecoder[AudioMessage]
 
       def uploads(request: SendAudio): List[(String, InputFile)] =
         List("audio" -> request.audio)

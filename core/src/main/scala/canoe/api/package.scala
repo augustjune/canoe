@@ -1,17 +1,35 @@
 package canoe
 
 import canoe.api.models._
-import canoe.models.messages.TelegramMessage
-import canoe.models.{Chat, InlineQuery}
+import canoe.models._
+import canoe.models.messages.{LocationMessage, PollMessage, TelegramMessage}
 
+/**
+  * Contains implicit conversions to the API classes of particular Telegram models
+  */
 package object api {
 
-  implicit def chatApi[F[_]: TelegramClient](chat: Chat): ChatApi[F] =
-    new ChatApi[F](chat)
+  implicit def chatApi(chat: Chat): ChatApi =
+    new ChatApi(chat)
 
-  implicit def messageApi[F[_]: TelegramClient](message: TelegramMessage): MessageApi[F] =
-    new MessageApi[F](message)
+  implicit def messageApi(message: TelegramMessage): MessageApi =
+    new MessageApi(message)
 
-  implicit def inlineQueryApi[F[_]: TelegramClient](query: InlineQuery): InlineQueryApi[F] =
-    new InlineQueryApi[F](query)
+  implicit def pollApi(message: PollMessage): PollMessageApi =
+    new PollMessageApi(message)
+
+  implicit def liveLocationApi(message: LocationMessage): LiveLocationAPI =
+    new LiveLocationAPI(message)
+
+  implicit def inlineQueryApi(query: InlineQuery): InlineQueryApi =
+    new InlineQueryApi(query)
+
+  implicit def callbackQueryApi(query: CallbackQuery): CallbackQueryAPI =
+    new CallbackQueryAPI(query)
+
+  implicit def preCheckoutQueryApi(query: PreCheckoutQuery): PreCheckoutQueryAPI =
+    new PreCheckoutQueryAPI(query)
+
+  implicit def shippingQueryApi(query: ShippingQuery): ShippingQueryAPI =
+    new ShippingQueryAPI(query)
 }

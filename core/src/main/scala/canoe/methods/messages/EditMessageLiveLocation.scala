@@ -26,15 +26,14 @@ import io.circe.{Decoder, Encoder}
   *                        A JSON-serialized object for an inline keyboard, custom reply keyboard,
   *                        instructions to hide reply keyboard or to force a reply from the user.
   */
-final case class EditMessageLiveLocation private (chatId: Option[ChatId],
-                                                  messageId: Option[Int],
-                                                  inlineMessageId: Option[Int],
-                                                  latitude: Double,
-                                                  longitude: Double,
-                                                  replyMarkup: Option[InlineKeyboardMarkup] = None)
+final class EditMessageLiveLocation private (val chatId: Option[ChatId],
+                                             val messageId: Option[Int],
+                                             val inlineMessageId: Option[Int],
+                                             val latitude: Double,
+                                             val longitude: Double,
+                                             val replyMarkup: Option[InlineKeyboardMarkup] = None)
 
 object EditMessageLiveLocation {
-  import io.circe.generic.auto._
 
   /**
     * For the messages sent directed by the bot
@@ -44,7 +43,7 @@ object EditMessageLiveLocation {
              lat: Double,
              long: Double,
              replyMarkup: Option[InlineKeyboardMarkup] = None): EditMessageLiveLocation =
-    EditMessageLiveLocation(Some(chatId), Some(messageId), None, lat, long, replyMarkup)
+    new EditMessageLiveLocation(Some(chatId), Some(messageId), None, lat, long, replyMarkup)
 
   /**
     * For the inlined messages sent via the bot
@@ -53,10 +52,11 @@ object EditMessageLiveLocation {
               lat: Double,
               long: Double,
               replyMarkup: Option[InlineKeyboardMarkup] = None): EditMessageLiveLocation =
-    EditMessageLiveLocation(None, None, Some(inlineMessageId), lat, long, replyMarkup)
+    new EditMessageLiveLocation(None, None, Some(inlineMessageId), lat, long, replyMarkup)
 
   implicit val method: Method[EditMessageLiveLocation, Either[Boolean, TelegramMessage]] =
     new Method[EditMessageLiveLocation, Either[Boolean, TelegramMessage]] {
+      import io.circe.generic.auto._
 
       def name: String = "editMessageLiveLocation"
 

@@ -124,7 +124,6 @@ object Episode {
   private[api] implicit def monadErrorInstance[F[_]: ApplicativeError[*[_], Throwable], I]
     : MonadError[Episode[F, I, *], Throwable] =
     new MonadError[Episode[F, I, *], Throwable] with StackSafeMonad[Episode[F, I, *]] {
-      println("Constructing monad error instance")
 
       def pure[A](a: A): Episode[F, I, A] = Pure(a)
 
@@ -139,7 +138,6 @@ object Episode {
 
   private[api] implicit def monadInstance[F[_], I]: Monad[Episode[F, I, *]] =
     new StackSafeMonad[Episode[F, I, *]] {
-      println("Constructing monad instance")
 
       def pure[A](a: A): Episode[F, I, A] = Pure(a)
 
@@ -238,6 +236,7 @@ object Episode {
 
       case Bind(prev, fn) =>
         find(prev, input, cancelTokens).flatMap {
+          // Have to explicitly handle all not matched cases in order to satisfy compile
           case (Matched(a), rest)   => find(fn(a), rest, cancelTokens)
           case (Missed(m), rest)    => Stream(Missed(m) -> rest)
           case (Cancelled(m), rest) => Stream(Cancelled(m) -> rest)

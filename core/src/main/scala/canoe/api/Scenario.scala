@@ -3,7 +3,8 @@ package canoe.api
 import canoe.api.matching.Episode
 import canoe.models.messages.TelegramMessage
 import canoe.syntax.Expect
-import cats.{Monad, StackSafeMonad}
+import cats.syntax.applicativeError._
+import cats.{ApplicativeError, Monad, MonadError, StackSafeMonad}
 import fs2.Pipe
 
 /**
@@ -17,7 +18,7 @@ import fs2.Pipe
   */
 final class Scenario[F[_], A] private (private val episode: Episode[F, TelegramMessage, A]) extends AnyVal {
 
-  def pipe: Pipe[F, TelegramMessage, A] = episode.pipe
+  def pipe: Pipe[F, TelegramMessage, A] = episode.matching
 
   def flatMap[B](fn: A => Scenario[F, B]): Scenario[F, B] =
     new Scenario[F, B](episode.flatMap(fn(_).episode))
@@ -61,6 +62,18 @@ final class Scenario[F[_], A] private (private val episode: Episode[F, TelegramM
     */
   def cancelWith[Any](expect: Expect[Any])(cancellation: TelegramMessage => F[Unit]): Scenario[F, A] =
     new Scenario[F, A](episode.cancelWith(expect.isDefinedAt)(cancellation))
+
+  /**
+    * @return `this` or scenario which is result of `fn` if error occurs.
+    */
+  def handleErrorWith(fn: Throwable => Scenario[F, A]): Scenario[F, A] =
+    new Scenario[F, A](episode.handleErrorWith(fn(_).episode))
+
+  /**
+    * @return Scenario which wraps successful result values in `Right` and raised errors in `Left`.
+    */
+  def attempt: Scenario[F, Either[Throwable, A]] =
+    new Scenario[F, Either[Throwable, A]](episode.attempt)
 }
 
 object Scenario {
@@ -98,6 +111,20 @@ object Scenario {
     new Scenario[F, A](Episode.pure(a))
 
   def done[F[_]]: Scenario[F, Unit] = pure(())
+
+  implicit def monadErrorInstance[F[_]: ApplicativeError[*[_], Throwable]]: MonadError[Scenario[F, *], Throwable] =
+    new MonadError[Scenario[F, *], Throwable] with StackSafeMonad[Scenario[F, *]] {
+      def pure[A](a: A): Scenario[F, A] = Scenario.pure(a)
+
+      def flatMap[A, B](scenario: Scenario[F, A])(fn: A => Scenario[F, B]): Scenario[F, B] =
+        scenario.flatMap(fn)
+
+      def raiseError[A](e: Throwable): Scenario[F, A] =
+        Scenario.eval(e.raiseError[F, A])
+
+      def handleErrorWith[A](scenario: Scenario[F, A])(fn: Throwable => Scenario[F, A]): Scenario[F, A] =
+        scenario.handleErrorWith(fn)
+    }
 
   implicit def monadInstance[F[_]]: Monad[Scenario[F, *]] =
     new StackSafeMonad[Scenario[F, *]] {

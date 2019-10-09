@@ -9,10 +9,14 @@ import org.scalatest.funsuite.AnyFunSuite
 import org.typelevel.discipline.scalatest.Discipline
 
 class EpisodeLawsCheck extends AnyFunSuite with Discipline {
-  // By re-declaring implicit Monad instance here we ensure that it will be used during monad tests
+
+  // By re-declaring implicit Monad instance here we ensure that it will be used during monad tests,
   // instead of MonadError instance
   implicit def monadInstance[F[_], I]: Monad[Episode[F, I, *]] = Episode.monadInstance
-  checkAll("Episode.Monad laws", MonadTests[Episode[IO, Int, *]].monad[Int, Int, Int])
 
-  checkAll("Episode.MonadError laws", MonadErrorTests[Episode[IO, Int, *], Throwable].monadError[Int, Int, Int])
+  checkAll("Monad[Episode[IO, Int, *]]",
+    MonadTests[Episode[IO, Int, *]].monad[Int, Int, Int])
+
+  checkAll("MonadError[Episode[IO, Int, *], Throwable]",
+    MonadErrorTests[Episode[IO, Int, *], Throwable].monadError[Int, Int, Int])
 }

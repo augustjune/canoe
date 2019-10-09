@@ -225,26 +225,23 @@ object Episode {
 
           case _ =>
             find(episode, input, cancelTokens).flatMap {
-              case (Cancelled(m), rest) => Stream(Cancelled(m) -> rest)
               case (Missed(m), rest) =>
                 Stream.eval(fn(m)) >> find(
                   Tolerate(episode, limit.map(_ - 1), fn),
                   rest,
                   cancelTokens
                 )
-              case matched => Stream(matched)
+
+              case res => Stream(res)
             }
         }
 
       case Bind(prev, fn) =>
         find(prev, input, cancelTokens).flatMap {
-          case (result, rest) =>
-            result match {
-              case Matched(a)         => find(fn(a), rest, cancelTokens)
-              case Missed(message)    => Stream(Missed(message) -> rest)
-              case Cancelled(message) => Stream(Cancelled(message) -> rest)
-              case Failed(e)          => Stream(Failed(e) -> rest)
-            }
+          case (Matched(a), rest)   => find(fn(a), rest, cancelTokens)
+          case (Missed(m), rest)    => Stream(Missed(m) -> rest)
+          case (Cancelled(m), rest) => Stream(Cancelled(m) -> rest)
+          case (Failed(e), rest)    => Stream(Failed(e) -> rest)
         }
     }
 }

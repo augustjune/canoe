@@ -11,8 +11,8 @@ object EpisodeCheckInstances {
   implicit def eqEpisode[I: Arbitrary, O]: Eq[Episode[IO, I, O]] = {
     val sampleInput: List[I] = Gen.listOf(Arbitrary.arbitrary[I]).sample.get
 
-    def result(ep: Episode[IO, I, O]): List[O] =
-      Stream.emits(sampleInput).through(ep.matching).toList()
+    def result(ep: Episode[IO, I, O]): List[Either[Throwable, O]] =
+      Stream.emits(sampleInput).through(ep.attempt.matching).toList()
 
     (x: Episode[IO, I, O], y: Episode[IO, I, O]) =>
       result(x) == result(y)

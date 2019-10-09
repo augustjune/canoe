@@ -17,7 +17,7 @@ import fs2.Pipe
   */
 final class Scenario[F[_], A] private (private val episode: Episode[F, TelegramMessage, A]) extends AnyVal {
 
-  def pipe: Pipe[F, TelegramMessage, A] = episode.pipe
+  def pipe: Pipe[F, TelegramMessage, A] = episode.matching
 
   def flatMap[B](fn: A => Scenario[F, B]): Scenario[F, B] =
     new Scenario[F, B](episode.flatMap(fn(_).episode))
@@ -61,6 +61,9 @@ final class Scenario[F[_], A] private (private val episode: Episode[F, TelegramM
     */
   def cancelWith[Any](expect: Expect[Any])(cancellation: TelegramMessage => F[Unit]): Scenario[F, A] =
     new Scenario[F, A](episode.cancelWith(expect.isDefinedAt)(cancellation))
+
+  def attempt: Scenario[F, Either[Throwable, A]] =
+    new Scenario[F, Either[Throwable, A]](episode.attempt)
 }
 
 object Scenario {

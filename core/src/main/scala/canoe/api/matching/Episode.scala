@@ -3,7 +3,7 @@ package canoe.api.matching
 import canoe.api.matching.Episode._
 import cats.instances.list._
 import cats.syntax.all._
-import cats.{Monad, StackSafeMonad}
+import cats.{ApplicativeError, Monad, MonadError, StackSafeMonad}
 import fs2.{Pipe, Pull, Stream}
 
 /**
@@ -21,7 +21,7 @@ import fs2.{Pipe, Pull, Stream}
   *  - Cancelled(i) - when the episode was cancelled by specific input.
   *                   Contains the input element of type `I` which caused cancellation.
   *
-  * `Episode` forms a monad in `O` with `pure` and `flatMap`
+  * `Episode` forms a monad in `O` with `pure` and `flatMap`.
   *
   * @tparam F Effect type
   * @tparam I Input elements type
@@ -30,12 +30,14 @@ import fs2.{Pipe, Pull, Stream}
 private[api] sealed trait Episode[F[_], -I, +O] {
 
   /**
-    * @return Pipe which produces value `O` for each subsequence of `I` elements
-    *         matching this description, evaluated in `F` effect
+    * Pipe which produces value `O` for each subsequence of `I` elements
+    * matching this description, evaluated in `F` effect.
+    * Fails on the first unhandled error result.
     */
-  def pipe: Pipe[F, I, O] =
+  def matching: Pipe[F, I, O] =
     find(this, _, Nil).collect {
       case (Matched(o), _) => o
+      case (Failed(e), _)  => throw e
     }
 
   def flatMap[I2 <: I, O2](fn: O => Episode[F, I2, O2]): Episode[F, I2, O2] =
@@ -76,6 +78,13 @@ private[api] sealed trait Episode[F[_], -I, +O] {
     */
   def tolerateAll[I2 <: I](fn: I2 => F[Unit]): Episode[F, I2, O] =
     Tolerate(this, None, fn)
+
+  def handleErrorWith[I2 <: I, O2 >: O](f: Throwable => Episode[F, I2, O2]): Episode[F, I2, O2] =
+    Protected(this, f)
+
+  def attempt: Episode[F, I, Either[Throwable, O]] =
+    map(Right(_): Either[Throwable, O]).handleErrorWith(e => Episode.pure(Left(e)))
+
 }
 
 private final case class Pure[F[_], I, A](a: A) extends Episode[F, I, A]
@@ -85,6 +94,10 @@ private final case class Eval[F[_], I, A](fa: F[A]) extends Episode[F, I, A]
 private final case class Next[F[_], A](p: A => Boolean) extends Episode[F, A, A]
 
 private final case class First[F[_], A](p: A => Boolean) extends Episode[F, A, A]
+
+private final case class Protected[F[_], I, O1, O2 >: O1](episode: Episode[F, I, O1],
+                                                          onError: Throwable => Episode[F, I, O2])
+    extends Episode[F, I, O2]
 
 private final case class Bind[F[_], I, O1, O2](episode: Episode[F, I, O1], fn: O1 => Episode[F, I, O2])
     extends Episode[F, I, O2]
@@ -108,8 +121,26 @@ object Episode {
 
   private[api] def next[F[_], I](p: I => Boolean): Episode[F, I, I] = Next(p)
 
+  private[api] implicit def monadErrorInstance[F[_]: ApplicativeError[*[_], Throwable], I]
+    : MonadError[Episode[F, I, *], Throwable] =
+    new MonadError[Episode[F, I, *], Throwable] with StackSafeMonad[Episode[F, I, *]] {
+      println("Constructing monad error instance")
+
+      def pure[A](a: A): Episode[F, I, A] = Pure(a)
+
+      def flatMap[A, B](fa: Episode[F, I, A])(f: A => Episode[F, I, B]): Episode[F, I, B] =
+        fa.flatMap(f)
+
+      def handleErrorWith[A](fa: Episode[F, I, A])(f: Throwable => Episode[F, I, A]): Episode[F, I, A] =
+        fa.handleErrorWith(f)
+
+      def raiseError[A](e: Throwable): Episode[F, I, A] = Eval(e.raiseError[F, A])
+    }
+
   private[api] implicit def monadInstance[F[_], I]: Monad[Episode[F, I, *]] =
     new StackSafeMonad[Episode[F, I, *]] {
+      println("Constructing monad instance")
+
       def pure[A](a: A): Episode[F, I, A] = Pure(a)
 
       def flatMap[A, B](
@@ -123,12 +154,14 @@ object Episode {
       case Matched(o)          => Matched(f(o))
       case same @ Missed(_)    => same
       case same @ Cancelled(_) => same
+      case same @ Failed(_)    => same
     }
   }
 
   private final case class Matched[O](o: O) extends Result[Nothing, O]
   private final case class Missed[I](elem: I) extends Result[I, Nothing]
   private final case class Cancelled[I](elem: I) extends Result[I, Nothing]
+  private final case class Failed(e: Throwable) extends Result[Nothing, Nothing]
 
   private def find[F[_], I, O](
     episode: Episode[F, I, O],
@@ -139,8 +172,17 @@ object Episode {
       case Pure(a) =>
         Stream(a).covary[F].map(o => Matched(o) -> input)
 
+      case Protected(episode, onError) =>
+        find(episode, input, cancelTokens).flatMap {
+          case (Failed(e), rest) => find(onError(e), rest, cancelTokens)
+          case other             => Stream(other)
+        }
+
       case Eval(fa) =>
-        Stream.eval(fa).map(o => Matched(o) -> input)
+        Stream
+          .eval(fa)
+          .map(o => Matched(o) -> input)
+          .handleErrorWith(e => Stream(Failed(e) -> input))
 
       case First(p: (I => Boolean)) =>
         def go(in: Stream[F, I]): Pull[F, (Result[I, O], Stream[F, I]), Unit] =
@@ -201,6 +243,7 @@ object Episode {
               case Matched(a)         => find(fn(a), rest, cancelTokens)
               case Missed(message)    => Stream(Missed(message) -> rest)
               case Cancelled(message) => Stream(Cancelled(message) -> rest)
+              case Failed(e)          => Stream(Failed(e) -> rest)
             }
         }
     }

@@ -20,7 +20,7 @@ class EpisodeSpec extends AnyFunSuite {
 
     val input = Stream("one", "two")
 
-    assert(input.through(episode.matching).toList().size == 1)
+    assert(input.through(episode.matching).size() == 1)
   }
 
   test("Episode doesn't ignore the element which is mismatched") {

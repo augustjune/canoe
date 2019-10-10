@@ -29,6 +29,18 @@ final class Scenario[F[_], A] private (private val ep: Episode[F, TelegramMessag
   def map[B](fn: A => B): Scenario[F, B] = flatMap(fn.andThen(Scenario.pure))
 
   /**
+    * @return `this` or scenario which is result of `fn` if error occurs.
+    */
+  def handleErrorWith(fn: Throwable => Scenario[F, A]): Scenario[F, A] =
+    new Scenario[F, A](Episode.Protected(ep, fn(_).ep))
+
+  /**
+    * @return Scenario which wraps successful result values in `Right` and raised errors in `Left`.
+    */
+  def attempt: Scenario[F, Either[Throwable, A]] =
+    map(Right(_): Either[Throwable, A]).handleErrorWith(e => Scenario.pure(Left(e)))
+
+  /**
     * @return Scenario which ignores the input element, which causes
     *         missed result, `n` time and evaluates `fn` for every such element
     */
@@ -62,18 +74,6 @@ final class Scenario[F[_], A] private (private val ep: Episode[F, TelegramMessag
     */
   def cancelWith[Any](expect: Expect[Any])(cancellation: TelegramMessage => F[Unit]): Scenario[F, A] =
     new Scenario[F, A](Episode.Cancellable(ep, expect.isDefinedAt, Some(cancellation)))
-
-  /**
-    * @return `this` or scenario which is result of `fn` if error occurs.
-    */
-  def handleErrorWith(fn: Throwable => Scenario[F, A]): Scenario[F, A] =
-    new Scenario[F, A](Episode.Protected(ep, fn(_).ep))
-
-  /**
-    * @return Scenario which wraps successful result values in `Right` and raised errors in `Left`.
-    */
-  def attempt: Scenario[F, Either[Throwable, A]] =
-    map(Right(_): Either[Throwable, A]).handleErrorWith(e => Scenario.pure(Left(e)))
 }
 
 object Scenario {

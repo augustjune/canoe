@@ -44,82 +44,32 @@ private[api] sealed trait Episode[F[_], -I, +O] {
     Bind(this, fn)
 
   def map[O2](fn: O => O2): Episode[F, I, O2] = flatMap(fn.andThen(Pure(_)))
-
-  /**
-    * @return Episode which is cancellable by the occurrence of input element described
-    *         by predicate `p` at any point after the episode is started and before it is finished
-    */
-  def cancelOn[I2 <: I](p: I2 => Boolean): Episode[F, I2, O] =
-    Cancellable(this, p, None)
-
-  /**
-    * @param p Predicate which determines what input value causes cancellation
-    * @param cancellation Function which result is going to be evaluated during the cancellation
-    *
-    * @return Episode which is cancellable by the occurrence of input element described
-    *         by predicate `p` at any point after the episode is started and before it is finished,
-    *         and evaluates `cancellation` when such element occurs.
-    */
-  def cancelWith[I2 <: I](
-    p: I2 => Boolean
-  )(cancellation: I2 => F[Unit]): Episode[F, I2, O] =
-    Cancellable(this, p, Some(cancellation))
-
-  /**
-    * @return Episode which ignores the input element, which causes
-    *         missed result, `n` time and evaluates `fn` for every such element
-    */
-  def tolerateN[I2 <: I](n: Int)(fn: I2 => F[Unit]): Episode[F, I2, O] =
-    Tolerate(this, Some(n), fn)
-
-  /**
-    * @return Episode which ignores every input element which causes
-    *         missed result and evaluates `fn` for every such element
-    */
-  def tolerateAll[I2 <: I](fn: I2 => F[Unit]): Episode[F, I2, O] =
-    Tolerate(this, None, fn)
-
-  def handleErrorWith[I2 <: I, O2 >: O](f: Throwable => Episode[F, I2, O2]): Episode[F, I2, O2] =
-    Protected(this, f)
-
-  def attempt: Episode[F, I, Either[Throwable, O]] =
-    map(Right(_): Either[Throwable, O]).handleErrorWith(e => Episode.pure(Left(e)))
-
 }
-
-private final case class Pure[F[_], I, A](a: A) extends Episode[F, I, A]
-
-private final case class Eval[F[_], I, A](fa: F[A]) extends Episode[F, I, A]
-
-private final case class Next[F[_], A](p: A => Boolean) extends Episode[F, A, A]
-
-private final case class First[F[_], A](p: A => Boolean) extends Episode[F, A, A]
-
-private final case class Protected[F[_], I, O1, O2 >: O1](episode: Episode[F, I, O1],
-                                                          onError: Throwable => Episode[F, I, O2])
-    extends Episode[F, I, O2]
-
-private final case class Bind[F[_], I, O1, O2](episode: Episode[F, I, O1], fn: O1 => Episode[F, I, O2])
-    extends Episode[F, I, O2]
-
-private final case class Cancellable[F[_], I, O](
-  episode: Episode[F, I, O],
-  cancelOn: I => Boolean,
-  finalizer: Option[I => F[Unit]]
-) extends Episode[F, I, O]
-
-private final case class Tolerate[F[_], I, O](episode: Episode[F, I, O], limit: Option[Int], fn: I => F[Unit])
-    extends Episode[F, I, O]
 
 object Episode {
 
-  private[api] def pure[F[_], I, A](a: A): Episode[F, I, A] = Pure(a)
+  private[api] final case class Pure[F[_], I, A](a: A) extends Episode[F, I, A]
 
-  private[api] def eval[F[_], I, A](fa: F[A]): Episode[F, I, A] = Eval(fa)
+  private[api] final case class Eval[F[_], I, A](fa: F[A]) extends Episode[F, I, A]
 
-  private[api] def first[F[_], I](p: I => Boolean): Episode[F, I, I] = First(p)
+  private[api] final case class Next[F[_], A](p: A => Boolean) extends Episode[F, A, A]
 
-  private[api] def next[F[_], I](p: I => Boolean): Episode[F, I, I] = Next(p)
+  private[api] final case class First[F[_], A](p: A => Boolean) extends Episode[F, A, A]
+
+  private[api] final case class Protected[F[_], I, O1, O2 >: O1](episode: Episode[F, I, O1],
+                                                                 onError: Throwable => Episode[F, I, O2])
+      extends Episode[F, I, O2]
+
+  private[api] final case class Bind[F[_], I, O1, O2](episode: Episode[F, I, O1], fn: O1 => Episode[F, I, O2])
+      extends Episode[F, I, O2]
+
+  private[api] final case class Cancellable[F[_], I, O](episode: Episode[F, I, O],
+                                                        cancelOn: I => Boolean,
+                                                        finalizer: Option[I => F[Unit]])
+      extends Episode[F, I, O]
+
+  private[api] final case class Tolerate[F[_], I, O](episode: Episode[F, I, O], limit: Option[Int], fn: I => F[Unit])
+      extends Episode[F, I, O]
 
   private[api] implicit def monadErrorInstance[F[_]: ApplicativeError[*[_], Throwable], I]
     : MonadError[Episode[F, I, *], Throwable] =
@@ -131,7 +81,7 @@ object Episode {
         fa.flatMap(f)
 
       def handleErrorWith[A](fa: Episode[F, I, A])(f: Throwable => Episode[F, I, A]): Episode[F, I, A] =
-        fa.handleErrorWith(f)
+        Protected(fa, f)
 
       def raiseError[A](e: Throwable): Episode[F, I, A] = Eval(e.raiseError[F, A])
     }

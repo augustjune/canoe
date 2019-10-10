@@ -11,11 +11,11 @@ class EpisodeSpec extends AnyFunSuite {
 
   val predicate: String => Boolean = _.endsWith(expected)
 
-  test("Episode.start >>= Episode.next") {
+  test("Episode.First >>= Episode.Next") {
     val episode: Episode[fs2.Pure, String, String] =
       for {
-        m <- Episode.first[fs2.Pure, String](_.endsWith("one"))
-        _ <- Episode.next[fs2.Pure, String](_.endsWith("two"))
+        m <- Episode.First[fs2.Pure, String](_.endsWith("one"))
+        _ <- Episode.Next[fs2.Pure, String](_.endsWith("two"))
       } yield m
 
     val input = Stream("one", "two")
@@ -26,8 +26,8 @@ class EpisodeSpec extends AnyFunSuite {
   test("Episode doesn't ignore the element which is mismatched") {
     val episode: Episode[fs2.Pure, String, String] =
       for {
-        m <- Episode.first[fs2.Pure, String](_.endsWith("one"))
-        _ <- Episode.next[fs2.Pure, String](_.endsWith("two"))
+        m <- Episode.First[fs2.Pure, String](_.endsWith("one"))
+        _ <- Episode.Next[fs2.Pure, String](_.endsWith("two"))
       } yield m
 
     val input = Stream("1.one", "2.one", "3.two")
@@ -40,8 +40,8 @@ class EpisodeSpec extends AnyFunSuite {
 
     val episode: Episode[fs2.Pure, String, String] =
       (for {
-        m <- Episode.first[fs2.Pure, String](_.endsWith("one"))
-        _ <- Episode.next[fs2.Pure, String](_ => true)
+        m <- Episode.First[fs2.Pure, String](_.endsWith("one"))
+        _ <- Episode.Next[fs2.Pure, String](_ => true)
       } yield m).cancelOn(_ == cancelToken)
 
     val input = Stream("1.one", cancelToken, "any")
@@ -55,8 +55,8 @@ class EpisodeSpec extends AnyFunSuite {
 
     val episode: Episode[IO, String, String] =
       (for {
-        m <- Episode.first[IO, String](_.endsWith("one"))
-        _ <- Episode.next[IO, String](_ => true)
+        m <- Episode.First[IO, String](_.endsWith("one"))
+        _ <- Episode.Next[IO, String](_ => true)
       } yield m).cancelWith[String](_ == cancelToken)(m => IO { cancelledWith = m })
 
     val input = Stream("1.one", cancelToken, "any")
@@ -65,15 +65,15 @@ class EpisodeSpec extends AnyFunSuite {
     assert(cancelledWith == cancelToken)
   }
 
-  test("Episode.start needs at least one message") {
-    val episode: Episode[fs2.Pure, String, String] = Episode.first(predicate)
+  test("Episode.First needs at least one message") {
+    val episode: Episode[fs2.Pure, String, String] = Episode.First(predicate)
     val input = Stream.empty
 
     assert(input.through(episode.matching).toList().isEmpty)
   }
 
-  test("Episode.start returns all matched occurrences") {
-    val episode: Episode[fs2.Pure, String, String] = Episode.first(predicate)
+  test("Episode.First returns all matched occurrences") {
+    val episode: Episode[fs2.Pure, String, String] = Episode.First(predicate)
     val input = Stream(
       s"1.$expected",
       s"1.$expected",
@@ -84,15 +84,15 @@ class EpisodeSpec extends AnyFunSuite {
     assert(input.through(episode.matching).size() == input.toList().count(predicate))
   }
 
-  test("Episode.next needs at least one message") {
-    val episode: Episode[fs2.Pure, String, String] = Episode.next(predicate)
+  test("Episode.Next needs at least one message") {
+    val episode: Episode[fs2.Pure, String, String] = Episode.Next(predicate)
     val input = Stream.empty
 
     assert(input.through(episode.matching).toList().isEmpty)
   }
 
-  test("Episode.next matches only the first message") {
-    val episode: Episode[fs2.Pure, String, String] = Episode.next(predicate)
+  test("Episode.Next matches only the first message") {
+    val episode: Episode[fs2.Pure, String, String] = Episode.Next(predicate)
 
     val input = Stream(s"1.$expected", s"2.$expected")
 
@@ -101,42 +101,42 @@ class EpisodeSpec extends AnyFunSuite {
     assert(results.head.startsWith("1"))
   }
 
-  test("Episode.next uses provided predicate to match the result") {
-    val episode: Episode[fs2.Pure, String, String] = Episode.next(predicate)
+  test("Episode.Next uses provided predicate to match the result") {
+    val episode: Episode[fs2.Pure, String, String] = Episode.Next(predicate)
     val input = Stream("")
 
     assert(input.through(episode.matching).toList().isEmpty)
   }
 
-  test("Episode.next#tolerate doesn't skip the element if it matches") {
+  test("Episode.Next#tolerate doesn't skip the element if it matches") {
     val episode: Episode[IO, String, String] =
-      Episode.next(predicate).tolerateN(1)(_ => IO.unit)
+      Episode.Next(predicate).tolerateN(1)(_ => IO.unit)
 
     val input = Stream(s"1.$expected", s"2.$expected")
 
     assert(input.through(episode.matching).toList().head.startsWith("1"))
   }
 
-  test("Episode.next#tolerateN skips up to N elements if they don't match") {
+  test("Episode.Next#tolerateN skips up to N elements if they don't match") {
     val n = 5
     val episode: Episode[IO, String, String] =
-      Episode.next(predicate).tolerateN(n)(_ => IO.unit)
+      Episode.Next(predicate).tolerateN(n)(_ => IO.unit)
 
     val input = Stream("").repeatN(5) ++ Stream(s"2.$expected")
 
     assert(input.through(episode.matching).toList().head.startsWith("2"))
   }
 
-  test("Episode.eval doesn't consume any message") {
-    val episode: Episode[IO, Unit, Unit] = Episode.eval(IO.unit)
+  test("Episode.Eval doesn't consume any message") {
+    val episode: Episode[IO, Unit, Unit] = Episode.Eval(IO.unit)
     val input: Stream[fs2.Pure, Unit] = Stream.empty
 
     assert(input.through(episode.matching).size == 1)
   }
 
-  test("Episode.eval evaluates effect") {
+  test("Episode.Eval evaluates effect") {
     var evaluated = false
-    val episode: Episode[IO, Unit, Unit] = Episode.eval(IO { evaluated = true })
+    val episode: Episode[IO, Unit, Unit] = Episode.Eval(IO { evaluated = true })
     val input: Stream[fs2.Pure, Unit] = Stream.empty
 
     input.through(episode.matching).run()
@@ -144,25 +144,25 @@ class EpisodeSpec extends AnyFunSuite {
     assert(evaluated)
   }
 
-  test("Episode.eval evaluates value in an effect") {
-    val episode: Episode[IO, Unit, Int] = Episode.eval(IO.pure(1))
+  test("Episode.Eval evaluates value in an effect") {
+    val episode: Episode[IO, Unit, Int] = Episode.Eval(IO.pure(1))
     val input: Stream[fs2.Pure, Unit] = Stream.empty
 
     assert(input.through(episode.matching).value() == 1)
   }
 
-  test("Episode.eval evaluates effect only once") {
+  test("Episode.Eval evaluates effect only once") {
     var times = 0
-    val episode: Episode[IO, Unit, Unit] = Episode.eval(IO { times = times + 1 })
+    val episode: Episode[IO, Unit, Unit] = Episode.Eval(IO { times = times + 1 })
     val input: Stream[fs2.Pure, Unit] = Stream.empty
 
     input.through(episode.matching).run()
     assert(times == 1)
   }
 
-  test("Episode.eval propagates error raised in underlying value") {
+  test("Episode.Eval propagates error raised in underlying value") {
     case class Error(s: String) extends Throwable
-    val episode: Episode[IO, Unit, Int] = Episode.eval(IO.raiseError(Error("test")))
+    val episode: Episode[IO, Unit, Int] = Episode.Eval(IO.raiseError(Error("test")))
 
     assertThrows[Error](Stream.empty.through(episode.matching).run())
   }
@@ -171,9 +171,9 @@ class EpisodeSpec extends AnyFunSuite {
     case class Error(s: String) extends Throwable
     val episode: Episode[IO, Unit, Int] =
       Episode
-        .eval(IO.raiseError(Error("test")))
-        .flatMap(_ => Episode.eval(IO.pure(-1)))
-        .handleErrorWith(_ => Episode.eval(IO.pure(12)))
+        .Eval[IO, Unit, Int](IO.raiseError(Error("test")))
+        .flatMap(_ => Episode.Eval[IO, Unit, Int](IO.pure(-1)))
+        .handleErrorWith(_ => Episode.Eval[IO, Unit, Int](IO.pure(12)))
 
     assert(Stream.empty.through(episode.matching).value() == 12)
   }
@@ -182,18 +182,18 @@ class EpisodeSpec extends AnyFunSuite {
     case class Error(s: String) extends Throwable
     val error = Error("test")
 
-    val episode: Episode[IO, Unit, Unit] = Episode.eval(IO.raiseError(error))
+    val episode: Episode[IO, Unit, Unit] = Episode.Eval(IO.raiseError(error))
     assert(Stream.empty.through(episode.attempt.matching).value() == Left(error))
   }
 
   test("Episode.attempt wraps result in right part of Either") {
-    val episode: Episode[IO, Unit, Int] = Episode.eval(IO.pure(12))
+    val episode: Episode[IO, Unit, Int] = Episode.Eval(IO.pure(12))
     assert(Stream.empty.through(episode.attempt.matching).value() == Right(12))
   }
 
   test("should not happen") {
     case class Error(s: String) extends Throwable
-    val episode: Episode[IO, Unit, Error] = Episode.eval(IO.pure(Error("test")))
+    val episode: Episode[IO, Unit, Error] = Episode.Eval(IO.pure(Error("test")))
     assert(Stream.empty.through(episode.matching).value() == Error("test"))
   }
 }

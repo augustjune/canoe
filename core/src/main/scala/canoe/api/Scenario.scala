@@ -16,12 +16,12 @@ import fs2.Pipe
   *
   * `Scenario` forms a monad in `A` with `pure` and `flatMap`.
   */
-final class Scenario[F[_], A] private (private val episode: Episode[F, TelegramMessage, A]) extends AnyVal {
+final class Scenario[F[_], A] private (private val ep: Episode[F, TelegramMessage, A]) extends AnyVal {
 
-  def pipe: Pipe[F, TelegramMessage, A] = episode.matching
+  def pipe: Pipe[F, TelegramMessage, A] = ep.matching
 
   def flatMap[B](fn: A => Scenario[F, B]): Scenario[F, B] =
-    new Scenario[F, B](episode.flatMap(fn(_).episode))
+    new Scenario[F, B](ep.flatMap(fn(_).ep))
 
   def >>[B](s2: => Scenario[F, B]): Scenario[F, B] = flatMap(_ => s2)
 
@@ -33,7 +33,7 @@ final class Scenario[F[_], A] private (private val episode: Episode[F, TelegramM
     *         missed result, `n` time and evaluates `fn` for every such element
     */
   def tolerateN(n: Int)(fn: TelegramMessage => F[Unit]): Scenario[F, A] =
-    new Scenario[F, A](episode.tolerateN(n)(fn))
+    new Scenario[F, A](Episode.Tolerate(ep, Some(n), fn))
 
   /** Alias for tolerateN(1) */
   def tolerate(fn: TelegramMessage => F[Unit]): Scenario[F, A] = tolerateN(1)(fn)
@@ -43,14 +43,14 @@ final class Scenario[F[_], A] private (private val episode: Episode[F, TelegramM
     *         missed result and evaluates `fn` for every such element
     */
   def tolerateAll(fn: TelegramMessage => F[Unit]): Scenario[F, A] =
-    new Scenario[F, A](episode.tolerateAll(fn))
+    new Scenario[F, A](Episode.Tolerate(ep, None, fn))
 
   /**
     * @return Scenario which is cancellable by the occurrence of input element, for which `expect` is defined,
     *         at any point after the scenario is started and before it is finished.
     */
   def cancelOn[Any](expect: Expect[Any]): Scenario[F, A] =
-    new Scenario[F, A](episode.cancelOn(expect.isDefinedAt))
+    new Scenario[F, A](Episode.Cancellable(ep, expect.isDefinedAt, None))
 
   /**
     * @param expect       Partial function which defines the domain of input values which cause cancellation
@@ -61,19 +61,19 @@ final class Scenario[F[_], A] private (private val episode: Episode[F, TelegramM
     *         and evaluates `cancellation` when such element occurs.
     */
   def cancelWith[Any](expect: Expect[Any])(cancellation: TelegramMessage => F[Unit]): Scenario[F, A] =
-    new Scenario[F, A](episode.cancelWith(expect.isDefinedAt)(cancellation))
+    new Scenario[F, A](Episode.Cancellable(ep, expect.isDefinedAt, Some(cancellation)))
 
   /**
     * @return `this` or scenario which is result of `fn` if error occurs.
     */
   def handleErrorWith(fn: Throwable => Scenario[F, A]): Scenario[F, A] =
-    new Scenario[F, A](episode.handleErrorWith(fn(_).episode))
+    new Scenario[F, A](Episode.Protected(ep, fn(_).ep))
 
   /**
     * @return Scenario which wraps successful result values in `Right` and raised errors in `Left`.
     */
   def attempt: Scenario[F, Either[Throwable, A]] =
-    new Scenario[F, Either[Throwable, A]](episode.attempt)
+    map(Right(_): Either[Throwable, A]).handleErrorWith(e => Scenario.pure(Left(e)))
 }
 
 object Scenario {
@@ -84,7 +84,7 @@ object Scenario {
     * Each input value from `pf` domain is going to be matched and transformed into `A` type value.
     */
   def start[F[_], A](pf: PartialFunction[TelegramMessage, A]): Scenario[F, A] =
-    new Scenario[F, A](Episode.first(pf.isDefinedAt).map(pf))
+    new Scenario[F, A](Episode.First(pf.isDefinedAt).map(pf))
 
   /**
     * Defines following step of the scenario.
@@ -93,7 +93,7 @@ object Scenario {
     * it is going to be matched and transformed into `A` type value.
     */
   def next[F[_], A](pf: PartialFunction[TelegramMessage, A]): Scenario[F, A] =
-    new Scenario[F, A](Episode.next(pf.isDefinedAt).map(pf))
+    new Scenario[F, A](Episode.Next(pf.isDefinedAt).map(pf))
 
   /**
     * Suspends an effectful value of type `A` into Scenario context.
@@ -102,13 +102,13 @@ object Scenario {
     * (e.g. sending messages, making calls to external APIs, etc.)
     */
   def eval[F[_], A](fa: F[A]): Scenario[F, A] =
-    new Scenario[F, A](Episode.eval(fa))
+    new Scenario[F, A](Episode.Eval(fa))
 
   /**
     * Lifts pure value to Scenario context
     */
   def pure[F[_], A](a: A): Scenario[F, A] =
-    new Scenario[F, A](Episode.pure(a))
+    new Scenario[F, A](Episode.Pure(a))
 
   def done[F[_]]: Scenario[F, Unit] = pure(())
 

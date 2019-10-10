@@ -83,43 +83,34 @@ private[api] sealed trait Episode[F[_], -I, +O] {
     Protected(this, f)
 
   def attempt: Episode[F, I, Either[Throwable, O]] =
-    map(Right(_): Either[Throwable, O]).handleErrorWith(e => Episode.pure(Left(e)))
+    map(Right(_): Either[Throwable, O]).handleErrorWith(e => Episode.Pure(Left(e)))
 
 }
 
-private final case class Pure[F[_], I, A](a: A) extends Episode[F, I, A]
-
-private final case class Eval[F[_], I, A](fa: F[A]) extends Episode[F, I, A]
-
-private final case class Next[F[_], A](p: A => Boolean) extends Episode[F, A, A]
-
-private final case class First[F[_], A](p: A => Boolean) extends Episode[F, A, A]
-
-private final case class Protected[F[_], I, O1, O2 >: O1](episode: Episode[F, I, O1],
-                                                          onError: Throwable => Episode[F, I, O2])
-    extends Episode[F, I, O2]
-
-private final case class Bind[F[_], I, O1, O2](episode: Episode[F, I, O1], fn: O1 => Episode[F, I, O2])
-    extends Episode[F, I, O2]
-
-private final case class Cancellable[F[_], I, O](
-  episode: Episode[F, I, O],
-  cancelOn: I => Boolean,
-  finalizer: Option[I => F[Unit]]
-) extends Episode[F, I, O]
-
-private final case class Tolerate[F[_], I, O](episode: Episode[F, I, O], limit: Option[Int], fn: I => F[Unit])
-    extends Episode[F, I, O]
-
 object Episode {
 
-  private[api] def pure[F[_], I, A](a: A): Episode[F, I, A] = Pure(a)
+  private[api] final case class Pure[F[_], I, A](a: A) extends Episode[F, I, A]
 
-  private[api] def eval[F[_], I, A](fa: F[A]): Episode[F, I, A] = Eval(fa)
+  private[api] final case class Eval[F[_], I, A](fa: F[A]) extends Episode[F, I, A]
 
-  private[api] def first[F[_], I](p: I => Boolean): Episode[F, I, I] = First(p)
+  private[api] final case class Next[F[_], A](p: A => Boolean) extends Episode[F, A, A]
 
-  private[api] def next[F[_], I](p: I => Boolean): Episode[F, I, I] = Next(p)
+  private[api] final case class First[F[_], A](p: A => Boolean) extends Episode[F, A, A]
+
+  private[api] final case class Protected[F[_], I, O1, O2 >: O1](episode: Episode[F, I, O1],
+                                                                 onError: Throwable => Episode[F, I, O2])
+      extends Episode[F, I, O2]
+
+  private[api] final case class Bind[F[_], I, O1, O2](episode: Episode[F, I, O1], fn: O1 => Episode[F, I, O2])
+      extends Episode[F, I, O2]
+
+  private[api] final case class Cancellable[F[_], I, O](episode: Episode[F, I, O],
+                                                        cancelOn: I => Boolean,
+                                                        finalizer: Option[I => F[Unit]])
+      extends Episode[F, I, O]
+
+  private[api] final case class Tolerate[F[_], I, O](episode: Episode[F, I, O], limit: Option[Int], fn: I => F[Unit])
+      extends Episode[F, I, O]
 
   private[api] implicit def monadErrorInstance[F[_]: ApplicativeError[*[_], Throwable], I]
     : MonadError[Episode[F, I, *], Throwable] =

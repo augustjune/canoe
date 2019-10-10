@@ -24,15 +24,15 @@ object EpisodeCheckInstances {
   implicit def arbEpisode[F[_], I, O: Arbitrary]: Arbitrary[Episode[F, I, O]] =
     Arbitrary(
       Gen.oneOf(
-        Arbitrary.arbitrary[O].map(o => Episode.pure[F, I, O](o)),
+        Arbitrary.arbitrary[O].map(o => Episode.Pure[F, I, O](o)),
         for {
           b <- Arbitrary.arbBool.arbitrary
           o <- Arbitrary.arbitrary[O]
-        } yield Episode.first[F, I](_ => b).map(_ => o),
+        } yield Episode.First[F, I](_ => b).map(_ => o),
         for {
           b <- Arbitrary.arbBool.arbitrary
           o <- Arbitrary.arbitrary[O]
-        } yield Episode.next[F, I](_ => b).map(_ => o)
+        } yield Episode.Next[F, I](_ => b).map(_ => o)
       )
     )
 

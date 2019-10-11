@@ -3,7 +3,7 @@ package canoe.models.outgoing
 import canoe.models.Currency.Currency
 import canoe.models.ParseMode.ParseMode
 import canoe.models.messages._
-import canoe.models.{InputFile, LabeledPrice}
+import canoe.models.{InputFile, LabeledPrice, ParseMode}
 
 /**
   * The content of the message which is going to be sent by the bot.
@@ -69,7 +69,18 @@ final case class LocationContent(latitude: Double, longitude: Double, livePeriod
 final case class TextContent(text: String,
                              parseMode: Option[ParseMode] = None,
                              disableWebPagePreview: Option[Boolean] = None)
-    extends MessageContent[TextMessage]
+    extends MessageContent[TextMessage] {
+
+  /**
+    * @return Text content with markdown parse mode.
+    */
+  def markdown: TextContent = copy(parseMode = Some(ParseMode.Markdown))
+
+  /**
+    * @return Text content with HTML parse mode.
+    */
+  def html: TextContent = copy(parseMode = Some(ParseMode.HTML))
+}
 
 final case class PhotoContent(photo: InputFile, caption: String = "", parseMode: Option[ParseMode] = None)
     extends MessageContent[PhotoMessage]

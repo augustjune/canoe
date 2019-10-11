@@ -34,8 +34,8 @@ import io.circe.Encoder
   */
 object ParseMode extends Enumeration {
   type ParseMode = Value
-  val Markdown = Value("Markdown")
-  val HTML = Value("HTML")
+  val Markdown: ParseMode = Value("Markdown")
+  val HTML: ParseMode = Value("HTML")
 
   implicit val parseModeEncoder: Encoder[ParseMode] =
     Encoder[String].contramap[ParseMode](_.toString)

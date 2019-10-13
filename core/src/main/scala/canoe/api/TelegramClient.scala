@@ -30,7 +30,7 @@ object TelegramClient {
     * After it is used, client is going to be released.
     *
     * @param token Telegram bot token
-    * @param ec Dedicated ExecutionContext
+    * @param ec    Dedicated ExecutionContext
     */
   def apply[F[_]: ConcurrentEffect](token: String, ec: ExecutionContext): Resource[F, TelegramClient[F]] =
     BlazeClientBuilder[F](ec).resource.map(new Http4sTelegramClient[F](token, _))

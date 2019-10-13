@@ -6,7 +6,8 @@ canoe
 [![Gitter](https://badges.gitter.im/augustjune-canoe/community.svg)](https://gitter.im/augustjune-canoe/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
     
 ### Overview
-**canoe** provides a purely functional streaming interface over [Telegram Bot API](https://core.telegram.org/bots/api) 
+**canoe** is a purely functional, compositional library for building Telegram bots.
+It provides functional streaming interface over [Telegram Bot API](https://core.telegram.org/bots/api) 
 and allows you to build interactive chatbots using idiomatic Scala code.
 
 ### Getting started
@@ -14,7 +15,8 @@ sbt dependency:
 ```scala
 libraryDependencies += "org.augustjune" %% "canoe" % "<version>"
 ```
-You can find the latest version in [releases](https://github.com/augustjune/canoe/releases) tab or by clicking on the maven-central badge.
+You can find the latest version in [releases](https://github.com/augustjune/canoe/releases) tab 
+or by clicking on the maven-central badge.
 
 Imports:
 ```scala
@@ -79,7 +81,19 @@ def app[F[_]: ConcurrentEffect: Timer]: F[Unit] =
 
 def greetings[F[_]: TelegramClient]: Scenario[F, Unit] = ???  // Scenario stays unchanged
 ```
-Using a webhook version you have to specify the `url` to which Telegram messages will be sent. 
+Using a webhook version you have to specify the `url` to which Telegram updates will be sent. 
 This address must be reachable for the Telegram, 
-so in case you're using your local environment you'd have to expose your local host to the Internet.
+so in case you're using local environment you'd have to expose your local host to the Internet.
 It can be achieved using **ngrok** simply following this [comprehensive guide](https://developer.github.com/webhooks/configuring/#using-ngrok).
+
+### Handling errors
+There's a lot of things that may go wrong during your scenarios executions, 
+from network issues to the shared state conflicts.
+For this reason, `Scenario` forms a `MonadError` for any `F` having `ApplicativeError` instance.
+If you're not familiar with this kind of abstractions, you can just use built-in `handleErrorWith` and `attempt` methods,
+in order to react to the raised error or ensure that bot workflow won't break.
+
+### Contribution
+If you're interested in the project PRs are very welcomed.
+In case it's a feature you'd like to introduce, it is recommended to discuss it first by raising an issue 
+or simply using [gitter](https://gitter.im/augustjune-canoe/community).

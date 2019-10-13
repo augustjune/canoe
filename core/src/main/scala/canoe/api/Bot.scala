@@ -15,7 +15,7 @@ import scala.concurrent.duration.FiniteDuration
   * An instance which can communicate with Telegram service and
   * interact with other Telegram users in a certain predefined way
   */
-class Bot[F[_]] private[api] (source: UpdateSource[F])(implicit F: Concurrent[F]) {
+class Bot[F[_]: Concurrent] private[api] (source: UpdateSource[F]) {
 
   /**
     * Stream of all updates which your bot receives from Telegram service
@@ -51,7 +51,7 @@ class Bot[F[_]] private[api] (source: UpdateSource[F])(implicit F: Concurrent[F]
     * }}}
     *
     * Each scenario is handled concurrently across all chats,
-    * which means that scenario is only blocked if it is already in progress within the same chat.
+    * which means that scenario is blocked only if it's already in progress within the same chat.
     *
     * All the behavior is suspended as an effect of resulting stream, without changing its elements.
     * Also, result stream is not halted by the execution of any particular scenario.
@@ -79,10 +79,10 @@ class Bot[F[_]] private[api] (source: UpdateSource[F])(implicit F: Concurrent[F]
         .map { m =>
           Stream
             .eval(register(idsRef, m.chat.id))
-            .flatMap {
-              case true  => Stream.empty
-              case false =>
-                //  Using queue in order to avoid blocking topic publisher
+            .flatMap { existed =>
+              if (existed) Stream.empty
+              else
+                //  Using queues in order to avoid blocking topic publisher
                 Stream.eval(Queue.unbounded[F, TelegramMessage]).flatMap { queue =>
                   val enq = topic
                     .subscribe(1)

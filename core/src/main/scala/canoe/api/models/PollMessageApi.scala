@@ -8,9 +8,7 @@ import canoe.syntax.methodOps
 
 /**
   * Telegram API for the poll message.
-  * Offers a convenient access to the related Telegram methods in OO style.
-  *
-  * It is a conscious decision to provide this API via extension methods.
+  * Offers a convenient access to the related Telegram methods.
   */
 final class PollMessageApi(private val pollMessage: PollMessage) extends AnyVal {
 

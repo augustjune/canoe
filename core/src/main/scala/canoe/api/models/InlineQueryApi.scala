@@ -7,9 +7,7 @@ import canoe.syntax.methodOps
 
 /**
   * Telegram API for the inline query.
-  * Offers a convenient access to the related Telegram methods in OO style.
-  *
-  * It is a conscious decision to provide this API via extension methods.
+  * Offers a convenient access to the related Telegram methods.
   */
 final class InlineQueryApi(private val query: InlineQuery) extends AnyVal {
 

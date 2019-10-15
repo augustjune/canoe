@@ -144,7 +144,8 @@ object Bot {
     * After the bot is used, the webhook is deleted even in case of interruptions or errors.
     *
     * @param url         HTTPS url to which updates will be sent
-    * @param port        Port which will be used for listening for the incoming updates
+    * @param port        Port which will be used for listening for the incoming updates.
+    *                    Default is 8443.
     * @param certificate Public key of self-signed certificate (including BEGIN and END portions)
     */
   def hook[F[_]: TelegramClient: ConcurrentEffect: Timer](

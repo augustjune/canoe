@@ -9,9 +9,7 @@ import canoe.syntax.methodOps
 
 /**
   * Telegram API for the any message object.
-  * Offers a convenient access to the related Telegram methods in OO style.
-  *
-  * It is a conscious decision to provide this API via extension methods.
+  * Offers a convenient access to the related Telegram methods.
   */
 final class MessageApi(private val message: TelegramMessage) extends AnyVal {
 

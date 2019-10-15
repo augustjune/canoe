@@ -34,12 +34,12 @@ final class Scenario[F[_], +A] private (private val ep: Episode[F, TelegramMessa
     new Scenario[F, B](ep.flatMap(fn(_).ep))
 
   /**
-    * `flatMap` which ignores the result of first scenario.
+    * Lazy `flatMap` which ignores the result of the first scenario.
     */
   def >>[B](s2: => Scenario[F, B]): Scenario[F, B] = flatMap(_ => s2)
 
   /**
-    * Maps successful result value using provided function `fn`.
+    * Maps successful result values using provided function `fn`.
     */
   def map[B](fn: A => B): Scenario[F, B] = flatMap(fn.andThen(Scenario.pure))
 
@@ -56,8 +56,8 @@ final class Scenario[F[_], +A] private (private val ep: Episode[F, TelegramMessa
     map(Right(_): Either[Throwable, A]).handleErrorWith(e => Scenario.pure(Left(e)))
 
   /**
-    * @return Scenario which ignores the input element, which causes
-    *         missed result, `n` time and evaluates `fn` for every such element
+    * @return Scenario which ignores input element which causes
+    *         missed result, up to `n` times and evaluates `fn` for every such element.
     */
   def tolerateN(n: Int)(fn: TelegramMessage => F[Unit]): Scenario[F, A] =
     new Scenario[F, A](Episode.Tolerate(ep, Some(n), fn))
@@ -96,7 +96,7 @@ object Scenario {
   /**
     * Defines the beginning of the scenario.
     *
-    * Each input value from `pf` domain is going to be matched and transformed into `A` type value.
+    * Each input value from `pf` domain is going to be matched and transformed into a value of type `A`.
     */
   def start[F[_], A](pf: PartialFunction[TelegramMessage, A]): Scenario[F, A] =
     new Scenario[F, A](Episode.First(pf.isDefinedAt).map(pf))
@@ -105,7 +105,7 @@ object Scenario {
     * Defines following step of the scenario.
     *
     * If the first elements belongs to the `pf` domain,
-    * it is going to be matched and transformed into `A` type value.
+    * it is going to be matched and transformed into the value of type `A` using `pf` .
     */
   def next[F[_], A](pf: PartialFunction[TelegramMessage, A]): Scenario[F, A] =
     new Scenario[F, A](Episode.Next(pf.isDefinedAt).map(pf))

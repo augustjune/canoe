@@ -40,7 +40,7 @@ final class EditMessageCaption private (val chatId: Option[ChatId],
 object EditMessageCaption {
 
   /**
-    * For the messages sent directed by the bot
+    * For the messages sent directly by the bot
     */
   def direct(chatId: ChatId,
              messageId: Int,

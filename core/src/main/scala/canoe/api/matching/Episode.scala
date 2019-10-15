@@ -13,13 +13,15 @@ import fs2.{Pipe, Pull, Stream}
   * to find the subsequences which match the description.
   *
   * For each partially matched subsequence (such that at least first element was matched)
-  * one of 3 possible results is yielded:
+  * one of 4 possible results is yielded:
   *  - Matched(o)   - when the whole episode was matched as a subsequence of input sequence.
   *                   Contains the result value of type `O`.
   *  - Missed(i)    - when the episode was started (partially matched) but was not fully matched.
   *                   Contains the first element of type `I` which didn't match the description.
   *  - Cancelled(i) - when the episode was cancelled by specific input.
   *                   Contains the input element of type `I` which caused cancellation.
+  *  - Failed(e)    - when evaluated program resulted into failure.
+  *                   Contains the error (Throwable) which was raised during the evaluation.
   *
   * `Episode` forms a monad in `O` with `pure` and `flatMap`.
   *

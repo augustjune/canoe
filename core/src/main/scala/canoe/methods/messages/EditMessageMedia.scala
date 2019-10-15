@@ -40,7 +40,7 @@ final class EditMessageMedia private (val chatId: Option[ChatId],
 object EditMessageMedia {
 
   /**
-    * For the messages sent directed by the bot
+    * For the messages sent directly by the bot.
     */
   def direct(chatId: ChatId,
              messageId: Int,
@@ -49,7 +49,7 @@ object EditMessageMedia {
     new EditMessageMedia(Some(chatId), Some(messageId), None, media, replyMarkup)
 
   /**
-    * For the inlined messages sent via the bot
+    * For the inlined messages sent via the bot.
     */
   def inlined(inlineMessageId: String,
               media: InputMedia,

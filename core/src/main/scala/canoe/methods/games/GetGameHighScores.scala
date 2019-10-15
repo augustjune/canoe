@@ -35,7 +35,7 @@ object GetGameHighScores {
   import io.circe.generic.auto._
 
   /**
-    * For the messages sent directed by the bot
+    * For the messages sent directly by the bot
     */
   def direct(chatId: ChatId, messageId: Int, userId: Int): GetGameHighScores =
     new GetGameHighScores(userId, Some(chatId), Some(messageId))

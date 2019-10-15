@@ -1,7 +1,7 @@
 package canoe.api
 
+import canoe.models._
 import canoe.models.messages.TelegramMessage
-import canoe.models.{CallbackQuery, ChosenInlineResult, InlineQuery, Poll, PreCheckoutQuery, ShippingQuery, Update, _}
 import fs2.Pipe
 
 object pipes {

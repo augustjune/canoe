@@ -1,8 +1,8 @@
 package canoe
 
 import canoe.api.models._
-import canoe.models._
 import canoe.models.messages.{LocationMessage, PollMessage, TelegramMessage}
+import canoe.models._
 
 /**
   * Contains implicit conversions to the API classes of particular Telegram models

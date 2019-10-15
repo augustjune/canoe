@@ -33,7 +33,7 @@ final class EditMessageReplyMarkup private (val chatId: Option[ChatId],
 object EditMessageReplyMarkup {
 
   /**
-    * For the messages sent directed by the bot
+    * For the messages sent directly by the bot
     */
   def direct(chatId: ChatId, messageId: Int, replyMarkup: Option[InlineKeyboardMarkup] = None): EditMessageReplyMarkup =
     new EditMessageReplyMarkup(Some(chatId), Some(messageId), None, replyMarkup)

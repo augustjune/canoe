@@ -4,6 +4,8 @@ canoe
 [![Build Status](https://travis-ci.org/augustjune/canoe.svg?branch=master)](https://travis-ci.org/augustjune/canoe)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.augustjune/canoe_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.augustjune/canoe_2.12)
 [![Gitter](https://badges.gitter.im/augustjune-canoe/community.svg)](https://gitter.im/augustjune-canoe/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
+[![Telegram](https://img.shields.io/badge/Bot%20API-4.4%20(July%2029%2C%202019)-00aced.svg)](https://core.telegram.org/bots/api#recent-changes)
     
 ### Overview
 **canoe** is a purely functional, compositional library for building Telegram bots.
@@ -60,7 +62,7 @@ you are still able to use all functionality of Telegram Bot API in a streaming c
 as it is demonstrated [here](https://github.com/augustjune/canoe/blob/master/examples/src/main/scala/samples/NoScenario.scala).
 
 ### Using webhooks
-**canoe** also provides a support for obtaining messages from Telegram by setting a webhook.
+**canoe** also provides support for obtaining messages from Telegram by setting a webhook.
 The same app described above would look this way using webhook version. 
 Full example may be found [here](https://github.com/augustjune/canoe/blob/master/examples/src/main/scala/samples/WebhookGreetings.scala).
 ```scala
@@ -81,7 +83,7 @@ def app[F[_]: ConcurrentEffect: Timer]: F[Unit] =
 
 def greetings[F[_]: TelegramClient]: Scenario[F, Unit] = ???  // Scenario stays unchanged
 ```
-Using a webhook version you have to specify the `url` to which Telegram updates will be sent. 
+Setting a webhook you have to specify the `url` to which Telegram updates will be sent. 
 This address must be reachable for the Telegram, 
 so in case you're using local environment you'd have to expose your local host to the Internet.
 It can be achieved using **ngrok** simply following this [comprehensive guide](https://developer.github.com/webhooks/configuring/#using-ngrok).

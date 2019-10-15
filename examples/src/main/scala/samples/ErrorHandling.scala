@@ -6,6 +6,15 @@ import cats.effect.{ExitCode, IO, IOApp, Sync}
 import cats.syntax.all._
 import fs2.Stream
 
+/**
+  * Example of handling errors withing your scenario.
+  *
+  * Here `Scenario#attempt` method is used, but the same (and more)
+  * may be achieved with `Scenario#handleErrorWith`.
+  *
+  * Also having `ApplicativeError[F, Throwable]` instance for your effect type
+  * will allow you to raise errors inside the scenario with `Scenario#raiseError` method.
+  */
 object ErrorHandling extends IOApp {
 
   val token: String = "<your telegram token>"

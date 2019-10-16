@@ -36,6 +36,7 @@ which the chatbot will follow.
 ### Example
 Here's a quick example of how the definition of simple bot behavior looks like in **canoe**. 
 More samples can be found [here](https://github.com/augustjune/canoe/tree/master/examples/src/main/scala/samples). 
+
 ```scala
 import canoe.api._
 import canoe.syntax._
@@ -61,10 +62,24 @@ Regardless of whether you decide to use scenarios for steering the bot,
 you are still able to use all functionality of Telegram Bot API in a streaming context, 
 as it is demonstrated [here](https://github.com/augustjune/canoe/blob/master/examples/src/main/scala/samples/NoScenario.scala).
 
-### Using webhooks
+### Telegram Bot API methods
+Low level abstractions are available through standalone Telegram Bot API methods from `canoe.methods` package.
+Having instance of `TelegramClient` in implicit scope, 
+you can use `call` method on constructed action in order to execute it in effect `F`.
+
+```scala
+def sendText[F[_]: TelegramClient](chatId: Long, text: String): F[TextMessage] = 
+  SendMessage(chatId, text).call
+```
+
+As an alternative, all the methods from Telegram Bot API are available from corresponding models,
+e.g.`chat.kickUser(user.id)`, `message.editText("edited")`.
+
+### Webhook support
 **canoe** also provides support for obtaining messages from Telegram by setting a webhook.
 The same app described above would look this way using webhook version. 
 Full example may be found [here](https://github.com/augustjune/canoe/blob/master/examples/src/main/scala/samples/WebhookGreetings.scala).
+
 ```scala
 import canoe.api._
 import canoe.syntax._

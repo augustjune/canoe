@@ -202,4 +202,17 @@ class ScenarioSpec extends AnyPropSpec {
 
     assert(counter == 2)
   }
+
+  property("Scenario is stack safe during the interpretation") {
+    def stack[F[_]](n: Long): Scenario[F, Long] = {
+      def bind(n: Long, sc: Scenario[F, Long]): Scenario[F, Long] =
+        if (n <= 0) sc
+        else bind(n - 1, sc.flatMap(l => Scenario.pure(l + 1)))
+
+      bind(n, Scenario.pure(0))
+    }
+
+    val n = 100000L
+    assert(Stream.empty.through(stack[IO](n).pipe).value() == n)
+  }
 }

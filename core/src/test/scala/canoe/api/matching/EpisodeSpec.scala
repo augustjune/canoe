@@ -185,4 +185,17 @@ class EpisodeSpec extends AnyFunSuite {
 
     assert(Stream.empty.through(episode.matching).value() == 12)
   }
+
+  test("Episode is stack safe during the interpretation") {
+    def stack(n: Long): Episode[IO, Any, Long] = {
+      def bind(n: Long, ep: Episode[IO, Any, Long]): Episode[IO, Any, Long] =
+        if (n <= 0) ep
+        else bind(n - 1, ep.flatMap(l => Episode.Pure(l + 1)))
+
+      bind(n, Episode.Pure[IO, Any, Long](0L))
+    }
+
+    val n = 100000L
+    assert(Stream.empty.through(stack(n).matching).value() == n)
+  }
 }

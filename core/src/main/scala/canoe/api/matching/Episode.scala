@@ -189,13 +189,15 @@ object Episode {
         }
 
       case Bind(prev, fn) =>
-        find(prev, input, cancelTokens).flatMap {
-          // Have to explicitly handle all not matched cases in order to satisfy compile
-          case (Matched(a), rest)   => find(fn(a), rest, cancelTokens)
-          case (Missed(m), rest)    => Stream(Missed(m) -> rest)
-          case (Cancelled(m), rest) => Stream(Cancelled(m) -> rest)
-          case (Failed(e), rest)    => Stream(Failed(e) -> rest)
-        }
+        Stream(prev)
+          .flatMap(ep => find(ep, input, cancelTokens))
+          .flatMap {
+            // Have to explicitly handle all not matched cases in order to satisfy compile
+            case (Matched(a), rest)   => find(fn(a), rest, cancelTokens)
+            case (Missed(m), rest)    => Stream(Missed(m) -> rest)
+            case (Cancelled(m), rest) => Stream(Cancelled(m) -> rest)
+            case (Failed(e), rest)    => Stream(Failed(e) -> rest)
+          }
     }
 
   private def translate[F[_], G[_], I, O](episode: Episode[F, I, O], f: F ~> G): Episode[G, I, O] =

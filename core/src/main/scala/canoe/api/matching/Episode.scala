@@ -37,7 +37,7 @@ private[api] sealed trait Episode[F[_], -I, +O] {
     * Fails on the first unhandled error result.
     */
   def matching: Pipe[F, I, O] =
-    find(this, _, Nil).collect {
+    find(this, _, Nil, Nil).collect {
       case (Matched(o), _) => o
       case (Failed(e), _)  => throw e
     }
@@ -95,9 +95,7 @@ object Episode {
 
       def pure[A](a: A): Episode[F, I, A] = Pure(a)
 
-      def flatMap[A, B](
-        episode: Episode[F, I, A]
-      )(fn: A => Episode[F, I, B]): Episode[F, I, B] =
+      def flatMap[A, B](episode: Episode[F, I, A])(fn: A => Episode[F, I, B]): Episode[F, I, B] =
         episode.flatMap(fn)
     }
 
@@ -115,26 +113,32 @@ object Episode {
   private final case class Cancelled[I](elem: I) extends Result[I, Nothing]
   private final case class Failed(e: Throwable) extends Result[Nothing, Nothing]
 
+  private sealed trait BindF {
+    def isHandler: Boolean
+  }
+
+  private final case class ErrorHandle[F[_], I](fn: Throwable => Episode[F, I, Any]) extends BindF {
+    def isHandler: Boolean = true
+  }
+  private final case class FlatMap[F[_], I](fn: Any => Episode[F, I, Any]) extends BindF {
+    def isHandler: Boolean = false
+  }
+
   private def find[F[_], I, O](
     episode: Episode[F, I, O],
     input: Stream[F, I],
-    cancelTokens: List[(I => Boolean, Option[I => F[Unit]])]
+    cancelTokens: List[(I => Boolean, Option[I => F[Unit]])],
+    bindStack: List[BindF]
   ): Stream[F, (Result[I, O], Stream[F, I])] =
     episode match {
       case Pure(a) =>
-        Stream(a).covary[F].map(o => Matched(o) -> input)
+        bindStack.dropWhile(_.isHandler) match {
+          case FlatMap(fn) :: stack =>
+            find(fn(a).asInstanceOf[Episode[F, I, O]], input, cancelTokens, stack)
 
-      case Protected(episode, onError) =>
-        find(episode, input, cancelTokens).flatMap {
-          case (Failed(e), rest) => find(onError(e), rest, cancelTokens)
-          case other             => Stream(other)
+          case empty =>
+            Stream(a).covary[F].map(o => Matched(o) -> input)
         }
-
-      case Eval(fa) =>
-        Stream
-          .eval(fa)
-          .map(o => Matched(o) -> input)
-          .handleErrorWith(e => Stream(Failed(e) -> input))
 
       case First(p: (I => Boolean)) =>
         def go(in: Stream[F, I]): Pull[F, (Result[I, O], Stream[F, I]), Unit] =
@@ -145,9 +149,16 @@ object Episode {
             case None => Pull.done
           }
 
-        go(input).stream
+        bindStack.dropWhile(_.isHandler) match {
+          case FlatMap(fn) :: stack =>
+            go(input).stream.flatMap {
+              case (Matched(o), rest) => find(fn(o).asInstanceOf[Episode[F, I, O]], rest, cancelTokens, stack)
+              case other              => Stream(other)
+            }
+          case empty => go(input).stream
+        }
 
-      case Next(p) =>
+      case Next(p: (I => Boolean)) =>
         def go(in: Stream[F, I]): Pull[F, (Result[I, O], Stream[F, I]), Unit] =
           in.pull.uncons1.flatMap {
             case Some((m, rest)) =>
@@ -165,23 +176,55 @@ object Episode {
             case None => Pull.done
           }
 
-        go(input).stream
+        bindStack.dropWhile(_.isHandler) match {
+          case FlatMap(fn) :: stack =>
+            go(input).stream.flatMap {
+              case (Matched(o), rest) => find(fn(o).asInstanceOf[Episode[F, I, O]], rest, cancelTokens, stack)
+              case other              => Stream(other)
+            }
+          case empty => go(input).stream
+        }
+
+      case Eval(fa) =>
+        Stream.eval(fa).attempt.flatMap {
+          case Left(e) =>
+            bindStack.dropWhile(!_.isHandler) match {
+              case ErrorHandle(fn) :: stack =>
+                find(fn(e).asInstanceOf[Episode[F, I, O]], input, cancelTokens, stack)
+
+              case empty =>
+                Stream(Failed(e) -> input)
+            }
+
+          case Right(a) =>
+            bindStack.dropWhile(_.isHandler) match {
+              case FlatMap(fn) :: stack =>
+                find(fn(a).asInstanceOf[Episode[F, I, O]], input, cancelTokens, stack)
+
+              case empty =>
+                Stream(Matched(a) -> input)
+            }
+        }
+
+      case Protected(episode, onError) =>
+        find(episode, input, cancelTokens, ErrorHandle(onError) :: bindStack)
 
       case Cancellable(episode, p, f) =>
-        find(episode, input, (p, f) :: cancelTokens)
+        find(episode, input, (p, f) :: cancelTokens, bindStack)
 
       case Tolerate(episode, limit, fn) =>
         limit match {
           case Some(n) if n <= 0 =>
-            find(episode, input, cancelTokens)
+            find(episode, input, cancelTokens, bindStack)
 
           case _ =>
-            find(episode, input, cancelTokens).flatMap {
+            find(episode, input, cancelTokens, bindStack).flatMap {
               case (Missed(m), rest) =>
                 Stream.eval(fn(m)) >> find(
                   Tolerate(episode, limit.map(_ - 1), fn),
                   rest,
-                  cancelTokens
+                  cancelTokens,
+                  bindStack
                 )
 
               case res => Stream(res)
@@ -189,15 +232,10 @@ object Episode {
         }
 
       case Bind(prev, fn) =>
-        Stream(prev)
-          .flatMap(ep => find(ep, input, cancelTokens))
-          .flatMap {
-            // Have to explicitly handle all not matched cases in order to satisfy compile
-            case (Matched(a), rest)   => find(fn(a), rest, cancelTokens)
-            case (Missed(m), rest)    => Stream(Missed(m) -> rest)
-            case (Cancelled(m), rest) => Stream(Cancelled(m) -> rest)
-            case (Failed(e), rest)    => Stream(Failed(e) -> rest)
-          }
+        find[F, I, O](prev.asInstanceOf[Episode[F, I, O]],
+                      input,
+                      cancelTokens,
+                      FlatMap(fn.asInstanceOf[Any => Episode[F, I, Any]]) :: bindStack)
     }
 
   private def translate[F[_], G[_], I, O](episode: Episode[F, I, O], f: F ~> G): Episode[G, I, O] =

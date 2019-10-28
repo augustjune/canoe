@@ -52,9 +52,9 @@ private[api] sealed trait Episode[F[_], -I, +O] {
 
 object Episode {
 
-  private[api] final case class Pure[F[_], I, A](a: A) extends Episode[F, I, A]
+  private[api] final case class Pure[F[_], A](a: A) extends Episode[F, Any, A]
 
-  private[api] final case class Eval[F[_], I, A](fa: F[A]) extends Episode[F, I, A]
+  private[api] final case class Eval[F[_], A](fa: F[A]) extends Episode[F, Any, A]
 
   private[api] final case class Next[F[_], A](p: A => Boolean) extends Episode[F, A, A]
 

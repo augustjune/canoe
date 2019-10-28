@@ -177,9 +177,9 @@ class EpisodeSpec extends AnyFunSuite {
     case class Error(s: String) extends Throwable
 
     val failing: Episode[IO, Unit, Int] =
-      Episode.Eval[IO, Unit, Int](IO.raiseError(Error("test")))
-        .flatMap(_ => Episode.Eval[IO, Unit, Int](IO.pure(-1)))
-    val recover = Episode.Eval[IO, Unit, Int](IO.pure(12))
+      Episode.Eval[IO, Int](IO.raiseError(Error("test")))
+        .flatMap(_ => Episode.Eval[IO, Int](IO.pure(-1)))
+    val recover = Episode.Eval[IO, Int](IO.pure(12))
 
     val episode = Episode.Protected(failing, _ => recover)
 
@@ -192,7 +192,7 @@ class EpisodeSpec extends AnyFunSuite {
         if (n <= 0) ep
         else bind(n - 1, ep.flatMap(l => Episode.Pure(l + 1)))
 
-      bind(n, Episode.Pure[IO, Any, Long](0L))
+      bind(n, Episode.Pure[IO, Long](0L))
     }
 
     val n = 100000L

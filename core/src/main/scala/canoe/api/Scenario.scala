@@ -3,8 +3,9 @@ package canoe.api
 import canoe.api.matching.Episode
 import canoe.models.messages.TelegramMessage
 import canoe.syntax.Expect
+import cats.arrow.FunctionK
 import cats.syntax.applicativeError._
-import cats.{ApplicativeError, Monad, MonadError, StackSafeMonad}
+import cats.{ApplicativeError, Monad, MonadError, StackSafeMonad, ~>}
 import fs2.Pipe
 
 /**
@@ -89,6 +90,15 @@ final class Scenario[F[_], +A] private (private val ep: Episode[F, TelegramMessa
     */
   def cancelWith[Any](expect: Expect[Any])(cancellation: TelegramMessage => F[Unit]): Scenario[F, A] =
     new Scenario[F, A](Episode.Cancellable(ep, expect.isDefinedAt, Some(cancellation)))
+
+  /**
+    * Maps effect type from `F` to `G` using the supplied transformation.
+    *
+    * Warning: this operation can result into StackOverflowError
+    * if `this` is nested with a lot of `flatMap` operations.
+    */
+  def mapK[G[_]](f: F ~> G): Scenario[G, A] =
+    new Scenario[G, A](ep.mapK(f))
 }
 
 object Scenario {
@@ -151,4 +161,7 @@ object Scenario {
       def flatMap[A, B](scenario: Scenario[F, A])(fn: A => Scenario[F, B]): Scenario[F, B] =
         scenario.flatMap(fn)
     }
+
+  implicit def functionKInstance[F[_]]: F ~> Scenario[F, *] =
+    FunctionK.lift(Scenario.eval)
 }

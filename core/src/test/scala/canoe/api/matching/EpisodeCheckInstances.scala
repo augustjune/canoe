@@ -25,7 +25,7 @@ object EpisodeCheckInstances {
   implicit def arbEpisode[F[_], I, O: Arbitrary]: Arbitrary[Episode[F, I, O]] =
     Arbitrary(
       Gen.oneOf(
-        Arbitrary.arbitrary[O].map(o => Episode.Pure[F, I, O](o)),
+        Arbitrary.arbitrary[O].map(o => Episode.Pure[F, O](o)),
         for {
           b <- Arbitrary.arbBool.arbitrary
           o <- Arbitrary.arbitrary[O]

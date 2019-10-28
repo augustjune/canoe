@@ -3,7 +3,7 @@ package canoe.api.matching
 import canoe.api.matching.Episode._
 import cats.instances.list._
 import cats.syntax.all._
-import cats.{ApplicativeError, Monad, MonadError, StackSafeMonad}
+import cats.{ApplicativeError, Monad, MonadError, StackSafeMonad, ~>}
 import fs2.{Pipe, Pull, Stream}
 
 /**
@@ -46,13 +46,15 @@ private[api] sealed trait Episode[F[_], -I, +O] {
     Bind(this, fn)
 
   def map[O2](fn: O => O2): Episode[F, I, O2] = flatMap(fn.andThen(Pure(_)))
+
+  def mapK[G[_]](fn: F ~> G): Episode[G, I, O] = translate(this, fn)
 }
 
 object Episode {
 
-  private[api] final case class Pure[F[_], I, A](a: A) extends Episode[F, I, A]
+  private[api] final case class Pure[F[_], A](a: A) extends Episode[F, Any, A]
 
-  private[api] final case class Eval[F[_], I, A](fa: F[A]) extends Episode[F, I, A]
+  private[api] final case class Eval[F[_], A](fa: F[A]) extends Episode[F, Any, A]
 
   private[api] final case class Next[F[_], A](p: A => Boolean) extends Episode[F, A, A]
 
@@ -187,12 +189,26 @@ object Episode {
         }
 
       case Bind(prev, fn) =>
-        find(prev, input, cancelTokens).flatMap {
-          // Have to explicitly handle all not matched cases in order to satisfy compile
-          case (Matched(a), rest)   => find(fn(a), rest, cancelTokens)
-          case (Missed(m), rest)    => Stream(Missed(m) -> rest)
-          case (Cancelled(m), rest) => Stream(Cancelled(m) -> rest)
-          case (Failed(e), rest)    => Stream(Failed(e) -> rest)
-        }
+        Stream(prev)
+          .flatMap(ep => find(ep, input, cancelTokens))
+          .flatMap {
+            // Have to explicitly handle all not matched cases in order to satisfy compile
+            case (Matched(a), rest)   => find(fn(a), rest, cancelTokens)
+            case (Missed(m), rest)    => Stream(Missed(m) -> rest)
+            case (Cancelled(m), rest) => Stream(Cancelled(m) -> rest)
+            case (Failed(e), rest)    => Stream(Failed(e) -> rest)
+          }
+    }
+
+  private def translate[F[_], G[_], I, O](episode: Episode[F, I, O], f: F ~> G): Episode[G, I, O] =
+    episode match {
+      case Pure(a)                    => Pure(a)
+      case Eval(fa)                   => Eval(f(fa))
+      case Next(p)                    => Next(p).asInstanceOf[Episode[G, I, O]]
+      case First(p)                   => First(p).asInstanceOf[Episode[G, I, O]]
+      case Protected(ep, onError)     => Protected(ep.mapK(f), onError.andThen(_.mapK(f)))
+      case Bind(ep, fn)               => Bind(ep.mapK(f), fn.andThen(_.mapK(f)))
+      case Tolerate(ep, limit, fn)    => Tolerate(ep.mapK(f), limit, fn.andThen(f(_)))
+      case Cancellable(ep, canc, fin) => Cancellable(ep.mapK(f), canc, fin.map(_.andThen(f(_))))
     }
 }

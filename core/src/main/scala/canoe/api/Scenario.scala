@@ -91,6 +91,12 @@ final class Scenario[F[_], +A] private (private val ep: Episode[F, TelegramMessa
   def cancelWith[Any](expect: Expect[Any])(cancellation: TelegramMessage => F[Unit]): Scenario[F, A] =
     new Scenario[F, A](Episode.Cancellable(ep, expect.isDefinedAt, Some(cancellation)))
 
+  /**
+    * Maps effect type from `F` to `G` using the supplied transformation.
+    *
+    * Warning: this operation can result into StackOverflowError
+    * if `this` is nested with a lot of `flatMap` operations.
+    */
   def mapK[G[_]](f: F ~> G): Scenario[G, A] =
     new Scenario[G, A](ep.mapK(f))
 }

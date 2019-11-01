@@ -4,8 +4,7 @@ import canoe.api.matching.Episode
 import canoe.models.messages.TelegramMessage
 import canoe.syntax.Expect
 import cats.arrow.FunctionK
-import cats.syntax.applicativeError._
-import cats.{ApplicativeError, Monad, MonadError, StackSafeMonad, ~>}
+import cats.{MonadError, StackSafeMonad, ~>}
 import fs2.Pipe
 
 /**
@@ -77,7 +76,7 @@ final class Scenario[F[_], +A] private (private val ep: Episode[F, TelegramMessa
     * @return Scenario which is cancellable by the occurrence of input element for which `expect` is defined,
     *         at any point after the scenario is started and before it is finished.
     */
-  def cancelOn[Any](expect: Expect[Any]): Scenario[F, A] =
+  def cancelOn(expect: Expect[_]): Scenario[F, A] =
     new Scenario[F, A](Episode.Cancellable(ep, expect.isDefinedAt, None))
 
   /**
@@ -88,7 +87,7 @@ final class Scenario[F[_], +A] private (private val ep: Episode[F, TelegramMessa
     *         at any point after the scenario is started and before it is finished,
     *         and evaluates `cancellation` when such element occurs.
     */
-  def cancelWith[Any](expect: Expect[Any])(cancellation: TelegramMessage => F[Unit]): Scenario[F, A] =
+  def cancelWith(expect: Expect[_])(cancellation: TelegramMessage => F[Unit]): Scenario[F, A] =
     new Scenario[F, A](Episode.Cancellable(ep, expect.isDefinedAt, Some(cancellation)))
 
   /**
@@ -140,26 +139,27 @@ object Scenario {
     */
   def done[F[_]]: Scenario[F, Unit] = pure(())
 
-  implicit def monadErrorInstance[F[_]: ApplicativeError[*[_], Throwable]]: MonadError[Scenario[F, *], Throwable] =
+  /**
+    * Lifts error value to the Scenario context.
+    *
+    * @return Scenario which fails with `e`
+    */
+  def raiseError[F[_]](e: Throwable): Scenario[F, Nothing] =
+    new Scenario[F, Nothing](Episode.RaiseError(e))
+
+  implicit def monadErrorInstance[F[_]]: MonadError[Scenario[F, *], Throwable] =
     new MonadError[Scenario[F, *], Throwable] with StackSafeMonad[Scenario[F, *]] {
-      def pure[A](a: A): Scenario[F, A] = Scenario.pure(a)
+      def pure[A](a: A): Scenario[F, A] =
+        Scenario.pure(a)
 
       def flatMap[A, B](scenario: Scenario[F, A])(fn: A => Scenario[F, B]): Scenario[F, B] =
         scenario.flatMap(fn)
 
       def raiseError[A](e: Throwable): Scenario[F, A] =
-        Scenario.eval(e.raiseError[F, A])
+        Scenario.raiseError(e)
 
       def handleErrorWith[A](scenario: Scenario[F, A])(fn: Throwable => Scenario[F, A]): Scenario[F, A] =
         scenario.handleErrorWith(fn)
-    }
-
-  implicit def monadInstance[F[_]]: Monad[Scenario[F, *]] =
-    new StackSafeMonad[Scenario[F, *]] {
-      def pure[A](a: A): Scenario[F, A] = Scenario.pure(a)
-
-      def flatMap[A, B](scenario: Scenario[F, A])(fn: A => Scenario[F, B]): Scenario[F, B] =
-        scenario.flatMap(fn)
     }
 
   implicit def functionKInstance[F[_]]: F ~> Scenario[F, *] =

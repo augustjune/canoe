@@ -1,9 +1,22 @@
 package canoe.models
 
+import io.circe.Encoder
+import io.circe.syntax._
+import io.circe.generic.auto._
+
 /**
   * Base for custom (keyboard) markups.
   */
 sealed trait ReplyMarkup
+
+object ReplyMarkup {
+  implicit val replyMarkupEncoder: Encoder[ReplyMarkup] = Encoder.instance {
+    case replyKeyboardMarkup: ReplyKeyboardMarkup => replyKeyboardMarkup.asJson
+    case replyKeyboardRemove: ReplyKeyboardRemove => replyKeyboardRemove.asJson
+    case inlineKeyboardMarkup: InlineKeyboardMarkup => inlineKeyboardMarkup.asJson
+    case forceReply: ForceReply => forceReply.asJson
+  }
+}
 
 /**
   * Represents a custom keyboard with reply options (see Introduction to bots for details).

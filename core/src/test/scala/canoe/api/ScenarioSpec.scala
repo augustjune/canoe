@@ -96,22 +96,29 @@ class ScenarioSpec extends AnyPropSpec {
     assertThrows[Error](Stream.empty.through(scenario.pipe).run())
   }
 
+  property("Scenario.raiseError interrupts the flow of the scenario") {
+    case class Error(s: String) extends Throwable
+    val scenario: Scenario[IO, Int] = Scenario.raiseError(Error("test")).map(_ => 12)
+
+    assertThrows[Error](Stream.empty.through(scenario.pipe).value())
+  }
+
   property("Scenario.handleErrorWith transforms into provided substitute in case of error") {
     case class Error(s: String) extends Throwable
-    val episode: Scenario[IO, Int] =
+    val scenario: Scenario[IO, Int] =
       Scenario
-        .eval[IO, Int](IO.raiseError(Error("test")))
+        .raiseError(Error("test"))
         .flatMap(_ => Scenario.eval(IO.pure(-1)))
         .handleErrorWith(_ => Scenario.eval(IO.pure(12)))
 
-    assert(Stream.empty.through(episode.pipe).value() == 12)
+    assert(Stream.empty.through(scenario.pipe).value() == 12)
   }
 
   property("Scenario.attempt wraps exception in left part of Either") {
     case class Error(s: String) extends Throwable
     val error = Error("test")
 
-    val scenario: Scenario[IO, Unit] = Scenario.eval(IO.raiseError(error))
+    val scenario: Scenario[IO, Unit] = Scenario.raiseError(error)
     assert(Stream.empty.through(scenario.attempt.pipe).value() == Left(error))
   }
 

@@ -4,7 +4,7 @@ import canoe.api.matching.Episode
 import canoe.models.messages.TelegramMessage
 import canoe.syntax.Expect
 import cats.arrow.FunctionK
-import cats.{MonadError, StackSafeMonad, ~>}
+import cats.{ApplicativeError, MonadError, StackSafeMonad, ~>}
 import fs2.Pipe
 
 /**
@@ -25,7 +25,8 @@ final class Scenario[F[_], +A] private (private val ep: Episode[F, TelegramMessa
     *
     * Should be used in order to translate this scenario into a fs2.Stream.
     */
-  def pipe: Pipe[F, TelegramMessage, A] = ep.matching
+  def pipe(implicit F: ApplicativeError[F, Throwable]): Pipe[F, TelegramMessage, A] =
+    ep.matching
 
   /**
     * Chains this scenario with the one produced by applying `fn` to the result of this scenario.
@@ -141,6 +142,10 @@ object Scenario {
 
   /**
     * Lifts error value to the Scenario context.
+    *
+    * Error can be safely brought back to the return value domain using `attempt` method.
+    * It also can be handled using various methods from `MonadError`
+    * such as `handleErrorWith`, `recover` etc.
     *
     * @return Scenario which fails with `e`
     */

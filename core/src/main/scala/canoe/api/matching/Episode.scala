@@ -3,7 +3,7 @@ package canoe.api.matching
 import canoe.api.matching.Episode._
 import cats.instances.list._
 import cats.syntax.all._
-import cats.{MonadError, StackSafeMonad, ~>}
+import cats.{ApplicativeError, MonadError, StackSafeMonad, ~>}
 import fs2.{Pipe, Pull, Stream}
 
 /**
@@ -36,10 +36,11 @@ private[api] sealed trait Episode[F[_], -I, +O] {
     * matching this description, evaluated in `F` effect.
     * Fails on the first unhandled error result.
     */
-  def matching: Pipe[F, I, O] =
-    find(this, _, Nil).collect {
-      case (Matched(o), _) => o
-      case (Failed(e), _)  => throw e
+  def matching(implicit F: ApplicativeError[F, Throwable]): Pipe[F, I, O] =
+    find(this, _, Nil).flatMap {
+      case (Matched(o), _) => Stream(o)
+      case (Failed(e), _)  => Stream.raiseError[F](e)
+      case _               => Stream.empty
     }
 
   def flatMap[I2 <: I, O2](fn: O => Episode[F, I2, O2]): Episode[F, I2, O2] =
@@ -77,8 +78,7 @@ object Episode {
   private[api] final case class Tolerate[F[_], I, O](episode: Episode[F, I, O], limit: Option[Int], fn: I => F[Unit])
       extends Episode[F, I, O]
 
-  private[api] implicit def monadErrorInstance[F[_], I]
-    : MonadError[Episode[F, I, *], Throwable] =
+  private[api] implicit def monadErrorInstance[F[_], I]: MonadError[Episode[F, I, *], Throwable] =
     new MonadError[Episode[F, I, *], Throwable] with StackSafeMonad[Episode[F, I, *]] {
 
       def pure[A](a: A): Episode[F, I, A] = Pure(a)

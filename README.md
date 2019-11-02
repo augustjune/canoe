@@ -106,8 +106,8 @@ It can be achieved using **ngrok** simply following this [comprehensive guide](h
 ### Handling errors
 There's a lot of things that may go wrong during your scenarios executions, 
 from user input to the network issues.
-For this reason, `Scenario` forms a `MonadError` for any `F` having `ApplicativeError` instance.
-If you're not familiar with this kind of abstractions, you can just use built-in `handleErrorWith` and `attempt` methods,
+For this reason, `Scenario` has `MonadError` instance for any `F`.  
+It means that you can use built-in `handleErrorWith` and `attempt` methods,
 in order to react to the raised error or ensure that bot workflow won't break.
 Full example may be found [here](https://github.com/augustjune/canoe/blob/master/examples/src/main/scala/samples/ErrorHandling.scala).
 

@@ -67,10 +67,10 @@ object Composition extends IOApp {
       pass      <- enterPass(chat)
       _         <- Scenario.eval(chat.send("Repeat your password"))
       reentered <- enterPass(chat)
-      _ <-
-        if (pass == reentered) Scenario.eval(chat.send("Your password is stored."))
+      r <-
+        if (pass == reentered) Scenario.eval(chat.send("Your password is stored.")).as(pass)
         else Scenario.eval(chat.send("Provided passwords don't match. Try again")) >> providePass(chat)
-    } yield pass
+    } yield r
 
   def enterPass[F[_]: TelegramClient](chat: Chat): Scenario[F, String] =
     for {

@@ -12,8 +12,8 @@ import fs2.Stream
   * Here `Scenario#attempt` method is used, but the same (and more)
   * may be achieved with `Scenario#handleErrorWith`.
   *
-  * Also having `ApplicativeError[F, Throwable]` instance for your effect type
-  * will allow you to raise errors inside the scenario with `Scenario#raiseError` method.
+  * Also using `Scenario#raiseError` method you can lift error value
+  * in order to represent failing scenario.
   */
 object ErrorHandling extends IOApp {
 

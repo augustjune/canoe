@@ -2,7 +2,7 @@ package canoe.api
 
 import canoe.TestIO._
 import canoe.models.PrivateChat
-import canoe.models.messages.TextMessage
+import canoe.models.messages.{TelegramMessage, TextMessage}
 import canoe.syntax._
 import cats.effect.IO
 import fs2.Stream
@@ -221,5 +221,23 @@ class ScenarioSpec extends AnyPropSpec {
 
     val n = 100000L
     assert(Stream.empty.through(stack[IO](n).pipe).value() == n)
+  }
+
+  property("Scenario doesn't throw exception during the interpretation") {
+    case class Error(s: String) extends Throwable
+
+    val input: Stream[IO, TelegramMessage] =
+      Stream(Right(""), Left(Error("test")), Right("2"), Right("3")).evalMap {
+        case Right(i)    => IO.pure(message(i))
+        case Left(error) => IO.raiseError(error)
+      }
+
+    val scenario: Scenario[IO, Unit] =
+      for {
+        _ <- Scenario.start(any)
+        _ <- Scenario.next(any)
+      } yield ()
+
+    input.through(scenario.attempt.pipe).run()
   }
 }

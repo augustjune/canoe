@@ -19,18 +19,27 @@ object ScenarioCheckInstances {
 
   implicit def eqScenario[A]: Eq[Scenario[IO, A]] = {
 
-    val sampleInput: List[TelegramMessage] =
-      Gen.listOf(Arbitrary.arbitrary[TelegramMessage]).sample.get
+    val inputGen =
+      Gen.listOf(
+        Gen.frequency(
+          1 -> Arbitrary.arbException.arbitrary.map(Left(_)),
+          10 -> Arbitrary.arbitrary[TelegramMessage].map(Right(_))
+        )
+      )
+
+    val input = Stream.emits(inputGen.sample.get).evalMap {
+      case Right(i) => IO.pure(i)
+      case Left(e)  => IO.raiseError(e)
+    }
 
     def result(sc: Scenario[IO, A]): List[Either[Throwable, A]] =
-      Stream.emits(sampleInput).through(sc.attempt.pipe).toList()
+      input.through(sc.attempt.pipe).toList()
 
     (x: Scenario[IO, A], y: Scenario[IO, A]) =>
       result(x) == result(y)
   }
 
-  implicit val eqThrowable: Eq[Throwable] =
-    (x: Throwable, y: Throwable) => (x ne null) == (y ne null)
+  implicit val eqThrowable: Eq[Throwable] = Eq.fromUniversalEquals[Throwable]
 
   implicit def arbScenario[F[_], A: Arbitrary]: Arbitrary[Scenario[F, A]] =
     Arbitrary(

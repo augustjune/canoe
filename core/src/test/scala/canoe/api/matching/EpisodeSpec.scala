@@ -2,7 +2,7 @@ package canoe.api.matching
 
 import canoe.TestIO._
 import cats.effect.IO
-import cats.syntax.functor._
+import cats.syntax.all._
 import fs2.Stream
 import org.scalatest.funsuite.AnyFunSuite
 
@@ -196,5 +196,23 @@ class EpisodeSpec extends AnyFunSuite {
 
     val n = 100000L
     assert(Stream.empty.through(stack(n).matching).value() == n)
+  }
+
+  test("Episode doesn't throw exception during the interpretation") {
+    case class Error(s: String) extends Throwable
+
+    val input: Stream[IO, Int] =
+      Stream(Right(1), Left(Error("test")), Right(2), Right(3)).evalMap {
+        case Right(i)    => IO.pure(i)
+        case Left(error) => IO.raiseError(error)
+      }
+
+    val episode: Episode[IO, Int, Unit] =
+      for {
+        _ <- Episode.First[IO, Int](_ => true)
+        _ <- Episode.Next[IO, Int](_ => true)
+      } yield ()
+
+    input.through(episode.attempt.matching).run()
   }
 }

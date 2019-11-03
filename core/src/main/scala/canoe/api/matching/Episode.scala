@@ -107,7 +107,7 @@ object Episode {
   private final case class Cancelled[I](elem: I) extends Result[I, Nothing]
   private final case class Failed(e: Throwable) extends Result[Nothing, Nothing]
 
-  private def find[F[_], I, O](
+  private def find[F[_]: ApplicativeError[*[_], Throwable], I, O](
     episode: Episode[F, I, O],
     input: Stream[F, I],
     cancelTokens: List[(I => Boolean, Option[I => F[Unit]])]
@@ -117,35 +117,45 @@ object Episode {
         Stream(a).covary[F].map(o => Matched(o) -> input)
 
       case First(p: (I => Boolean)) =>
-        def go(in: Stream[F, I]): Pull[F, (Result[I, O], Stream[F, I]), Unit] =
-          in.dropWhile(!p(_)).pull.uncons1.flatMap {
-            case Some((m, rest)) =>
-              Pull.output1(Matched(m.asInstanceOf[O]) -> rest) >> go(rest)
-
-            case None => Pull.done
+        def skipFailing(stream: Stream[F, Either[Throwable, I]]): Stream[F, Either[Throwable, I]] =
+          stream.dropWhile {
+            case Right(i) if p(i) => false
+            case _                => true
           }
 
-        go(input).stream
+        def go(in: Stream[F, Either[Throwable, I]]): Pull[F, (Result[I, O], Stream[F, I]), Unit] =
+          skipFailing(in).pull.uncons1.flatMap {
+            case Some((Right(m), rest)) =>
+              Pull.output1(Matched(m.asInstanceOf[O]) -> rest.rethrow) >> go(rest)
+
+            case _ => Pull.done
+          }
+
+        go(input.attempt).stream
 
       case Next(p) =>
-        def go(in: Stream[F, I]): Pull[F, (Result[I, O], Stream[F, I]), Unit] =
+        def go(in: Stream[F, Either[Throwable, I]]): Pull[F, (Result[I, O], Stream[F, I]), Unit] =
           in.pull.uncons1.flatMap {
-            case Some((m, rest)) =>
+            case Some((Right(m), rest)) =>
               cancelTokens.collect { case (p, f) if p(m) => f } match {
                 case Nil =>
-                  if (p(m)) Pull.output1(Matched(m.asInstanceOf[O]) -> rest)
-                  else Pull.output1(Missed(m) -> rest)
+                  if (p(m)) Pull.output1(Matched(m.asInstanceOf[O]) -> rest.rethrow)
+                  else Pull.output1(Missed(m) -> rest.rethrow)
 
                 case nonEmpty =>
                   nonEmpty
                     .collect { case Some(f) => f }
                     .traverse(f => Pull.eval(f(m))) >>
-                    Pull.output1(Cancelled(m) -> rest)
+                    Pull.output1(Cancelled(m) -> rest.rethrow)
               }
+
+            case Some((Left(e), rest)) =>
+              Pull.output1(Failed(e) -> rest.rethrow)
+
             case None => Pull.done
           }
 
-        go(input).stream
+        go(input.attempt).stream
 
       case Eval(fa) =>
         Stream

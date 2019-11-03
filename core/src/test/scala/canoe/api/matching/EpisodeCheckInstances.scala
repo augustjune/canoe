@@ -10,17 +10,28 @@ import org.scalacheck.{Arbitrary, Gen}
 object EpisodeCheckInstances {
 
   implicit def eqEpisode[I: Arbitrary, O]: Eq[Episode[IO, I, O]] = {
-    val sampleInput: List[I] = Gen.listOf(Arbitrary.arbitrary[I]).sample.get
+
+    val inputGen =
+      Gen.listOf(
+        Gen.frequency(
+          1 -> Arbitrary.arbException.arbitrary.map(Left(_)),
+          10 -> Arbitrary.arbitrary[I].map(Right(_))
+        )
+      )
+
+    val input = Stream.emits(inputGen.sample.get).evalMap {
+      case Right(i) => IO.pure(i)
+      case Left(e)  => IO.raiseError(e)
+    }
 
     def result(ep: Episode[IO, I, O]): List[Either[Throwable, O]] =
-      Stream.emits(sampleInput).through(ep.attempt.matching).toList()
+      input.through(ep.attempt.matching).toList()
 
     (x: Episode[IO, I, O], y: Episode[IO, I, O]) =>
       result(x) == result(y)
   }
 
-  implicit val eqThrowable: Eq[Throwable] =
-    (x: Throwable, y: Throwable) => (x ne null) == (y ne null)
+  implicit val eqThrowable: Eq[Throwable] = Eq.fromUniversalEquals[Throwable]
 
   implicit def arbEpisode[F[_], I, O: Arbitrary]: Arbitrary[Episode[F, I, O]] =
     Arbitrary(

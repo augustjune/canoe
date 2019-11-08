@@ -3,6 +3,7 @@ import sbtcrossproject.CrossPlugin.autoImport.crossProject
 lazy val canoe = project
   .in(file("."))
   .aggregate(coreJvm, coreJs, examples)
+  .disablePlugins(MimaPlugin)
   .settings(
     projectSettings,
     crossScalaVersions := Nil,
@@ -34,11 +35,12 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
     )
   )
 
-lazy val coreJvm = core.jvm
-lazy val coreJs = core.js
+lazy val coreJvm = core.jvm.settings(mimaSettings)
+lazy val coreJs = core.js.disablePlugins(MimaPlugin)
 
 lazy val examples = project
   .dependsOn(coreJvm)
+  .disablePlugins(MimaPlugin)
   .settings(
     name := "canoe-examples",
     skip.in(publish) := true,
@@ -81,6 +83,10 @@ lazy val crossDependencies =
     "io.circe"          %%% "circe-parser"  % circeVersion,
     "io.chrisdavenport" %%% "log4cats-core" % log4catsVersion
   )
+
+lazy val mimaSettings = Seq(
+  mimaPreviousArtifacts := Set(organization.value %% name.value % "0.3.0")
+)
 
 lazy val compilerOptions =
   scalacOptions ++= Seq(

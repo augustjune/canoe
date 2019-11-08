@@ -1,24 +1,44 @@
+import sbtcrossproject.CrossPlugin.autoImport.crossProject
+
 lazy val canoe = project
   .in(file("."))
-  .aggregate(core, examples)
+  .aggregate(coreJvm, coreJs, examples)
   .settings(
     projectSettings,
     crossScalaVersions := Nil,
     skip.in(publish) := true
   )
 
-lazy val core = project
+lazy val core = crossProject(JVMPlatform, JSPlatform)
+  .in(file("core"))
   .settings(
     name := "canoe",
     projectSettings,
     compilerOptions,
     typeSystemEnhancements,
-    dependencies,
+    crossDependencies,
     tests
   )
+  .jvmSettings(
+    libraryDependencies ++= Seq(
+      "org.http4s"        %% "http4s-dsl"          % http4sVersion,
+      "org.http4s"        %% "http4s-blaze-client" % http4sVersion,
+      "org.http4s"        %% "http4s-blaze-server" % http4sVersion,
+      "org.http4s"        %% "http4s-circe"        % http4sVersion,
+      "io.chrisdavenport" %% "log4cats-slf4j"      % log4catsVersion
+    )
+  )
+  .jsSettings(
+    libraryDependencies ++= Seq(
+      "org.scala-js" %%% "scalajs-dom" % "0.9.7"
+    )
+  )
+
+lazy val coreJvm = core.jvm
+lazy val coreJs = core.js
 
 lazy val examples = project
-  .dependsOn(core)
+  .dependsOn(coreJvm)
   .settings(
     name := "canoe-examples",
     skip.in(publish) := true,
@@ -51,20 +71,15 @@ val disciplineVersion = "1.0.0-RC1"
 val scalacheckShapelessVersion = "1.2.3"
 val kindProjectorVersion = "0.10.3"
 
-lazy val dependencies =
+lazy val crossDependencies =
   libraryDependencies ++= Seq(
-    "co.fs2"            %% "fs2-core"            % fs2Version,
-    "org.typelevel"     %% "cats-core"           % catsCoreVersion,
-    "org.typelevel"     %% "cats-effect"         % catsEffectVersion,
-    "io.circe"          %% "circe-core"          % circeVersion,
-    "io.circe"          %% "circe-generic"       % circeVersion,
-    "io.circe"          %% "circe-parser"        % circeVersion,
-    "org.http4s"        %% "http4s-dsl"          % http4sVersion,
-    "org.http4s"        %% "http4s-blaze-client" % http4sVersion,
-    "org.http4s"        %% "http4s-blaze-server" % http4sVersion,
-    "org.http4s"        %% "http4s-circe"        % http4sVersion,
-    "io.chrisdavenport" %% "log4cats-core"       % log4catsVersion,
-    "io.chrisdavenport" %% "log4cats-slf4j"      % log4catsVersion
+    "co.fs2"            %%% "fs2-core"      % fs2Version,
+    "org.typelevel"     %%% "cats-core"     % catsCoreVersion,
+    "org.typelevel"     %%% "cats-effect"   % catsEffectVersion,
+    "io.circe"          %%% "circe-core"    % circeVersion,
+    "io.circe"          %%% "circe-generic" % circeVersion,
+    "io.circe"          %%% "circe-parser"  % circeVersion,
+    "io.chrisdavenport" %%% "log4cats-core" % log4catsVersion
   )
 
 lazy val compilerOptions =

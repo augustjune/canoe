@@ -5,6 +5,7 @@ import canoe.models.{InputFile, Update}
 import cats.effect.{ConcurrentEffect, Resource, Timer}
 import fs2.Stream
 import fs2.concurrent.Queue
+import javax.naming.OperationNotSupportedException
 
 class Hook[F[_]](queue: Queue[F, Update]) extends UpdateSource[F] {
   def updates: Stream[F, Update] = queue.dequeue
@@ -25,5 +26,5 @@ object Hook {
   def install[F[_]: TelegramClient: ConcurrentEffect: Timer](url: String,
                                                              port: Int,
                                                              certificate: Option[InputFile]): Resource[F, Hook[F]] =
-    ???
+    throw new OperationNotSupportedException("Webhook is not supported for JS version.")
 }

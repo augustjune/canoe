@@ -16,7 +16,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
     projectSettings,
     compilerOptions,
     typeSystemEnhancements,
-    dependencies,
+    crossDependencies,
     tests
   )
   .jvmSettings(
@@ -71,7 +71,7 @@ val disciplineVersion = "1.0.0-RC1"
 val scalacheckShapelessVersion = "1.2.3"
 val kindProjectorVersion = "0.10.3"
 
-lazy val dependencies =
+lazy val crossDependencies =
   libraryDependencies ++= Seq(
     "co.fs2"            %%% "fs2-core"      % fs2Version,
     "org.typelevel"     %%% "cats-core"     % catsCoreVersion,

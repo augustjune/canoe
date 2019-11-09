@@ -4,7 +4,7 @@ import canoe.api._
 import canoe.methods.messages._
 import canoe.models.messages.TelegramMessage
 import canoe.models.outgoing._
-import canoe.models.{Chat, InlineKeyboardMarkup, ReplyMarkup}
+import canoe.models.{Chat, InlineKeyboardMarkup}
 import canoe.syntax.methodOps
 
 /**
@@ -39,9 +39,9 @@ final class MessageApi(private val message: TelegramMessage) extends AnyVal {
     * Sends new message as a reply to this message.
     */
   def reply[F[_]: TelegramClient, M](content: MessageContent[M],
-                                     replyMarkup: Option[ReplyMarkup] = None,
+                                     keyboard: Keyboard = Keyboard.Unchanged,
                                      disableNotification: Boolean = false): F[M] =
-    message.chat.send(content, Some(messageId), replyMarkup, disableNotification)
+    message.chat.send(content, Some(messageId), keyboard, disableNotification)
 
   /**
     * Changes the text of this message.

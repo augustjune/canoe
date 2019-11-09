@@ -204,7 +204,7 @@ final class ChatApi(private val chat: Chat) extends AnyVal {
     */
   def send[F[_]: TelegramClient, M](content: MessageContent[M],
                                     replyToMessageId: Option[Int] = None,
-                                    replyMarkup: Option[ReplyMarkup] = None,
+                                    keyboard: Keyboard = Keyboard.Unchanged,
                                     disableNotification: Boolean = false): F[M] =
     // Casting the result type due to the lack of type inference in M type parameter
     content match {
@@ -219,7 +219,7 @@ final class ChatApi(private val chat: Chat) extends AnyVal {
                       parseMode,
                       notFalse(disableNotification),
                       replyToMessageId,
-                      replyMarkup).call.asInstanceOf[F[M]]
+                      keyboard.replyMarkup).call.asInstanceOf[F[M]]
 
       case AudioContent(audio, caption, duration, parseMode, performer, title, thumb) =>
         SendAudio(chat.id,
@@ -232,7 +232,7 @@ final class ChatApi(private val chat: Chat) extends AnyVal {
                   thumb,
                   notFalse(disableNotification),
                   replyToMessageId,
-                  replyMarkup).call.asInstanceOf[F[M]]
+                  keyboard.replyMarkup).call.asInstanceOf[F[M]]
 
       case ContactContent(phoneNumber, firstName, lastName, vcard) =>
         SendContact(chat.id,
@@ -242,7 +242,7 @@ final class ChatApi(private val chat: Chat) extends AnyVal {
                     vcard,
                     notFalse(disableNotification),
                     replyToMessageId,
-                    replyMarkup).call.asInstanceOf[F[M]]
+                    keyboard.replyMarkup).call.asInstanceOf[F[M]]
 
       case DocumentContent(document, thumb, caption, parseMode) =>
         SendDocument(chat.id,
@@ -252,10 +252,10 @@ final class ChatApi(private val chat: Chat) extends AnyVal {
                      parseMode,
                      notFalse(disableNotification),
                      replyToMessageId,
-                     replyMarkup).call.asInstanceOf[F[M]]
+                     keyboard.replyMarkup).call.asInstanceOf[F[M]]
 
       case GameContent(gameShortName) =>
-        SendGame(chat.id, gameShortName, notFalse(disableNotification), replyToMessageId, replyMarkup).call
+        SendGame(chat.id, gameShortName, notFalse(disableNotification), replyToMessageId, keyboard.replyMarkup).call
           .asInstanceOf[F[M]]
 
       case InvoiceContent(title,
@@ -296,7 +296,7 @@ final class ChatApi(private val chat: Chat) extends AnyVal {
           isFlexible,
           notFalse(disableNotification),
           replyToMessageId,
-          replyMarkup
+          keyboard.replyMarkup
         ).call.asInstanceOf[F[M]]
 
       case LocationContent(latitude, longitude, livePeriod) =>
@@ -306,7 +306,7 @@ final class ChatApi(private val chat: Chat) extends AnyVal {
                      livePeriod,
                      notFalse(disableNotification),
                      replyToMessageId,
-                     replyMarkup).call
+                     keyboard.replyMarkup).call
           .asInstanceOf[F[M]]
 
       case TextContent(text, parseMode, disableWebPagePreview) =>
@@ -316,7 +316,7 @@ final class ChatApi(private val chat: Chat) extends AnyVal {
                     disableWebPagePreview,
                     notFalse(disableNotification),
                     replyToMessageId,
-                    replyMarkup).call
+                    keyboard.replyMarkup).call
           .asInstanceOf[F[M]]
 
       case PhotoContent(photo, caption, parseMode) =>
@@ -326,15 +326,15 @@ final class ChatApi(private val chat: Chat) extends AnyVal {
                   parseMode,
                   notFalse(disableNotification),
                   replyToMessageId,
-                  replyMarkup).call
+                  keyboard.replyMarkup).call
           .asInstanceOf[F[M]]
 
       case PollContent(question, options) =>
-        SendPoll(chat.id, question, options, notFalse(disableNotification), replyToMessageId, replyMarkup).call
+        SendPoll(chat.id, question, options, notFalse(disableNotification), replyToMessageId, keyboard.replyMarkup).call
           .asInstanceOf[F[M]]
 
       case StickerContent(sticker) =>
-        SendSticker(chat.id, sticker, notFalse(disableNotification), replyToMessageId, replyMarkup).call
+        SendSticker(chat.id, sticker, notFalse(disableNotification), replyToMessageId, keyboard.replyMarkup).call
           .asInstanceOf[F[M]]
 
       case VenueContent(latitude, longitude, title, address, foursquareId, foursquareType) =>
@@ -347,21 +347,23 @@ final class ChatApi(private val chat: Chat) extends AnyVal {
                   foursquareType,
                   notFalse(disableNotification),
                   replyToMessageId,
-                  replyMarkup).call.asInstanceOf[F[M]]
+                  keyboard.replyMarkup).call.asInstanceOf[F[M]]
 
       case VideoContent(video, caption, duration, width, height, thumb, parseMode, supportsStreaming) =>
-        SendVideo(chat.id,
-                  video,
-                  duration,
-                  width,
-                  height,
-                  thumb,
-                  nonEmpty(caption),
-                  parseMode,
-                  supportsStreaming,
-                  notFalse(disableNotification),
-                  replyToMessageId,
-                  replyMarkup).call.asInstanceOf[F[M]]
+        SendVideo(
+          chat.id,
+          video,
+          duration,
+          width,
+          height,
+          thumb,
+          nonEmpty(caption),
+          parseMode,
+          supportsStreaming,
+          notFalse(disableNotification),
+          replyToMessageId,
+          keyboard.replyMarkup
+        ).call.asInstanceOf[F[M]]
 
       case VideoNoteContent(videoNote, duration, length) =>
         SendVideoNote(chat.id,
@@ -370,7 +372,7 @@ final class ChatApi(private val chat: Chat) extends AnyVal {
                       length,
                       notFalse(disableNotification),
                       replyToMessageId,
-                      replyMarkup).call
+                      keyboard.replyMarkup).call
           .asInstanceOf[F[M]]
 
       case VoiceContent(voice, caption, parseMode, duration) =>
@@ -381,7 +383,7 @@ final class ChatApi(private val chat: Chat) extends AnyVal {
                   duration,
                   notFalse(disableNotification),
                   replyToMessageId,
-                  replyMarkup).call.asInstanceOf[F[M]]
+                  keyboard.replyMarkup).call.asInstanceOf[F[M]]
     }
 
   /**

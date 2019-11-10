@@ -53,7 +53,7 @@ lazy val projectSettings = Seq(
   licenses ++= Seq(("MIT", url("http://opensource.org/licenses/MIT"))),
   homepage := Some(url("https://github.com/augustjune/canoe")),
   developers := List(
-    Developer("augustjune", "Yura Slinkin", "jurij.jurich@gmail.com", url("https://github.com/augustjune"))
+      Developer("augustjune", "Yura Slinkin", "jurij.jurich@gmail.com", url("https://github.com/augustjune"))
   ),
   scalaVersion := scala2_13,
   crossScalaVersions := Seq(scala2_12, scalaVersion.value)
@@ -98,8 +98,6 @@ lazy val compilerOptions =
     "-language:postfixOps", // Allow higher-kinded types
     "-language:implicitConversions" // Allow definition of implicit functions called views
   ) ++ (if (scalaBinaryVersion.value.startsWith("2.12")) List("-Ypartial-unification") else Nil)
-
-resolvers += Resolver.sonatypeRepo("releases")
 
 lazy val typeSystemEnhancements =
   addCompilerPlugin("org.typelevel" %% "kind-projector" % kindProjectorVersion)

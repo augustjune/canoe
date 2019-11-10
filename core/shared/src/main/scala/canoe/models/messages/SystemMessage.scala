@@ -12,6 +12,7 @@ object SystemMessage {
 
   implicit val systemMessageDecoder: Decoder[SystemMessage] =
     List[Decoder[SystemMessage]](
+      deriveDecoder[MessagePinned].widen,
       deriveDecoder[ChatMemberAdded].widen,
       deriveDecoder[ChannelCreated].widen,
       deriveDecoder[ChatMemberLeft].widen,
@@ -27,7 +28,7 @@ object SystemMessage {
     ).reduceLeft(_.or(_))
 }
 
-final case class MessagePinned(messageId: Int, chat: Chat, date: Int, pinnedMessage: UserMessage) extends SystemMessage
+final case class MessagePinned(messageId: Int, chat: Chat, date: Int, pinnedMessage: TelegramMessage) extends SystemMessage
 
 final case class ChannelCreated(messageId: Int, chat: Chat, date: Int, channelChatCreated: Boolean)
     extends SystemMessage

@@ -1,12 +1,11 @@
 package canoe.api.sources
 
-import canoe.api.{ResponseDecodingError, TelegramClient, TelegramError, UpdateSource}
+import canoe.api.{ResponseDecodingError, UpdateSource}
 import canoe.methods.updates.GetUpdates
 import canoe.models.Update
 import canoe.syntax.methodOps
 import cats.ApplicativeError
 import cats.effect.Timer
-import cats.syntax.all._
 import fs2.Stream
 import io.circe.parser.decode
 
@@ -35,8 +34,6 @@ private[api] class Polling[F[_]: TelegramClient: ApplicativeError[*[_], Throwabl
           val updates = successfulUpdates(json)
           val nextOffset = lastId(updates).map(_ + 1).getOrElse(offset)
           nextOffset -> updates
-
-        case _: TelegramError => offset -> Nil // Basically try again
       }
 
   private def successfulUpdates(json: String): List[Update] =

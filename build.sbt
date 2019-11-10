@@ -31,7 +31,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
   )
   .jsSettings(
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "0.9.7"
+      "org.scala-js" %%% "scalajs-dom" % scalaJsDomVersion
     )
   )
 
@@ -58,20 +58,6 @@ lazy val projectSettings = Seq(
   scalaVersion := scala2_13,
   crossScalaVersions := Seq(scala2_12, scalaVersion.value)
 )
-
-val scala2_13 = "2.13.0"
-val scala2_12 = "2.12.8"
-
-val fs2Version = "2.1.0"
-val catsCoreVersion = "2.0.0"
-val catsEffectVersion = "2.0.0"
-val circeVersion = "0.12.3"
-val http4sVersion = "0.21.0-M5"
-val log4catsVersion = "1.0.1"
-val scalatestVersion = "3.0.8"
-val disciplineVersion = "1.0.0-RC1"
-val scalacheckShapelessVersion = "1.2.3"
-val kindProjectorVersion = "0.10.3"
 
 lazy val crossDependencies =
   libraryDependencies ++= Seq(
@@ -116,3 +102,19 @@ lazy val tests = {
 
   Seq(dependencies, frameworks)
 }
+
+
+val scala2_13 = "2.13.0"
+val scala2_12 = "2.12.8"
+
+val fs2Version = "2.1.0"
+val catsCoreVersion = "2.0.0"
+val catsEffectVersion = "2.0.0"
+val circeVersion = "0.12.3"
+val http4sVersion = "0.21.0-M5"
+val log4catsVersion = "1.0.1"
+val scalatestVersion = "3.0.8"
+val disciplineVersion = "1.0.0-RC1"
+val scalacheckShapelessVersion = "1.2.3"
+val scalaJsDomVersion = "0.9.7"
+val kindProjectorVersion = "0.10.3"

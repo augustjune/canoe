@@ -36,6 +36,6 @@ object SendChatAction {
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 
-      def uploads(request: SendChatAction): List[(String, InputFile)] = Nil
+      def attachments(request: SendChatAction): List[(String, InputFile)] = Nil
     }
 }

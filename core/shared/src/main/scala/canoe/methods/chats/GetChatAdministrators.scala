@@ -31,6 +31,6 @@ object GetChatAdministrators {
 
       def decoder: Decoder[List[ChatMember]] = Decoder.decodeList
 
-      def uploads(request: GetChatAdministrators): List[(String, InputFile)] = Nil
+      def attachments(request: GetChatAdministrators): List[(String, InputFile)] = Nil
     }
 }

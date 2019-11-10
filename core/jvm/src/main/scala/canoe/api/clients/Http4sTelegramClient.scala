@@ -39,7 +39,7 @@ private[api] class Http4sTelegramClient[F[_]: Sync: Logger](token: String, clien
       ResponseDecodingError(error.details.dropWhile(_ != '{')).raiseError[F, A]
 
   private def prepareRequest[Req, Res](url: Uri, method: Method[Req, Res], action: Req): F[Request[F]] = {
-    val uploads = method.uploads(action).collect {
+    val uploads = method.attachments(action).collect {
       case (name, InputFile.Upload(filename, contents)) =>
         Part.fileData(name, filename, Stream.emits(contents).covary[F])
     }

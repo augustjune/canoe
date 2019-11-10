@@ -35,6 +35,6 @@ object KickChatMember {
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 
-      def uploads(request: KickChatMember): List[(String, InputFile)] = Nil
+      def attachments(request: KickChatMember): List[(String, InputFile)] = Nil
     }
 }

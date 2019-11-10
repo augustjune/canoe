@@ -33,6 +33,6 @@ object GetFile {
 
       def decoder: Decoder[File] = deriveDecoder[File]
 
-      def uploads(request: GetFile): List[(String, InputFile)] = Nil
+      def attachments(request: GetFile): List[(String, InputFile)] = Nil
     }
 }

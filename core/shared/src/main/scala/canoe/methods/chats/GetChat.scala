@@ -29,6 +29,6 @@ object GetChat {
 
       def decoder: Decoder[DetailedChat] = deriveDecoder[DetailedChat]
 
-      def uploads(request: GetChat): List[(String, InputFile)] = Nil
+      def attachments(request: GetChat): List[(String, InputFile)] = Nil
     }
 }

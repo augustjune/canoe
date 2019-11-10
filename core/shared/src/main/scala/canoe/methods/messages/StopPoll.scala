@@ -30,6 +30,6 @@ object StopPoll {
 
       def decoder: Decoder[Poll] = deriveDecoder[Poll]
 
-      def uploads(request: StopPoll): List[(String, InputFile)] = Nil
+      def attachments(request: StopPoll): List[(String, InputFile)] = Nil
     }
 }

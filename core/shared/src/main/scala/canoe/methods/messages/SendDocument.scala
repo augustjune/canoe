@@ -49,7 +49,7 @@ object SendDocument {
 
       def decoder: Decoder[DocumentMessage] = deriveDecoder[DocumentMessage]
 
-      def uploads(request: SendDocument): List[(String, InputFile)] =
+      def attachments(request: SendDocument): List[(String, InputFile)] =
         List("document" -> request.document)
     }
 }

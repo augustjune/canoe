@@ -28,6 +28,6 @@ object SetPassportDataErrors {
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 
-      def uploads(request: SetPassportDataErrors): List[(String, InputFile)] = Nil
+      def attachments(request: SetPassportDataErrors): List[(String, InputFile)] = Nil
     }
 }

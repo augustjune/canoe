@@ -27,6 +27,6 @@ object GetChatMembersCount {
 
       def decoder: Decoder[Int] = Decoder.decodeInt
 
-      def uploads(request: GetChatMembersCount): List[(String, InputFile)] = Nil
+      def attachments(request: GetChatMembersCount): List[(String, InputFile)] = Nil
     }
 }

@@ -26,6 +26,6 @@ object GetStickerSet {
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 
-      def uploads(request: GetStickerSet): List[(String, InputFile)] = Nil
+      def attachments(request: GetStickerSet): List[(String, InputFile)] = Nil
     }
 }

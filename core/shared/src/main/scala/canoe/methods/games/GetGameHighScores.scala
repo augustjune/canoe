@@ -57,6 +57,6 @@ object GetGameHighScores {
       def decoder: Decoder[List[GameHighScore]] =
         Decoder.decodeList(deriveDecoder[GameHighScore])
 
-      def uploads(request: GetGameHighScores): List[(String, InputFile)] = Nil
+      def attachments(request: GetGameHighScores): List[(String, InputFile)] = Nil
     }
 }

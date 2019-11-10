@@ -55,7 +55,7 @@ object SendAnimation {
 
       def decoder: Decoder[AnimationMessage] = deriveDecoder[AnimationMessage]
 
-      def uploads(request: SendAnimation): List[(String, InputFile)] =
+      def attachments(request: SendAnimation): List[(String, InputFile)] =
         List("animation" -> request.animation) ++ request.thumb.map(t => "thumb" -> t).toList
     }
 }

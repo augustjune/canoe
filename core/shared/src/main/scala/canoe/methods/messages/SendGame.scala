@@ -40,6 +40,6 @@ object SendGame {
 
       def decoder: Decoder[GameMessage] = deriveDecoder[GameMessage]
 
-      def uploads(request: SendGame): List[(String, InputFile)] = Nil
+      def attachments(request: SendGame): List[(String, InputFile)] = Nil
     }
 }

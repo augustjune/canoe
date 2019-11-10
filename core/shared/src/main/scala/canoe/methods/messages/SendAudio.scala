@@ -59,7 +59,7 @@ object SendAudio {
 
       def decoder: Decoder[AudioMessage] = deriveDecoder[AudioMessage]
 
-      def uploads(request: SendAudio): List[(String, InputFile)] =
+      def attachments(request: SendAudio): List[(String, InputFile)] =
         List("audio" -> request.audio)
     }
 }

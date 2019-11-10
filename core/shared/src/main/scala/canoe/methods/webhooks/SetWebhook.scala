@@ -57,7 +57,7 @@ object SetWebhook {
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 
-      def uploads(request: SetWebhook): List[(String, InputFile)] =
+      def attachments(request: SetWebhook): List[(String, InputFile)] =
         request.certificate.map("certificate" -> _).toList
     }
 }

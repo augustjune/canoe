@@ -71,7 +71,7 @@ object EditMessageMedia {
           TelegramMessage.telegramMessageDecoder
         )
 
-      def uploads(request: EditMessageMedia): List[(String, InputFile)] =
+      def attachments(request: EditMessageMedia): List[(String, InputFile)] =
         request.media.files
     }
 }

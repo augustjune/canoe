@@ -42,6 +42,6 @@ object SendPoll {
 
       def decoder: Decoder[PollMessage] = deriveDecoder[PollMessage]
 
-      def uploads(request: SendPoll): List[(String, InputFile)] = Nil
+      def attachments(request: SendPoll): List[(String, InputFile)] = Nil
     }
 }

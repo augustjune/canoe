@@ -48,6 +48,6 @@ object AnswerShippingQuery {
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 
-      def uploads(request: AnswerShippingQuery): List[(String, InputFile)] = Nil
+      def attachments(request: AnswerShippingQuery): List[(String, InputFile)] = Nil
     }
 }

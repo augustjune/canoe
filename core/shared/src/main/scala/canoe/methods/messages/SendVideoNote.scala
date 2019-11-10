@@ -45,7 +45,7 @@ object SendVideoNote {
 
       def decoder: Decoder[VideoNoteMessage] = deriveDecoder[VideoNoteMessage]
 
-      def uploads(request: SendVideoNote): List[(String, InputFile)] =
+      def attachments(request: SendVideoNote): List[(String, InputFile)] =
         List("videoNote" -> request.videoNote)
     }
 }

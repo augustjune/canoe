@@ -31,6 +31,6 @@ object SetChatDescription {
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 
-      def uploads(request: SetChatDescription): List[(String, InputFile)] = Nil
+      def attachments(request: SetChatDescription): List[(String, InputFile)] = Nil
     }
 }

@@ -59,6 +59,6 @@ object StopMessageLiveLocation {
           TelegramMessage.telegramMessageDecoder
         )
 
-      def uploads(request: StopMessageLiveLocation): List[(String, InputFile)] = Nil
+      def attachments(request: StopMessageLiveLocation): List[(String, InputFile)] = Nil
     }
 }

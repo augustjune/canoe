@@ -32,6 +32,6 @@ object PinChatMessage {
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 
-      def uploads(request: PinChatMessage): List[(String, InputFile)] = Nil
+      def attachments(request: PinChatMessage): List[(String, InputFile)] = Nil
     }
 }

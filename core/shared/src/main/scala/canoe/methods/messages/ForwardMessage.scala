@@ -35,6 +35,6 @@ object ForwardMessage {
 
       def decoder: Decoder[TelegramMessage] = TelegramMessage.telegramMessageDecoder
 
-      def uploads(request: ForwardMessage): List[(String, InputFile)] = Nil
+      def attachments(request: ForwardMessage): List[(String, InputFile)] = Nil
     }
 }

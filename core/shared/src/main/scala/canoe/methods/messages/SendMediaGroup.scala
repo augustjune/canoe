@@ -46,7 +46,7 @@ object SendMediaGroup {
       def decoder: Decoder[List[TelegramMessage]] =
         Decoder.decodeList(TelegramMessage.telegramMessageDecoder)
 
-      def uploads(request: SendMediaGroup): List[(String, InputFile)] =
+      def attachments(request: SendMediaGroup): List[(String, InputFile)] =
         request.media.flatMap(_.files)
     }
 }

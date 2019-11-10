@@ -27,6 +27,6 @@ object LeaveChat {
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 
-      def uploads(request: LeaveChat): List[(String, InputFile)] = Nil
+      def attachments(request: LeaveChat): List[(String, InputFile)] = Nil
     }
 }

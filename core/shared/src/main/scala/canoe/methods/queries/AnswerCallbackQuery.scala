@@ -69,6 +69,6 @@ object AnswerCallbackQuery {
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 
-      def uploads(request: AnswerCallbackQuery): List[(String, InputFile)] = Nil
+      def attachments(request: AnswerCallbackQuery): List[(String, InputFile)] = Nil
     }
 }

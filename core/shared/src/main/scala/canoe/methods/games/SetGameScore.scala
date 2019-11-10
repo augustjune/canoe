@@ -73,6 +73,6 @@ object SetGameScore {
           TelegramMessage.telegramMessageDecoder
         )
 
-      def uploads(request: SetGameScore): List[(String, InputFile)] = Nil
+      def attachments(request: SetGameScore): List[(String, InputFile)] = Nil
     }
 }

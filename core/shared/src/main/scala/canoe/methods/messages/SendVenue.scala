@@ -49,6 +49,6 @@ object SendVenue {
 
       def decoder: Decoder[VenueMessage] = deriveDecoder[VenueMessage]
 
-      def uploads(request: SendVenue): List[(String, InputFile)] = Nil
+      def attachments(request: SendVenue): List[(String, InputFile)] = Nil
     }
 }

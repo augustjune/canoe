@@ -49,6 +49,6 @@ object PromoteChatMember {
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 
-      def uploads(request: PromoteChatMember): List[(String, InputFile)] = Nil
+      def attachments(request: PromoteChatMember): List[(String, InputFile)] = Nil
     }
 }

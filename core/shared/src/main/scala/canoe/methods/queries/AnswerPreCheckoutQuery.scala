@@ -49,6 +49,6 @@ object AnswerPreCheckoutQuery {
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 
-      def uploads(request: AnswerPreCheckoutQuery): List[(String, InputFile)] = Nil
+      def attachments(request: AnswerPreCheckoutQuery): List[(String, InputFile)] = Nil
     }
 }

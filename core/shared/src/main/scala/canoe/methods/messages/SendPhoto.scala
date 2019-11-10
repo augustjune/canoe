@@ -47,7 +47,7 @@ object SendPhoto {
 
       def decoder: Decoder[PhotoMessage] = deriveDecoder[PhotoMessage]
 
-      def uploads(request: SendPhoto): List[(String, InputFile)] =
+      def attachments(request: SendPhoto): List[(String, InputFile)] =
         List("photo" -> request.photo)
     }
 }

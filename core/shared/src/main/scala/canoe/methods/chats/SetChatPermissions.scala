@@ -29,6 +29,6 @@ object SetChatPermissions {
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 
-      def uploads(request: SetChatPermissions): List[(String, InputFile)] = Nil
+      def attachments(request: SetChatPermissions): List[(String, InputFile)] = Nil
     }
 }

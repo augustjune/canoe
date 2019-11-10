@@ -39,6 +39,6 @@ object DeleteMessage {
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 
-      def uploads(request: DeleteMessage): List[(String, InputFile)] = Nil
+      def attachments(request: DeleteMessage): List[(String, InputFile)] = Nil
     }
 }

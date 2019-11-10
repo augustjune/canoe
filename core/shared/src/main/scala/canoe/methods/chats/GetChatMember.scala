@@ -28,6 +28,6 @@ object GetChatMember {
 
       def decoder: Decoder[ChatMember] = ChatMember.chatMemberDecoder
 
-      def uploads(request: GetChatMember): List[(String, InputFile)] = Nil
+      def attachments(request: GetChatMember): List[(String, InputFile)] = Nil
     }
 }

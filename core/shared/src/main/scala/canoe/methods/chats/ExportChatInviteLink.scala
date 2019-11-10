@@ -39,6 +39,6 @@ object ExportChatInviteLink {
 
       def decoder: Decoder[String] = Decoder.decodeString
 
-      def uploads(request: ExportChatInviteLink): List[(String, InputFile)] = Nil
+      def attachments(request: ExportChatInviteLink): List[(String, InputFile)] = Nil
     }
 }

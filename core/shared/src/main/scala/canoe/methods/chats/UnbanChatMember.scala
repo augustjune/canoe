@@ -30,6 +30,6 @@ object UnbanChatMember {
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 
-      def uploads(request: UnbanChatMember): List[(String, InputFile)] = Nil
+      def attachments(request: UnbanChatMember): List[(String, InputFile)] = Nil
     }
 }

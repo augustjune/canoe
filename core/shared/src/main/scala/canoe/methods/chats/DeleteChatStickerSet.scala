@@ -32,6 +32,6 @@ object DeleteChatStickerSet {
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 
-      def uploads(request: DeleteChatStickerSet): List[(String, InputFile)] = Nil
+      def attachments(request: DeleteChatStickerSet): List[(String, InputFile)] = Nil
     }
 }

@@ -20,6 +20,6 @@ case object GetWebhookInfo {
 
       def decoder: Decoder[WebhookInfo] = deriveDecoder[WebhookInfo]
 
-      def uploads(request: GetWebhookInfo.type): List[(String, InputFile)] = Nil
+      def attachments(request: GetWebhookInfo.type): List[(String, InputFile)] = Nil
     }
 }

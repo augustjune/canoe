@@ -18,6 +18,6 @@ case object DeleteWebhook {
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 
-      def uploads(request: DeleteWebhook.type): List[(String, InputFile)] = Nil
+      def attachments(request: DeleteWebhook.type): List[(String, InputFile)] = Nil
     }
 }

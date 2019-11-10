@@ -1,6 +1,5 @@
 .idea
 .metals
 .vscode
+**/.bloop
 target
-
-core/src/main/resources

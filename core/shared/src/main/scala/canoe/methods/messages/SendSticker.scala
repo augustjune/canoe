@@ -42,7 +42,7 @@ object SendSticker {
 
       def decoder: Decoder[StickerMessage] = deriveDecoder[StickerMessage]
 
-      def uploads(request: SendSticker): List[(String, InputFile)] =
+      def attachments(request: SendSticker): List[(String, InputFile)] =
         List("sticker" -> request.sticker)
     }
 }

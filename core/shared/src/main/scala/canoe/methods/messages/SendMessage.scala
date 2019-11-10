@@ -72,6 +72,6 @@ object SendMessage {
 
       def decoder: Decoder[TextMessage] = deriveDecoder[TextMessage]
 
-      def uploads(request: SendMessage): List[(String, InputFile)] = Nil
+      def attachments(request: SendMessage): List[(String, InputFile)] = Nil
     }
 }

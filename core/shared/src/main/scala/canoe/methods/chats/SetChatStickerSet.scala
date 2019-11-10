@@ -33,6 +33,6 @@ object SetChatStickerSet {
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 
-      def uploads(request: SetChatStickerSet): List[(String, InputFile)] = Nil
+      def attachments(request: SetChatStickerSet): List[(String, InputFile)] = Nil
     }
 }

@@ -47,6 +47,6 @@ object SendContact {
 
       def decoder: Decoder[ContactMessage] = deriveDecoder[ContactMessage]
 
-      def uploads(request: SendContact): List[(String, InputFile)] = Nil
+      def attachments(request: SendContact): List[(String, InputFile)] = Nil
     }
 }

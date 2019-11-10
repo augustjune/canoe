@@ -29,6 +29,6 @@ object GetUserProfilePhotos {
 
       def decoder: Decoder[UserProfilePhotos] = deriveDecoder[UserProfilePhotos]
 
-      def uploads(request: GetUserProfilePhotos): List[(String, InputFile)] = Nil
+      def attachments(request: GetUserProfilePhotos): List[(String, InputFile)] = Nil
     }
 }

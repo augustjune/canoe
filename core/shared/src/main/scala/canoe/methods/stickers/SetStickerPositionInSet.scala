@@ -27,6 +27,6 @@ object SetStickerPositionInSet {
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 
-      def uploads(request: SetStickerPositionInSet): List[(String, InputFile)] = Nil
+      def attachments(request: SetStickerPositionInSet): List[(String, InputFile)] = Nil
     }
 }

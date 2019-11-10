@@ -3,7 +3,7 @@ package canoe.api.models
 import canoe.models._
 
 /**
-  * A wrapper around the value of Option[ReplyMarkup].
+  * Wrapper around a value of Option[ReplyMarkup].
   */
 trait Keyboard {
   def replyMarkup: Option[ReplyMarkup]

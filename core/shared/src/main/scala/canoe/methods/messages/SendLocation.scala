@@ -45,6 +45,6 @@ object SendLocation {
 
       def decoder: Decoder[LocationMessage] = deriveDecoder[LocationMessage]
 
-      def uploads(request: SendLocation): List[(String, InputFile)] = Nil
+      def attachments(request: SendLocation): List[(String, InputFile)] = Nil
     }
 }

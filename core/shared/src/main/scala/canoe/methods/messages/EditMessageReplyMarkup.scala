@@ -58,6 +58,6 @@ object EditMessageReplyMarkup {
           TelegramMessage.telegramMessageDecoder
         )
 
-      def uploads(request: EditMessageReplyMarkup): List[(String, InputFile)] = Nil
+      def attachments(request: EditMessageReplyMarkup): List[(String, InputFile)] = Nil
     }
 }

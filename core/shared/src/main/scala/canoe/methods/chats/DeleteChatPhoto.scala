@@ -31,6 +31,6 @@ object DeleteChatPhoto {
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 
-      def uploads(request: DeleteChatPhoto): List[(String, InputFile)] = Nil
+      def attachments(request: DeleteChatPhoto): List[(String, InputFile)] = Nil
     }
 }

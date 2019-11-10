@@ -75,6 +75,6 @@ object EditMessageText {
           TelegramMessage.telegramMessageDecoder
         )
 
-      def uploads(request: EditMessageText): List[(String, InputFile)] = Nil
+      def attachments(request: EditMessageText): List[(String, InputFile)] = Nil
     }
 }

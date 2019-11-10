@@ -35,6 +35,6 @@ object RestrictChatMember {
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 
-      def uploads(request: RestrictChatMember): List[(String, InputFile)] = Nil
+      def attachments(request: RestrictChatMember): List[(String, InputFile)] = Nil
     }
 }

@@ -26,6 +26,6 @@ object DeleteStickerFromSet {
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 
-      def uploads(request: DeleteStickerFromSet): List[(String, InputFile)] = Nil
+      def attachments(request: DeleteStickerFromSet): List[(String, InputFile)] = Nil
     }
 }

@@ -10,7 +10,7 @@ import io.circe.parser.decode
 import org.scalajs.dom.console
 import org.scalajs.dom.ext.Ajax
 
-class AjaxClient[F[_]: Async: ContextShift](token: String) extends TelegramClient[F] {
+private[api] class AjaxClient[F[_]: Async: ContextShift](token: String) extends TelegramClient[F] {
 
   private val botApiUri: String = s"https://api.telegram.org/bot$token"
 

@@ -32,6 +32,6 @@ object SetChatPhoto {
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 
-      def uploads(request: SetChatPhoto): List[(String, InputFile)] = List("photo" -> request.photo)
+      def attachments(request: SetChatPhoto): List[(String, InputFile)] = List("photo" -> request.photo)
     }
 }

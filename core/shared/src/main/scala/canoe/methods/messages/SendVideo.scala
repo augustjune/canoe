@@ -55,7 +55,7 @@ object SendVideo {
 
       def decoder: Decoder[VideoMessage] = deriveDecoder[VideoMessage]
 
-      def uploads(request: SendVideo): List[(String, InputFile)] =
+      def attachments(request: SendVideo): List[(String, InputFile)] =
         List("video" -> request.video)
     }
 }

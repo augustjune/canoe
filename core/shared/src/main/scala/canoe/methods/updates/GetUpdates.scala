@@ -49,7 +49,7 @@ object GetUpdates {
 
       def decoder: Decoder[List[Update]] = Decoder.decodeList
 
-      def uploads(request: GetUpdates): List[(String, InputFile)] = Nil
+      def attachments(request: GetUpdates): List[(String, InputFile)] = Nil
     }
 
   /**

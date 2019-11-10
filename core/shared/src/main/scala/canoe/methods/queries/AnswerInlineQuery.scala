@@ -52,6 +52,6 @@ object AnswerInlineQuery {
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 
-      def uploads(request: AnswerInlineQuery): List[(String, InputFile)] = Nil
+      def attachments(request: AnswerInlineQuery): List[(String, InputFile)] = Nil
     }
 }

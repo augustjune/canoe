@@ -68,6 +68,6 @@ object EditMessageLiveLocation {
           TelegramMessage.telegramMessageDecoder
         )
 
-      def uploads(request: EditMessageLiveLocation): List[(String, InputFile)] = Nil
+      def attachments(request: EditMessageLiveLocation): List[(String, InputFile)] = Nil
     }
 }

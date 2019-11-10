@@ -73,6 +73,6 @@ object SendInvoice {
 
       def decoder: Decoder[InvoiceMessage] = deriveDecoder[InvoiceMessage]
 
-      def uploads(request: SendInvoice): List[(String, InputFile)] = Nil
+      def attachments(request: SendInvoice): List[(String, InputFile)] = Nil
     }
 }

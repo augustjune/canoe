@@ -34,7 +34,7 @@ object AddStickerToSet {
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 
-      def uploads(request: AddStickerToSet): List[(String, InputFile)] =
+      def attachments(request: AddStickerToSet): List[(String, InputFile)] =
         List("png_sticker" -> request.pngSticker)
     }
 }

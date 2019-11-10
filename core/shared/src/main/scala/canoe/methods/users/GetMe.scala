@@ -20,6 +20,6 @@ case object GetMe {
 
       def decoder: Decoder[User] = deriveDecoder[User]
 
-      def uploads(request: GetMe.type): List[(String, InputFile)] = Nil
+      def attachments(request: GetMe.type): List[(String, InputFile)] = Nil
     }
 }

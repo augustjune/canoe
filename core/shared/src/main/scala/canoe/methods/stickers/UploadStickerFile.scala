@@ -30,7 +30,7 @@ object UploadStickerFile {
 
       def decoder: Decoder[File] = deriveDecoder[File]
 
-      def uploads(request: UploadStickerFile): List[(String, InputFile)] =
+      def attachments(request: UploadStickerFile): List[(String, InputFile)] =
         List("png_sticker" -> request.pngSticker)
     }
 }

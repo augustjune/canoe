@@ -49,7 +49,7 @@ object SendVoice {
 
       def decoder: Decoder[VoiceMessage] = deriveDecoder[VoiceMessage]
 
-      def uploads(request: SendVoice): List[(String, InputFile)] =
+      def attachments(request: SendVoice): List[(String, InputFile)] =
         List("voice" -> request.voice)
     }
 }

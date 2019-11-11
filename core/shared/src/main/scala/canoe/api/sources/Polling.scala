@@ -1,11 +1,13 @@
 package canoe.api.sources
 
-import canoe.api.{ResponseDecodingError, UpdateSource}
+import canoe.api.{ResponseDecodingError, UpdateSource, TelegramClient}
 import canoe.methods.updates.GetUpdates
 import canoe.models.Update
 import canoe.syntax.methodOps
 import cats.ApplicativeError
 import cats.effect.Timer
+import cats.syntax.functor.toFunctorOps
+import cats.syntax.applicativeError.catsSyntaxApplicativeError
 import fs2.Stream
 import io.circe.parser.decode
 

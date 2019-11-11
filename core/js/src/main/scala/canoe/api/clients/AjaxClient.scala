@@ -19,12 +19,18 @@ private[api] class AjaxClient[F[_]: Async: ContextShift](token: String) extends 
     */
   def execute[Req, Res](request: Req)(implicit M: Method[Req, Res]): F[Res] = {
     implicit val responseDecoder: Decoder[Response[Res]] = Response.decoder[Res](M.decoder)
-    console.log(s"Executing ${M.name}")
 
     sendJsonRequest(request, M).map(decode[Response[Res]]).flatMap {
-      case Left(error)     => ResponseDecodingError(error.toString).raiseError[F, Res]
+      case Left(error)     => handleUnknownEntity(M.name, request, error.getMessage)
       case Right(response) => handleTelegramResponse(M, request)(response)
     }
+  }
+
+  private def handleUnknownEntity[I, A](method: String, input: I, error: String): F[A] = {
+    console.error(
+      s"Received unknown Telegram entity during execution of '$method' method. \nInput data: $input. \n${error}"
+    )
+    ResponseDecodingError(error.toString).raiseError[F, A]
   }
 
   private def handleTelegramResponse[A, I, C](m: Method[I, A], input: I)(response: Response[A]): F[A] =

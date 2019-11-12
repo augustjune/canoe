@@ -8,9 +8,8 @@ canoe
 [![Telegram](https://img.shields.io/badge/Bot%20API-4.4%20(July%2029%2C%202019)-00aced.svg)](https://core.telegram.org/bots/api#recent-changes)
     
 ### Overview
-**canoe** is a purely functional, compositional library for building Telegram bots.
-It provides functional streaming interface over [Telegram Bot API](https://core.telegram.org/bots/api) 
-and allows you to build interactive chatbots using idiomatic Scala code.
+**canoe** is a purely functional, compositional library for building interactive Telegram bots.
+It provides functional streaming interface over [Telegram Bot API](https://core.telegram.org/bots/api) with built-in abstractions for describing your chatbot behavior.
 
 ### Getting started
 sbt dependency:
@@ -18,7 +17,7 @@ sbt dependency:
 libraryDependencies += "org.augustjune" %% "canoe" % "<version>"
 ```
 You can find the latest version in [releases](https://github.com/augustjune/canoe/releases) tab 
-or by clicking on the maven-central badge.
+or by clicking on the maven-central badge. The library is available for Scala 2.12, 2.13, and Scala.js.
 
 Imports:
 ```scala
@@ -58,7 +57,7 @@ def greetings[F[_]: TelegramClient]: Scenario[F, Unit] =
     } yield ()
 ```
 
-Regardless of whether you decide to use scenarios for steering the bot, 
+Regardless of whether you prefer to use scenarios for building a bot, 
 you are still able to use all functionality of Telegram Bot API in a streaming context, 
 as it is demonstrated [here](https://github.com/augustjune/canoe/blob/master/examples/src/main/scala/samples/NoScenario.scala).
 

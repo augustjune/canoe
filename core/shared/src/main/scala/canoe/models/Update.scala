@@ -24,7 +24,8 @@ object Update {
       deriveDecoder[InlineResultSelected].widen,
       deriveDecoder[CallbackButtonSelected].widen,
       deriveDecoder[ShippingQueryReceived].widen,
-      deriveDecoder[PreCheckoutQueryReceived].widen
+      deriveDecoder[PreCheckoutQueryReceived].widen,
+      deriveDecoder[Unknown].widen
     ).reduceLeft(_.or(_)).camelCase
 }
 
@@ -47,3 +48,5 @@ final case class ShippingQueryReceived(updateId: Long, shippingQuery: ShippingQu
 final case class PreCheckoutQueryReceived(updateId: Long, preCheckoutQuery: PreCheckoutQuery) extends Update
 
 final case class PollUpdated(updateId: Long, poll: Poll) extends Update
+
+final case class Unknown(updateId: Long) extends Update

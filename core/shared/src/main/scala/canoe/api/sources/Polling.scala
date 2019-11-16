@@ -31,12 +31,6 @@ private[api] class Polling[F[_]: TelegramClient: ApplicativeError[*[_], Throwabl
   private def requestUpdates(offset: Long): F[(Long, List[Update])] =
     GetUpdates(offset = Some(offset), timeout = Some(timeout.toSeconds.toInt)).call
       .map(updates => (lastId(updates).map(_ + 1).getOrElse(offset), updates))
-      .recover {
-        case ResponseDecodingError(json) =>
-          val updates = successfulUpdates(json)
-          val nextOffset = lastId(updates).map(_ + 1).getOrElse(offset)
-          nextOffset -> updates
-      }
 
   private def successfulUpdates(json: String): List[Update] =
     decode(json)(GetUpdates.accumulativeDecoder).toOption.getOrElse(Nil)

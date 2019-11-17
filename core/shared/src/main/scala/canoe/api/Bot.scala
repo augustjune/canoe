@@ -71,10 +71,9 @@ class Bot[F[_]: Concurrent] private[api] (source: UpdateSource[F]) {
 
     def runSingle(scenario: Scenario[F, Unit],
                   idsRef: Ref[F, Set[Long]],
-                  topic: Topic[F, Option[Update]]): Stream[F, Nothing] =
+                  topic: Topic[F, Update]): Stream[F, Nothing] =
       topic
         .subscribe(1)
-        .unNone
         .through(pipes.messages)
         .map { m =>
           Stream
@@ -86,7 +85,6 @@ class Bot[F[_]: Concurrent] private[api] (source: UpdateSource[F]) {
                 Stream.eval(Queue.unbounded[F, TelegramMessage]).flatMap { queue =>
                   val enq = topic
                     .subscribe(1)
-                    .unNone
                     .through(pipes.messages andThen filterById(m.chat.id))
                     .through(queue.enqueue)
 
@@ -100,7 +98,7 @@ class Bot[F[_]: Concurrent] private[api] (source: UpdateSource[F]) {
 
     def runAll(scenarios: List[Scenario[F, Unit]],
                updates: Stream[F, Update],
-               topic: Topic[F, Option[Update]]): Stream[F, Update] = {
+               topic: Topic[F, Update]): Stream[F, Update] = {
 
       val run = Stream
         .emits(scenarios)
@@ -109,12 +107,12 @@ class Bot[F[_]: Concurrent] private[api] (source: UpdateSource[F]) {
         }
         .parJoinUnbounded
 
-      val populate = updates.evalTap(u => topic.publish1(Some(u)))
+      val populate = updates.evalTap(u => topic.publish1(u))
 
       populate.concurrently(run)
     }
 
-    Stream.eval(Topic[F, Option[Update]](None)).flatMap { topic =>
+    Stream.eval(Topic[F, Update](Update.Unknown(-1L))).flatMap { topic =>
       runAll(scenarios.toList, updates, topic)
     }
   }

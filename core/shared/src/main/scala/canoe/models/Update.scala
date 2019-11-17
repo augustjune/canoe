@@ -13,6 +13,8 @@ sealed trait Update {
 
 object Update {
 
+  final case class Unknown(updateId: Long) extends Update
+
   implicit val updateDecoder: Decoder[Update] =
     List[Decoder[Update]](
       deriveDecoder[MessageReceived].widen,
@@ -48,5 +50,3 @@ final case class ShippingQueryReceived(updateId: Long, shippingQuery: ShippingQu
 final case class PreCheckoutQueryReceived(updateId: Long, preCheckoutQuery: PreCheckoutQuery) extends Update
 
 final case class PollUpdated(updateId: Long, poll: Poll) extends Update
-
-final case class Unknown(updateId: Long) extends Update

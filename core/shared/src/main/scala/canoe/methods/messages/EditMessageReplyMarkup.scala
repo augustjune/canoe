@@ -28,7 +28,7 @@ import io.circe.{Decoder, Encoder}
 final class EditMessageReplyMarkup private (val chatId: Option[ChatId],
                                             val messageId: Option[Int],
                                             val inlineMessageId: Option[String],
-                                            val replyMarkup: Option[InlineKeyboardMarkup] = None)
+                                            val replyMarkup: Option[InlineKeyboardMarkup])
 
 object EditMessageReplyMarkup {
 

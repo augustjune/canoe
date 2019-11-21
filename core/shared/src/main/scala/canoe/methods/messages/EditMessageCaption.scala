@@ -33,9 +33,9 @@ import io.circe.{Decoder, Encoder}
 final class EditMessageCaption private (val chatId: Option[ChatId],
                                         val messageId: Option[Int],
                                         val inlineMessageId: Option[String],
-                                        val caption: Option[String] = None,
-                                        val parseMode: Option[ParseMode] = None,
-                                        val replyMarkup: Option[ReplyMarkup] = None)
+                                        val caption: Option[String],
+                                        val parseMode: Option[ParseMode],
+                                        val replyMarkup: Option[ReplyMarkup])
 
 object EditMessageCaption {
 

@@ -34,9 +34,9 @@ final class EditMessageText private (val chatId: Option[ChatId],
                                      val messageId: Option[Int],
                                      val inlineMessageId: Option[String],
                                      val text: String,
-                                     val parseMode: Option[ParseMode] = None,
-                                     val disableWebPagePreview: Option[Boolean] = None,
-                                     val replyMarkup: Option[ReplyMarkup] = None)
+                                     val parseMode: Option[ParseMode],
+                                     val disableWebPagePreview: Option[Boolean],
+                                     val replyMarkup: Option[ReplyMarkup])
 
 object EditMessageText {
 

@@ -27,7 +27,7 @@ import io.circe.{Decoder, Encoder}
 final class StopMessageLiveLocation private (val chatId: Option[ChatId],
                                              val messageId: Option[Int],
                                              val inlineMessageId: Option[Int],
-                                             val replyMarkup: Option[InlineKeyboardMarkup] = None)
+                                             val replyMarkup: Option[InlineKeyboardMarkup])
 
 object StopMessageLiveLocation {
 

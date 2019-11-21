@@ -35,7 +35,7 @@ final class EditMessageMedia private (val chatId: Option[ChatId],
                                       val messageId: Option[Int],
                                       val inlineMessageId: Option[String],
                                       val media: InputMedia,
-                                      val replyMarkup: Option[InlineKeyboardMarkup] = None)
+                                      val replyMarkup: Option[InlineKeyboardMarkup])
 
 object EditMessageMedia {
 

@@ -2,8 +2,6 @@ package canoe.models
 
 import io.circe.{Decoder, Encoder}
 
-import scala.language.implicitConversions
-
 /**
   * Parsed from [[https://core.telegram.org/bots/payments/currencies.json]].
   */

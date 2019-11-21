@@ -22,8 +22,7 @@ import io.circe.{Decoder, Encoder}
 final case class GetFile(fileId: String)
 
 object GetFile {
-  import io.circe.generic.auto._
-
+  
   implicit val method: Method[GetFile, File] =
     new Method[GetFile, File] {
 

@@ -31,7 +31,7 @@ final class EditMessageLiveLocation private (val chatId: Option[ChatId],
                                              val inlineMessageId: Option[Int],
                                              val latitude: Double,
                                              val longitude: Double,
-                                             val replyMarkup: Option[InlineKeyboardMarkup] = None)
+                                             val replyMarkup: Option[InlineKeyboardMarkup])
 
 object EditMessageLiveLocation {
 

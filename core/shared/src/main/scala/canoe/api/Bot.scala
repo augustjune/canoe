@@ -5,7 +5,6 @@ import canoe.models.messages.TelegramMessage
 import canoe.models.{InputFile, Update}
 import cats.effect.concurrent.Ref
 import cats.effect.{Concurrent, ConcurrentEffect, Resource, Timer}
-import cats.implicits._
 import fs2.concurrent.{Queue, Topic}
 import fs2.{Pipe, Stream}
 

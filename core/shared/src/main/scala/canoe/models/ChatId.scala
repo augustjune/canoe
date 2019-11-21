@@ -3,8 +3,6 @@ package canoe.models
 import io.circe.Encoder
 import io.circe.syntax._
 
-import scala.language.implicitConversions
-
 /**
   * Represents the id of a chat.
   * This may be the numeric id or channel username in the format `@channelusername`.

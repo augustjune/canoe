@@ -31,8 +31,8 @@ import io.circe.{Decoder, Encoder}
   */
 final class SetGameScore private (val userId: Int,
                                   val score: Long,
-                                  val force: Option[Boolean] = None,
-                                  val disableEditMessage: Option[Boolean] = None,
+                                  val force: Option[Boolean],
+                                  val disableEditMessage: Option[Boolean],
                                   val chatId: Option[ChatId] = None,
                                   val messageId: Option[Int] = None,
                                   val inlineMessageId: Option[String] = None)

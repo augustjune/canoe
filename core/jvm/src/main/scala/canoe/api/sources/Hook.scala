@@ -34,11 +34,9 @@ object Hook {
     * @param port        Port which will be used for listening for the incoming updates
     * @param certificate Public key of self-signed certificate (including BEGIN and END portions)
     */
-  def install[F[_]: TelegramClient: ConcurrentEffect: Timer](
-                                                              url: String,
-                                                              port: Int,
-                                                              certificate: Option[InputFile]
-                                                            ): Resource[F, Hook[F]] =
+  def install[F[_]: TelegramClient: ConcurrentEffect: Timer](url: String,
+                                                             port: Int,
+                                                             certificate: Option[InputFile]): Resource[F, Hook[F]] =
     Resource.suspend(Slf4jLogger.create.map { implicit logger =>
       for {
         _    <- setTelegramWebhook(url, certificate)
@@ -54,9 +52,9 @@ object Hook {
     * @param certificate Public key of self-signed certificate (including BEGIN and END portions)
     */
   private def setTelegramWebhook[F[_]: TelegramClient: Monad: Logger](
-                                                                       url: String,
-                                                                       certificate: Option[InputFile]
-                                                                     ): Resource[F, Unit] =
+    url: String,
+    certificate: Option[InputFile]
+  ): Resource[F, Unit] =
     Resource.make(
       Logger[F].info(
         "Setting a webhook to the Telegram service. Don't forget to delete the webhook, since it blocks you from using polling methods."

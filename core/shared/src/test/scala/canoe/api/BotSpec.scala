@@ -59,14 +59,13 @@ class BotSpec extends AnyFunSuite {
 
     val bot = new Bot[IO](updateSource(messages))
 
-    val counterValue = Stream
+    val counter = Stream
       .eval(Ref[IO].of(0))
       .flatMap { counter =>
         bot.follow(scenario(counter)).drain ++ Stream.eval(counter.get)
       }
-      .value()
 
-    assert(counterValue == messages.size)
+    assert(counter.value() == messages.size)
   }
 
   test("executes a scenario for a single chat") {
@@ -85,14 +84,13 @@ class BotSpec extends AnyFunSuite {
 
     val bot = new Bot[IO](updateSource(messages))
 
-    val counterValue = Stream
+    val counter = Stream
       .eval(Ref[IO].of(0))
       .flatMap { counter =>
         bot.follow(scenario(counter)).drain ++ Stream.eval(counter.get)
       }
-      .value()
 
-    assert(counterValue == 1)
+    assert(counter.value() == 1)
   }
 
   test("doesn't interrupt the scenario because of messages from other chat") {
@@ -112,14 +110,13 @@ class BotSpec extends AnyFunSuite {
 
     val bot = new Bot[IO](updateSource(messages))
 
-    val counterValue = Stream
+    val counter = Stream
       .eval(Ref[IO].of(0))
       .flatMap { counter =>
         bot.follow(scenario(counter)).drain ++ Stream.eval(counter.get)
       }
-      .value()
 
-    assert(counterValue == 1)
+    assert(counter.value() == 1)
   }
 
   test("matches scenario from different chats") {
@@ -141,13 +138,12 @@ class BotSpec extends AnyFunSuite {
 
     val bot = new Bot[IO](updateSource(messages))
 
-    val counterValue = Stream
+    val counter = Stream
       .eval(Ref[IO].of(0))
       .flatMap { counter =>
         bot.follow(scenario(counter)).drain ++ Stream.eval(counter.get)
       }
-      .value()
 
-    assert(counterValue == 2)
+    assert(counter.value() == 2)
   }
 }

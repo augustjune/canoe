@@ -63,56 +63,40 @@ class Bot[F[_]: Concurrent] private[api] (source: UpdateSource[F]) {
       _.filter(_.chat.id == id)
 
     def register(idsRef: Ref[F, Set[Long]], id: Long): F[Boolean] =
-      idsRef.modify { ids =>
-        val was = ids.contains(id)
-        ids + id -> was
+      idsRef.modify(ids => ids + id -> ids.contains(id))
+
+    def runScenarios(topic: Topic[F, Update]): Stream[F, Nothing] =
+      Stream.eval(Ref[F].of(Set.empty[Long])).flatMap { ids =>
+        topic
+          .subscribe(1)
+          .through(pipes.messages)
+          .map { m =>
+            Stream
+              .eval(register(ids, m.chat.id))
+              .flatMap { existed =>
+                if (existed) Stream.empty
+                else
+                  //  Using queues in order to avoid blocking topic publisher
+                  Stream.eval(Queue.unbounded[F, TelegramMessage]).flatMap { queue =>
+                    val enq = topic
+                      .subscribe(1)
+                      .through(pipes.messages andThen filterById(m.chat.id))
+                      .through(queue.enqueue)
+
+                    val deq = queue.dequeue.broadcastTo(scenarios.map(_.pipe): _*).drain
+
+                    deq.concurrently(enq)
+                  }
+              }
+          }
+          .parJoinUnbounded
       }
 
-    def runSingle(scenario: Scenario[F, Unit],
-                  idsRef: Ref[F, Set[Long]],
-                  topic: Topic[F, Update]): Stream[F, Nothing] =
-      topic
-        .subscribe(1)
-        .through(pipes.messages)
-        .map { m =>
-          Stream
-            .eval(register(idsRef, m.chat.id))
-            .flatMap { existed =>
-              if (existed) Stream.empty
-              else
-                //  Using queues in order to avoid blocking topic publisher
-                Stream.eval(Queue.unbounded[F, TelegramMessage]).flatMap { queue =>
-                  val enq = topic
-                    .subscribe(1)
-                    .through(pipes.messages andThen filterById(m.chat.id))
-                    .through(queue.enqueue)
-
-                  val deq = queue.dequeue.through(scenario.pipe).drain
-
-                  deq.concurrently(enq)
-                }
-            }
-        }
-        .parJoinUnbounded
-
-    def runAll(scenarios: List[Scenario[F, Unit]],
-               updates: Stream[F, Update],
-               topic: Topic[F, Update]): Stream[F, Update] = {
-
-      val run = Stream
-        .emits(scenarios)
-        .zipWith(Stream.repeatEval(Ref[F].of(Set.empty[Long]))) {
-          case (scenario, ids) => runSingle(scenario, ids, topic)
-        }
-        .parJoinUnbounded
-
-      val populate = updates.evalTap(u => topic.publish1(u))
+    Stream.eval(Topic[F, Update](Update.Unknown(-1L))).flatMap { topic =>
+      val populate = updates.evalTap(topic.publish1)
+      val run = runScenarios(topic)
 
       populate.concurrently(run)
-    }
-
-    Stream.eval(Topic[F, Update](Update.Unknown(-1L))).flatMap { topic =>
-      runAll(scenarios.toList, updates, topic)
     }
   }
 }

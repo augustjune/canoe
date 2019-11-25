@@ -146,4 +146,34 @@ class BotSpec extends AnyFunSuite {
 
     assert(counter.value() == 2)
   }
+
+  test("handles more than one scenario") {
+    def scenario1(registed: Ref[IO, Set[Int]]): Scenario[IO, Unit] = 
+      for {
+        _ <- Scenario.start(text.when(_ == "start"))
+        _ <- Scenario.next(text.when(_ == "end"))
+        _ <- Scenario.eval(registed.update(_ + 1))
+      } yield ()
+
+    def scenario2(registed: Ref[IO, Set[Int]]): Scenario[IO, Unit] = 
+      for {
+        _ <- Scenario.start(any)
+        _ <- Scenario.eval(registed.update(_ + 2))
+      } yield ()
+
+    val messages: List[(Message, ChatId)] = List(
+      "start" -> 1,
+      "end" -> 1
+    )
+
+    val bot = new Bot[IO](updateSource(messages))
+
+    val register = Stream
+      .eval(Ref[IO].of(Set.empty[Int]))
+      .flatMap { reg =>
+        bot.follow(scenario1(reg), scenario2(reg)).drain ++ Stream.eval(reg.get)
+      }
+
+    assert(register.value().size == 2)
+  }
 }

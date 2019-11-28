@@ -134,7 +134,7 @@ object Episode {
         def go(in: Stream[F, I]): Pull[F, (Result[I, O], Stream[F, I]), Unit] =
           in.pull.uncons1.attempt.flatMap {
             case Left(e) => Pull.output1(Failed(e) -> Stream.empty)
-            case Right(Some(a -> rest)) =>
+            case Right(Some((a, rest))) =>
               cancelTokens.collect { case (p, f) if p(a) => f } match {
                 case Nil =>
                   if (p(a)) Pull.output1(Matched(a.asInstanceOf[O]) -> rest)

@@ -34,7 +34,6 @@ class ScenarioSpec extends AnyPropSpec {
     val input = Stream(
       trigger,
       trigger,
-      "dasd",
       trigger
     ).map(message)
 

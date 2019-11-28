@@ -20,7 +20,7 @@ class BotSpec extends AnyFunSuite {
       def updates: Stream[IO, Update] =
         Stream
           .emits(messages.zipWithIndex.map {
-            case ((m, id), i) => MessageReceived(i, TextMessage(-1, PrivateChat(id, None, None, None), -1, m))
+            case ((m, id), i) => MessageReceived(i, TextMessage(i, PrivateChat(id, None, None, None), -1, m))
           })
           .covary[IO]
           .metered(0.2.second)
@@ -145,5 +145,115 @@ class BotSpec extends AnyFunSuite {
       }
 
     assert(counter.value() == 2)
+  }
+
+  test("handles more than one scenario") {
+    def scenario1(registed: Ref[IO, Set[Int]]): Scenario[IO, Unit] =
+      for {
+        _ <- Scenario.start(text.when(_ == "start"))
+        _ <- Scenario.next(text.when(_ == "end"))
+        _ <- Scenario.eval(registed.update(_ + 1))
+      } yield ()
+
+    def scenario2(registed: Ref[IO, Set[Int]]): Scenario[IO, Unit] =
+      for {
+        _ <- Scenario.start(any)
+        _ <- Scenario.eval(registed.update(_ + 2))
+      } yield ()
+
+    val messages: List[(Message, ChatId)] = List(
+      "start" -> 1,
+      "end" -> 1
+    )
+
+    val bot = new Bot[IO](updateSource(messages))
+
+    val register = Stream
+      .eval(Ref[IO].of(Set.empty[Int]))
+      .flatMap { reg =>
+        bot.follow(scenario1(reg), scenario2(reg)).drain ++ Stream.eval(reg.get)
+      }
+
+    assert(register.value().size == 2)
+  }
+
+  test("scenarios don't block each other") {
+    def scenario1(registed: Ref[IO, Set[Int]]): Scenario[IO, Unit] =
+      for {
+        _ <- Scenario.start(text.when(_ == "start"))
+        _ <- Scenario.next(text.when(_ == "end"))
+        _ <- Scenario.eval(registed.update(_ + 1))
+        _ <- Scenario.eval(IO.never)
+      } yield ()
+
+    def scenario2(registed: Ref[IO, Set[Int]]): Scenario[IO, Unit] =
+      for {
+        _ <- Scenario.start(any)
+        _ <- Scenario.eval(registed.update(_ + 2))
+        _ <- Scenario.eval(IO.never)
+      } yield ()
+
+    val messages: List[(Message, ChatId)] = List(
+      "start" -> 1,
+      "end" -> 1
+    )
+
+    val bot = new Bot[IO](updateSource(messages))
+
+    val register = Stream
+      .eval(Ref[IO].of(Set.empty[Int]))
+      .flatMap { reg =>
+        bot.follow(scenario1(reg), scenario2(reg)).drain ++ Stream.eval(reg.get)
+      }
+
+    assert(register.value().size == 2)
+  }
+
+  test("single scenario evaluation is not blocked between different chats") {
+    def scenario1(registed: Ref[IO, Set[Int]]): Scenario[IO, Unit] =
+      for {
+        m <- Scenario.start(any)
+        _ <- Scenario.eval(registed.update(_ + m.messageId))
+        _ <- Scenario.eval(IO.never)
+      } yield ()
+
+    val messages: List[(Message, ChatId)] = List(
+      "first" -> 1,
+      "second" -> 2
+    )
+
+    val bot = new Bot[IO](updateSource(messages))
+
+    val register = Stream
+      .eval(Ref[IO].of(Set.empty[Int]))
+      .flatMap { reg =>
+        bot.follow(scenario1(reg)).drain ++ Stream.eval(reg.get)
+      }
+
+    assert(register.value().size == 2)
+  }
+
+  test("single scenario evaluation is not blocked with same chat") {
+    def scenario1(registed: Ref[IO, Set[Int]]): Scenario[IO, Unit] =
+      for {
+        m <- Scenario.start(any)
+        _ <- Scenario.eval(registed.update(_ + m.messageId))
+        _ <- Scenario.eval(IO.never)
+      } yield ()
+
+    val messages: List[(Message, ChatId)] = List(
+      "first" -> 1,
+      "second" -> 1
+    )
+
+    val bot = new Bot[IO](updateSource(messages))
+
+    val register = Stream
+      .eval(Ref[IO].of(Set.empty[Int]))
+      .flatMap { reg =>
+        bot.follow(scenario1(reg)).drain ++ Stream.eval(reg.get)
+      }
+
+    assert(register.value().size == 2)
   }
 }

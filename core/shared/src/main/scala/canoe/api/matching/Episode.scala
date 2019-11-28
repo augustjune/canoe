@@ -3,7 +3,7 @@ package canoe.api.matching
 import canoe.api.matching.Episode._
 import cats.instances.list._
 import cats.syntax.all._
-import cats.{ApplicativeError, MonadError, StackSafeMonad, ~>}
+import cats.{~>, ApplicativeError, MonadError, StackSafeMonad}
 import fs2.{Pipe, Pull, Stream}
 
 /**
@@ -38,6 +38,13 @@ private[api] sealed trait Episode[F[_], -I, +O] {
     */
   def matching(implicit F: ApplicativeError[F, Throwable]): Pipe[F, I, O] =
     find(this, _, Nil).flatMap {
+      case (Matched(o), _) => Stream(o)
+      case (Failed(e), _)  => Stream.raiseError[F](e)
+      case _               => Stream.empty
+    }
+
+  def sequential(implicit F: ApplicativeError[F, Throwable]): Pipe[F, I, O] =
+    serial(this, _, Nil).flatMap {
       case (Matched(o), _) => Stream(o)
       case (Failed(e), _)  => Stream.raiseError[F](e)
       case _               => Stream.empty
@@ -106,6 +113,95 @@ object Episode {
   private final case class Missed[I](elem: I) extends Result[I, Nothing]
   private final case class Cancelled[I](elem: I) extends Result[I, Nothing]
   private final case class Failed(e: Throwable) extends Result[Nothing, Nothing]
+
+  private def serial[F[_], I, O](
+    episode: Episode[F, I, O],
+    input: Stream[F, I],
+    cancelTokens: List[(I => Boolean, Option[I => F[Unit]])]
+  ): Stream[F, (Result[I, O], Stream[F, I])] =
+    episode match {
+      case First(p) =>
+        def go(in: Stream[F, I]): Pull[F, (Result[I, O], Stream[F, I]), Unit] =
+          in.pull.uncons1.attempt.flatMap {
+            case Left(e)                          => Pull.output1(Failed(e) -> Stream.empty)
+            case Right(Some((a, rest))) if (p(a)) => Pull.output1(Matched(a.asInstanceOf[O]) -> rest) >> go(rest)
+            case _                                => Pull.done
+          }
+
+        go(input).stream
+
+      case Next(p) =>
+        def go(in: Stream[F, I]): Pull[F, (Result[I, O], Stream[F, I]), Unit] =
+          in.pull.uncons1.attempt.flatMap {
+            case Left(e) => Pull.output1(Failed(e) -> Stream.empty)
+            case Right(Some(a -> rest)) =>
+              cancelTokens.collect { case (p, f) if p(a) => f } match {
+                case Nil =>
+                  if (p(a)) Pull.output1(Matched(a.asInstanceOf[O]) -> rest)
+                  else Pull.output1(Missed(a) -> rest)
+
+                case nonEmpty =>
+                  nonEmpty
+                    .collect { case Some(f) => f }
+                    .traverse(f => Pull.eval(f(a))) >>
+                    Pull.output1(Cancelled(a) -> rest)
+              }
+
+            case Right(None) => Pull.done
+          }
+
+        go(input).stream
+
+      case Pure(a) =>
+        Stream(a).covary[F].map(Matched(_) -> input)
+
+      case Eval(fa) =>
+        Stream
+          .eval(fa)
+          .map(Matched(_) -> input)
+          .handleErrorWith(e => Stream(Failed(e) -> input))
+
+      case RaiseError(e) =>
+        Stream(Failed(e) -> input)
+
+      case Protected(episode, onError) =>
+        serial(episode, input, cancelTokens).flatMap {
+          case (Failed(e), rest) => serial(onError(e), rest, cancelTokens)
+          case other             => Stream(other)
+        }
+
+      case Cancellable(episode, p, f) =>
+        serial(episode, input, (p, f) :: cancelTokens)
+
+      case Tolerate(episode, limit, fn) =>
+        limit match {
+          case Some(n) if n <= 0 =>
+            serial(episode, input, cancelTokens)
+
+          case _ =>
+            serial(episode, input, cancelTokens).flatMap {
+              case (Missed(m), rest) =>
+                Stream.eval(fn(m)) >> serial(
+                  Tolerate(episode, limit.map(_ - 1), fn),
+                  rest,
+                  cancelTokens
+                )
+
+              case res => Stream(res)
+            }
+        }
+
+      case Bind(prev, fn) =>
+        Stream(prev)
+          .flatMap(ep => serial(ep, input, cancelTokens))
+          .flatMap {
+            // Have to explicitly handle all not matched cases in order to satisfy compile
+            case (Matched(a), rest)   => serial(fn(a), rest, cancelTokens)
+            case (Missed(m), rest)    => Stream(Missed(m) -> rest)
+            case (Cancelled(m), rest) => Stream(Cancelled(m) -> rest)
+            case (Failed(e), rest)    => Stream(Failed(e) -> rest)
+          }
+    }
 
   private def find[F[_]: ApplicativeError[*[_], Throwable], I, O](
     episode: Episode[F, I, O],

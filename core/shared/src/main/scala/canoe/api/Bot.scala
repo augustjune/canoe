@@ -81,7 +81,7 @@ class Bot[F[_]: Concurrent] private[api] (source: UpdateSource[F]) {
       }
 
     def track(updates: Topic[F, Update], m: TelegramMessage): Stream[F, TelegramMessage] =
-      debounce(updates.subscribe(1).through(filterMessages(m.chat.id))).cons1(m)
+      debounce(updates.subscribe(1).through(filterMessages(m.chat.id)))
 
     def runScenarios(updates: Topic[F, Update]): Stream[F, Nothing] =
       updates

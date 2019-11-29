@@ -22,8 +22,7 @@ class BotSpec extends AnyFunSuite {
           .emits(messages.zipWithIndex.map {
             case ((m, id), i) => MessageReceived(i, TextMessage(i, PrivateChat(id, None, None, None), -1, m))
           })
-          .covary[IO]
-          .metered(0.2.second)
+          .metered[IO](0.3.second)
     }
 
   test("updates returns updates from the source") {

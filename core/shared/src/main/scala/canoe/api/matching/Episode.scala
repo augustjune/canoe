@@ -37,14 +37,7 @@ private[api] sealed trait Episode[F[_], -I, +O] {
     * Fails on the first unhandled error result.
     */
   def matching(implicit F: ApplicativeError[F, Throwable]): Pipe[F, I, O] =
-    find(this, _, Nil).flatMap {
-      case (Matched(o), _) => Stream(o)
-      case (Failed(e), _)  => Stream.raiseError[F](e)
-      case _               => Stream.empty
-    }
-
-  def sequential(implicit F: ApplicativeError[F, Throwable]): Pipe[F, I, O] =
-    serial(this, _, Nil).flatMap {
+    open(this, _, Nil).flatMap {
       case (Matched(o), _) => Stream(o)
       case (Failed(e), _)  => Stream.raiseError[F](e)
       case _               => Stream.empty
@@ -114,7 +107,7 @@ object Episode {
   private final case class Cancelled[I](elem: I) extends Result[I, Nothing]
   private final case class Failed(e: Throwable) extends Result[Nothing, Nothing]
 
-  private def serial[F[_], I, O](
+  private def open[F[_], I, O](
     episode: Episode[F, I, O],
     input: Stream[F, I],
     cancelTokens: List[(I => Boolean, Option[I => F[Unit]])]
@@ -124,7 +117,7 @@ object Episode {
         def go(in: Stream[F, I]): Pull[F, (Result[I, O], Stream[F, I]), Unit] =
           in.pull.uncons1.attempt.flatMap {
             case Left(e)                          => Pull.output1(Failed(e) -> Stream.empty)
-            case Right(Some((a, rest))) if (p(a)) => Pull.output1(Matched(a.asInstanceOf[O]) -> rest) >> go(rest)
+            case Right(Some((a, rest))) if (p(a)) => Pull.output1(Matched(a.asInstanceOf[O]) -> rest)
             case _                                => Pull.done
           }
 
@@ -165,23 +158,23 @@ object Episode {
         Stream(Failed(e) -> input)
 
       case Protected(episode, onError) =>
-        serial(episode, input, cancelTokens).flatMap {
-          case (Failed(e), rest) => serial(onError(e), rest, cancelTokens)
+        open(episode, input, cancelTokens).flatMap {
+          case (Failed(e), rest) => open(onError(e), rest, cancelTokens)
           case other             => Stream(other)
         }
 
       case Cancellable(episode, p, f) =>
-        serial(episode, input, (p, f) :: cancelTokens)
+        open(episode, input, (p, f) :: cancelTokens)
 
       case Tolerate(episode, limit, fn) =>
         limit match {
           case Some(n) if n <= 0 =>
-            serial(episode, input, cancelTokens)
+            open(episode, input, cancelTokens)
 
           case _ =>
-            serial(episode, input, cancelTokens).flatMap {
+            open(episode, input, cancelTokens).flatMap {
               case (Missed(m), rest) =>
-                Stream.eval(fn(m)) >> serial(
+                Stream.eval(fn(m)) >> open(
                   Tolerate(episode, limit.map(_ - 1), fn),
                   rest,
                   cancelTokens
@@ -193,108 +186,10 @@ object Episode {
 
       case Bind(prev, fn) =>
         Stream(prev)
-          .flatMap(ep => serial(ep, input, cancelTokens))
+          .flatMap(ep => open(ep, input, cancelTokens))
           .flatMap {
             // Have to explicitly handle all not matched cases in order to satisfy compile
-            case (Matched(a), rest)   => serial(fn(a), rest, cancelTokens)
-            case (Missed(m), rest)    => Stream(Missed(m) -> rest)
-            case (Cancelled(m), rest) => Stream(Cancelled(m) -> rest)
-            case (Failed(e), rest)    => Stream(Failed(e) -> rest)
-          }
-    }
-
-  private def find[F[_]: ApplicativeError[*[_], Throwable], I, O](
-    episode: Episode[F, I, O],
-    input: Stream[F, I],
-    cancelTokens: List[(I => Boolean, Option[I => F[Unit]])]
-  ): Stream[F, (Result[I, O], Stream[F, I])] =
-    episode match {
-      case Pure(a) =>
-        Stream(a).covary[F].map(o => Matched(o) -> input)
-
-      case First(p: (I => Boolean)) =>
-        def skipFailing(stream: Stream[F, Either[Throwable, I]]): Stream[F, Either[Throwable, I]] =
-          stream.dropWhile {
-            case Right(i) if p(i) => false
-            case _                => true
-          }
-
-        def go(in: Stream[F, Either[Throwable, I]]): Pull[F, (Result[I, O], Stream[F, I]), Unit] =
-          skipFailing(in).pull.uncons1.flatMap {
-            case Some((Right(m), rest)) =>
-              Pull.output1(Matched(m.asInstanceOf[O]) -> rest.rethrow) >> go(rest)
-
-            case _ => Pull.done
-          }
-
-        go(input.attempt).stream
-
-      case Next(p) =>
-        def go(in: Stream[F, Either[Throwable, I]]): Pull[F, (Result[I, O], Stream[F, I]), Unit] =
-          in.pull.uncons1.flatMap {
-            case Some((Right(m), rest)) =>
-              cancelTokens.collect { case (p, f) if p(m) => f } match {
-                case Nil =>
-                  if (p(m)) Pull.output1(Matched(m.asInstanceOf[O]) -> rest.rethrow)
-                  else Pull.output1(Missed(m) -> rest.rethrow)
-
-                case nonEmpty =>
-                  nonEmpty
-                    .collect { case Some(f) => f }
-                    .traverse(f => Pull.eval(f(m))) >>
-                    Pull.output1(Cancelled(m) -> rest.rethrow)
-              }
-
-            case Some((Left(e), rest)) =>
-              Pull.output1(Failed(e) -> rest.rethrow)
-
-            case None => Pull.done
-          }
-
-        go(input.attempt).stream
-
-      case Eval(fa) =>
-        Stream
-          .eval(fa)
-          .map(o => Matched(o) -> input)
-          .handleErrorWith(e => Stream(Failed(e) -> input))
-
-      case RaiseError(e) =>
-        Stream(Failed(e) -> input)
-
-      case Protected(episode, onError) =>
-        find(episode, input, cancelTokens).flatMap {
-          case (Failed(e), rest) => find(onError(e), rest, cancelTokens)
-          case other             => Stream(other)
-        }
-
-      case Cancellable(episode, p, f) =>
-        find(episode, input, (p, f) :: cancelTokens)
-
-      case Tolerate(episode, limit, fn) =>
-        limit match {
-          case Some(n) if n <= 0 =>
-            find(episode, input, cancelTokens)
-
-          case _ =>
-            find(episode, input, cancelTokens).flatMap {
-              case (Missed(m), rest) =>
-                Stream.eval(fn(m)) >> find(
-                  Tolerate(episode, limit.map(_ - 1), fn),
-                  rest,
-                  cancelTokens
-                )
-
-              case res => Stream(res)
-            }
-        }
-
-      case Bind(prev, fn) =>
-        Stream(prev)
-          .flatMap(ep => find(ep, input, cancelTokens))
-          .flatMap {
-            // Have to explicitly handle all not matched cases in order to satisfy compile
-            case (Matched(a), rest)   => find(fn(a), rest, cancelTokens)
+            case (Matched(a), rest)   => open(fn(a), rest, cancelTokens)
             case (Missed(m), rest)    => Stream(Missed(m) -> rest)
             case (Cancelled(m), rest) => Stream(Cancelled(m) -> rest)
             case (Failed(e), rest)    => Stream(Failed(e) -> rest)

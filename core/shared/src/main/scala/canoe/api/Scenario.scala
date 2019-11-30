@@ -26,7 +26,7 @@ final class Scenario[F[_], +A] private (private val ep: Episode[F, TelegramMessa
     * Should be used in order to translate this scenario into a fs2.Stream.
     */
   def pipe(implicit F: ApplicativeError[F, Throwable]): Pipe[F, TelegramMessage, A] =
-    ep.sequential
+    ep.matching
 
   /**
     * Chains this scenario with the one produced by applying `fn` to the result of this scenario.

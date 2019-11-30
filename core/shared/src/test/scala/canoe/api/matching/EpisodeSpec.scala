@@ -24,18 +24,6 @@ class EpisodeSpec extends AnyFunSuite {
     assert(input.through(episode.matching).size() == 1)
   }
 
-  test("Episode doesn't ignore the element which is mismatched") {
-    val episode: Episode[IO, String, String] =
-      for {
-        m <- Episode.First[IO, String](_.endsWith("one"))
-        _ <- Episode.Next[IO, String](_.endsWith("two"))
-      } yield m
-
-    val input = Stream("1.one", "2.one", "3.two")
-
-    assert(input.through(episode.matching).value().startsWith("2"))
-  }
-
   test("Episode can be cancelled while it's in progress") {
     val cancelToken = "cancel"
 
@@ -79,16 +67,11 @@ class EpisodeSpec extends AnyFunSuite {
     assert(input.through(episode.matching).toList().isEmpty)
   }
 
-  test("Episode.First returns all matched occurrences") {
+  test("Episode.First halts the stream if the first element was not matched") {
     val episode: Episode[IO, String, String] = Episode.First(predicate)
-    val input = Stream(
-      s"1.$expected",
-      s"1.$expected",
-      s"1.",
-      s"2.$expected"
-    )
+    val input = Stream("not_matched", expected)
 
-    assert(input.through(episode.matching).size() == input.toList().count(predicate))
+    assert(input.through(episode.matching).toList().isEmpty)
   }
 
   test("Episode.Next needs at least one message") {

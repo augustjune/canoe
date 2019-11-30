@@ -3,9 +3,10 @@ package canoe.api
 import canoe.api.sources.{Hook, Polling}
 import canoe.models.messages.TelegramMessage
 import canoe.models.{InputFile, Update}
-import cats.effect.concurrent.Ref
+import cats.effect.concurrent.{Deferred, Ref}
 import cats.effect.{Concurrent, ConcurrentEffect, Resource, Timer}
-import fs2.concurrent.{Queue, Topic}
+import cats.syntax.all._
+import fs2.concurrent.Topic
 import fs2.{Pipe, Stream}
 
 import scala.concurrent.duration.FiniteDuration
@@ -59,60 +60,40 @@ class Bot[F[_]: Concurrent] private[api] (source: UpdateSource[F]) {
     */
   def follow(scenarios: Scenario[F, Unit]*): Stream[F, Update] = {
 
-    def filterById(id: Long): Pipe[F, TelegramMessage, TelegramMessage] =
-      _.filter(_.chat.id == id)
+    def filterMessages(id: Long): Pipe[F, Update, TelegramMessage] =
+      _.through(pipes.messages).filter(_.chat.id == id)
 
-    def register(idsRef: Ref[F, Set[Long]], id: Long): F[Boolean] =
-      idsRef.modify { ids =>
-        val was = ids.contains(id)
-        ids + id -> was
+    def debounce[F[_]: Concurrent, A](in: Stream[F, A]): Stream[F, A] =
+      Stream.eval(Ref[F].of[Option[Deferred[F, A]]](None)).flatMap { ref =>
+        val hook = Stream
+          .repeatEval(Deferred[F, A])
+          .evalMap(df => ref.set(Some(df)) *> df.get)
+
+        val update = in.evalMap(
+          a =>
+            ref.getAndSet(None).flatMap {
+              case Some(df) => df.complete(a)
+              case None     => Concurrent[F].unit
+            }
+        )
+
+        hook.concurrently(update)
       }
 
-    def runSingle(scenario: Scenario[F, Unit],
-                  idsRef: Ref[F, Set[Long]],
-                  topic: Topic[F, Update]): Stream[F, Nothing] =
-      topic
+    def track(updates: Topic[F, Update], m: TelegramMessage): Stream[F, TelegramMessage] =
+      debounce(updates.subscribe(1).through(filterMessages(m.chat.id)))
+
+    def runScenarios(updates: Topic[F, Update]): Stream[F, Nothing] =
+      updates
         .subscribe(1)
         .through(pipes.messages)
-        .map { m =>
-          Stream
-            .eval(register(idsRef, m.chat.id))
-            .flatMap { existed =>
-              if (existed) Stream.empty
-              else
-                //  Using queues in order to avoid blocking topic publisher
-                Stream.eval(Queue.unbounded[F, TelegramMessage]).flatMap { queue =>
-                  val enq = topic
-                    .subscribe(1)
-                    .through(pipes.messages andThen filterById(m.chat.id))
-                    .through(queue.enqueue)
-
-                  val deq = queue.dequeue.through(scenario.pipe).drain
-
-                  deq.concurrently(enq)
-                }
-            }
-        }
+        .map(m => Stream.emits(scenarios).map(sc => track(updates, m).through(sc.pipe).take(1)).parJoinUnbounded.drain)
         .parJoinUnbounded
-
-    def runAll(scenarios: List[Scenario[F, Unit]],
-               updates: Stream[F, Update],
-               topic: Topic[F, Update]): Stream[F, Update] = {
-
-      val run = Stream
-        .emits(scenarios)
-        .zipWith(Stream.repeatEval(Ref[F].of(Set.empty[Long]))) {
-          case (scenario, ids) => runSingle(scenario, ids, topic)
-        }
-        .parJoinUnbounded
-
-      val populate = updates.evalTap(u => topic.publish1(u))
-
-      populate.concurrently(run)
-    }
 
     Stream.eval(Topic[F, Update](Update.Unknown(-1L))).flatMap { topic =>
-      runAll(scenarios.toList, updates, topic)
+      val pop = updates.evalTap(topic.publish1)
+      val run = runScenarios(topic)
+      pop.concurrently(run)
     }
   }
 }

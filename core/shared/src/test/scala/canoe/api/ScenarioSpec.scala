@@ -13,6 +13,13 @@ class ScenarioSpec extends AnyPropSpec {
   private def message(s: String): TextMessage =
     TextMessage(-1, PrivateChat(-1, None, None, None), -1, s)
 
+  property("Scenario.start returns finishes if the first element is not matched") {
+    val scenario: Scenario[IO, TextMessage] = Scenario.start(command("fire"))
+    val input = Stream(message("not matched"), message("fire"))
+
+    assert(input.through(scenario.pipe).toList().isEmpty)
+  }
+
   property("Scenario.start consumes at least one message") {
     val scenario: Scenario[IO, TextMessage] = Scenario.start(command("fire"))
     val input = Stream.empty
@@ -27,7 +34,6 @@ class ScenarioSpec extends AnyPropSpec {
     val input = Stream(
       trigger,
       trigger,
-      "dasd",
       trigger
     ).map(message)
 

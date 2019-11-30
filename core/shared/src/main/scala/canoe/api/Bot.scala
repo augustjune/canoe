@@ -81,7 +81,7 @@ class Bot[F[_]: Concurrent] private[api] (source: UpdateSource[F]) {
       }
 
     def track(updates: Topic[F, Update], m: TelegramMessage): Stream[F, TelegramMessage] =
-      debounce(updates.subscribe(1).through(filterMessages(m.chat.id)))
+      debounce(updates.subscribe(1).through(filterMessages(m.chat.id))).cons1(m)
 
     def runScenarios(updates: Topic[F, Update]): Stream[F, Nothing] =
       updates
@@ -90,7 +90,7 @@ class Bot[F[_]: Concurrent] private[api] (source: UpdateSource[F]) {
         .map(m => Stream.emits(scenarios).map(sc => track(updates, m).through(sc.pipe).take(1)).parJoinUnbounded.drain)
         .parJoinUnbounded
 
-    Stream.eval(Topic[F, Update](Update.Unknown(-1L))).flatMap { topic =>
+    Stream.eval(Broadcast[F, Update]).flatMap { topic =>
       val pop = updates.evalTap(topic.publish1)
       val run = runScenarios(topic)
       pop.concurrently(run)

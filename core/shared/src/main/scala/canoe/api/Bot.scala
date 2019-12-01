@@ -5,6 +5,7 @@ import canoe.models.messages.TelegramMessage
 import canoe.models.{InputFile, Update}
 import cats.effect.concurrent.{Deferred, Ref}
 import cats.effect.{Concurrent, ConcurrentEffect, Resource, Timer}
+import cats.instances.option._
 import cats.syntax.all._
 import fs2.concurrent.Topic
 import fs2.{Pipe, Stream}
@@ -16,7 +17,6 @@ import scala.concurrent.duration.FiniteDuration
   * interact with other Telegram users in a certain predefined way
   */
 class Bot[F[_]: Concurrent] private[api] (source: UpdateSource[F]) {
-
   /**
     * Stream of all updates which your bot receives from Telegram service
     */
@@ -59,36 +59,36 @@ class Bot[F[_]: Concurrent] private[api] (source: UpdateSource[F]) {
     * @return Stream of all updates which your bot receives from Telegram service
     */
   def follow(scenarios: Scenario[F, Unit]*): Stream[F, Update] = {
-
-    def filterMessages(id: Long): Pipe[F, Update, TelegramMessage] =
-      _.through(pipes.messages).filter(_.chat.id == id)
-
-    def debounce[F[_]: Concurrent, A](in: Stream[F, A]): Stream[F, A] =
-      Stream.eval(Ref[F].of[Option[Deferred[F, A]]](None)).flatMap { ref =>
-        val hook = Stream
-          .repeatEval(Deferred[F, A])
-          .evalMap(df => ref.set(Some(df)) *> df.get)
-
-        val update = in.evalMap(
-          a =>
-            ref.getAndSet(None).flatMap {
-              case Some(df) => df.complete(a)
-              case None     => Concurrent[F].unit
-            }
-        )
-
-        hook.concurrently(update)
-      }
-
-    def track(updates: Topic[F, Update], m: TelegramMessage): Stream[F, TelegramMessage] =
-      debounce(updates.subscribe(1).through(filterMessages(m.chat.id))).cons1(m)
-
     def runScenarios(updates: Topic[F, Update]): Stream[F, Nothing] =
       updates
         .subscribe(1)
         .through(pipes.messages)
-        .map(m => Stream.emits(scenarios).map(sc => track(updates, m).through(sc.pipe).take(1)).parJoinUnbounded.drain)
+        .map(m => Stream.emits(scenarios).map(sc => fork(updates, m).through(sc.pipe)).parJoinUnbounded.drain)
         .parJoinUnbounded
+
+    def fork(updates: Topic[F, Update], m: TelegramMessage): Stream[F, TelegramMessage] =
+      updates
+        .subscribe(1)
+        .through(filterMessages(m.chat.id))
+        .through(debounce)
+        .cons1(m)
+
+    def filterMessages(id: Long): Pipe[F, Update, TelegramMessage] =
+      _.through(pipes.messages).filter(_.chat.id == id)
+
+    def debounce[F[_]: Concurrent, A]: Pipe[F, A, A] =
+      input =>
+        Stream.eval(Ref[F].of[Option[Deferred[F, A]]](None)).flatMap { ref =>
+          val hook = Stream
+            .repeatEval(Deferred[F, A])
+            .evalMap(df => ref.set(Some(df)) *> df.get)
+
+          val update = input.evalMap { a =>
+            ref.getAndSet(None).flatMap(_.traverse_(_.complete(a)))
+          }
+
+          hook.concurrently(update)
+        }
 
     Stream.eval(Broadcast[F, Update]).flatMap { topic =>
       val pop = updates.evalTap(topic.publish1)
@@ -99,7 +99,6 @@ class Bot[F[_]: Concurrent] private[api] (source: UpdateSource[F]) {
 }
 
 object Bot {
-
   /**
     * Creates a bot which receives incoming updates using long polling mechanism.
     *

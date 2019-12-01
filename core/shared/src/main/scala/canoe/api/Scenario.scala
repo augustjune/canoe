@@ -20,13 +20,11 @@ final class Scenario[F[_], +A] private (private val ep: Episode[F, TelegramMessa
 
   /**
     * Pipe which produces a value of type `A` evaluated in `F` effect
-    * as a result of each successful interaction matching this description.
+    * as a result of the successful interaction matching this description.
     * If an unhandled error result was encountered during the interaction, it will be raised here.
-    *
-    * Should be used in order to translate this scenario into a fs2.Stream.
     */
   def pipe(implicit F: ApplicativeError[F, Throwable]): Pipe[F, TelegramMessage, A] =
-    ep.sequential
+    ep.matching
 
   /**
     * Chains this scenario with the one produced by applying `fn` to the result of this scenario.

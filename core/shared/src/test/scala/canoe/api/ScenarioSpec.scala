@@ -13,13 +13,6 @@ class ScenarioSpec extends AnyPropSpec {
   private def message(s: String): TextMessage =
     TextMessage(-1, PrivateChat(-1, None, None, None), -1, s)
 
-  property("Scenario.start returns finishes if the first element is not matched") {
-    val scenario: Scenario[IO, TextMessage] = Scenario.start(command("fire"))
-    val input = Stream(message("not matched"), message("fire"))
-
-    assert(input.through(scenario.pipe).toList().isEmpty)
-  }
-
   property("Scenario.start consumes at least one message") {
     val scenario: Scenario[IO, TextMessage] = Scenario.start(command("fire"))
     val input = Stream.empty
@@ -27,17 +20,13 @@ class ScenarioSpec extends AnyPropSpec {
     assert(input.through(scenario.pipe).toList().isEmpty)
   }
 
-  property("Scenario.first returns all matched occurrences") {
+  property("Scenario.first halts the stream if the first element was not matched") {
     val trigger = "fire"
     val scenario: Scenario[IO, TextMessage] = Scenario.start(textMessage.matching(trigger))
 
-    val input = Stream(
-      trigger,
-      trigger,
-      trigger
-    ).map(message)
+    val input = Stream("not_matched", trigger).map(message)
 
-    assert(input.through(scenario.pipe).size() == input.toList().count(_.text == trigger))
+    assert(input.through(scenario.pipe).toList().isEmpty)
   }
 
   property("Scenario.next consumes at least one message") {
@@ -142,17 +131,6 @@ class ScenarioSpec extends AnyPropSpec {
 
     val input = Stream("one", "two").map(message)
     assert(input.through(scenario.pipe).size() == 1)
-  }
-
-  property("Scenario doesn't ignore the element which is mismatched") {
-    val scenario: Scenario[IO, String] =
-      for {
-        m <- Scenario.start(textMessage.endingWith("one"))
-        _ <- Scenario.next(textMessage.endingWith("two"))
-      } yield m.text
-    val input = Stream("1.one", "2.one", "3.two").map(message)
-
-    assert(input.through(scenario.pipe).value().startsWith("2"))
   }
 
   property("Scenario can be cancelled while it's in progress") {

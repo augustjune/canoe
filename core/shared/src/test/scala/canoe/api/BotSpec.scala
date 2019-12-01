@@ -22,7 +22,7 @@ class BotSpec extends AnyFunSuite {
           .emits(messages.zipWithIndex.map {
             case ((m, id), i) => MessageReceived(i, TextMessage(i, PrivateChat(id, None, None, None), -1, m))
           })
-          .metered[IO](0.3.second)
+          .metered[IO](0.1.second)
     }
 
   test("updates returns updates from the source") {
@@ -40,14 +40,12 @@ class BotSpec extends AnyFunSuite {
     assert(texts == messages.map(_._1))
   }
 
-  test("executes a scenario") {
+  test("follows scenario for each incoming message") {
 
     val messages: List[(Message, ChatId)] = List(
-      "message1" -> 1,
-      "message2" -> 1,
-      "message3" -> 1,
-      "message5" -> 1,
-      "message6" -> 1
+      "message" -> 1,
+      "message" -> 1,
+      "message" -> 1
     )
 
     def scenario(counter: Ref[IO, Int]): Scenario[IO, Unit] =
@@ -67,7 +65,7 @@ class BotSpec extends AnyFunSuite {
     assert(counter.value() == messages.size)
   }
 
-  test("executes a scenario for a single chat") {
+  test("follows a scenario for a single chat") {
     val chatId = 1
     val messages: List[(Message, ChatId)] = List(
       "start" -> chatId,

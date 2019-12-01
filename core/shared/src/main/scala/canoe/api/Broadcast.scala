@@ -12,22 +12,22 @@ import fs2.concurrent.{Queue, Topic}
   * Each subscriber has own queue where each incoming elements is stored.
   *
   * Unlike stanard Topic impemenatation, doesn't contain initial value,
-  * thus each subscriber sees only elements that were published after 
-  * the subscription was done. 
+  * thus each subscriber sees only elements that were published after
+  * the subscription was done.
   */
 private[api] class Broadcast[F[_], A](subs: Ref[F, List[Queue[F, A]]])(implicit C: Concurrent[F]) extends Topic[F, A] {
   def publish: Pipe[F, A, Unit] =
     _.evalMap(publish1)
 
   def publish1(a: A): F[Unit] =
-    subs.get.flatMap(_.traverse(_.enqueue1(a)).void)
+    subs.get.flatMap(_.traverse_(_.enqueue1(a)))
 
   def subscribe(maxQueued: Int): Stream[F, A] =
-    emptyQueue(maxQueued).evalTap(q => subs.update(q :: _)).flatMap(_.dequeue)
+    subscription(maxQueued).evalTap(q => subs.update(q :: _)).flatMap(_.dequeue)
 
-  private def emptyQueue(maxQueued: Int): Stream[F, Queue[F, A]] =
+  private def subscription(maxQueued: Int): Stream[F, Queue[F, A]] =
     Stream.bracket(Queue.bounded[F, A](maxQueued))(
-      queue => subs.update(_.filter(_.ne(queue)))
+      queue => subs.update(_.filter(_ ne queue))
     )
 
   def subscribeSize(maxQueued: Int): Stream[F, (A, Int)] =

@@ -12,9 +12,9 @@ import fs2.{Pipe, Pull, Stream}
   * Such description can be applied to the actual sequence/stream of elements
   * to find the subsequences which match the description.
   *
-  * For each partially matched subsequence (such that at least first element was matched)
+  * For partially matched subsequence (such that at least first element was matched)
   * one of 4 possible results is yielded:
-  *  - Matched(o)   - when the whole episode was matched as a subsequence of input sequence.
+  *  - Matched(o)   - when the whole episode was matched as a prefix subsequence of input sequence.
   *                   Contains the result value of type `O`.
   *  - Missed(i)    - when the episode was started (partially matched) but was not fully matched.
   *                   Contains the first element of type `I` which didn't match the description.
@@ -32,8 +32,8 @@ import fs2.{Pipe, Pull, Stream}
 private[api] sealed trait Episode[F[_], -I, +O] {
 
   /**
-    * Pipe which produces value `O` for each subsequence of `I` elements
-    * matching this description, evaluated in `F` effect.
+    * Pipe which produces a singleton stream if the elements of input stream 
+    * match the description of this episode and empty stream otherwise.
     * Fails on the first unhandled error result.
     */
   def matching(implicit F: ApplicativeError[F, Throwable]): Pipe[F, I, O] =

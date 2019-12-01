@@ -51,7 +51,7 @@ class Bot[F[_]: Concurrent] private[api] (source: UpdateSource[F]) {
     * }}}
     *
     * Each scenario is handled concurrently across all chats,
-    * which means that scenario is blocked only if it's already in progress within the same chat.
+    * which means that scenario cannot be blocked by any other scenario being in progress.
     *
     * All the behavior is suspended as an effect of resulting stream, without changing its elements.
     * Also, result stream is not halted by the execution of any particular scenario.

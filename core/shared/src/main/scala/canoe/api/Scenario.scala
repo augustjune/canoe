@@ -39,7 +39,7 @@ final class Scenario[F[_], +A] private (private val ep: Episode[F, TelegramMessa
   /**
     * Maps successful result values using provided function `fn`.
     */
-  def map[B](fn: A => B): Scenario[F, B] = flatMap(fn.andThen(Scenario.pure))
+  def map[B](fn: A => B): Scenario[F, B] = flatMap(fn.andThen(Scenario.pure(_)))
 
   /**
     * @return `this` or scenario which is result of `fn` if error occurs.
@@ -101,8 +101,8 @@ final class Scenario[F[_], +A] private (private val ep: Episode[F, TelegramMessa
 object Scenario {
   /**
     * Describes the next expected input message.
-    * 
-    * Any input message from `pf` domain will be matched 
+    *
+    * Any input message from `pf` domain will be matched
     * and transformed into a value of type `A`.
     */
   def expect[F[_], A](pf: PartialFunction[TelegramMessage, A]): Scenario[F, A] =
@@ -119,9 +119,17 @@ object Scenario {
 
   /**
     * Lifts pure value to Scenario context.
+    * 
+    * Uses partially applied type parameter technique.
     */
-  def pure[F[_], A](a: A): Scenario[F, A] =
-    new Scenario[F, A](Episode.Pure(a))
+  def pure[F[_]]: PurePartiallyApplied[F] = new PurePartiallyApplied[F]
+
+  final class PurePartiallyApplied[F[_]](private val dummy: Boolean = false) extends AnyVal {
+    /**
+      * Lifts pure value to Scenario context.
+      */
+    def apply[A](a: A): Scenario[F, A] = new Scenario[F, A](Episode.Pure(a))
+  }
 
   /**
     * Unit value lifted to Scenario context with effect `F`.

@@ -58,7 +58,7 @@ object Composition extends IOApp {
         if (exists)
           Scenario.eval(chat.send("User with such nick already exists. Please try another one")) >>
             provideUsername(chat, service)
-        else Scenario.pure[F, String](nick)
+        else Scenario.pure[F](nick)
     } yield res
 
   def providePass[F[_]: TelegramClient](chat: Chat): Scenario[F, String] =

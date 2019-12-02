@@ -169,11 +169,14 @@ class ScenarioSpec extends AnyPropSpec {
 
   property("tolerate skips up to N elements if they don't match") {
     val n = 5
-    val scenario: Scenario[IO, String] = Scenario.next(textMessage.endingWith("fire").map(_.text))
-    val input = Stream("").repeatN(n) ++ Stream(s"2.fire")
-    val tolerating = scenario.tolerateN(n)(_ => IO.unit)
+    val scenario: Scenario[IO, TextMessage] = 
+      for {
+        _ <- Scenario.next(any)
+        s <- Scenario.next(textMessage.endingWith("fire")).tolerateN(n)(_ => IO.unit)
+      } yield s
+    val input = Stream("any") ++ Stream("").repeatN(n) ++ Stream("2.fire")
 
-    assert(input.map(message).through(tolerating.pipe).value().startsWith("2"))
+    assert(input.map(message).through(scenario.pipe).value().text.startsWith("2"))
   }
 
   property("tolerate doesn't skip the element if it matches") {
@@ -186,10 +189,14 @@ class ScenarioSpec extends AnyPropSpec {
 
   property("tolerate evaluates provided effect each time it skips the element") {
     var counter = 0
-    val scenario: Scenario[IO, String] = Scenario.next(textMessage.endingWith("fire").map(_.text))
-    val input = Stream("1", "2", "fire").map(message)
-    val tolerating = scenario.tolerateAll(_ => IO { counter += 1 })
-    input.through(tolerating.pipe).run()
+    val scenario: Scenario[IO, Unit] = 
+    for {
+      _ <- Scenario.start(any)
+      _ <- Scenario.next(textMessage.endingWith("fire")).tolerateAll(_ => IO { counter += 1 })
+    } yield ()
+
+    val input = Stream("any", "1", "2", "fire").map(message)
+    input.through(scenario.pipe).run()
 
     assert(counter == 2)
   }

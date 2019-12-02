@@ -2,20 +2,20 @@ package canoe.api.matching
 
 import canoe.TestIO._
 import cats.effect.IO
+import cats.effect.concurrent.Ref
 import cats.syntax.all._
 import fs2.Stream
 import org.scalatest.funsuite.AnyFunSuite
 
 class EpisodeSpec extends AnyFunSuite {
-
   val expected: String = "fire"
 
   val predicate: String => Boolean = _.endsWith(expected)
 
-  test("Episode.First >>= Episode.Next") {
+  test("Episode.Next >>= Episode.Next") {
     val episode: Episode[IO, String, String] =
       for {
-        m <- Episode.First[IO, String](_.endsWith("one"))
+        m <- Episode.Next[IO, String](_.endsWith("one"))
         _ <- Episode.Next[IO, String](_.endsWith("two"))
       } yield m
 
@@ -29,7 +29,7 @@ class EpisodeSpec extends AnyFunSuite {
 
     val episode: Episode[IO, String, String] =
       for {
-        m <- Episode.First[IO, String](_.endsWith("one"))
+        m <- Episode.Next[IO, String](_.endsWith("one"))
         _ <- Episode.Next[IO, String](_ => true)
       } yield m
 
@@ -47,7 +47,7 @@ class EpisodeSpec extends AnyFunSuite {
 
     val episode: Episode[IO, String, String] =
       for {
-        m <- Episode.First[IO, String](_.endsWith("one"))
+        m <- Episode.Next[IO, String](_.endsWith("one"))
         _ <- Episode.Next[IO, String](_ => true)
       } yield m
 
@@ -61,14 +61,14 @@ class EpisodeSpec extends AnyFunSuite {
   }
 
   test("Episode.First needs at least one message") {
-    val episode: Episode[IO, String, String] = Episode.First(predicate)
+    val episode: Episode[IO, String, String] = Episode.Next(predicate)
     val input = Stream.empty
 
     assert(input.through(episode.matching).toList().isEmpty)
   }
 
   test("Episode.First halts the stream if the first element was not matched") {
-    val episode: Episode[IO, String, String] = Episode.First(predicate)
+    val episode: Episode[IO, String, String] = Episode.Next(predicate)
     val input = Stream("not_matched", expected)
 
     assert(input.through(episode.matching).toList().isEmpty)
@@ -98,12 +98,45 @@ class EpisodeSpec extends AnyFunSuite {
     assert(input.through(episode.matching).toList().isEmpty)
   }
 
+  test("Tolerate is ignored if the first Next was missmatched") {
+    val episode: Episode[IO, String, String] =
+      Episode.Tolerate(Episode.Next(predicate), None, _ => IO.unit)
+
+    val input = Stream("", expected)
+    assert(input.through(episode.matching).toList().isEmpty)
+  }
+
+  test("Tolerate is not ignored if not the second Next was missmatched") {
+    val original: Episode[IO, String, Unit] =
+      for {
+        _ <- Episode.Next[IO, String](s => true)
+        _ <- Episode.Next(predicate)
+      } yield ()
+
+    def episode(ref: Ref[IO, Int]): Episode[IO, String, Unit] =
+      Episode.Tolerate(original, None, _ => ref.update(_ + 1))
+
+    val input = Stream("", "")
+    val counter = Stream.eval(Ref[IO].of(0)).flatMap { ref =>
+      input.through(episode(ref).matching).drain ++ Stream.eval(ref.get)
+    }
+
+    assert(counter.value() == 1)
+  }
+
   test("Episode.Next#tolerateN skips up to N elements if they don't match") {
     val n = 5
     val episode: Episode[IO, String, String] =
-      Episode.Tolerate(Episode.Next(predicate), Some(n), _ => IO.unit)
+      for {
+        _ <- Episode.Next[IO, String](_ => true)
+        s <- Episode.Tolerate[IO, String, String](
+          Episode.Next(predicate),
+          Some(n),
+          _ => IO.unit
+        )
+      } yield s
 
-    val input = Stream("").repeatN(5) ++ Stream(s"2.$expected")
+    val input = Stream("any") ++ Stream("").repeatN(5) ++ Stream(s"2.$expected")
 
     assert(input.through(episode.matching).value().startsWith("2"))
   }
@@ -192,7 +225,7 @@ class EpisodeSpec extends AnyFunSuite {
 
     val episode: Episode[IO, Int, Unit] =
       for {
-        _ <- Episode.First[IO, Int](_ => true)
+        _ <- Episode.Next[IO, Int](_ => true)
         _ <- Episode.Next[IO, Int](_ => true)
       } yield ()
 

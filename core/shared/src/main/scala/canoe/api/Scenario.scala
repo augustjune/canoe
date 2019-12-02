@@ -4,7 +4,7 @@ import canoe.api.matching.Episode
 import canoe.models.messages.TelegramMessage
 import canoe.syntax.Expect
 import cats.arrow.FunctionK
-import cats.{ApplicativeError, MonadError, StackSafeMonad, ~>}
+import cats.{~>, ApplicativeError, MonadError, StackSafeMonad}
 import fs2.Pipe
 
 /**
@@ -17,7 +17,6 @@ import fs2.Pipe
   * `Scenario` forms a monad in `A` with `pure` and `flatMap`.
   */
 final class Scenario[F[_], +A] private (private val ep: Episode[F, TelegramMessage, A]) extends AnyVal {
-
   /**
     * Pipe which produces a value of type `A` evaluated in `F` effect
     * as a result of the successful interaction matching this description.
@@ -100,14 +99,13 @@ final class Scenario[F[_], +A] private (private val ep: Episode[F, TelegramMessa
 }
 
 object Scenario {
-
   /**
     * Defines the beginning of the scenario.
     *
     * Each input value from `pf` domain is going to be matched and transformed into a value of type `A`.
     */
   def start[F[_], A](pf: PartialFunction[TelegramMessage, A]): Scenario[F, A] =
-    new Scenario[F, A](Episode.First(pf.isDefinedAt).map(pf))
+    expect(pf)
 
   /**
     * Defines following step of the scenario.
@@ -116,6 +114,9 @@ object Scenario {
     * it is going to be matched and transformed into the value of type `A` using `pf` .
     */
   def next[F[_], A](pf: PartialFunction[TelegramMessage, A]): Scenario[F, A] =
+    expect(pf)
+
+  def expect[F[_], A](pf: PartialFunction[TelegramMessage, A]): Scenario[F, A] =
     new Scenario[F, A](Episode.Next(pf.isDefinedAt).map(pf))
 
   /**

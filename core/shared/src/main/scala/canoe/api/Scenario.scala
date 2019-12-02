@@ -100,22 +100,11 @@ final class Scenario[F[_], +A] private (private val ep: Episode[F, TelegramMessa
 
 object Scenario {
   /**
-    * Defines the beginning of the scenario.
-    *
-    * Each input value from `pf` domain is going to be matched and transformed into a value of type `A`.
+    * Describes the next expected input message.
+    * 
+    * Any input message from `pf` domain will be matched 
+    * and transformed into a value of type `A`.
     */
-  def start[F[_], A](pf: PartialFunction[TelegramMessage, A]): Scenario[F, A] =
-    expect(pf)
-
-  /**
-    * Defines following step of the scenario.
-    *
-    * If the first elements belongs to the `pf` domain,
-    * it is going to be matched and transformed into the value of type `A` using `pf` .
-    */
-  def next[F[_], A](pf: PartialFunction[TelegramMessage, A]): Scenario[F, A] =
-    expect(pf)
-
   def expect[F[_], A](pf: PartialFunction[TelegramMessage, A]): Scenario[F, A] =
     new Scenario[F, A](Episode.Next(pf.isDefinedAt).map(pf))
 

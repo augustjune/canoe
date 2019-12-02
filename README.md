@@ -50,10 +50,10 @@ def app[F[_]: ConcurrentEffect]: F[Unit] =
 
 def greetings[F[_]: TelegramClient]: Scenario[F, Unit] =
     for {
-      chat  <- Scenario.start(command("hi").chat)
-      _     <- Scenario.eval(chat.send("Hello. What's your name?"))
-      name  <- Scenario.next(text)
-      _     <- Scenario.eval(chat.send(s"Nice to meet you, $name"))
+      chat <- Scenario.expect(command("hi").chat)
+      _    <- Scenario.eval(chat.send("Hello. What's your name?"))
+      name <- Scenario.expect(text)
+      _    <- Scenario.eval(chat.send(s"Nice to meet you, $name"))
     } yield ()
 ```
 

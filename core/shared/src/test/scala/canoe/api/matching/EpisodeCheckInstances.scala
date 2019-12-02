@@ -40,10 +40,6 @@ object EpisodeCheckInstances {
         for {
           b <- Arbitrary.arbBool.arbitrary
           o <- Arbitrary.arbitrary[O]
-        } yield Episode.Next[F, I](_ => b).map(_ => o),
-        for {
-          b <- Arbitrary.arbBool.arbitrary
-          o <- Arbitrary.arbitrary[O]
         } yield Episode.Next[F, I](_ => b).map(_ => o)
       )
     )

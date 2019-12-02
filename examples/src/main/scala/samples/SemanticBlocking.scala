@@ -27,7 +27,7 @@ object SemanticBlocking extends IOApp {
 
   def count[F[_]: TelegramClient: Timer]: Scenario[F, Unit] =
     for {
-      m <- Scenario.start(command("count"))
+      m <- Scenario.expect(command("count"))
       start = Try(m.text.split(" ")(1).toInt).getOrElse(10)
       _ <- repeat(m.chat, start)
     } yield ()

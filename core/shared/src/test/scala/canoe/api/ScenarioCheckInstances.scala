@@ -48,11 +48,7 @@ object ScenarioCheckInstances {
         for {
           b <- Arbitrary.arbBool.arbitrary
           a <- Arbitrary.arbitrary[A]
-        } yield Scenario.start[F, A] { case _ if b => a },
-        for {
-          b <- Arbitrary.arbBool.arbitrary
-          a <- Arbitrary.arbitrary[A]
-        } yield Scenario.next[F, A] { case _ if b => a }
+        } yield Scenario.expect[F, A] { case _ if b => a }
       )
     )
 

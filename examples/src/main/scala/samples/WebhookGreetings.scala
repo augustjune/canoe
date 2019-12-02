@@ -33,9 +33,9 @@ object WebhookGreetings extends IOApp {
 
   def greetings[F[_]: TelegramClient]: Scenario[F, Unit] =
     for {
-      chat <- Scenario.start(command("hi").chat)
+      chat <- Scenario.expect(command("hi").chat)
       _    <- Scenario.eval(chat.send("Hello. What's your name?"))
-      name <- Scenario.next(text)
+      name <- Scenario.expect(text)
       _    <- Scenario.eval(chat.send(s"Nice to meet you, $name"))
     } yield ()
 }

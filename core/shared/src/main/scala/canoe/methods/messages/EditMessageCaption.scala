@@ -46,7 +46,6 @@ object EditMessageCaption {
              messageId: Int,
              caption: Option[String],
              parseMode: Option[ParseMode] = None,
-             disableWebPagePreview: Option[Boolean] = None,
              replyMarkup: Option[ReplyMarkup] = None): EditMessageCaption =
     new EditMessageCaption(Some(chatId), Some(messageId), None, caption, parseMode, replyMarkup)
 
@@ -56,7 +55,6 @@ object EditMessageCaption {
   def inlined(inlineMessageId: String,
               caption: Option[String],
               parseMode: Option[ParseMode] = None,
-              disableWebPagePreview: Option[Boolean] = None,
               replyMarkup: Option[ReplyMarkup] = None): EditMessageCaption =
     new EditMessageCaption(None, None, Some(inlineMessageId), caption, parseMode, replyMarkup)
 

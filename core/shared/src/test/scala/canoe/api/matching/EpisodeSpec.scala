@@ -109,7 +109,7 @@ class EpisodeSpec extends AnyFunSuite {
   test("Tolerate is not ignored if not the second Next was missmatched") {
     val original: Episode[IO, String, Unit] =
       for {
-        _ <- Episode.Next[IO, String](s => true)
+        _ <- Episode.Next[IO, String](_ => true)
         _ <- Episode.Next(predicate)
       } yield ()
 

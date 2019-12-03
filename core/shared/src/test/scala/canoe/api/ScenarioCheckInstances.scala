@@ -44,15 +44,11 @@ object ScenarioCheckInstances {
   implicit def arbScenario[F[_], A: Arbitrary]: Arbitrary[Scenario[F, A]] =
     Arbitrary(
       Gen.oneOf(
-        Arbitrary.arbitrary[A].map(a => Scenario.pure[F, A](a)),
+        Arbitrary.arbitrary[A].map(a => Scenario.pure[F](a)),
         for {
           b <- Arbitrary.arbBool.arbitrary
           a <- Arbitrary.arbitrary[A]
-        } yield Scenario.start[F, A] { case _ if b => a },
-        for {
-          b <- Arbitrary.arbBool.arbitrary
-          a <- Arbitrary.arbitrary[A]
-        } yield Scenario.next[F, A] { case _ if b => a }
+        } yield Scenario.expect[F, A] { case _ if b => a }
       )
     )
 

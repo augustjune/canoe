@@ -31,7 +31,7 @@ object ConcurrentScenarios extends IOApp {
 
   def pop[F[_]: TelegramClient](semaphore: Semaphore[F]): Scenario[F, Unit] =
     for {
-      m <- Scenario.start(command("pop"))
+      m <- Scenario.expect(command("pop"))
       _ <- Scenario.eval(m.chat.send("Waiting for available elements.."))
       _ <- Scenario.eval(semaphore.acquire)
       _ <- Scenario.eval(m.reply("Done."))
@@ -39,7 +39,7 @@ object ConcurrentScenarios extends IOApp {
 
   def push[F[_]: TelegramClient](semaphore: Semaphore[F]): Scenario[F, Unit] =
     for {
-      chat <- Scenario.start(command("push").chat)
+      chat <- Scenario.expect(command("push").chat)
       _    <- Scenario.eval(semaphore.release)
       _    <- Scenario.eval(chat.send("Pushed one element."))
     } yield ()

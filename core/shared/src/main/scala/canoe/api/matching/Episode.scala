@@ -30,14 +30,13 @@ import fs2.{Pipe, Pull, Stream}
   * @tparam O Result value type
   */
 private[api] sealed trait Episode[F[_], -I, +O] {
-
   /**
-    * Pipe which produces a singleton stream if the elements of input stream 
+    * Pipe which produces a singleton stream if the elements of input stream
     * match the description of this episode and empty stream otherwise.
     * Fails on the first unhandled error result.
     */
   def matching(implicit F: ApplicativeError[F, Throwable]): Pipe[F, I, O] =
-    open(this, _, Nil).flatMap {
+    open(this, _, Nil, true).flatMap {
       case (Matched(o), _) => Stream(o)
       case (Failed(e), _)  => Stream.raiseError[F](e)
       case _               => Stream.empty
@@ -52,12 +51,9 @@ private[api] sealed trait Episode[F[_], -I, +O] {
 }
 
 object Episode {
-
   private[api] final case class Pure[F[_], A](a: A) extends Episode[F, Any, A]
 
   private[api] final case class Next[F[_], A](p: A => Boolean) extends Episode[F, A, A]
-
-  private[api] final case class First[F[_], A](p: A => Boolean) extends Episode[F, A, A]
 
   private[api] final case class Eval[F[_], A](fa: F[A]) extends Episode[F, Any, A]
 
@@ -80,7 +76,6 @@ object Episode {
 
   private[api] implicit def monadErrorInstance[F[_], I]: MonadError[Episode[F, I, *], Throwable] =
     new MonadError[Episode[F, I, *], Throwable] with StackSafeMonad[Episode[F, I, *]] {
-
       def pure[A](a: A): Episode[F, I, A] = Pure(a)
 
       def flatMap[A, B](fa: Episode[F, I, A])(f: A => Episode[F, I, B]): Episode[F, I, B] =
@@ -93,15 +88,7 @@ object Episode {
         RaiseError(e)
     }
 
-  private sealed trait Result[+I, +O] {
-    def map[O1](f: O => O1): Result[I, O1] = this match {
-      case Matched(o)          => Matched(f(o))
-      case same @ Missed(_)    => same
-      case same @ Cancelled(_) => same
-      case same @ Failed(_)    => same
-    }
-  }
-
+  private sealed trait Result[+I, +O]
   private final case class Matched[O](o: O) extends Result[Nothing, O]
   private final case class Missed[I](elem: I) extends Result[I, Nothing]
   private final case class Cancelled[I](elem: I) extends Result[I, Nothing]
@@ -110,19 +97,10 @@ object Episode {
   private def open[F[_], I, O](
     episode: Episode[F, I, O],
     input: Stream[F, I],
-    cancelTokens: List[(I => Boolean, Option[I => F[Unit]])]
+    cancelTokens: List[(I => Boolean, Option[I => F[Unit]])],
+    first: Boolean
   ): Stream[F, (Result[I, O], Stream[F, I])] =
     episode match {
-      case First(p) =>
-        def go(in: Stream[F, I]): Pull[F, (Result[I, O], Stream[F, I]), Unit] =
-          in.pull.uncons1.attempt.flatMap {
-            case Left(e)                          => Pull.output1(Failed(e) -> Stream.empty)
-            case Right(Some((a, rest))) if (p(a)) => Pull.output1(Matched(a.asInstanceOf[O]) -> rest)
-            case _                                => Pull.done
-          }
-
-        go(input).stream
-
       case Next(p) =>
         def go(in: Stream[F, I]): Pull[F, (Result[I, O], Stream[F, I]), Unit] =
           in.pull.uncons1.attempt.flatMap {
@@ -131,7 +109,8 @@ object Episode {
               cancelTokens.collect { case (p, f) if p(a) => f } match {
                 case Nil =>
                   if (p(a)) Pull.output1(Matched(a.asInstanceOf[O]) -> rest)
-                  else Pull.output1(Missed(a) -> rest)
+                  else if (!first) Pull.output1(Missed(a) -> rest)
+                  else Pull.done
 
                 case nonEmpty =>
                   nonEmpty
@@ -158,26 +137,27 @@ object Episode {
         Stream(Failed(e) -> input)
 
       case Protected(episode, onError) =>
-        open(episode, input, cancelTokens).flatMap {
-          case (Failed(e), rest) => open(onError(e), rest, cancelTokens)
+        open(episode, input, cancelTokens, first).flatMap {
+          case (Failed(e), rest) => open(onError(e), rest, cancelTokens, first)
           case other             => Stream(other)
         }
 
       case Cancellable(episode, p, f) =>
-        open(episode, input, (p, f) :: cancelTokens)
+        open(episode, input, (p, f) :: cancelTokens, first)
 
       case Tolerate(episode, limit, fn) =>
         limit match {
           case Some(n) if n <= 0 =>
-            open(episode, input, cancelTokens)
+            open(episode, input, cancelTokens, first)
 
           case _ =>
-            open(episode, input, cancelTokens).flatMap {
+            open(episode, input, cancelTokens, first).flatMap {
               case (Missed(m), rest) =>
                 Stream.eval(fn(m)) >> open(
                   Tolerate(episode, limit.map(_ - 1), fn),
                   rest,
-                  cancelTokens
+                  cancelTokens,
+                  first
                 )
 
               case res => Stream(res)
@@ -186,10 +166,10 @@ object Episode {
 
       case Bind(prev, fn) =>
         Stream(prev)
-          .flatMap(ep => open(ep, input, cancelTokens))
+          .flatMap(ep => open(ep, input, cancelTokens, first))
           .flatMap {
             // Have to explicitly handle all not matched cases in order to satisfy compile
-            case (Matched(a), rest)   => open(fn(a), rest, cancelTokens)
+            case (Matched(a), rest)   => open(fn(a), rest, cancelTokens, false)
             case (Missed(m), rest)    => Stream(Missed(m) -> rest)
             case (Cancelled(m), rest) => Stream(Cancelled(m) -> rest)
             case (Failed(e), rest)    => Stream(Failed(e) -> rest)
@@ -200,7 +180,6 @@ object Episode {
     episode match {
       case Pure(a)                    => Pure(a)
       case Next(p)                    => Next(p).asInstanceOf[Episode[G, I, O]]
-      case First(p)                   => First(p).asInstanceOf[Episode[G, I, O]]
       case Eval(fa)                   => Eval(f(fa))
       case RaiseError(e)              => RaiseError(e)
       case Protected(ep, onError)     => Protected(ep.mapK(f), onError.andThen(_.mapK(f)))

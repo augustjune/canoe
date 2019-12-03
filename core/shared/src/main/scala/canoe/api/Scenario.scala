@@ -4,7 +4,7 @@ import canoe.api.matching.Episode
 import canoe.models.messages.TelegramMessage
 import canoe.syntax.Expect
 import cats.arrow.FunctionK
-import cats.{ApplicativeError, MonadError, StackSafeMonad, ~>}
+import cats.{~>, ApplicativeError, MonadError, StackSafeMonad}
 import fs2.Pipe
 
 /**
@@ -17,7 +17,6 @@ import fs2.Pipe
   * `Scenario` forms a monad in `A` with `pure` and `flatMap`.
   */
 final class Scenario[F[_], +A] private (private val ep: Episode[F, TelegramMessage, A]) extends AnyVal {
-
   /**
     * Pipe which produces a value of type `A` evaluated in `F` effect
     * as a result of the successful interaction matching this description.
@@ -40,7 +39,7 @@ final class Scenario[F[_], +A] private (private val ep: Episode[F, TelegramMessa
   /**
     * Maps successful result values using provided function `fn`.
     */
-  def map[B](fn: A => B): Scenario[F, B] = flatMap(fn.andThen(Scenario.pure))
+  def map[B](fn: A => B): Scenario[F, B] = flatMap(fn.andThen(Scenario.pure(_)))
 
   /**
     * @return `this` or scenario which is result of `fn` if error occurs.
@@ -100,22 +99,13 @@ final class Scenario[F[_], +A] private (private val ep: Episode[F, TelegramMessa
 }
 
 object Scenario {
-
   /**
-    * Defines the beginning of the scenario.
+    * Describes the next expected input message.
     *
-    * Each input value from `pf` domain is going to be matched and transformed into a value of type `A`.
+    * Any input message from `pf` domain will be matched
+    * and transformed into a value of type `A`.
     */
-  def start[F[_], A](pf: PartialFunction[TelegramMessage, A]): Scenario[F, A] =
-    new Scenario[F, A](Episode.First(pf.isDefinedAt).map(pf))
-
-  /**
-    * Defines following step of the scenario.
-    *
-    * If the first elements belongs to the `pf` domain,
-    * it is going to be matched and transformed into the value of type `A` using `pf` .
-    */
-  def next[F[_], A](pf: PartialFunction[TelegramMessage, A]): Scenario[F, A] =
+  def expect[F[_], A](pf: PartialFunction[TelegramMessage, A]): Scenario[F, A] =
     new Scenario[F, A](Episode.Next(pf.isDefinedAt).map(pf))
 
   /**
@@ -129,9 +119,17 @@ object Scenario {
 
   /**
     * Lifts pure value to Scenario context.
+    * 
+    * Uses partially applied type parameter technique.
     */
-  def pure[F[_], A](a: A): Scenario[F, A] =
-    new Scenario[F, A](Episode.Pure(a))
+  def pure[F[_]]: PurePartiallyApplied[F] = new PurePartiallyApplied[F]
+
+  final class PurePartiallyApplied[F[_]](private val dummy: Boolean = false) extends AnyVal {
+    /**
+      * Lifts pure value to Scenario context.
+      */
+    def apply[A](a: A): Scenario[F, A] = new Scenario[F, A](Episode.Pure(a))
+  }
 
   /**
     * Unit value lifted to Scenario context with effect `F`.

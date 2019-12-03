@@ -13,32 +13,25 @@ class ScenarioSpec extends AnyPropSpec {
   private def message(s: String): TextMessage =
     TextMessage(-1, PrivateChat(-1, None, None, None), -1, s)
 
-  property("Scenario.start consumes at least one message") {
-    val scenario: Scenario[IO, TextMessage] = Scenario.start(command("fire"))
+  property("Scenario.expect consumes at least one message") {
+    val scenario: Scenario[IO, TextMessage] = Scenario.expect(command("fire"))
     val input = Stream.empty
 
     assert(input.through(scenario.pipe).toList().isEmpty)
   }
 
-  property("Scenario.first halts the stream if the first element was not matched") {
+  property("Scenario.expect halts the stream if the first element was not matched") {
     val trigger = "fire"
-    val scenario: Scenario[IO, TextMessage] = Scenario.start(textMessage.matching(trigger))
+    val scenario: Scenario[IO, TextMessage] = Scenario.expect(textMessage.matching(trigger))
 
     val input = Stream("not_matched", trigger).map(message)
 
     assert(input.through(scenario.pipe).toList().isEmpty)
   }
 
-  property("Scenario.next consumes at least one message") {
-    val scenario: Scenario[IO, TextMessage] = Scenario.next(command("fire"))
-    val input = Stream.empty
-
-    assert(input.through(scenario.pipe).toList().isEmpty)
-  }
-
-  property("Scenario.next matches only the first message") {
+  property("Scenario.expect matches only the first message") {
     val trigger = "fire"
-    val scenario: Scenario[IO, TextMessage] = Scenario.start(textMessage.endingWith(trigger))
+    val scenario: Scenario[IO, TextMessage] = Scenario.expect(textMessage.endingWith(trigger))
 
     val input = Stream(
       s"1.$trigger",
@@ -48,8 +41,8 @@ class ScenarioSpec extends AnyPropSpec {
     assert(input.through(scenario.pipe).value().text.startsWith("1"))
   }
 
-  property("Scenario.next uses provided predicate to match the result") {
-    val scenario: Scenario[IO, TextMessage] = Scenario.start(textMessage.endingWith("fire"))
+  property("Scenario.expect uses provided predicate to match the result") {
+    val scenario: Scenario[IO, TextMessage] = Scenario.expect(textMessage.endingWith("fire"))
     val input = Stream("").map(message)
 
     assert(input.through(scenario.pipe).toList().isEmpty)
@@ -125,8 +118,8 @@ class ScenarioSpec extends AnyPropSpec {
   property("flatMap composes scenarios together") {
     val scenario: Scenario[IO, Unit] =
       for {
-        _ <- Scenario.start(textMessage.matching("one"))
-        _ <- Scenario.next(textMessage.matching("two"))
+        _ <- Scenario.expect(textMessage.matching("one"))
+        _ <- Scenario.expect(textMessage.matching("two"))
       } yield ()
 
     val input = Stream("one", "two").map(message)
@@ -137,8 +130,8 @@ class ScenarioSpec extends AnyPropSpec {
     val cancelMessage = "cancel"
     val scenario: Scenario[IO, Unit] =
       for {
-        _ <- Scenario.start(any)
-        _ <- Scenario.next(any)
+        _ <- Scenario.expect(any)
+        _ <- Scenario.expect(any)
       } yield ()
 
     val cancellable = scenario.cancelOn(textMessage.matching(cancelMessage))
@@ -153,8 +146,8 @@ class ScenarioSpec extends AnyPropSpec {
 
     val scenario: Scenario[IO, Unit] =
       for {
-        _ <- Scenario.start(any)
-        _ <- Scenario.next(any)
+        _ <- Scenario.expect(any)
+        _ <- Scenario.expect(any)
       } yield ()
 
     val cancellable = scenario.cancelWith(textMessage.matching(cancelMessage)) { _ =>
@@ -169,16 +162,19 @@ class ScenarioSpec extends AnyPropSpec {
 
   property("tolerate skips up to N elements if they don't match") {
     val n = 5
-    val scenario: Scenario[IO, String] = Scenario.next(textMessage.endingWith("fire").map(_.text))
-    val input = Stream("").repeatN(n) ++ Stream(s"2.fire")
-    val tolerating = scenario.tolerateN(n)(_ => IO.unit)
+    val scenario: Scenario[IO, TextMessage] = 
+      for {
+        _ <- Scenario.expect(any)
+        s <- Scenario.expect(textMessage.endingWith("fire")).tolerateN(n)(_ => IO.unit)
+      } yield s
+    val input = Stream("any") ++ Stream("").repeatN(n) ++ Stream("2.fire")
 
-    assert(input.map(message).through(tolerating.pipe).value().startsWith("2"))
+    assert(input.map(message).through(scenario.pipe).value().text.startsWith("2"))
   }
 
   property("tolerate doesn't skip the element if it matches") {
     val scenario: Scenario[IO, String] =
-      Scenario.next(textMessage.endingWith("fire").map(_.text)).tolerate(_ => IO.unit)
+      Scenario.expect(textMessage.endingWith("fire").map(_.text)).tolerate(_ => IO.unit)
     val input = Stream("1.fire", "2.fire").map(message)
 
     assert(input.through(scenario.pipe).value().startsWith("1"))
@@ -186,10 +182,14 @@ class ScenarioSpec extends AnyPropSpec {
 
   property("tolerate evaluates provided effect each time it skips the element") {
     var counter = 0
-    val scenario: Scenario[IO, String] = Scenario.next(textMessage.endingWith("fire").map(_.text))
-    val input = Stream("1", "2", "fire").map(message)
-    val tolerating = scenario.tolerateAll(_ => IO { counter += 1 })
-    input.through(tolerating.pipe).run()
+    val scenario: Scenario[IO, Unit] = 
+    for {
+      _ <- Scenario.expect(any)
+      _ <- Scenario.expect(textMessage.endingWith("fire")).tolerateAll(_ => IO { counter += 1 })
+    } yield ()
+
+    val input = Stream("any", "1", "2", "fire").map(message)
+    input.through(scenario.pipe).run()
 
     assert(counter == 2)
   }
@@ -218,8 +218,8 @@ class ScenarioSpec extends AnyPropSpec {
 
     val scenario: Scenario[IO, Unit] =
       for {
-        _ <- Scenario.start(any)
-        _ <- Scenario.next(any)
+        _ <- Scenario.expect(any)
+        _ <- Scenario.expect(any)
       } yield ()
 
     input.through(scenario.attempt.pipe).run()

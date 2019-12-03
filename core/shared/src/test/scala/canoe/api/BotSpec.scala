@@ -50,7 +50,7 @@ class BotSpec extends AnyFunSuite {
 
     def scenario(counter: Ref[IO, Int]): Scenario[IO, Unit] =
       for {
-        _ <- Scenario.start(any)
+        _ <- Scenario.expect(any)
         _ <- Scenario.eval(counter.update(_ + 1))
       } yield ()
 
@@ -74,8 +74,8 @@ class BotSpec extends AnyFunSuite {
 
     def scenario(counter: Ref[IO, Int]): Scenario[IO, Unit] =
       for {
-        _ <- Scenario.start(text.when(_ == "start"))
-        _ <- Scenario.next(text.when(_ == "end"))
+        _ <- Scenario.expect(text.when(_ == "start"))
+        _ <- Scenario.expect(text.when(_ == "end"))
         _ <- Scenario.eval(counter.update(_ + 1))
       } yield ()
 
@@ -100,8 +100,8 @@ class BotSpec extends AnyFunSuite {
 
     def scenario(counter: Ref[IO, Int]): Scenario[IO, Unit] =
       for {
-        _ <- Scenario.start(text.when(_ == "start"))
-        _ <- Scenario.next(text.when(_ == "end"))
+        _ <- Scenario.expect(text.when(_ == "start"))
+        _ <- Scenario.expect(text.when(_ == "end"))
         _ <- Scenario.eval(counter.update(_ + 1))
       } yield ()
 
@@ -128,8 +128,8 @@ class BotSpec extends AnyFunSuite {
 
     def scenario(counter: Ref[IO, Int]): Scenario[IO, Unit] =
       for {
-        _ <- Scenario.start(text.when(_ == "start"))
-        _ <- Scenario.next(text.when(_ == "end"))
+        _ <- Scenario.expect(text.when(_ == "start"))
+        _ <- Scenario.expect(text.when(_ == "end"))
         _ <- Scenario.eval(counter.update(_ + 1))
       } yield ()
 
@@ -147,14 +147,14 @@ class BotSpec extends AnyFunSuite {
   test("handles more than one scenario") {
     def scenario1(registed: Ref[IO, Set[Int]]): Scenario[IO, Unit] =
       for {
-        _ <- Scenario.start(text.when(_ == "start"))
-        _ <- Scenario.next(text.when(_ == "end"))
+        _ <- Scenario.expect(text.when(_ == "start"))
+        _ <- Scenario.expect(text.when(_ == "end"))
         _ <- Scenario.eval(registed.update(_ + 1))
       } yield ()
 
     def scenario2(registed: Ref[IO, Set[Int]]): Scenario[IO, Unit] =
       for {
-        _ <- Scenario.start(any)
+        _ <- Scenario.expect(any)
         _ <- Scenario.eval(registed.update(_ + 2))
       } yield ()
 
@@ -177,15 +177,15 @@ class BotSpec extends AnyFunSuite {
   test("scenarios don't block each other") {
     def scenario1(registed: Ref[IO, Set[Int]]): Scenario[IO, Unit] =
       for {
-        _ <- Scenario.start(text.when(_ == "start"))
-        _ <- Scenario.next(text.when(_ == "end"))
+        _ <- Scenario.expect(text.when(_ == "start"))
+        _ <- Scenario.expect(text.when(_ == "end"))
         _ <- Scenario.eval(registed.update(_ + 1))
         _ <- Scenario.eval(IO.never)
       } yield ()
 
     def scenario2(registed: Ref[IO, Set[Int]]): Scenario[IO, Unit] =
       for {
-        _ <- Scenario.start(any)
+        _ <- Scenario.expect(any)
         _ <- Scenario.eval(registed.update(_ + 2))
         _ <- Scenario.eval(IO.never)
       } yield ()
@@ -209,7 +209,7 @@ class BotSpec extends AnyFunSuite {
   test("single scenario evaluation is not blocked between different chats") {
     def scenario1(registed: Ref[IO, Set[Int]]): Scenario[IO, Unit] =
       for {
-        m <- Scenario.start(any)
+        m <- Scenario.expect(any)
         _ <- Scenario.eval(registed.update(_ + m.messageId))
         _ <- Scenario.eval(IO.never)
       } yield ()
@@ -233,7 +233,7 @@ class BotSpec extends AnyFunSuite {
   test("single scenario evaluation is not blocked with same chat") {
     def scenario1(registed: Ref[IO, Set[Int]]): Scenario[IO, Unit] =
       for {
-        m <- Scenario.start(any)
+        m <- Scenario.expect(any)
         _ <- Scenario.eval(registed.update(_ + m.messageId))
         _ <- Scenario.eval(IO.never)
       } yield ()

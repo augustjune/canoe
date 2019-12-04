@@ -1,34 +1,39 @@
 package canoe.marshalling
 
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.freespec.AnyFreeSpec
 
-class CaseStringSpec extends AnyFunSuite {
-
+class CaseStringSpec extends AnyFreeSpec {
   val snake: String = "some_snake_case_string"
   val camel: String = "someSnakeCaseString"
   val pascal: String = camel.capitalize
 
-  test("snake_case to camelCase") {
-    assert(snake.camelCase == camel)
+  "snake_case" - {
+    "to camelCase" in {
+      assert(snake.camelCase == camel)
+    }
+
+    "to PascalCase" in {
+      assert(snake.pascalCase == pascal)
+    }
   }
 
-  test("snake_case to PascalCase") {
-    assert(snake.pascalCase == pascal)
+  "camelCase" - {
+    "to snake_case" in {
+      assert(camel.snakeCase == snake)
+    }
+
+    "to PascalCase" in {
+      assert(camel.pascalCase == pascal)
+    }
   }
 
-  test("camelCase to snake_case") {
-    assert(camel.snakeCase == snake)
-  }
+  "PascalCase" - {
+    "to snake_case" in {
+      assert(pascal.snakeCase == snake)
+    }
 
-  test("camelcase to PascalCase") {
-    assert(camel.pascalCase == pascal)
-  }
-
-  test("PascalCase to snake_case") {
-    assert(pascal.snakeCase == snake)
-  }
-
-  test("PascalCase to camelCase") {
-    assert(pascal.camelCase == camel)
+    "to camelCase" in {
+      assert(pascal.camelCase == camel)
+    }
   }
 }

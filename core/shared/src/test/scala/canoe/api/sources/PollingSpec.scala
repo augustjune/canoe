@@ -7,12 +7,11 @@ import canoe.methods.updates.GetUpdates
 import canoe.models.messages.TextMessage
 import canoe.models.{MessageReceived, PrivateChat, Update}
 import cats.effect.IO
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.freespec.AnyFreeSpec
 
 import scala.concurrent.duration.Duration
 
-class PollingSpec extends AnyFunSuite {
-
+class PollingSpec extends AnyFreeSpec {
   implicit val updatesClient: TelegramClient[IO] = new TelegramClient[IO] {
     def execute[Req, Res](request: Req)(implicit M: Method[Req, Res]): IO[Res] =
       if (M.name != GetUpdates.method.name) throw new UnsupportedOperationException
@@ -25,17 +24,20 @@ class PollingSpec extends AnyFunSuite {
   }
 
   val polling = new Polling(Duration.Zero)
+  "polling" - {
+    "starts with given offset" in {
+      assert(polling.pollUpdates(0).take(1).value().head.updateId == 0)
+    }
 
-  test("polling starts with given offset") {
-    assert(polling.pollUpdates(0).take(1).value().head.updateId == 0)
-  }
+    "uses last offset increased by 1 for each new call" in {
+      val updates = polling
+        .pollUpdates(0)
+        .zipWithNext
+        .collect { case (u1, Some(u2)) => u1.last -> u2.head }
+        .take(5)
+        .toList()
 
-  test("polling uses last offset increased by 1 for each new call") {
-    val updates = polling.pollUpdates(0).zipWithNext
-      .collect { case (u1, Some(u2)) => u1.last -> u2.head }
-      .take(5)
-      .toList()
-
-    assert(updates.forall { case (u1, u2) => u2.updateId == u1.updateId + 1 })
+      assert(updates.forall { case (u1, u2) => u2.updateId == u1.updateId + 1 })
+    }
   }
 }

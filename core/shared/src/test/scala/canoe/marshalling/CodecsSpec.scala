@@ -3,10 +3,9 @@ package canoe.marshalling
 import canoe.marshalling.codecs._
 import io.circe.generic.semiauto._
 import io.circe.{Decoder, Encoder, Json}
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.freespec.AnyFreeSpec
 
-class CodecsSpec extends AnyFunSuite {
-
+class CodecsSpec extends AnyFreeSpec {
   case class Inner(longName: String)
   case class Outer(longInt: Int, inner: Inner)
 
@@ -18,30 +17,30 @@ class CodecsSpec extends AnyFunSuite {
 
   val instance: Outer = Outer(12, Inner("name"))
 
-  test("encoder works as expected") {
+  "encoder works as expected" in {
     assert(allJsonKeys(encoder(instance)) == List("longInt", "inner", "longName"))
   }
 
-  test("snake case encoder encodes keys in snake_case manner") {
+  "snake case encoder encodes keys in snake_case manner" in {
     val encodedKeys = allJsonKeys(encoder.snakeCase(instance))
 
     assert(encodedKeys.map(_.snakeCase) == encodedKeys)
   }
 
-  test("encoded snake_case is decoded in camelCase") {
+  "encoded snake_case is decoded in camelCase" in {
     val encodedDecoded = decoder.camelCase.decodeJson(encoder.snakeCase(instance))
 
     assert(encodedDecoded.contains(instance))
   }
 
-  test("either decoder decodes left") {
+  "either decoder decodes left" in {
     val decoder: Decoder[Either[Int, String]] = eitherDecoder(Decoder.decodeInt, Decoder.decodeString)
     val res = decoder.decodeJson(Json.fromInt(12))
 
     assert(res.exists(_.isLeft))
   }
 
-  test("either decoder decodes right") {
+  "either decoder decodes right" in {
     val decoder: Decoder[Either[Int, String]] = eitherDecoder(Decoder.decodeInt, Decoder.decodeString)
     val res = decoder.decodeJson(Json.fromString("dasd"))
 

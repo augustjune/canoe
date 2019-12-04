@@ -49,7 +49,7 @@ class BroadcastSpec extends AnyFreeSpec {
     "pulls from publisher" - {
       "one element before it's blocked by the subscriber" in {
         val pulled = broadcast[Int].flatMap { b =>
-          val pop = input.through(recordPulled(b, 0.2.second))
+          val pop = Stream.sleep_(0.05.second) ++ input.through(recordPulled(b, 0.2.second))
           val consumer = b.subscribe(0).evalMap(_ => IO.never)
           pop.concurrently(consumer)
         }
@@ -60,7 +60,7 @@ class BroadcastSpec extends AnyFreeSpec {
       "maxQueued + 2 elements for non-empty blocking consumer" in {
         val maxQueued = 3
         val pulled = broadcast[Int].flatMap { b =>
-          val pop = input.through(recordPulled(b, 0.2.second))
+          val pop = Stream.sleep_(0.05.second) ++ input.through(recordPulled(b, 0.2.second))
           val consumer = b.subscribe(maxQueued).evalMap(_ => IO.never)
           pop.concurrently(consumer)
         }

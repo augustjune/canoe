@@ -2,7 +2,6 @@ package canoe.api
 
 import canoe.api.matching.Episode
 import canoe.models.messages.TelegramMessage
-import canoe.syntax.Expect
 import cats.arrow.FunctionK
 import cats.{~>, ApplicativeError, MonadError, StackSafeMonad}
 import fs2.Pipe
@@ -71,22 +70,23 @@ final class Scenario[F[_], +A] private (private val ep: Episode[F, TelegramMessa
     new Scenario[F, A](Episode.Tolerate(ep, None, fn))
 
   /**
-    * @return Scenario which is cancellable by the occurrence of input element for which `expect` is defined,
-    *         at any point after the scenario is started and before it is finished.
+    * @param p Predicate which determines what message makes scenario stop
+    *
+    * @return Scenario which stops matching input messages
+    *         after a message described with `p` is received.
     */
-  def cancelOn(expect: Expect[_]): Scenario[F, A] =
-    new Scenario[F, A](Episode.Cancellable(ep, expect.isDefinedAt, None))
+  def stopOn(p: TelegramMessage => Boolean): Scenario[F, A] =
+    new Scenario[F, A](Episode.Cancellable(ep, p, None))
 
   /**
-    * @param expect       Partial function which defines the domain of input values which cause cancellation
-    * @param cancellation Function which result is going to be evaluated during the cancellation
+    * @param p            Predicate which determines what message makes scenario stop
+    * @param cancellation Function which result is evaluated when scenario is stopped
     *
-    * @return Scenario which is cancellable by the occurrence of an input element from `expect` domain
-    *         at any point after the scenario is started and before it is finished,
-    *         and evaluates `cancellation` when such element occurs.
+    * @return Scenario which stops matching input messages and evaluates cancellation
+    *         after a message described with `p` is received.
     */
-  def cancelWith(expect: Expect[_])(cancellation: TelegramMessage => F[Unit]): Scenario[F, A] =
-    new Scenario[F, A](Episode.Cancellable(ep, expect.isDefinedAt, Some(cancellation)))
+  def stopWith(p: TelegramMessage => Boolean)(cancellation: TelegramMessage => F[Unit]): Scenario[F, A] =
+    new Scenario[F, A](Episode.Cancellable(ep, p, Some(cancellation)))
 
   /**
     * Maps effect type from `F` to `G` using the supplied transformation.
@@ -119,7 +119,7 @@ object Scenario {
 
   /**
     * Lifts pure value to Scenario context.
-    * 
+    *
     * Uses partially applied type parameter technique.
     */
   def pure[F[_]]: PurePartiallyApplied[F] = new PurePartiallyApplied[F]

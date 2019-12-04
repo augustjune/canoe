@@ -126,7 +126,7 @@ class ScenarioSpec extends AnyFreeSpec {
             _ <- Scenario.expect(any)
           } yield ()
 
-        val cancellable = scenario.cancelOn(textMessage.matching(cancelMessage).isDefinedAt)
+        val cancellable = scenario.stopOn(textMessage.matching(cancelMessage).isDefinedAt)
         val input = Stream("1.one", cancelMessage).map(message)
 
         assert(input.through(cancellable.pipe).size() == 0)
@@ -142,7 +142,7 @@ class ScenarioSpec extends AnyFreeSpec {
             _ <- Scenario.expect(any)
           } yield ()
 
-        val cancellable = scenario.cancelWith(textMessage.matching(cancelMessage).isDefinedAt) { _ =>
+        val cancellable = scenario.stopWith(textMessage.matching(cancelMessage).isDefinedAt) { _ =>
           IO { cancelled = true }
         }
 

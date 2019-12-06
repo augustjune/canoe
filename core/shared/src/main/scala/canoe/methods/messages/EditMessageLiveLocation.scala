@@ -63,10 +63,7 @@ object EditMessageLiveLocation {
       def encoder: Encoder[EditMessageLiveLocation] = deriveEncoder[EditMessageLiveLocation].snakeCase
 
       def decoder: Decoder[Either[Boolean, TelegramMessage]] =
-        eitherDecoder(
-          Decoder.decodeBoolean,
-          TelegramMessage.telegramMessageDecoder
-        )
+        Decoder.decodeBoolean.either(TelegramMessage.telegramMessageDecoder)
 
       def attachments(request: EditMessageLiveLocation): List[(String, InputFile)] = Nil
     }

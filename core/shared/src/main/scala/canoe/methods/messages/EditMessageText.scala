@@ -39,7 +39,6 @@ final class EditMessageText private (val chatId: Option[ChatId],
                                      val replyMarkup: Option[ReplyMarkup])
 
 object EditMessageText {
-
   /**
     * For the messages sent directly by the bot
     */
@@ -70,10 +69,7 @@ object EditMessageText {
       def encoder: Encoder[EditMessageText] = deriveEncoder[EditMessageText].snakeCase
 
       def decoder: Decoder[Either[Boolean, TelegramMessage]] =
-        eitherDecoder(
-          Decoder.decodeBoolean,
-          TelegramMessage.telegramMessageDecoder
-        )
+        Decoder.decodeBoolean.either(TelegramMessage.telegramMessageDecoder)
 
       def attachments(request: EditMessageText): List[(String, InputFile)] = Nil
     }

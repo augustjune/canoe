@@ -33,20 +33,6 @@ class CodecsSpec extends AnyFreeSpec {
     assert(encodedDecoded.contains(instance))
   }
 
-  "either decoder decodes left" in {
-    val decoder: Decoder[Either[Int, String]] = eitherDecoder(Decoder.decodeInt, Decoder.decodeString)
-    val res = decoder.decodeJson(Json.fromInt(12))
-
-    assert(res.exists(_.isLeft))
-  }
-
-  "either decoder decodes right" in {
-    val decoder: Decoder[Either[Int, String]] = eitherDecoder(Decoder.decodeInt, Decoder.decodeString)
-    val res = decoder.decodeJson(Json.fromString("dasd"))
-
-    assert(res.exists(_.isRight))
-  }
-
   def allJsonKeys(json: Json): List[String] =
     json.asObject.toList.flatMap(_.toList).flatMap {
       case (k, json) => k :: allJsonKeys(json)

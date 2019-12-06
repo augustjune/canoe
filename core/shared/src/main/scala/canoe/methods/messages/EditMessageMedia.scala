@@ -38,7 +38,6 @@ final class EditMessageMedia private (val chatId: Option[ChatId],
                                       val replyMarkup: Option[InlineKeyboardMarkup])
 
 object EditMessageMedia {
-
   /**
     * For the messages sent directly by the bot.
     */
@@ -66,10 +65,7 @@ object EditMessageMedia {
         deriveEncoder[EditMessageMedia].snakeCase
 
       def decoder: Decoder[Either[Boolean, TelegramMessage]] =
-        eitherDecoder(
-          Decoder.decodeBoolean,
-          TelegramMessage.telegramMessageDecoder
-        )
+        Decoder.decodeBoolean.either(TelegramMessage.telegramMessageDecoder)
 
       def attachments(request: EditMessageMedia): List[(String, InputFile)] =
         request.media.files

@@ -30,7 +30,6 @@ final class StopMessageLiveLocation private (val chatId: Option[ChatId],
                                              val replyMarkup: Option[InlineKeyboardMarkup])
 
 object StopMessageLiveLocation {
-
   /**
     * For the messages sent directly by the bot
     */
@@ -54,10 +53,7 @@ object StopMessageLiveLocation {
       def encoder: Encoder[StopMessageLiveLocation] = deriveEncoder[StopMessageLiveLocation].snakeCase
 
       def decoder: Decoder[Either[Boolean, TelegramMessage]] =
-        eitherDecoder(
-          Decoder.decodeBoolean,
-          TelegramMessage.telegramMessageDecoder
-        )
+        Decoder.decodeBoolean.either(TelegramMessage.telegramMessageDecoder)
 
       def attachments(request: StopMessageLiveLocation): List[(String, InputFile)] = Nil
     }

@@ -38,6 +38,6 @@ private[api] class Broadcast[F[_], A](subs: Ref[F, List[Queue[F, A]]])(implicit 
 }
 
 object Broadcast {
-  def apply[F[_], A](implicit C: Concurrent[F]): F[Broadcast[F, A]] =
+  private [api] def apply[F[_], A](implicit C: Concurrent[F]): F[Broadcast[F, A]] =
     Ref.of[F, List[Queue[F, A]]](List.empty).map(new Broadcast(_))
 }

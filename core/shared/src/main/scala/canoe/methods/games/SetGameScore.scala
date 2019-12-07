@@ -38,7 +38,6 @@ final class SetGameScore private (val userId: Int,
                                   val inlineMessageId: Option[String] = None)
 
 object SetGameScore {
-
   /**
     * For the messages sent directly by the bot
     */
@@ -62,16 +61,12 @@ object SetGameScore {
 
   implicit val method: Method[SetGameScore, Either[Boolean, TelegramMessage]] =
     new Method[SetGameScore, Either[Boolean, TelegramMessage]] {
-
       def name: String = "setGameScore"
 
       def encoder: Encoder[SetGameScore] = deriveEncoder[SetGameScore].snakeCase
 
       def decoder: Decoder[Either[Boolean, TelegramMessage]] =
-        eitherDecoder(
-          Decoder.decodeBoolean,
-          TelegramMessage.telegramMessageDecoder
-        )
+        Decoder.decodeBoolean.either(TelegramMessage.telegramMessageDecoder)
 
       def attachments(request: SetGameScore): List[(String, InputFile)] = Nil
     }

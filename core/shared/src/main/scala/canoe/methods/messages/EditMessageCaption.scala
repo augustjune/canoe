@@ -38,7 +38,6 @@ final class EditMessageCaption private (val chatId: Option[ChatId],
                                         val replyMarkup: Option[ReplyMarkup])
 
 object EditMessageCaption {
-
   /**
     * For the messages sent directly by the bot
     */
@@ -60,16 +59,12 @@ object EditMessageCaption {
 
   implicit val method: Method[EditMessageCaption, Either[Boolean, TelegramMessage]] =
     new Method[EditMessageCaption, Either[Boolean, TelegramMessage]] {
-
       def name: String = "editMessageCaption"
 
       def encoder: Encoder[EditMessageCaption] = deriveEncoder[EditMessageCaption].snakeCase
 
       def decoder: Decoder[Either[Boolean, TelegramMessage]] =
-        eitherDecoder(
-          Decoder.decodeBoolean,
-          TelegramMessage.telegramMessageDecoder
-        )
+        Decoder.decodeBoolean.either(TelegramMessage.telegramMessageDecoder)
 
       def attachments(request: EditMessageCaption): List[(String, InputFile)] = Nil
     }

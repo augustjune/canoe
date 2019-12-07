@@ -2,7 +2,7 @@ package canoe
 
 package object marshalling {
 
-  implicit class CaseString(private val word: String) extends AnyVal {
+  private[canoe] implicit class CaseString(private val word: String) extends AnyVal {
 
     def camelCase: String =
       if (word.isEmpty) word

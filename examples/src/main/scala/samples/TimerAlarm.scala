@@ -15,18 +15,18 @@ import scala.concurrent.duration._
   * Each user can schedule any number of jobs and all of them 
   * will be executed concurrently without blocking each other.
   */
-object TimerAlert extends IOApp {
+object TimerAlarm extends IOApp {
   val token: String = "<your telegram token>"
 
   def run(args: List[String]): IO[ExitCode] =
     Stream
       .resource(TelegramClient.global[IO](token))
-      .flatMap { implicit client => Bot.polling[IO].follow(alert) }
+      .flatMap { implicit client => Bot.polling[IO].follow(alarm) }
       .compile.drain.as(ExitCode.Success)
 
-  def alert[F[_]: TelegramClient: Timer]: Scenario[F, Unit] =
+  def alarm[F[_]: TelegramClient: Timer]: Scenario[F, Unit] =
     for {
-      chat <- Scenario.expect(command("alert").chat)
+      chat <- Scenario.expect(command("alarm").chat)
       _    <- Scenario.eval(chat.send("Tell me in how many seconds you want to be notified?"))
       in   <- Scenario.expect(textMessage)
       sec = Try(in.text.toInt).toOption.filter(_ > 0)

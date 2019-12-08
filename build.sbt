@@ -71,7 +71,7 @@ lazy val crossDependencies =
   )
 
 lazy val mimaSettings = Seq(
-  mimaPreviousArtifacts := Set(organization.value %% name.value % "0.3.0")
+  mimaPreviousArtifacts := Set(organization.value %% name.value % "0.4.0")
 )
 
 lazy val compilerOptions =

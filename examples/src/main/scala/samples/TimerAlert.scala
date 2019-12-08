@@ -9,7 +9,6 @@ import fs2.Stream
 
 import scala.util.Try
 import scala.concurrent.duration._
-import scala.io.StdIn
 
 /**
   * Example of scheduling a job after user-defined delay.

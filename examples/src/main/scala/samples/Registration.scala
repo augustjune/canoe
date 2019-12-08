@@ -11,7 +11,7 @@ import fs2.Stream
   * Example using compositional property of scenarios
   * by combining them into more complex registration process
   */
-object Composition extends IOApp {
+object Registration extends IOApp {
 
   val token: String = "<your telegram token>"
 

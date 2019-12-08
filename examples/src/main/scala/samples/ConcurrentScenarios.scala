@@ -22,8 +22,8 @@ object ConcurrentScenarios extends IOApp {
       .resource(TelegramClient.global[IO](token))
       .flatMap { implicit client =>
         Stream.eval(Semaphore[IO](0)).flatMap { sem =>
-          // Both scenarios use shared semaphore,
-          // so the interaction may be achieved across different chats
+          // Both scenarios use shared semaphore
+          // to achieve the interaction across different chats.
           Bot.polling[IO].follow(pop(sem), push(sem))
         }
       }

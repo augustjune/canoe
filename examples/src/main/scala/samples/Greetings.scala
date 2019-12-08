@@ -7,7 +7,7 @@ import cats.syntax.functor._
 import fs2.Stream
 
 /**
-  * Example of interaction between a user and the bot
+  * Basic example of interaction between a user and the bot.
   */
 object Greetings extends IOApp {
 

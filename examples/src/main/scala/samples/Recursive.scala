@@ -8,10 +8,9 @@ import cats.syntax.functor._
 import fs2.Stream
 
 /**
-  * Example of stack safe self recursive call of Scenario
+  * Example of stack safe infinite self recursive scenario.
   */
 object Recursive extends IOApp {
-
   val token: String = "<your telegram token>"
 
   def run(args: List[String]): IO[ExitCode] =
@@ -35,8 +34,7 @@ object Recursive extends IOApp {
     for {
       _ <- Scenario.eval(chat.send(s"Repeat after me: $i"))
       m <- Scenario.expect(text)
-      _ <-
-        if (m == i.toString) Scenario.eval(chat.send("Well done. Let's go to the next one!")) >> repeat(chat, i + 1)
-        else Scenario.eval(chat.send("Not even close. You should try again")) >> repeat(chat, i)
+      _ <- if (m == i.toString) Scenario.eval(chat.send("Well done. Let's go to the next one!")) >> repeat(chat, i + 1)
+      else Scenario.eval(chat.send("Not even close. You should try again")) >> repeat(chat, i)
     } yield ()
 }

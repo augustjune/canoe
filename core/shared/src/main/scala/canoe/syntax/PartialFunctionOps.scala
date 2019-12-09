@@ -14,9 +14,4 @@ final class PartialFunctionOps[A, B](private val original: PartialFunction[A, B]
         if (isDefinedAt(in)) original.apply(in)
         else throw new MatchError(in)
     }
-
-  /**
-    * Appends a transformation to the result of this partial function
-    */
-  def map[C](f: B => C): PartialFunction[A, C] = original andThen f
 }

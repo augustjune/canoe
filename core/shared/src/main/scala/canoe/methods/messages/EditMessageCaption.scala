@@ -38,7 +38,6 @@ final class EditMessageCaption private (val chatId: Option[ChatId],
                                         val replyMarkup: Option[ReplyMarkup])
 
 object EditMessageCaption {
-
   /**
     * For the messages sent directly by the bot
     */
@@ -46,7 +45,6 @@ object EditMessageCaption {
              messageId: Int,
              caption: Option[String],
              parseMode: Option[ParseMode] = None,
-             disableWebPagePreview: Option[Boolean] = None,
              replyMarkup: Option[ReplyMarkup] = None): EditMessageCaption =
     new EditMessageCaption(Some(chatId), Some(messageId), None, caption, parseMode, replyMarkup)
 
@@ -56,22 +54,17 @@ object EditMessageCaption {
   def inlined(inlineMessageId: String,
               caption: Option[String],
               parseMode: Option[ParseMode] = None,
-              disableWebPagePreview: Option[Boolean] = None,
               replyMarkup: Option[ReplyMarkup] = None): EditMessageCaption =
     new EditMessageCaption(None, None, Some(inlineMessageId), caption, parseMode, replyMarkup)
 
   implicit val method: Method[EditMessageCaption, Either[Boolean, TelegramMessage]] =
     new Method[EditMessageCaption, Either[Boolean, TelegramMessage]] {
-
       def name: String = "editMessageCaption"
 
       def encoder: Encoder[EditMessageCaption] = deriveEncoder[EditMessageCaption].snakeCase
 
       def decoder: Decoder[Either[Boolean, TelegramMessage]] =
-        eitherDecoder(
-          Decoder.decodeBoolean,
-          TelegramMessage.telegramMessageDecoder
-        )
+        Decoder.decodeBoolean.either(TelegramMessage.telegramMessageDecoder)
 
       def attachments(request: EditMessageCaption): List[(String, InputFile)] = Nil
     }

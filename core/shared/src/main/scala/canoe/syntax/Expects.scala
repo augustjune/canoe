@@ -18,7 +18,7 @@ trait Expects {
   /**
     * Partial function which matches only text messages and returns contained text
     */
-  val text: Expect[String] = textMessage.map(_.text)
+  val text: Expect[String] = textMessage.andThen(_.text)
 
   /**
     * Partial function which matches only text messages starting with a command with provided name
@@ -33,7 +33,7 @@ trait Expects {
   /**
     * Partial function which matches only animation messages and returns contained animation
     */
-  val animation: Expect[Animation] = animationMessage.map(_.animation)
+  val animation: Expect[Animation] = animationMessage.andThen(_.animation)
 
   /**
     * Partial function which matches only audio messages
@@ -43,7 +43,7 @@ trait Expects {
   /**
     * Partial function which matches only audio messages and returns contained audio
     */
-  val audio: Expect[Audio] = audioMessage.map(_.audio)
+  val audio: Expect[Audio] = audioMessage.andThen(_.audio)
 
   /**
     * Partial function which matches only document messages
@@ -53,7 +53,7 @@ trait Expects {
   /**
     * Partial function which matches only document messages and returns contained document
     */
-  val document: Expect[Document] = documentMessage.map(_.document)
+  val document: Expect[Document] = documentMessage.andThen(_.document)
 
   /**
     * Partial function which matches only game messages
@@ -63,7 +63,7 @@ trait Expects {
   /**
     * Partial function which matches only game messages and returns contained game
     */
-  val game: Expect[Game] = gameMessage.map(_.game)
+  val game: Expect[Game] = gameMessage.andThen(_.game)
 
   /**
     * Partial function which matches only contact messages
@@ -73,7 +73,7 @@ trait Expects {
   /**
     * Partial function which matches only contact messages and returns contained contact
     */
-  val contact: Expect[Contact] = contactMessage.map(_.contact)
+  val contact: Expect[Contact] = contactMessage.andThen(_.contact)
 
   /**
     * Partial function which matches only location messages
@@ -83,7 +83,7 @@ trait Expects {
   /**
     * Partial function which matches only location messages and returns contained location
     */
-  val location: Expect[Location] = locationMessage.map(_.location)
+  val location: Expect[Location] = locationMessage.andThen(_.location)
 
   /**
     * Partial function which matches only photo messages
@@ -93,7 +93,7 @@ trait Expects {
   /**
     * Partial function which matches only photo messages and returns contained photo
     */
-  val photo: Expect[PhotoSize] = photoMessage.map(_.photo.last)
+  val photo: Expect[PhotoSize] = photoMessage.andThen(_.photo.last)
 
   /**
     * Partial function which matches only poll messages
@@ -103,7 +103,7 @@ trait Expects {
   /**
     * Partial function which matches only poll messages and returns contained poll
     */
-  val poll: Expect[Poll] = pollMessage.map(_.poll)
+  val poll: Expect[Poll] = pollMessage.andThen(_.poll)
 
   /**
     * Partial function which matches only sticker messages
@@ -113,7 +113,7 @@ trait Expects {
   /**
     * Partial function which matches only sticker messages and returns contained sticker
     */
-  val sticker: Expect[Sticker] = stickerMessage.map(_.sticker)
+  val sticker: Expect[Sticker] = stickerMessage.andThen(_.sticker)
 
   /**
     * Partial function which matches only venue messages
@@ -123,7 +123,7 @@ trait Expects {
   /**
     * Partial function which matches only venue messages and returns contained venue
     */
-  val venue: Expect[Venue] = venueMessage.map(_.venue)
+  val venue: Expect[Venue] = venueMessage.andThen(_.venue)
 
   /**
     * Partial function which matches only video messages
@@ -133,7 +133,7 @@ trait Expects {
   /**
     * Partial function which matches only video messages and returns contained video
     */
-  val video: Expect[Video] = videoMessage.map(_.video)
+  val video: Expect[Video] = videoMessage.andThen(_.video)
 
   /**
     * Partial function which matches only video note messages
@@ -143,7 +143,7 @@ trait Expects {
   /**
     * Partial function which matches only video note messages and returns contained video note
     */
-  val videoNote: Expect[VideoNote] = videoNoteMessage.map(_.videoNote)
+  val videoNote: Expect[VideoNote] = videoNoteMessage.andThen(_.videoNote)
 
   /**
     * Partial function which matches only voice messages
@@ -153,5 +153,5 @@ trait Expects {
   /**
     * Partial function which matches only voice messages and returns contained voice
     */
-  val voice: Expect[Voice] = voiceMessage.map(_.voice)
+  val voice: Expect[Voice] = voiceMessage.andThen(_.voice)
 }

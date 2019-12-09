@@ -9,7 +9,8 @@ canoe
     
 ### Overview
 **canoe** is a purely functional, compositional library for building interactive Telegram bots.
-It provides functional streaming interface over [Telegram Bot API](https://core.telegram.org/bots/api) with built-in abstractions for describing your chatbot behavior.
+It provides functional streaming interface over [Telegram Bot API](https://core.telegram.org/bots/api) 
+with built-in abstractions for describing your chatbot behavior.
 
 ### Getting started
 sbt dependency:
@@ -29,10 +30,10 @@ import canoe.syntax._
 Building interactive chatbots requires maintaining the state of each conversation, 
 with possible interaction across them and/or using shared resources.
 The complexity of this task grows rapidly with the advancement of the bot.
-**canoe** solves this problem by decomposing behavior of the bot into the set of scenarios 
+**canoe** solves this problem by decomposing behavior of the bot into a set of scenarios 
 which the chatbot will follow.
 
-### Example
+### Basic example
 Here's a quick example of how the definition of simple bot behavior looks like in **canoe**. 
 More samples can be found [here](https://github.com/augustjune/canoe/tree/master/examples/src/main/scala/samples). 
 
@@ -50,16 +51,21 @@ def app[F[_]: ConcurrentEffect]: F[Unit] =
 
 def greetings[F[_]: TelegramClient]: Scenario[F, Unit] =
     for {
-      chat  <- Scenario.start(command("hi").chat)
-      _     <- Scenario.eval(chat.send("Hello. What's your name?"))
-      name  <- Scenario.next(text)
-      _     <- Scenario.eval(chat.send(s"Nice to meet you, $name"))
+      chat <- Scenario.expect(command("hi").chat)
+      _    <- Scenario.eval(chat.send("Hello. What's your name?"))
+      name <- Scenario.expect(text)
+      _    <- Scenario.eval(chat.send(s"Nice to meet you, $name"))
     } yield ()
 ```
 
-Regardless of whether you prefer to use scenarios for building a bot, 
-you are still able to use all functionality of Telegram Bot API in a streaming context, 
-as it is demonstrated [here](https://github.com/augustjune/canoe/blob/master/examples/src/main/scala/samples/NoScenario.scala).
+Scenarios are executed concurrently in a non-blocking fashion, 
+allowing to handle multiple users at the same time.
+In fact, even the same scenario can be triggered multiple times before 
+the previous execution is completed.
+This can be extremely useful when you allow users to schedule long-running jobs 
+and don't want to make them wait before they can schedule the new ones.
+As example may serve a simple [alarm clock implementation](https://github.com/augustjune/canoe/tree/master/examples/src/main/scala/samples/TimerAlarm.scala).
+
 
 ### Telegram Bot API methods
 Low level abstractions are available through standalone Telegram Bot API methods from `canoe.methods` package.
@@ -76,36 +82,12 @@ e.g.`chat.kickUser(user.id)`, `message.editText("edited")`.
 
 ### Webhook support
 **canoe** also provides support for obtaining messages from Telegram by setting a webhook.
-The same app described above would look this way using webhook version. 
 Full example may be found [here](https://github.com/augustjune/canoe/blob/master/examples/src/main/scala/samples/WebhookGreetings.scala).
-
-```scala
-import canoe.api._
-import canoe.syntax._
-import cats.effect.{ConcurrentEffect, Timer}
-import fs2.Stream
-
-val url: String = "<your server url>"
-
-def app[F[_]: ConcurrentEffect: Timer]: F[Unit] =
-    Stream
-      .resource(TelegramClient.global[F](token))
-      .flatMap { implicit client =>
-        Stream.resource(Bot.hook[F](url)).flatMap(_.follow(greetings))
-      }
-      .compile.drain
-
-def greetings[F[_]: TelegramClient]: Scenario[F, Unit] = ???  // Scenario stays unchanged
-```
-Setting a webhook you have to specify the `url` to which Telegram updates will be sent. 
-This address must be reachable for the Telegram, 
-so in case you're using local environment you'd have to expose your local host to the Internet.
-It can be achieved using **ngrok** simply following this [comprehensive guide](https://developer.github.com/webhooks/configuring/#using-ngrok).
 
 ### Handling errors
 There's a lot of things that may go wrong during your scenarios executions, 
 from user input to the network issues.
-For this reason, `Scenario` has `MonadError` instance for any `F`.  
+For this reason, `Scenario` forms a `MonadError` for any `F`.  
 It means that you can use built-in `handleErrorWith` and `attempt` methods,
 in order to react to the raised error or ensure that bot workflow won't break.
 Full example may be found [here](https://github.com/augustjune/canoe/blob/master/examples/src/main/scala/samples/ErrorHandling.scala).

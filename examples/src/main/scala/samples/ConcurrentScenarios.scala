@@ -22,8 +22,8 @@ object ConcurrentScenarios extends IOApp {
       .resource(TelegramClient.global[IO](token))
       .flatMap { implicit client =>
         Stream.eval(Semaphore[IO](0)).flatMap { sem =>
-          // Both scenarios use shared semaphore,
-          // so the interaction may be achieved across different chats
+          // Both scenarios use shared semaphore
+          // to achieve the interaction across different chats.
           Bot.polling[IO].follow(pop(sem), push(sem))
         }
       }
@@ -31,7 +31,7 @@ object ConcurrentScenarios extends IOApp {
 
   def pop[F[_]: TelegramClient](semaphore: Semaphore[F]): Scenario[F, Unit] =
     for {
-      m <- Scenario.start(command("pop"))
+      m <- Scenario.expect(command("pop"))
       _ <- Scenario.eval(m.chat.send("Waiting for available elements.."))
       _ <- Scenario.eval(semaphore.acquire)
       _ <- Scenario.eval(m.reply("Done."))
@@ -39,7 +39,7 @@ object ConcurrentScenarios extends IOApp {
 
   def push[F[_]: TelegramClient](semaphore: Semaphore[F]): Scenario[F, Unit] =
     for {
-      chat <- Scenario.start(command("push").chat)
+      chat <- Scenario.expect(command("push").chat)
       _    <- Scenario.eval(semaphore.release)
       _    <- Scenario.eval(chat.send("Pushed one element."))
     } yield ()

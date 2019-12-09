@@ -4,13 +4,7 @@ import io.circe._
 
 object codecs {
 
-  def eitherDecoder[A, B](decA: Decoder[A], decB: Decoder[B]): Decoder[Either[A, B]] = {
-    val l: Decoder[Either[A, B]] = decA.map(Left(_))
-    val r: Decoder[Either[A, B]] = decB.map(Right(_))
-    l or r
-  }
-
-  implicit class EncoderOps[A](private val encoder: Encoder[A]) extends AnyVal {
+  private[canoe] implicit class EncoderOps[A](private val encoder: Encoder[A]) extends AnyVal {
     def snakeCase: Encoder[A] =
       encoder.mapJson(
         j =>
@@ -20,7 +14,7 @@ object codecs {
       )
   }
 
-  implicit class DecoderOps[A](private val decoder: Decoder[A]) extends AnyVal {
+  private[canoe] implicit class DecoderOps[A](private val decoder: Decoder[A]) extends AnyVal {
     def camelCase: Decoder[A] =
       decoder.prepare(c => c.focus.map(camelKeys(_).hcursor).getOrElse(c))
   }

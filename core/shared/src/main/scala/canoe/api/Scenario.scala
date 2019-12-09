@@ -2,24 +2,22 @@ package canoe.api
 
 import canoe.api.matching.Episode
 import canoe.models.messages.TelegramMessage
-import canoe.syntax.Expect
 import cats.arrow.FunctionK
-import cats.{ApplicativeError, MonadError, StackSafeMonad, ~>}
+import cats.{~>, ApplicativeError, MonadError, StackSafeMonad}
 import fs2.Pipe
 
 /**
-  * Description of an interaction between two sides,
+  * Description of an interaction between two parties,
   * where generally one is the application (bot) and the other is Telegram user.
   *
   * Particular interaction is coherent with some scenario as long as it matches the description
-  * (i.e. every step of the interaction is the same as described in scenario).
+  * (i.e. every step of the interaction matches the step described in scenario).
   *
   * `Scenario` forms a monad in `A` with `pure` and `flatMap`.
   */
 final class Scenario[F[_], +A] private (private val ep: Episode[F, TelegramMessage, A]) extends AnyVal {
-
   /**
-    * Pipe which produces a value of type `A` evaluated in `F` effect
+    * Pipe which produces a stream with at most single value of type `A` evaluated in `F` effect
     * as a result of the successful interaction matching this description.
     * If an unhandled error result was encountered during the interaction, it will be raised here.
     */
@@ -38,12 +36,12 @@ final class Scenario[F[_], +A] private (private val ep: Episode[F, TelegramMessa
   def >>[B](s2: => Scenario[F, B]): Scenario[F, B] = flatMap(_ => s2)
 
   /**
-    * Maps successful result values using provided function `fn`.
+    * Maps successful result values using provided function.
     */
-  def map[B](fn: A => B): Scenario[F, B] = flatMap(fn.andThen(Scenario.pure))
+  def map[B](fn: A => B): Scenario[F, B] = flatMap(fn.andThen(Scenario.pure(_)))
 
   /**
-    * @return `this` or scenario which is result of `fn` if error occurs.
+    * @return `this` or scenario which is result of provided function if error occurs.
     */
   def handleErrorWith[A2 >: A](fn: Throwable => Scenario[F, A2]): Scenario[F, A2] =
     new Scenario[F, A2](Episode.Protected(ep, fn(_).ep))
@@ -55,8 +53,11 @@ final class Scenario[F[_], +A] private (private val ep: Episode[F, TelegramMessa
     map(Right(_): Either[Throwable, A]).handleErrorWith(e => Scenario.pure(Left(e)))
 
   /**
-    * @return Scenario which ignores input element which causes
-    *         missed result, up to `n` times and evaluates `fn` for every such element.
+    * Restarts this scenario if it was mismatched, up to `n` times,
+    * evaluating `fn` applied to the input element that was mismatched.
+    *
+    * This can be useful, when you expect some input from the user (e.g. data in specific format)
+    * and want to retry if the input was not correct.
     */
   def tolerateN(n: Int)(fn: TelegramMessage => F[Unit]): Scenario[F, A] =
     new Scenario[F, A](Episode.Tolerate(ep, Some(n), fn))
@@ -65,29 +66,25 @@ final class Scenario[F[_], +A] private (private val ep: Episode[F, TelegramMessa
   def tolerate(fn: TelegramMessage => F[Unit]): Scenario[F, A] = tolerateN(1)(fn)
 
   /**
-    * @return Scenario which ignores every input element which causes
-    *         missed result and evaluates `fn` for every such element
+    * Same as tolerateN, but retries until the scenario is fully matched.
+    *
+    * Often used in combination with stopOn/stopWith to give users a way to 'escape' the scenario.
     */
   def tolerateAll(fn: TelegramMessage => F[Unit]): Scenario[F, A] =
     new Scenario[F, A](Episode.Tolerate(ep, None, fn))
 
   /**
-    * @return Scenario which is cancellable by the occurrence of input element for which `expect` is defined,
-    *         at any point after the scenario is started and before it is finished.
+    * Stops this scenario on first input message matching the predicate.
     */
-  def cancelOn(expect: Expect[_]): Scenario[F, A] =
-    new Scenario[F, A](Episode.Cancellable(ep, expect.isDefinedAt, None))
+  def stopOn(p: TelegramMessage => Boolean): Scenario[F, A] =
+    new Scenario[F, A](Episode.Cancellable(ep, p, None))
 
   /**
-    * @param expect       Partial function which defines the domain of input values which cause cancellation
-    * @param cancellation Function which result is going to be evaluated during the cancellation
-    *
-    * @return Scenario which is cancellable by the occurrence of an input element from `expect` domain
-    *         at any point after the scenario is started and before it is finished,
-    *         and evaluates `cancellation` when such element occurs.
+    * Stops this scenario on first input message matching the predicate
+    * and evaluates cancellation function with this message.
     */
-  def cancelWith(expect: Expect[_])(cancellation: TelegramMessage => F[Unit]): Scenario[F, A] =
-    new Scenario[F, A](Episode.Cancellable(ep, expect.isDefinedAt, Some(cancellation)))
+  def stopWith(p: TelegramMessage => Boolean)(cancellation: TelegramMessage => F[Unit]): Scenario[F, A] =
+    new Scenario[F, A](Episode.Cancellable(ep, p, Some(cancellation)))
 
   /**
     * Maps effect type from `F` to `G` using the supplied transformation.
@@ -100,28 +97,19 @@ final class Scenario[F[_], +A] private (private val ep: Episode[F, TelegramMessa
 }
 
 object Scenario {
-
   /**
-    * Defines the beginning of the scenario.
+    * Describes the next expected received message.
     *
-    * Each input value from `pf` domain is going to be matched and transformed into a value of type `A`.
+    * Any input message from `pf` domain will be matched
+    * and transformed into a value of type `A`.
     */
-  def start[F[_], A](pf: PartialFunction[TelegramMessage, A]): Scenario[F, A] =
-    new Scenario[F, A](Episode.First(pf.isDefinedAt).map(pf))
-
-  /**
-    * Defines following step of the scenario.
-    *
-    * If the first elements belongs to the `pf` domain,
-    * it is going to be matched and transformed into the value of type `A` using `pf` .
-    */
-  def next[F[_], A](pf: PartialFunction[TelegramMessage, A]): Scenario[F, A] =
+  def expect[F[_], A](pf: PartialFunction[TelegramMessage, A]): Scenario[F, A] =
     new Scenario[F, A](Episode.Next(pf.isDefinedAt).map(pf))
 
   /**
     * Suspends an effectful value of type `A` into Scenario context.
     *
-    * Generally used for describing bot part of a scenario
+    * Generally used for describing action that should be executed by the bot
     * (e.g. sending messages, making calls to external APIs, etc.)
     */
   def eval[F[_], A](fa: F[A]): Scenario[F, A] =
@@ -129,9 +117,17 @@ object Scenario {
 
   /**
     * Lifts pure value to Scenario context.
+    *
+    * Uses partially applied type parameter technique.
     */
-  def pure[F[_], A](a: A): Scenario[F, A] =
-    new Scenario[F, A](Episode.Pure(a))
+  def pure[F[_]]: PurePartiallyApplied[F] = new PurePartiallyApplied[F]
+
+  final class PurePartiallyApplied[F[_]](private val dummy: Boolean = false) extends AnyVal {
+    /**
+      * Lifts pure value to Scenario context.
+      */
+    def apply[A](a: A): Scenario[F, A] = new Scenario[F, A](Episode.Pure(a))
+  }
 
   /**
     * Unit value lifted to Scenario context with effect `F`.

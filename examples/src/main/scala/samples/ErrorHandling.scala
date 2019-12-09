@@ -40,9 +40,9 @@ object ErrorHandling extends IOApp {
 
   def order[F[_]: TelegramClient: Sync](service: FaultyService[F]): Scenario[F, Unit] =
     for {
-      chat   <- Scenario.start(command("order").chat)
+      chat   <- Scenario.expect(command("order").chat)
       _      <- Scenario.eval(chat.send("What you'd like to order?"))
-      item   <- Scenario.next(text)
+      item   <- Scenario.expect(text)
       result <- Scenario.eval(service.order(item)).attempt
       _ <- result.fold(
         e => Scenario.eval(processError(e)).flatMap(m => Scenario.eval(chat.send(m))),

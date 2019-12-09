@@ -26,9 +26,9 @@ private[api] class Broadcast[F[_], A](subs: Ref[F, List[Queue[F, A]]])(implicit 
     subscription(maxQueued).evalTap(q => subs.update(q :: _)).flatMap(_.dequeue)
 
   private def subscription(maxQueued: Int): Stream[F, Queue[F, A]] =
-    Stream.bracket(Queue.bounded[F, A](maxQueued))(
-      queue => subs.update(_.filter(_ ne queue))
-    )
+    Stream.bracket(Queue.bounded[F, A](maxQueued)) { q =>
+      subs.update(_.filter(_ ne q)) *> q.tryDequeue1.void
+    }
 
   def subscribeSize(maxQueued: Int): Stream[F, (A, Int)] =
     subscribe(maxQueued).zip(subscribers)
@@ -38,6 +38,6 @@ private[api] class Broadcast[F[_], A](subs: Ref[F, List[Queue[F, A]]])(implicit 
 }
 
 object Broadcast {
-  def apply[F[_], A](implicit C: Concurrent[F]): F[Broadcast[F, A]] =
+  private [api] def apply[F[_], A](implicit C: Concurrent[F]): F[Broadcast[F, A]] =
     Ref.of[F, List[Queue[F, A]]](List.empty).map(new Broadcast(_))
 }

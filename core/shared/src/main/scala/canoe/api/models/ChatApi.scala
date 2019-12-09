@@ -120,6 +120,7 @@ final class ChatApi(private val chat: Chat) extends AnyVal {
                           userId,
                           canChangeInfo,
                           canPostMessages,
+                          canEditMessages,
                           canDeleteMessages,
                           canInviteUsers,
                           canRestrictMembers,

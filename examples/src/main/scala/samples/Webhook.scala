@@ -18,10 +18,18 @@ import fs2.Stream
   *
   * The webhook can also be deleted manually using [[canoe.methods.webhooks.DeleteWebhook]] method.
   */
-object WebhookGreetings extends IOApp {
+object Webhook extends IOApp {
+
+  /**
+   * URL to which Telegram updates will be sent.
+   * This address must be reachable for the Telegram, so in case you're using local environment 
+   * you'd have to expose your local host to the Internet. 
+   * It can be achieved using ngrok simply following 
+   * this [[https://developer.github.com/webhooks/configuring/#using-ngrok comprehensive guide]]. 
+   */
+  val url: String = "<your server url>"
 
   val token: String = "<your telegram token>"
-  val url: String = "<your server url>"
 
   def run(args: List[String]): IO[ExitCode] =
     Stream
@@ -33,9 +41,9 @@ object WebhookGreetings extends IOApp {
 
   def greetings[F[_]: TelegramClient]: Scenario[F, Unit] =
     for {
-      chat <- Scenario.start(command("hi").chat)
+      chat <- Scenario.expect(command("hi").chat)
       _    <- Scenario.eval(chat.send("Hello. What's your name?"))
-      name <- Scenario.next(text)
+      name <- Scenario.expect(text)
       _    <- Scenario.eval(chat.send(s"Nice to meet you, $name"))
     } yield ()
 }

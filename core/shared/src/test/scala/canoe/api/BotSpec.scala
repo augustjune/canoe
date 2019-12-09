@@ -7,11 +7,11 @@ import canoe.syntax._
 import cats.effect.IO
 import cats.effect.concurrent.Ref
 import fs2.Stream
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.freespec.AnyFreeSpec
 
 import scala.concurrent.duration._
 
-class BotSpec extends AnyFunSuite {
+class BotSpec extends AnyFreeSpec {
   type Message = String
   type ChatId = Int
 
@@ -25,232 +25,190 @@ class BotSpec extends AnyFunSuite {
           .metered[IO](0.2.second)
     }
 
-  test("updates returns updates from the source") {
-    val messages: List[(Message, ChatId)] = List(
-      "1.start" -> 1,
-      "2.hello" -> 2
-    )
+  "Bot" - {
+    "updates" - {
+      "are returned from the update source" in {
+        val messages: List[(Message, ChatId)] = List(
+          "1.start" -> 1,
+          "2.hello" -> 2
+        )
 
-    val bot = new Bot[IO](updateSource(messages))
+        val bot = new Bot[IO](updateSource(messages))
 
-    val texts = bot.updates.toList().collect {
-      case MessageReceived(_, m: TextMessage) => m.text
+        val texts = bot.updates.toList().collect {
+          case MessageReceived(_, m: TextMessage) => m.text
+        }
+
+        assert(texts == messages.map(_._1))
+      }
     }
 
-    assert(texts == messages.map(_._1))
-  }
+    "follow" - {
+      "matches" - {
+        "scenario for each incoming message" in {
+          val messages: List[(Message, ChatId)] = List(
+            "message" -> 1,
+            "message" -> 1,
+            "message" -> 1
+          )
 
-  test("follows scenario for each incoming message") {
+          def scenario(counter: Ref[IO, Int]): Scenario[IO, Unit] =
+            for {
+              _ <- Scenario.expect(any)
+              _ <- Scenario.eval(counter.update(_ + 1))
+            } yield ()
 
-    val messages: List[(Message, ChatId)] = List(
-      "message" -> 1,
-      "message" -> 1,
-      "message" -> 1
-    )
+          val bot = new Bot[IO](updateSource(messages))
 
-    def scenario(counter: Ref[IO, Int]): Scenario[IO, Unit] =
-      for {
-        _ <- Scenario.start(any)
-        _ <- Scenario.eval(counter.update(_ + 1))
-      } yield ()
+          val counter = Stream
+            .eval(Ref[IO].of(0))
+            .flatMap { counter =>
+              bot.follow(scenario(counter)).drain ++ Stream.eval(counter.get)
+            }
 
-    val bot = new Bot[IO](updateSource(messages))
+          assert(counter.value() == messages.size)
+        }
 
-    val counter = Stream
-      .eval(Ref[IO].of(0))
-      .flatMap { counter =>
-        bot.follow(scenario(counter)).drain ++ Stream.eval(counter.get)
+        "scenario for the messages from different chats" in {
+          val chat1Id = 1
+          val chat2Id = 2
+          val messages: List[(Message, ChatId)] = List(
+            "start" -> chat1Id,
+            "start" -> chat2Id,
+            "end" -> chat1Id,
+            "end" -> chat2Id
+          )
+
+          def scenario(counter: Ref[IO, Int]): Scenario[IO, Unit] =
+            for {
+              _ <- Scenario.expect(text.when(_ == "start"))
+              _ <- Scenario.expect(text.when(_ == "end"))
+              _ <- Scenario.eval(counter.update(_ + 1))
+            } yield ()
+
+          val bot = new Bot[IO](updateSource(messages))
+
+          val counter = Stream
+            .eval(Ref[IO].of(0))
+            .flatMap { counter =>
+              bot.follow(scenario(counter)).drain ++ Stream.eval(counter.get)
+            }
+
+          assert(counter.value() == 2)
+        }
+
+        "more than one scenario" in {
+          def scenario1(registed: Ref[IO, Set[Int]]): Scenario[IO, Unit] =
+            for {
+              _ <- Scenario.expect(text.when(_ == "start"))
+              _ <- Scenario.expect(text.when(_ == "end"))
+              _ <- Scenario.eval(registed.update(_ + 1))
+            } yield ()
+
+          def scenario2(registed: Ref[IO, Set[Int]]): Scenario[IO, Unit] =
+            for {
+              _ <- Scenario.expect(any)
+              _ <- Scenario.eval(registed.update(_ + 2))
+            } yield ()
+
+          val messages: List[(Message, ChatId)] = List(
+            "start" -> 1,
+            "end" -> 1
+          )
+
+          val bot = new Bot[IO](updateSource(messages))
+
+          val register = Stream
+            .eval(Ref[IO].of(Set.empty[Int]))
+            .flatMap { reg =>
+              bot.follow(scenario1(reg), scenario2(reg)).drain ++ Stream.eval(reg.get)
+            }
+
+          assert(register.value().size == 2)
+        }
       }
 
-    assert(counter.value() == messages.size)
-  }
+      "scenario execution is not blocked" - {
+        "by other scenario" in {
+          def scenario1(registed: Ref[IO, Set[Int]]): Scenario[IO, Unit] =
+            for {
+              _ <- Scenario.expect(text.when(_ == "start"))
+              _ <- Scenario.expect(text.when(_ == "end"))
+              _ <- Scenario.eval(registed.update(_ + 1))
+              _ <- Scenario.eval(IO.never)
+            } yield ()
 
-  test("follows a scenario for a single chat") {
-    val chatId = 1
-    val messages: List[(Message, ChatId)] = List(
-      "start" -> chatId,
-      "end" -> chatId
-    )
+          def scenario2(registed: Ref[IO, Set[Int]]): Scenario[IO, Unit] =
+            for {
+              _ <- Scenario.expect(any)
+              _ <- Scenario.eval(registed.update(_ + 2))
+              _ <- Scenario.eval(IO.never)
+            } yield ()
 
-    def scenario(counter: Ref[IO, Int]): Scenario[IO, Unit] =
-      for {
-        _ <- Scenario.start(text.when(_ == "start"))
-        _ <- Scenario.next(text.when(_ == "end"))
-        _ <- Scenario.eval(counter.update(_ + 1))
-      } yield ()
+          val messages: List[(Message, ChatId)] = List(
+            "start" -> 1,
+            "end" -> 1
+          )
 
-    val bot = new Bot[IO](updateSource(messages))
+          val bot = new Bot[IO](updateSource(messages))
 
-    val counter = Stream
-      .eval(Ref[IO].of(0))
-      .flatMap { counter =>
-        bot.follow(scenario(counter)).drain ++ Stream.eval(counter.get)
+          val register = Stream
+            .eval(Ref[IO].of(Set.empty[Int]))
+            .flatMap { reg =>
+              bot.follow(scenario1(reg), scenario2(reg)).drain ++ Stream.eval(reg.get)
+            }
+
+          assert(register.value().size == 2)
+        }
+
+        "by the same scenario in other chat" in {
+          def scenario1(registed: Ref[IO, Set[Int]]): Scenario[IO, Unit] =
+            for {
+              m <- Scenario.expect(any)
+              _ <- Scenario.eval(registed.update(_ + m.messageId))
+              _ <- Scenario.eval(IO.never)
+            } yield ()
+
+          val messages: List[(Message, ChatId)] = List(
+            "first" -> 1,
+            "second" -> 2
+          )
+
+          val bot = new Bot[IO](updateSource(messages))
+
+          val register = Stream
+            .eval(Ref[IO].of(Set.empty[Int]))
+            .flatMap { reg =>
+              bot.follow(scenario1(reg)).drain ++ Stream.eval(reg.get)
+            }
+
+          assert(register.value().size == 2)
+        }
+
+        "by the same scenario in the same chat" in {
+          def scenario1(registed: Ref[IO, Set[Int]]): Scenario[IO, Unit] =
+            for {
+              m <- Scenario.expect(any)
+              _ <- Scenario.eval(registed.update(_ + m.messageId))
+              _ <- Scenario.eval(IO.never)
+            } yield ()
+
+          val messages: List[(Message, ChatId)] = List(
+            "first" -> 1,
+            "second" -> 1
+          )
+
+          val bot = new Bot[IO](updateSource(messages))
+
+          val register = Stream
+            .eval(Ref[IO].of(Set.empty[Int]))
+            .flatMap { reg =>
+              bot.follow(scenario1(reg)).drain ++ Stream.eval(reg.get)
+            }
+
+          assert(register.value().size == 2)
+        }
       }
-
-    assert(counter.value() == 1)
-  }
-
-  test("doesn't interrupt the scenario because of messages from other chat") {
-    val chatId = 1
-    val messages: List[(Message, ChatId)] = List(
-      "start" -> chatId,
-      "interrupt" -> (chatId + 1),
-      "end" -> chatId
-    )
-
-    def scenario(counter: Ref[IO, Int]): Scenario[IO, Unit] =
-      for {
-        _ <- Scenario.start(text.when(_ == "start"))
-        _ <- Scenario.next(text.when(_ == "end"))
-        _ <- Scenario.eval(counter.update(_ + 1))
-      } yield ()
-
-    val bot = new Bot[IO](updateSource(messages))
-
-    val counter = Stream
-      .eval(Ref[IO].of(0))
-      .flatMap { counter =>
-        bot.follow(scenario(counter)).drain ++ Stream.eval(counter.get)
-      }
-
-    assert(counter.value() == 1)
-  }
-
-  test("matches scenario from different chats") {
-    val chat1Id = 1
-    val chat2Id = 2
-    val messages: List[(Message, ChatId)] = List(
-      "start" -> chat1Id,
-      "start" -> chat2Id,
-      "end" -> chat1Id,
-      "end" -> chat2Id
-    )
-
-    def scenario(counter: Ref[IO, Int]): Scenario[IO, Unit] =
-      for {
-        _ <- Scenario.start(text.when(_ == "start"))
-        _ <- Scenario.next(text.when(_ == "end"))
-        _ <- Scenario.eval(counter.update(_ + 1))
-      } yield ()
-
-    val bot = new Bot[IO](updateSource(messages))
-
-    val counter = Stream
-      .eval(Ref[IO].of(0))
-      .flatMap { counter =>
-        bot.follow(scenario(counter)).drain ++ Stream.eval(counter.get)
-      }
-
-    assert(counter.value() == 2)
-  }
-
-  test("handles more than one scenario") {
-    def scenario1(registed: Ref[IO, Set[Int]]): Scenario[IO, Unit] =
-      for {
-        _ <- Scenario.start(text.when(_ == "start"))
-        _ <- Scenario.next(text.when(_ == "end"))
-        _ <- Scenario.eval(registed.update(_ + 1))
-      } yield ()
-
-    def scenario2(registed: Ref[IO, Set[Int]]): Scenario[IO, Unit] =
-      for {
-        _ <- Scenario.start(any)
-        _ <- Scenario.eval(registed.update(_ + 2))
-      } yield ()
-
-    val messages: List[(Message, ChatId)] = List(
-      "start" -> 1,
-      "end" -> 1
-    )
-
-    val bot = new Bot[IO](updateSource(messages))
-
-    val register = Stream
-      .eval(Ref[IO].of(Set.empty[Int]))
-      .flatMap { reg =>
-        bot.follow(scenario1(reg), scenario2(reg)).drain ++ Stream.eval(reg.get)
-      }
-
-    assert(register.value().size == 2)
-  }
-
-  test("scenarios don't block each other") {
-    def scenario1(registed: Ref[IO, Set[Int]]): Scenario[IO, Unit] =
-      for {
-        _ <- Scenario.start(text.when(_ == "start"))
-        _ <- Scenario.next(text.when(_ == "end"))
-        _ <- Scenario.eval(registed.update(_ + 1))
-        _ <- Scenario.eval(IO.never)
-      } yield ()
-
-    def scenario2(registed: Ref[IO, Set[Int]]): Scenario[IO, Unit] =
-      for {
-        _ <- Scenario.start(any)
-        _ <- Scenario.eval(registed.update(_ + 2))
-        _ <- Scenario.eval(IO.never)
-      } yield ()
-
-    val messages: List[(Message, ChatId)] = List(
-      "start" -> 1,
-      "end" -> 1
-    )
-
-    val bot = new Bot[IO](updateSource(messages))
-
-    val register = Stream
-      .eval(Ref[IO].of(Set.empty[Int]))
-      .flatMap { reg =>
-        bot.follow(scenario1(reg), scenario2(reg)).drain ++ Stream.eval(reg.get)
-      }
-
-    assert(register.value().size == 2)
-  }
-
-  test("single scenario evaluation is not blocked between different chats") {
-    def scenario1(registed: Ref[IO, Set[Int]]): Scenario[IO, Unit] =
-      for {
-        m <- Scenario.start(any)
-        _ <- Scenario.eval(registed.update(_ + m.messageId))
-        _ <- Scenario.eval(IO.never)
-      } yield ()
-
-    val messages: List[(Message, ChatId)] = List(
-      "first" -> 1,
-      "second" -> 2
-    )
-
-    val bot = new Bot[IO](updateSource(messages))
-
-    val register = Stream
-      .eval(Ref[IO].of(Set.empty[Int]))
-      .flatMap { reg =>
-        bot.follow(scenario1(reg)).drain ++ Stream.eval(reg.get)
-      }
-
-    assert(register.value().size == 2)
-  }
-
-  test("single scenario evaluation is not blocked with same chat") {
-    def scenario1(registed: Ref[IO, Set[Int]]): Scenario[IO, Unit] =
-      for {
-        m <- Scenario.start(any)
-        _ <- Scenario.eval(registed.update(_ + m.messageId))
-        _ <- Scenario.eval(IO.never)
-      } yield ()
-
-    val messages: List[(Message, ChatId)] = List(
-      "first" -> 1,
-      "second" -> 1
-    )
-
-    val bot = new Bot[IO](updateSource(messages))
-
-    val register = Stream
-      .eval(Ref[IO].of(Set.empty[Int]))
-      .flatMap { reg =>
-        bot.follow(scenario1(reg)).drain ++ Stream.eval(reg.get)
-      }
-
-    assert(register.value().size == 2)
+    }
   }
 }

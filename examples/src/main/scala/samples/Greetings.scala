@@ -7,7 +7,7 @@ import cats.syntax.functor._
 import fs2.Stream
 
 /**
-  * Example of interaction between a user and the bot
+  * Basic example of interaction between a user and the bot.
   */
 object Greetings extends IOApp {
 
@@ -21,9 +21,9 @@ object Greetings extends IOApp {
 
   def greetings[F[_]: TelegramClient]: Scenario[F, Unit] =
     for {
-      chat <- Scenario.start(command("hi").chat)
+      chat <- Scenario.expect(command("hi").chat)
       _    <- Scenario.eval(chat.send("Hello. What's your name?"))
-      name <- Scenario.next(text)
+      name <- Scenario.expect(text)
       _    <- Scenario.eval(chat.send(s"Nice to meet you, $name"))
     } yield ()
 }

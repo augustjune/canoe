@@ -37,7 +37,7 @@ object TelegramClient {
 
   /**
     * Creates an authorized asynchronous Telegram Bot API client wrapped in Resource,
-    * which works on `global` ExecutionContext
+    * which works on `global` ExecutionContext.
     *
     * @param token Telegram bot token
     */

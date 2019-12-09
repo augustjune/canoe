@@ -3,7 +3,9 @@ package canoe.api
 import canoe.models.Update
 import fs2.Stream
 
-trait UpdateSource[F[_]] {
-
+private[api] trait UpdateSource[F[_]] {
+  /**
+    * Incoming Telegram updates.
+    */
   def updates: Stream[F, Update]
 }

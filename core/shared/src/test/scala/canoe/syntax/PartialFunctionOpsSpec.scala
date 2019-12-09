@@ -15,11 +15,4 @@ class PartialFunctionOpsSpec extends AnyFreeSpec {
       assert(!evenBiggerThanTen.isDefinedAt(13))
     }
   }
-
-  "map" - {
-    "applies provided function over the result" in {
-      val evenString = evenInt.map(_.toString)
-      assert(evenString(6) == 6.toString)
-    }
-  }
 }

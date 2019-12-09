@@ -168,7 +168,7 @@ class ScenarioSpec extends AnyFreeSpec {
 
       "doesn't skip the element if it matches" in {
         val scenario: Scenario[IO, String] =
-          Scenario.expect(textMessage.endingWith("fire").map(_.text)).tolerate(_ => IO.unit)
+          Scenario.expect(textMessage.endingWith("fire")).map(_.text).tolerate(_ => IO.unit)
         val input = Stream("1.fire", "2.fire").map(message)
 
         assert(input.through(scenario.pipe).value().startsWith("1"))

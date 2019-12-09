@@ -8,7 +8,7 @@ import cats.syntax.functor._
 import fs2.Stream
 
 /**
-  * Example of echo bot that will answer to you with the message you've sent to him
+  * Example of echos bot that will answer to you with the message you've sent to him
   */
 object Echo extends IOApp {
   val token: String = "<your telegram token>"
@@ -17,15 +17,15 @@ object Echo extends IOApp {
     Stream
       .resource(TelegramClient.global[IO](token))
       .flatMap { implicit client =>
-        Bot.polling[IO].follow(greetings)
+        Bot.polling[IO].follow(echos)
       }
       .compile
       .drain
       .as(ExitCode.Success)
 
-  def greetings[F[_]: TelegramClient]: Scenario[F, Unit] =
+  def echos[F[_]: TelegramClient]: Scenario[F, Unit] =
     for {
-      msg <- Scenario.start(any)
+      msg <- Scenario.expect(any)
       _   <- Scenario.eval(echoBack(msg))
     } yield ()
 
@@ -33,6 +33,6 @@ object Echo extends IOApp {
     case textMessage: TextMessage           => msg.chat.send(textMessage.text)
     case animationMessage: AnimationMessage => msg.chat.send(animationMessage.animation)
     case stickerMessage: StickerMessage     => msg.chat.send(stickerMessage.sticker)
-    case _                                  => msg.chat.send("Sorry! I can't echo that back.")
+    case _                                  => msg.chat.send("Sorry! I can't echos that back.")
   }
 }

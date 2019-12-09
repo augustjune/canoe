@@ -23,11 +23,11 @@ object CustomExtractor extends IOApp {
 
   def greetParticularUser[F[_]: TelegramClient](userId: Int): Scenario[F, Unit] =
     for {
-      msg <- Scenario.start(expectParticularUsersMessages(userId))
+      msg <- Scenario.expect(particularUsersMessages(userId))
       _   <- Scenario.eval(msg.chat.send(s"I was waiting for you ${name(msg)}"))
     } yield ()
 
-  def expectParticularUsersMessages(userId: Int): Expect[UserMessage] = {
+  def particularUsersMessages(userId: Int): Expect[UserMessage] = {
     case m: UserMessage if m.from.map(_.id).contains(userId) => m
   }
 

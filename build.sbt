@@ -92,8 +92,10 @@ lazy val compilerOptions =
     "-Ywarn-value-discard" // Warn when non-Unit expression results are unused.
   ) ++ (if (scalaBinaryVersion.value.startsWith("2.12")) List("-Ypartial-unification") else Nil)
 
-lazy val typeSystemEnhancements =
-  addCompilerPlugin("org.typelevel" %% "kind-projector" % kindProjectorVersion)
+lazy val typeSystemEnhancements = Seq(
+    addCompilerPlugin("org.typelevel" %% "kind-projector" % kindProjectorVersion),
+    addCompilerPlugin("org.augustjune" %% "context-applied" % contextAppliedVersion)
+  )
 
 lazy val tests = {
   val dependencies =
@@ -124,3 +126,4 @@ val disciplineVersion = "1.0.0-RC1"
 val scalacheckShapelessVersion = "1.2.3"
 val scalaJsDomVersion = "0.9.8"
 val kindProjectorVersion = "0.10.3"
+val contextAppliedVersion = "0.1.2"

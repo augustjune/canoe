@@ -47,7 +47,7 @@ private[api] class AjaxClient[F[_]: Async: ContextShift](token: String) extends 
     val json = method.encoder.apply(request).toString
 
     Async
-      .fromFuture(Async[F].delay(Ajax.post(url, json, headers = Map("Content-Type" -> "application/json"))))
+      .fromFuture(F.delay(Ajax.post(url, json, headers = Map("Content-Type" -> "application/json"))))
       .map(_.responseText)
   }
 }

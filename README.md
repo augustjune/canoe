@@ -82,7 +82,7 @@ e.g.`chat.kickUser(user.id)`, `message.editText("edited")`.
 
 ### Webhook support
 **canoe** also provides support for obtaining messages from Telegram by setting a webhook.
-Full example may be found [here](https://github.com/augustjune/canoe/blob/master/examples/src/main/scala/samples/WebhookGreetings.scala).
+Full example may be found [here](https://github.c?om/augustjune/canoe/blob/master/examples/src/main/scala/samples/Webhook.scala).
 
 ### Handling errors
 There's a lot of things that may go wrong during your scenarios executions, 

@@ -89,10 +89,6 @@ final class ChatApi(private val chat: Chat) extends AnyVal {
       case _              => LeaveChat(chat.id).call
     }
 
-  private def notFalse(b: Boolean): Option[Boolean] =
-    if (b) Some(true)
-    else None
-
   /**
     * Pins message in this chat, unless it's private chat.
     */
@@ -101,6 +97,10 @@ final class ChatApi(private val chat: Chat) extends AnyVal {
       case _: PrivateChat => false.pure[F]
       case _              => PinChatMessage(chat.id, messageId, notFalse(silent)).call
     }
+
+  private def notFalse(b: Boolean): Option[Boolean] =
+    if (b) Some(true)
+    else None
 
   /**
     * Promotes or demotes a user in this chat.
@@ -195,10 +195,6 @@ final class ChatApi(private val chat: Chat) extends AnyVal {
     */
   def details[F[_]: TelegramClient]: F[DetailedChat] =
     GetChat(chat.id).call
-
-  private def nonEmpty(str: String): Option[String] =
-    if (str.isEmpty) None
-    else Some(str)
 
   /**
     * Sends a message to this chat.
@@ -331,7 +327,12 @@ final class ChatApi(private val chat: Chat) extends AnyVal {
           .asInstanceOf[F[M]]
 
       case PollContent(question, options) =>
-        SendPoll(chat.id, question, options, notFalse(disableNotification), replyToMessageId, keyboard.replyMarkup).call
+        SendPoll(chat.id,
+                 question,
+                 options,
+                 notFalse(disableNotification),
+                 replyToMessageId = replyToMessageId,
+                 replyMarkup = keyboard.replyMarkup).call
           .asInstanceOf[F[M]]
 
       case StickerContent(sticker) =>
@@ -386,6 +387,10 @@ final class ChatApi(private val chat: Chat) extends AnyVal {
                   replyToMessageId,
                   keyboard.replyMarkup).call.asInstanceOf[F[M]]
     }
+
+  private def nonEmpty(str: String): Option[String] =
+    if (str.isEmpty) None
+    else Some(str)
 
   /**
     * Sends a list of media files as an album.

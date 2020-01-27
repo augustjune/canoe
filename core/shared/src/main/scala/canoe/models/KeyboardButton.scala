@@ -2,6 +2,7 @@ package canoe.models
 
 import io.circe.Encoder
 import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.auto._
 
 /**
   * Button of the reply keyboard.

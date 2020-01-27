@@ -2,6 +2,7 @@ package canoe.models
 
 import io.circe.Encoder
 import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.auto._
 
 /**
   * Button of the reply keyboard.
@@ -17,8 +18,10 @@ import io.circe.generic.semiauto.deriveEncoder
   */
 final class KeyboardButton private (val text: String,
                                     val requestContact: Option[Boolean] = None,
-                                    val requestLocation: Option[Boolean] = None)
+                                    val requestLocation: Option[Boolean] = None,
+                                    val requestPoll: Option[KeyboardButtonPollType] = None)
 
+case class KeyboardButtonPollType(`type`: Option[String])
 object KeyboardButton {
 
   /**
@@ -45,6 +48,17 @@ object KeyboardButton {
     */
   def requestContact(text: String): KeyboardButton =
     new KeyboardButton(text, requestContact = Some(true))
+
+  /**
+    * The user will be asked to create a poll and send it to the bot when the button is pressed.
+    * Available in private chats only.
+    *
+    * @param specificType If 'quiz' is passed, the user will be allowed to create only polls in the quiz mode.
+    *                     If 'regular' is passed, only regular polls will be allowed.
+    *                     Otherwise, the user will be allowed to create a poll of any type.
+    */
+  def requestPoll(text: String, specificType: Option[String] = None): KeyboardButton =
+    new KeyboardButton(text, requestPoll = Some(KeyboardButtonPollType(specificType)))
 
   implicit val encoderInstance: Encoder[KeyboardButton] = deriveEncoder[KeyboardButton]
 }

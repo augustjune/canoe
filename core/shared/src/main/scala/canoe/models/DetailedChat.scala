@@ -14,5 +14,6 @@ final case class DetailedChat(id: Long,
                               description: Option[String],
                               inviteLink: Option[String],
                               pinnedMessage: Option[TelegramMessage],
+                              slowModeDelay: Option[Int],
                               stickerSetName: Option[String],
                               canSetStickerSet: Option[Boolean])

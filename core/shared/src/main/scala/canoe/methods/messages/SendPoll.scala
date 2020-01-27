@@ -26,6 +26,11 @@ import io.circe.{Decoder, Encoder}
 final case class SendPoll(chatId: ChatId,
                           question: String,
                           options: List[String],
+                          isAnonymous: Option[Boolean] = None,
+                          `type`: Option[String] = None,
+                          allowsMultipleAnswers: Option[Boolean] = None,
+                          correctOptionId: Option[Int] = None,
+                          isClosed: Option[Boolean] = None,
                           disableNotification: Option[Boolean] = None,
                           replyToMessageId: Option[Int] = None,
                           replyMarkup: Option[ReplyMarkup] = None)

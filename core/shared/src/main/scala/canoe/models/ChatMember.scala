@@ -35,6 +35,7 @@ final case class LeftMember(user: User) extends ChatMember
 final case class KickedMember(user: User, untilDate: Option[Int]) extends ChatMember
 
 final case class ChatAdministrator(user: User,
+                                   customTitle: Option[String],
                                    canBeEdited: Option[Boolean],
                                    canChangeInfo: Option[Boolean],
                                    canPostMessages: Option[Boolean],

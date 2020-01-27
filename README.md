@@ -2,10 +2,10 @@ canoe
 =============
 
 [![Build Status](https://travis-ci.org/augustjune/canoe.svg?branch=master)](https://travis-ci.org/augustjune/canoe)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.augustjune/canoe_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.augustjune/canoe_2.12)
 [![Gitter](https://badges.gitter.im/augustjune-canoe/community.svg)](https://gitter.im/augustjune-canoe/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-[![Telegram](https://img.shields.io/badge/Bot%20API-4.4%20(July%2029%2C%202019)-00aced.svg)](https://core.telegram.org/bots/api#recent-changes)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.augustjune/canoe_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.augustjune/canoe_2.12)
+[![Telegram](https://img.shields.io/badge/Bot%20API-4.6%20-00aced.svg)](https://core.telegram.org/bots/api#recent-changes)
 
 ### Overview
 **canoe** is a purely functional, compositional library for building interactive Telegram bots.

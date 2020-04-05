@@ -49,7 +49,7 @@ private[api] class Http4sTelegramClient[F[_]: Sync: Logger](token: String, clien
   }
 
   private def jsonRequest[Req, Res](url: Uri, method: Method[Req, Res], action: Req): F[Request[F]] =
-    Method.POST(action, url)(F, jsonEncoderOf(F, method.encoder))
+    Method.POST(action, url)(F, jsonEncoderOf(method.encoder))
 
   private def multipartRequest[Req, Res](url: Uri,
                                          method: Method[Req, Res],

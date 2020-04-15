@@ -1,6 +1,6 @@
 package canoe.api.sources
 
-import canoe.api.{TelegramClient, UpdateSource}
+import canoe.api.TelegramClient
 import canoe.methods.updates.GetUpdates
 import canoe.models.Update
 import canoe.syntax.methodOps
@@ -45,19 +45,14 @@ object Polling {
   /**
     * Polls new batch of updates whenever consumer is ready
     */
-  private[api] def continual[F[_]: TelegramClient: Functor]: UpdateSource[F] =
-    new Polling[F](longPollTimeout) with UpdateSource[F] {
-      def updates: Stream[F, Update] = pollUpdates(0).flatMap(Stream.emits)
-    }
+  private[api] def continual[F[_]: TelegramClient: Functor]: Stream[F, Update] =
+    new Polling[F](longPollTimeout).pollUpdates(0).flatMap(Stream.emits)
 
   /**
     * Polls new batch of updates when consumer is ready and `interval` passed since the last polling
     */
   private[api] def metered[F[_]: TelegramClient: Functor: Timer](
     interval: FiniteDuration
-  ): UpdateSource[F] =
-    new Polling[F](longPollTimeout) with UpdateSource[F] {
-      def updates: Stream[F, Update] =
-        pollUpdates(0).metered(interval).flatMap(Stream.emits)
-    }
+  ): Stream[F, Update] =
+    new Polling[F](longPollTimeout).pollUpdates(0).metered(interval).flatMap(Stream.emits)
 }

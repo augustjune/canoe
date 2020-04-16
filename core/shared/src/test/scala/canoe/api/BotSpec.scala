@@ -15,15 +15,12 @@ class BotSpec extends AnyFreeSpec {
   type Message = String
   type ChatId = Int
 
-  def updateSource(messages: List[(Message, ChatId)]): UpdateSource[IO] =
-    new UpdateSource[IO] {
-      def updates: Stream[IO, Update] =
-        Stream
-          .emits(messages.zipWithIndex.map {
-            case ((m, id), i) => MessageReceived(i, TextMessage(i, PrivateChat(id, None, None, None), -1, m))
-          })
-          .metered[IO](0.2.second)
-    }
+  def updates(messages: List[(Message, ChatId)]): Stream[IO, Update] =
+    Stream
+      .emits(messages.zipWithIndex.map {
+        case ((m, id), i) => MessageReceived(i, TextMessage(i, PrivateChat(id, None, None, None), -1, m))
+      })
+      .metered[IO](0.2.second)
 
   "Bot" - {
     "updates" - {
@@ -33,7 +30,7 @@ class BotSpec extends AnyFreeSpec {
           "2.hello" -> 2
         )
 
-        val bot = new Bot[IO](updateSource(messages))
+        val bot = new Bot[IO](updates(messages))
 
         val texts = bot.updates.toList().collect {
           case MessageReceived(_, m: TextMessage) => m.text
@@ -58,13 +55,11 @@ class BotSpec extends AnyFreeSpec {
               _ <- Scenario.eval(counter.update(_ + 1))
             } yield ()
 
-          val bot = new Bot[IO](updateSource(messages))
+          val bot = new Bot[IO](updates(messages))
 
           val counter = Stream
             .eval(Ref[IO].of(0))
-            .flatMap { counter =>
-              bot.follow(scenario(counter)).drain ++ Stream.eval(counter.get)
-            }
+            .flatMap(counter => bot.follow(scenario(counter)).drain ++ Stream.eval(counter.get))
 
           assert(counter.value() == messages.size)
         }
@@ -86,13 +81,11 @@ class BotSpec extends AnyFreeSpec {
               _ <- Scenario.eval(counter.update(_ + 1))
             } yield ()
 
-          val bot = new Bot[IO](updateSource(messages))
+          val bot = new Bot[IO](updates(messages))
 
           val counter = Stream
             .eval(Ref[IO].of(0))
-            .flatMap { counter =>
-              bot.follow(scenario(counter)).drain ++ Stream.eval(counter.get)
-            }
+            .flatMap(counter => bot.follow(scenario(counter)).drain ++ Stream.eval(counter.get))
 
           assert(counter.value() == 2)
         }
@@ -116,13 +109,11 @@ class BotSpec extends AnyFreeSpec {
             "end" -> 1
           )
 
-          val bot = new Bot[IO](updateSource(messages))
+          val bot = new Bot[IO](updates(messages))
 
           val register = Stream
             .eval(Ref[IO].of(Set.empty[Int]))
-            .flatMap { reg =>
-              bot.follow(scenario1(reg), scenario2(reg)).drain ++ Stream.eval(reg.get)
-            }
+            .flatMap(reg => bot.follow(scenario1(reg), scenario2(reg)).drain ++ Stream.eval(reg.get))
 
           assert(register.value().size == 2)
         }
@@ -150,13 +141,11 @@ class BotSpec extends AnyFreeSpec {
             "end" -> 1
           )
 
-          val bot = new Bot[IO](updateSource(messages))
+          val bot = new Bot[IO](updates(messages))
 
           val register = Stream
             .eval(Ref[IO].of(Set.empty[Int]))
-            .flatMap { reg =>
-              bot.follow(scenario1(reg), scenario2(reg)).drain ++ Stream.eval(reg.get)
-            }
+            .flatMap(reg => bot.follow(scenario1(reg), scenario2(reg)).drain ++ Stream.eval(reg.get))
 
           assert(register.value().size == 2)
         }
@@ -174,13 +163,11 @@ class BotSpec extends AnyFreeSpec {
             "second" -> 2
           )
 
-          val bot = new Bot[IO](updateSource(messages))
+          val bot = new Bot[IO](updates(messages))
 
           val register = Stream
             .eval(Ref[IO].of(Set.empty[Int]))
-            .flatMap { reg =>
-              bot.follow(scenario1(reg)).drain ++ Stream.eval(reg.get)
-            }
+            .flatMap(reg => bot.follow(scenario1(reg)).drain ++ Stream.eval(reg.get))
 
           assert(register.value().size == 2)
         }
@@ -198,13 +185,11 @@ class BotSpec extends AnyFreeSpec {
             "second" -> 1
           )
 
-          val bot = new Bot[IO](updateSource(messages))
+          val bot = new Bot[IO](updates(messages))
 
           val register = Stream
             .eval(Ref[IO].of(Set.empty[Int]))
-            .flatMap { reg =>
-              bot.follow(scenario1(reg)).drain ++ Stream.eval(reg.get)
-            }
+            .flatMap(reg => bot.follow(scenario1(reg)).drain ++ Stream.eval(reg.get))
 
           assert(register.value().size == 2)
         }

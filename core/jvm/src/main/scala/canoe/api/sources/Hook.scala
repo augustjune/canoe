@@ -1,6 +1,6 @@
 package canoe.api.sources
 
-import canoe.api.{TelegramClient, UpdateSource}
+import canoe.api.{TelegramClient}
 import canoe.methods.webhooks.{DeleteWebhook, SetWebhook}
 import canoe.models.{InputFile, Update}
 import canoe.syntax.methodOps
@@ -18,7 +18,7 @@ import org.http4s.implicits._
 import org.http4s.server.Server
 import org.http4s.server.blaze.BlazeServerBuilder
 
-class Hook[F[_]](queue: Queue[F, Update]) extends UpdateSource[F] {
+class Hook[F[_]](queue: Queue[F, Update]) {
   def updates: Stream[F, Update] = queue.dequeue
 }
 

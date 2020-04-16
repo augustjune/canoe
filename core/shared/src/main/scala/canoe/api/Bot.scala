@@ -96,8 +96,11 @@ class Bot[F[_]: Concurrent] private[api] (val updates: Stream[F, Update]) {
 
 object Bot {
 
+  /**
+    * Creates a bot which operates on provided updates. 
+    */
   def fromStream[F[_]: Concurrent](updates: Stream[F, Update]): Bot[F] = new Bot(updates)
-
+  
   /**
     * Creates a bot which receives incoming updates using long polling mechanism.
     *

@@ -16,11 +16,7 @@ import scala.concurrent.duration.FiniteDuration
   * An instance which can communicate with Telegram service and
   * interact with other Telegram users in a certain predefined way
   */
-class Bot[F[_]: Concurrent] private[api] (source: UpdateSource[F]) {
-  /**
-    * Stream of all updates which your bot receives from Telegram service
-    */
-  def updates: Stream[F, Update] = source.updates
+class Bot[F[_]: Concurrent] private[api] (val updates: Stream[F, Update]) {
 
   /**
     * Defines the behavior of the bot.
@@ -99,6 +95,12 @@ class Bot[F[_]: Concurrent] private[api] (source: UpdateSource[F]) {
 }
 
 object Bot {
+
+  /**
+    * Creates a bot which operates on provided updates. 
+    */
+  def fromStream[F[_]: Concurrent](updates: Stream[F, Update]): Bot[F] = new Bot(updates)
+  
   /**
     * Creates a bot which receives incoming updates using long polling mechanism.
     *
@@ -130,5 +132,5 @@ object Bot {
     port: Int = 8443,
     certificate: Option[InputFile] = None
   ): Resource[F, Bot[F]] =
-    Hook.install(url, port, certificate).map(new Bot(_))
+    Hook.install(url, port, certificate).map(h => new Bot(h.updates))
 }

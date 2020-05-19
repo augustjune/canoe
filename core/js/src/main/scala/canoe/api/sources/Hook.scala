@@ -1,13 +1,13 @@
 package canoe.api.sources
 
-import canoe.api.{TelegramClient, UpdateSource}
+import canoe.api.TelegramClient
 import canoe.models.{InputFile, Update}
 import cats.effect.{ConcurrentEffect, Resource, Timer}
 import fs2.Stream
 import fs2.concurrent.Queue
 import javax.naming.OperationNotSupportedException
 
-class Hook[F[_]](queue: Queue[F, Update]) extends UpdateSource[F] {
+class Hook[F[_]](queue: Queue[F, Update]) {
   def updates: Stream[F, Update] = queue.dequeue
 }
 

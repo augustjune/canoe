@@ -1,11 +1,9 @@
 package samples
 
 import canoe.api._
-import canoe.methods.messages.SendDice
-import canoe.models.messages.DiceThrownMessage
 import canoe.models.{Darts, Dice}
 import canoe.syntax._
-import cats.effect.{ExitCode, IO, IOApp, Sync}
+import cats.effect.{ExitCode, IO, IOApp}
 import fs2.Stream
 
 /**
@@ -24,11 +22,11 @@ object DiceExample extends IOApp {
       .drain
       .as(ExitCode.Success)
 
-  def echos[F[_]: Sync: TelegramClient]: Scenario[F, Unit] =
+  def echos[F[_]: TelegramClient]: Scenario[F, Unit] =
     for {
       msg <- Scenario.expect(any)
-      _   <- Scenario.eval(SendDice(msg.chat.id, Dice).call[F, DiceThrownMessage])
-      _   <- Scenario.eval(SendDice(msg.chat.id, Darts).call[F, DiceThrownMessage])
+      _   <- Scenario.eval(msg.chat.send(Dice))
+      _   <- Scenario.eval(msg.chat.send(Darts))
     } yield ()
 
 }

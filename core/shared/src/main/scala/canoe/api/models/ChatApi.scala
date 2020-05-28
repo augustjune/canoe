@@ -338,15 +338,51 @@ final class ChatApi(private val chat: Chat) extends AnyVal {
         ).call
           .asInstanceOf[F[M]]
 
-      case PollContent(question, options) =>
-        SendPoll(chat.id,
-                 question,
-                 options,
-                 notFalse(disableNotification),
-                 replyToMessageId = replyToMessageId,
-                 replyMarkup = keyboard.replyMarkup
-        ).call
-          .asInstanceOf[F[M]]
+      case PollContent(question, options, allowsMultipleAnswers, anonymous, openPeriod, closeDate) =>
+        SendPoll(
+          chat.id,
+          question,
+          options,
+          Some(anonymous),
+          Some("regular"),
+          Some(allowsMultipleAnswers),
+          None,
+          None,
+          None,
+          openPeriod,
+          closeDate,
+          None,
+          notFalse(disableNotification),
+          replyToMessageId,
+          keyboard.replyMarkup
+        ).call.asInstanceOf[F[M]]
+
+      case QuizContent(question,
+                       options,
+                       correctOptionId,
+                       anonymous,
+                       explanation,
+                       explanationParseMode,
+                       openPeriod,
+                       closeDate
+          ) =>
+        SendPoll(
+          chat.id,
+          question,
+          options,
+          Some(anonymous),
+          Some("quiz"),
+          None,
+          Some(correctOptionId),
+          explanation,
+          explanationParseMode,
+          openPeriod,
+          closeDate,
+          None,
+          notFalse(disableNotification),
+          replyToMessageId,
+          keyboard.replyMarkup
+        ).call.asInstanceOf[F[M]]
 
       case StickerContent(sticker) =>
         SendSticker(chat.id, sticker, notFalse(disableNotification), replyToMessageId, keyboard.replyMarkup).call

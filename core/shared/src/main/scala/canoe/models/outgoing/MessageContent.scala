@@ -85,7 +85,23 @@ final case class TextContent(text: String,
 final case class PhotoContent(photo: InputFile, caption: String = "", parseMode: Option[ParseMode] = None)
     extends MessageContent[PhotoMessage]
 
-final case class PollContent(question: String, options: List[String]) extends MessageContent[PollMessage]
+final case class PollContent(question: String,
+                             options: List[String],
+                             allowsMultipleAnswers: Boolean = false,
+                             anonymous: Boolean = false,
+                             openPeriod: Option[Int] = None,
+                             closeDate: Option[Int] = None
+) extends MessageContent[PollMessage]
+
+final case class QuizContent(question: String,
+                             options: List[String],
+                             correctOptionId: Int,
+                             anonymous: Boolean = false,
+                             explanation: Option[String] = None,
+                             explanationParseMode: Option[ParseMode] = None,
+                             openPeriod: Option[Int] = None,
+                             closeDate: Option[Int] = None
+) extends MessageContent[PollMessage]
 
 final case class StickerContent(sticker: InputFile) extends MessageContent[StickerMessage]
 

@@ -6,6 +6,7 @@ import io.circe.{Decoder, Encoder, Json}
 import io.circe.generic.semiauto.deriveDecoder
 
 case object GetMyCommands {
+  import io.circe.generic.auto._
 
   implicit val method: Method[GetMyCommands.type, List[BotCommand]] =
     new Method[GetMyCommands.type, List[BotCommand]] {

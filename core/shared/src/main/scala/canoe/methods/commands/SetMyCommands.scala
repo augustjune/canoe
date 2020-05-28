@@ -16,6 +16,7 @@ import io.circe.{Decoder, Encoder}
 final case class SetMyCommands(commands: List[BotCommand])
 
 object SetMyCommands {
+  import io.circe.generic.auto._
 
   implicit val method: Method[SetMyCommands, Boolean] =
     new Method[SetMyCommands, Boolean] {

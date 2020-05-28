@@ -438,6 +438,10 @@ final class ChatApi(private val chat: Chat) extends AnyVal {
                   replyToMessageId,
                   keyboard.replyMarkup
         ).call.asInstanceOf[F[M]]
+
+      case DiceContent(emoji) =>
+        SendDice(chat.id, emoji, notFalse(disableNotification), replyToMessageId, keyboard.replyMarkup).call
+          .asInstanceOf[F[M]]
     }
 
   private def nonEmpty(str: String): Option[String] =

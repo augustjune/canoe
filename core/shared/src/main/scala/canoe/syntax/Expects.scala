@@ -154,4 +154,15 @@ trait Expects {
     * Partial function which matches only voice messages and returns contained voice
     */
   val voice: Expect[Voice] = voiceMessage.andThen(_.voice)
+
+  /**
+   * Partial function which matches only dice thrown messages
+   */
+  val diceThrownMessage: Expect[DiceThrownMessage] = { case m: DiceThrownMessage => m }
+
+  /**
+   * Partial function which matches only dice thrown messages and returns result
+   */
+  val diceResult: Expect[DiceResult] = diceThrownMessage.andThen(_.dice)
+
 }

@@ -3,7 +3,7 @@ package canoe.models.outgoing
 import canoe.models.Currency.Currency
 import canoe.models.ParseMode.ParseMode
 import canoe.models.messages._
-import canoe.models.{InputFile, LabeledPrice, ParseMode}
+import canoe.models.{DiceEmoji, InputFile, LabeledPrice, ParseMode}
 
 /**
   * The content of the message which is going to be sent by the bot.
@@ -131,3 +131,5 @@ final case class VoiceContent(voice: InputFile,
                               parseMode: Option[ParseMode] = None,
                               duration: Option[Int] = None
 ) extends MessageContent[VoiceMessage]
+
+final case class DiceContent(emoji: DiceEmoji) extends MessageContent[DiceThrownMessage]

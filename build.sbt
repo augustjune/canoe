@@ -117,7 +117,7 @@ val scala2_12 = "2.12.8"
 
 val fs2Version = "2.3.0"
 val catsCoreVersion = "2.1.1"
-val catsEffectVersion = "2.1.3"
+val catsEffectVersion = "2.1.4"
 val circeVersion = "0.13.0"
 val http4sVersion = "0.21.3"
 val log4catsVersion = "1.0.1"

@@ -31,16 +31,19 @@ object Hook {
     * After the hook is used, local server and Telegram webhook are cleaned up.
     *
     * @param url         HTTPS url to which updates will be sent
+    * @param host        Network interface to bind the server
     * @param port        Port which will be used for listening for the incoming updates
     * @param certificate Public key of self-signed certificate (including BEGIN and END portions)
     */
   def install[F[_]: TelegramClient: ConcurrentEffect: Timer](url: String,
+                                                             host: String,
                                                              port: Int,
-                                                             certificate: Option[InputFile]): Resource[F, Hook[F]] =
+                                                             certificate: Option[InputFile]
+  ): Resource[F, Hook[F]] =
     Resource.suspend(Slf4jLogger.create.map { implicit logger =>
       for {
         _    <- setTelegramWebhook(url, certificate)
-        hook <- listenServer[F](port)
+        hook <- listenServer[F](host, port)
       } yield hook
     })
 
@@ -59,17 +62,16 @@ object Hook {
       F.info(
         "Setting a webhook to the Telegram service. Don't forget to delete the webhook, since it blocks you from using polling methods."
       ) *> SetWebhook(url, certificate).call.void
-    )(
-      _ =>
-        F.info(
-          "Telegram webhook is deleted. Polling is available again."
-        ) *> DeleteWebhook.call.void
+    )(_ =>
+      F.info(
+        "Telegram webhook is deleted. Polling is available again."
+      ) *> DeleteWebhook.call.void
     )
 
   /**
     * Creates local server which listens for the incoming updates on provided `port`.
     */
-  private def listenServer[F[_]: ConcurrentEffect: Timer: Logger](port: Int): Resource[F, Hook[F]] = {
+  private def listenServer[F[_]: ConcurrentEffect: Timer: Logger](host: String, port: Int): Resource[F, Hook[F]] = {
     val dsl = Http4sDsl[F]
     import dsl._
 
@@ -87,7 +89,7 @@ object Hook {
         .orNotFound
 
     def server(queue: Queue[F, Update]): Resource[F, Server[F]] =
-      BlazeServerBuilder[F].bindHttp(port).withHttpApp(app(queue)).resource
+      BlazeServerBuilder[F].bindHttp(port, host).withHttpApp(app(queue)).resource
 
     Resource.suspend(Queue.unbounded[F, Update].map(q => server(q).map(_ => new Hook[F](q))))
   }

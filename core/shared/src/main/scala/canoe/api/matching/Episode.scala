@@ -1,15 +1,13 @@
 package canoe.api.matching
 
-import Episode._
+import canoe.api.matching.Episode._
+import cats.effect.{Bracket, Concurrent, ExitCase, Timer}
 import cats.instances.list._
 import cats.syntax.all._
-import cats.{~>, MonadError, StackSafeMonad}
+import cats.~>
 import fs2.{Pipe, Pull, Stream}
-import cats.effect.Bracket
-import cats.effect.ExitCase
+
 import scala.concurrent.duration.FiniteDuration
-import cats.effect.Concurrent
-import cats.effect.Timer
 
 /**
   * Type which represents a description of sequence of elements.
@@ -116,20 +114,6 @@ object Episode {
           case Right(b) => pure(b)
         }
 
-    }
-
-  private[api] implicit def monadErrorInstance[F[_], I]: MonadError[Episode[F, I, *], Throwable] =
-    new MonadError[Episode[F, I, *], Throwable] with StackSafeMonad[Episode[F, I, *]] {
-      def pure[A](a: A): Episode[F, I, A] = Pure(a)
-
-      def flatMap[A, B](fa: Episode[F, I, A])(f: A => Episode[F, I, B]): Episode[F, I, B] =
-        fa.flatMap(f)
-
-      def handleErrorWith[A](fa: Episode[F, I, A])(f: Throwable => Episode[F, I, A]): Episode[F, I, A] =
-        Protected(fa, f)
-
-      def raiseError[A](e: Throwable): Episode[F, I, A] =
-        RaiseError(e)
     }
 
   private sealed trait Result[+I, +O] {

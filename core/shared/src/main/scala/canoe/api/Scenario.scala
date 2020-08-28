@@ -3,10 +3,11 @@ package canoe.api
 import canoe.api.matching.Episode
 import canoe.models.messages.TelegramMessage
 import cats.arrow.FunctionK
-import cats.{~>, MonadError, StackSafeMonad}
+import cats.effect.{Bracket, Concurrent, ExitCase, Timer}
+import cats.{MonadError, StackSafeMonad, ~>}
 import fs2.Pipe
+
 import scala.concurrent.duration.FiniteDuration
-import cats.effect.{Concurrent, Timer}
 
 /**
   * Description of an interaction between two parties,
@@ -161,19 +162,24 @@ object Scenario {
   def raiseError[F[_]](e: Throwable): Scenario[F, Nothing] =
     new Scenario[F, Nothing](Episode.RaiseError(e))
 
-  implicit def monadErrorInstance[F[_]]: MonadError[Scenario[F, *], Throwable] =
-    new MonadError[Scenario[F, *], Throwable] with StackSafeMonad[Scenario[F, *]] {
-      def pure[A](a: A): Scenario[F, A] =
-        Scenario.pure(a)
+  implicit def bracketInstance[F[_]]: MonadError[Scenario[F, *], Throwable] =
+    new Bracket[Scenario[F, *], Throwable] with StackSafeMonad[Scenario[F, *]] {
+      def bracketCase[A, B](acquire: Scenario[F, A])(use: A => Scenario[F, B])(
+        release: (A, ExitCase[Throwable]) => Scenario[F, Unit]
+      ): Scenario[F, B] =
+        new Scenario(
+          Episode.BracketCase(acquire.ep, use.andThen(_.ep), (a: A, ec: ExitCase[Throwable]) => release(a, ec).ep)
+        )
 
-      def flatMap[A, B](scenario: Scenario[F, A])(fn: A => Scenario[F, B]): Scenario[F, B] =
-        scenario.flatMap(fn)
+      def flatMap[A, B](fa: Scenario[F, A])(f: A => Scenario[F, B]): Scenario[F, B] =
+        fa.flatMap(f)
 
-      def raiseError[A](e: Throwable): Scenario[F, A] =
-        Scenario.raiseError(e)
+      def raiseError[A](e: Throwable): Scenario[F, A] = Scenario.raiseError(e)
 
-      def handleErrorWith[A](scenario: Scenario[F, A])(fn: Throwable => Scenario[F, A]): Scenario[F, A] =
-        scenario.handleErrorWith(fn)
+      def handleErrorWith[A](fa: Scenario[F, A])(f: Throwable => Scenario[F, A]): Scenario[F, A] =
+        fa.handleErrorWith(f)
+
+      def pure[A](a: A): Scenario[F, A] = Scenario.pure(a)
     }
 
   implicit def functionKInstance[F[_]]: F ~> Scenario[F, *] =

@@ -3,8 +3,10 @@ package canoe.api
 import canoe.api.matching.Episode
 import canoe.models.messages.TelegramMessage
 import cats.arrow.FunctionK
-import cats.{~>, ApplicativeError, MonadError, StackSafeMonad}
+import cats.{~>, MonadError, StackSafeMonad}
 import fs2.Pipe
+import scala.concurrent.duration.FiniteDuration
+import cats.effect.{Concurrent, Timer}
 
 /**
   * Description of an interaction between two parties,
@@ -16,12 +18,13 @@ import fs2.Pipe
   * `Scenario` forms a monad in `A` with `pure` and `flatMap`.
   */
 final class Scenario[F[_], +A] private (private val ep: Episode[F, TelegramMessage, A]) extends AnyVal {
+
   /**
     * Pipe which produces a stream with at most single value of type `A` evaluated in `F` effect
     * as a result of the successful interaction matching this description.
     * If an unhandled error result was encountered during the interaction, it will be raised here.
     */
-  def pipe(implicit F: ApplicativeError[F, Throwable]): Pipe[F, TelegramMessage, A] =
+  def pipe(implicit C: Concurrent[F], T: Timer[F]): Pipe[F, TelegramMessage, A] =
     ep.matching
 
   /**
@@ -87,6 +90,16 @@ final class Scenario[F[_], +A] private (private val ep: Episode[F, TelegramMessa
     new Scenario[F, A](Episode.Cancellable(ep, p, Some(cancellation)))
 
   /**
+    * Limit the amount of time that this scenario can run for.
+    * Useful in case you want to no longer wait for user input after a certain period of time
+    * and prefer to just drop the current interaction.
+    *
+    * Scenario that has exceeded specified duration is going to be interrupted and finish with ExitCase.Canceled.
+    */
+  def within(duration: FiniteDuration): Scenario[F, A] =
+    new Scenario[F, A](Episode.TimeLimited(ep, duration))
+
+  /**
     * Maps effect type from `F` to `G` using the supplied transformation.
     *
     * Warning: this operation can result into StackOverflowError
@@ -97,6 +110,7 @@ final class Scenario[F[_], +A] private (private val ep: Episode[F, TelegramMessa
 }
 
 object Scenario {
+
   /**
     * Describes the next expected received message.
     *
@@ -123,6 +137,7 @@ object Scenario {
   def pure[F[_]]: PurePartiallyApplied[F] = new PurePartiallyApplied[F]
 
   final class PurePartiallyApplied[F[_]](private val dummy: Boolean = false) extends AnyVal {
+
     /**
       * Lifts pure value to Scenario context.
       */

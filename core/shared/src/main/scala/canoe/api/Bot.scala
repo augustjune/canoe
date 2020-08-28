@@ -16,7 +16,7 @@ import scala.concurrent.duration.FiniteDuration
   * An instance which can communicate with Telegram service and
   * interact with other Telegram users in a certain predefined way
   */
-class Bot[F[_]: Concurrent] private[api] (val updates: Stream[F, Update]) {
+class Bot[F[_]: Concurrent: Timer] private[api] (val updates: Stream[F, Update]) {
 
   /**
     * Defines the behavior of the bot.
@@ -99,14 +99,14 @@ object Bot {
   /**
     * Creates a bot which operates on provided updates. 
     */
-  def fromStream[F[_]: Concurrent](updates: Stream[F, Update]): Bot[F] = new Bot(updates)
+  def fromStream[F[_]: Concurrent: Timer](updates: Stream[F, Update]): Bot[F] = new Bot(updates)
   
   /**
     * Creates a bot which receives incoming updates using long polling mechanism.
     *
     * See [[https://en.wikipedia.org/wiki/Push_technology#Long_polling wiki]].
     */
-  def polling[F[_]: Concurrent: TelegramClient]: Bot[F] =
+  def polling[F[_]: Concurrent: Timer: TelegramClient]: Bot[F] =
     new Bot[F](Polling.continual)
 
   /**

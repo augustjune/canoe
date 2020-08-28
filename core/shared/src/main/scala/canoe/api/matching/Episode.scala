@@ -3,10 +3,13 @@ package canoe.api.matching
 import Episode._
 import cats.instances.list._
 import cats.syntax.all._
-import cats.{~>, ApplicativeError, MonadError, StackSafeMonad}
+import cats.{~>, MonadError, StackSafeMonad}
 import fs2.{Pipe, Pull, Stream}
 import cats.effect.Bracket
 import cats.effect.ExitCase
+import scala.concurrent.duration.FiniteDuration
+import cats.effect.Concurrent
+import cats.effect.Timer
 
 /**
   * Type which represents a description of sequence of elements.
@@ -38,7 +41,7 @@ private[api] sealed trait Episode[F[_], -I, +O] {
     * match the description of this episode and empty stream otherwise.
     * Fails on the first unhandled error result.
     */
-  def matching(implicit F: ApplicativeError[F, Throwable]): Pipe[F, I, O] =
+  def matching(implicit C: Concurrent[F], T: Timer[F]): Pipe[F, I, O] =
     open(this, _, Nil, true).flatMap {
       case (Matched(o), _) => Stream(o)
       case (Failed(e), _)  => Stream.raiseError[F](e)
@@ -76,6 +79,14 @@ object Episode {
 
   private[api] final case class Tolerate[F[_], I, O](episode: Episode[F, I, O], limit: Option[Int], fn: I => F[Unit])
       extends Episode[F, I, O]
+
+  private[api] final case class TimeLimited[F[_], I, O](episode: Episode[F, I, O], duration: FiniteDuration)
+      extends Episode[F, I, O]
+
+  private[api] final case class BracketCase[F[_], I, A, B](acq: Episode[F, I, A],
+                                                           use: A => Episode[F, I, B],
+                                                           release: (A, ExitCase[Throwable]) => Episode[F, I, Unit]
+  ) extends Episode[F, I, B]
 
   private[api] implicit def bracketInstance[F[_], I]: Bracket[Episode[F, I, *], Throwable] =
     new Bracket[Episode[F, I, *], Throwable] {
@@ -122,25 +133,24 @@ object Episode {
     }
 
   private sealed trait Result[+I, +O] {
+    def castOutput[A]: Result[I, A] = mapOutput(_.asInstanceOf[A])
+
     def mapOutput[A](f: O => A): Result[I, A] =
       this match {
         case Matched(o)      => Matched(f(o))
         case Missed(elem)    => Missed(elem)
         case Cancelled(elem) => Cancelled(elem)
         case Failed(e)       => Failed(e)
+        case Interrupted     => Interrupted
       }
   }
   private final case class Matched[O](o: O) extends Result[Nothing, O]
   private final case class Missed[I](elem: I) extends Result[I, Nothing]
   private final case class Cancelled[I](elem: I) extends Result[I, Nothing]
   private final case class Failed(e: Throwable) extends Result[Nothing, Nothing]
+  private final case object Interrupted extends Result[Nothing, Nothing]
 
-  private[api] final case class BracketCase[F[_], I, A, B](acq: Episode[F, I, A],
-                                                           use: A => Episode[F, I, B],
-                                                           release: (A, ExitCase[Throwable]) => Episode[F, I, Unit]
-  ) extends Episode[F, I, B]
-
-  private def open[F[_], I, O](
+  private def open[F[_]: Concurrent: Timer, I, O](
     episode: Episode[F, I, O],
     input: Stream[F, I],
     cancelTokens: List[(I => Boolean, Option[I => F[Unit]])],
@@ -166,17 +176,13 @@ object Episode {
 
                       case Failed(e) =>
                         open(release(a, ExitCase.Error(e)), rest2, cancelTokens, first).map(Failed(e) -> _._2)
+
+                      case Interrupted =>
+                        open(release(a, ExitCase.Canceled), rest2, cancelTokens, first).map(Interrupted -> _._2)
                     }
                 }
 
-              case Missed(elem) =>
-                Stream(Missed(elem) -> rest)
-
-              case Cancelled(elem) =>
-                Stream(Cancelled(elem) -> rest)
-
-              case Failed(e) =>
-                Stream(Failed(e) -> rest)
+              case other => Stream(other.castOutput[O] -> rest)
             }
         }
 
@@ -221,6 +227,10 @@ object Episode {
           case other             => Stream(other)
         }
 
+      case TimeLimited(episode, limit) =>
+        (open(episode, input, cancelTokens, first).interruptAfter[F](limit) ++
+          Stream(Interrupted -> Stream.empty)).take(1)
+
       case Cancellable(episode, p, f) =>
         open(episode, input, (p, f) :: cancelTokens, first)
 
@@ -248,10 +258,8 @@ object Episode {
           .flatMap(ep => open(ep, input, cancelTokens, first))
           .flatMap {
             // Have to explicitly handle all not matched cases in order to satisfy compile
-            case (Matched(a), rest)   => open(fn(a), rest, cancelTokens, false)
-            case (Missed(m), rest)    => Stream(Missed(m) -> rest)
-            case (Cancelled(m), rest) => Stream(Cancelled(m) -> rest)
-            case (Failed(e), rest)    => Stream(Failed(e) -> rest)
+            case (Matched(a), rest) => open(fn(a), rest, cancelTokens, false)
+            case (other, rest)      => Stream(other.castOutput[O] -> rest)
           }
     }
 
@@ -265,6 +273,7 @@ object Episode {
       case Bind(ep, fn)               => Bind(ep.mapK(f), fn.andThen(_.mapK(f)))
       case Tolerate(ep, limit, fn)    => Tolerate(ep.mapK(f), limit, fn.andThen(f(_)))
       case Cancellable(ep, canc, fin) => Cancellable(ep.mapK(f), canc, fin.map(_.andThen(f(_))))
+      case TimeLimited(ep, limit)     => TimeLimited(ep.mapK(f), limit)
       case BracketCase(acq, use, release) =>
         BracketCase(acq.mapK(f), use.andThen(_.mapK(f)), (a: Any, ec) => release(a, ec).mapK(f))
     }

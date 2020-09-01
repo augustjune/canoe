@@ -28,9 +28,9 @@ class Bot[F[_]: Concurrent] private[api] (val updates: Stream[F, Update]) {
     *
     * @example {{{
     *   val scenario = for {
-    *     chat <- Scenario.start(command("first").chat)
+    *     chat <- Scenario.expect(command("first").chat)
     *     _    <- Scenario.eval(chat.send("first message received"))
-    *     _    <- Scenario.next(command("second"))
+    *     _    <- Scenario.expect(command("second"))
     *     _    <- Scenario.eval(chat.send("second message received"))
     *   }
     *

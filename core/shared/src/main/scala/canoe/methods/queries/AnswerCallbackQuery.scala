@@ -54,6 +54,12 @@ object AnswerCallbackQuery {
     new AnswerCallbackQuery(queryId, text = Some(text), showAlert = Some(true))
 
   /**
+    * React without notification to stop a progress bar
+    */
+  def withoutNotification(queryId: String): AnswerCallbackQuery =
+    new AnswerCallbackQuery(queryId)
+
+  /**
     * Answer which redirects the user to the provided address.
     * Example: you can redirect a user to your bot using `telegram.me/your_bot?start=XXXX`
     */

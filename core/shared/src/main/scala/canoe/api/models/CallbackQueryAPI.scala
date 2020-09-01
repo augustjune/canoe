@@ -24,6 +24,12 @@ final class CallbackQueryAPI(private val query: CallbackQuery) extends AnyVal {
     AnswerCallbackQuery.alert(query.id, text).call
 
   /**
+    * React with no notification
+    */
+  def withoutNotification[F[_]: TelegramClient]: F[Boolean] =
+    AnswerCallbackQuery.withoutNotification(query.id).call
+
+  /**
     * Redirect the user to the provided address.
     *
     * Example: you can redirect a user to your bot using `telegram.me/your_bot?start=XXXX`

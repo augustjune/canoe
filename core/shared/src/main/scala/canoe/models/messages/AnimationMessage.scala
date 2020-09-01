@@ -17,5 +17,6 @@ final case class AnimationMessage(messageId: Int,
                                   forwardDate: Option[Int] = None,
                                   replyToMessage: Option[TelegramMessage] = None,
                                   editDate: Option[Int] = None,
-                                  authorSignature: Option[String] = None)
+                                  authorSignature: Option[String] = None,
+                                  viaBot: Option[User] = None)
     extends UserMessage

@@ -27,6 +27,8 @@ trait UserMessage extends TelegramMessage {
   def editDate: Option[Int]
 
   def authorSignature: Option[String]
+
+  def viaBot: Option[User]
 }
 
 object UserMessage {

@@ -97,10 +97,10 @@ class Bot[F[_]: Concurrent: Timer] private[api] (val updates: Stream[F, Update])
 object Bot {
 
   /**
-    * Creates a bot which operates on provided updates. 
+    * Creates a bot which operates on provided updates.
     */
   def fromStream[F[_]: Concurrent: Timer](updates: Stream[F, Update]): Bot[F] = new Bot(updates)
-  
+
   /**
     * Creates a bot which receives incoming updates using long polling mechanism.
     *
@@ -123,14 +123,16 @@ object Bot {
     * After the bot is used, the webhook is deleted even in case of interruptions or errors.
     *
     * @param url         HTTPS url to which updates will be sent
+    * @param host        Network interface to bind the server
     * @param port        Port which will be used for listening for the incoming updates.
     *                    Default is 8443.
     * @param certificate Public key of self-signed certificate (including BEGIN and END portions)
     */
   def hook[F[_]: TelegramClient: ConcurrentEffect: Timer](
     url: String,
+    host: String = "0.0.0.0",
     port: Int = 8443,
     certificate: Option[InputFile] = None
   ): Resource[F, Bot[F]] =
-    Hook.install(url, port, certificate).map(h => new Bot(h.updates))
+    Hook.install(url, host, port, certificate).map(h => new Bot(h.updates))
 }

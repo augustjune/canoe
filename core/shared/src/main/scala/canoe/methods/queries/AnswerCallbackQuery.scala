@@ -56,7 +56,7 @@ object AnswerCallbackQuery {
   /**
     * React without notification to stop a progress bar
     */
-  def withoutNotification(queryId: String): AnswerCallbackQuery =
+  def finish(queryId: String): AnswerCallbackQuery =
     new AnswerCallbackQuery(queryId)
 
   /**

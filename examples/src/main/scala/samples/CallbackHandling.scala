@@ -47,7 +47,7 @@ object CallbackHandling extends IOApp {
           case Some(cbd) =>
             for {
               _ <- query.message.traverse(_.chat.send(cbd))
-              _ <- query.withoutNotification
+              _ <- query.finish
             } yield ()
           case _ => Applicative[F].unit
         }

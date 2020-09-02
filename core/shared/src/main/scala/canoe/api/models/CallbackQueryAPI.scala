@@ -26,8 +26,8 @@ final class CallbackQueryAPI(private val query: CallbackQuery) extends AnyVal {
   /**
     * React with no notification
     */
-  def withoutNotification[F[_]: TelegramClient]: F[Boolean] =
-    AnswerCallbackQuery.withoutNotification(query.id).call
+  def finish[F[_]: TelegramClient]: F[Boolean] =
+    AnswerCallbackQuery.finish(query.id).call
 
   /**
     * Redirect the user to the provided address.

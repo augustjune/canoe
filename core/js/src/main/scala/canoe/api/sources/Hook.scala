@@ -20,11 +20,14 @@ object Hook {
     * After the hook is used, local server and Telegram webhook are cleaned up.
     *
     * @param url         HTTPS url to which updates will be sent
+    * @param host        Network interface to bind the server
     * @param port        Port which will be used for listening for the incoming updates
     * @param certificate Public key of self-signed certificate (including BEGIN and END portions)
     */
   def install[F[_]: TelegramClient: ConcurrentEffect: Timer](url: String,
+                                                             host: String,
                                                              port: Int,
-                                                             certificate: Option[InputFile]): Resource[F, Hook[F]] =
+                                                             certificate: Option[InputFile]
+  ): Resource[F, Hook[F]] =
     throw new OperationNotSupportedException("Webhook is not supported for JS version.")
 }

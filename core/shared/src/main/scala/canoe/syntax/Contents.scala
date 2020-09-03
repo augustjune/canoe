@@ -40,4 +40,7 @@ trait Contents {
 
   implicit def voiceMessageContent(voice: Voice): VoiceContent =
     VoiceContent(InputFile.fromFileId(voice.fileId))
+
+  implicit def diceMessageContent(emoji: DiceEmoji): DiceContent =
+    DiceContent(emoji)
 }

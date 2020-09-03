@@ -3,8 +3,11 @@ package canoe.api
 import canoe.api.matching.Episode
 import canoe.models.messages.TelegramMessage
 import cats.arrow.FunctionK
-import cats.{~>, ApplicativeError, MonadError, StackSafeMonad}
+import cats.effect.{Bracket, Concurrent, ExitCase, Timer}
+import cats.{MonadError, StackSafeMonad, ~>}
 import fs2.Pipe
+
+import scala.concurrent.duration.FiniteDuration
 
 /**
   * Description of an interaction between two parties,
@@ -16,12 +19,13 @@ import fs2.Pipe
   * `Scenario` forms a monad in `A` with `pure` and `flatMap`.
   */
 final class Scenario[F[_], +A] private (private val ep: Episode[F, TelegramMessage, A]) extends AnyVal {
+
   /**
     * Pipe which produces a stream with at most single value of type `A` evaluated in `F` effect
     * as a result of the successful interaction matching this description.
     * If an unhandled error result was encountered during the interaction, it will be raised here.
     */
-  def pipe(implicit F: ApplicativeError[F, Throwable]): Pipe[F, TelegramMessage, A] =
+  def pipe(implicit C: Concurrent[F], T: Timer[F]): Pipe[F, TelegramMessage, A] =
     ep.matching
 
   /**
@@ -87,6 +91,16 @@ final class Scenario[F[_], +A] private (private val ep: Episode[F, TelegramMessa
     new Scenario[F, A](Episode.Cancellable(ep, p, Some(cancellation)))
 
   /**
+    * Limit the amount of time that this scenario can run for.
+    * Useful in case you want to no longer wait for user input after a certain period of time
+    * and prefer to just drop the current interaction.
+    *
+    * Scenario that has exceeded specified duration is going to be interrupted and finish with ExitCase.Canceled.
+    */
+  def within(duration: FiniteDuration): Scenario[F, A] =
+    new Scenario[F, A](Episode.TimeLimited(ep, duration))
+
+  /**
     * Maps effect type from `F` to `G` using the supplied transformation.
     *
     * Warning: this operation can result into StackOverflowError
@@ -97,6 +111,7 @@ final class Scenario[F[_], +A] private (private val ep: Episode[F, TelegramMessa
 }
 
 object Scenario {
+
   /**
     * Describes the next expected received message.
     *
@@ -123,6 +138,7 @@ object Scenario {
   def pure[F[_]]: PurePartiallyApplied[F] = new PurePartiallyApplied[F]
 
   final class PurePartiallyApplied[F[_]](private val dummy: Boolean = false) extends AnyVal {
+
     /**
       * Lifts pure value to Scenario context.
       */
@@ -146,19 +162,24 @@ object Scenario {
   def raiseError[F[_]](e: Throwable): Scenario[F, Nothing] =
     new Scenario[F, Nothing](Episode.RaiseError(e))
 
-  implicit def monadErrorInstance[F[_]]: MonadError[Scenario[F, *], Throwable] =
-    new MonadError[Scenario[F, *], Throwable] with StackSafeMonad[Scenario[F, *]] {
-      def pure[A](a: A): Scenario[F, A] =
-        Scenario.pure(a)
+  implicit def bracketInstance[F[_]]: MonadError[Scenario[F, *], Throwable] =
+    new Bracket[Scenario[F, *], Throwable] with StackSafeMonad[Scenario[F, *]] {
+      def bracketCase[A, B](acquire: Scenario[F, A])(use: A => Scenario[F, B])(
+        release: (A, ExitCase[Throwable]) => Scenario[F, Unit]
+      ): Scenario[F, B] =
+        new Scenario(
+          Episode.BracketCase(acquire.ep, use.andThen(_.ep), (a: A, ec: ExitCase[Throwable]) => release(a, ec).ep)
+        )
 
-      def flatMap[A, B](scenario: Scenario[F, A])(fn: A => Scenario[F, B]): Scenario[F, B] =
-        scenario.flatMap(fn)
+      def flatMap[A, B](fa: Scenario[F, A])(f: A => Scenario[F, B]): Scenario[F, B] =
+        fa.flatMap(f)
 
-      def raiseError[A](e: Throwable): Scenario[F, A] =
-        Scenario.raiseError(e)
+      def raiseError[A](e: Throwable): Scenario[F, A] = Scenario.raiseError(e)
 
-      def handleErrorWith[A](scenario: Scenario[F, A])(fn: Throwable => Scenario[F, A]): Scenario[F, A] =
-        scenario.handleErrorWith(fn)
+      def handleErrorWith[A](fa: Scenario[F, A])(f: Throwable => Scenario[F, A]): Scenario[F, A] =
+        fa.handleErrorWith(f)
+
+      def pure[A](a: A): Scenario[F, A] = Scenario.pure(a)
     }
 
   implicit def functionKInstance[F[_]]: F ~> Scenario[F, *] =

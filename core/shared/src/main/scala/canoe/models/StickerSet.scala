@@ -10,4 +10,5 @@ final case class StickerSet(name: String,
                             title: String,
                             isAnimated: Boolean,
                             containsMasks: Boolean,
-                            stickers: List[Sticker])
+                            stickers: List[Sticker],
+                            thumb: Option[PhotoSize])

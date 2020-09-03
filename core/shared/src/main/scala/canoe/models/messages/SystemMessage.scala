@@ -1,6 +1,6 @@
 package canoe.models.messages
 
-import canoe.models.{Chat, PhotoSize, SuccessfulPayment, User}
+import canoe.models.{Chat, DiceResult, PhotoSize, SuccessfulPayment, User}
 import cats.syntax.functor._
 import io.circe.Decoder
 import io.circe.generic.auto._
@@ -24,7 +24,8 @@ object SystemMessage {
       deriveDecoder[SuccessfulPaymentMessage].widen,
       deriveDecoder[GroupChatCreated].widen,
       deriveDecoder[SupergroupCreated].widen,
-      deriveDecoder[WebsiteConnected].widen
+      deriveDecoder[WebsiteConnected].widen,
+      deriveDecoder[DiceThrownMessage].widen
     ).reduceLeft(_.or(_))
 }
 
@@ -59,3 +60,5 @@ final case class SuccessfulPaymentMessage(messageId: Int, chat: Chat, date: Int,
     extends SystemMessage
 
 final case class WebsiteConnected(messageId: Int, chat: Chat, date: Int, connectedWebsite: String) extends SystemMessage
+
+final case class DiceThrownMessage(messageId: Int, chat: Chat, date: Int, dice: DiceResult) extends SystemMessage

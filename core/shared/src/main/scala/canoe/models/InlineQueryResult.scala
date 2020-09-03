@@ -5,25 +5,25 @@ import canoe.models.ParseMode.ParseMode
 /** This object represents one result of an inline query.
   * Telegram clients currently support results of the following 19 types:
   *
-  *   InlineQueryResultCachedAudio
-  *   InlineQueryResultCachedDocument
-  *   InlineQueryResultCachedGif
-  *   InlineQueryResultCachedMpeg4Gif
-  *   InlineQueryResultCachedPhoto
-  *   InlineQueryResultCachedSticker
-  *   InlineQueryResultCachedVideo
-  *   InlineQueryResultCachedVoice
-  *   InlineQueryResultArticle
-  *   InlineQueryResultAudio
-  *   InlineQueryResultContact
-  *   InlineQueryResultDocument
-  *   InlineQueryResultGif
-  *   InlineQueryResultLocation
-  *   InlineQueryResultMpeg4Gif
-  *   InlineQueryResultPhoto
-  *   InlineQueryResultVenue
-  *   InlineQueryResultVideo
-  *   InlineQueryResultVoice
+  *   [[canoe.models.InlineQueryResultCachedAudio]]
+  *   [[canoe.models.InlineQueryResultCachedDocument]]
+  *   [[canoe.models.InlineQueryResultCachedGif]]
+  *   [[canoe.models.InlineQueryResultCachedMpeg4Gif]]
+  *   [[canoe.models.InlineQueryResultCachedPhoto]]
+  *   [[canoe.models.InlineQueryResultCachedSticker]]
+  *   [[canoe.models.InlineQueryResultCachedVideo]]
+  *   [[canoe.models.InlineQueryResultCachedVoice]]
+  *   [[canoe.models.InlineQueryResultArticle]]
+  *   [[canoe.models.InlineQueryResultAudio]]
+  *   [[canoe.models.InlineQueryResultContact]]
+  *   [[canoe.models.InlineQueryResultDocument]]
+  *   [[canoe.models.InlineQueryResultGif]]
+  *   [[canoe.models.InlineQueryResultLocation]]
+  *   [[canoe.models.InlineQueryResultMpeg4Gif]]
+  *   [[canoe.models.InlineQueryResultPhoto]]
+  *   [[canoe.models.InlineQueryResultVenue]]
+  *   [[canoe.models.InlineQueryResultVideo]]
+  *   [[canoe.models.InlineQueryResultVoice]]
   */
 sealed trait InlineQueryResult {
   def id: String
@@ -123,7 +123,8 @@ final case class InlineQueryResultGame(id: String,
   * @param gifWidth            Width of the GIF
   * @param gifHeight           Height of the GIF
   * @param gifDuration         Duration of the GIF
-  * @param thumbUrl            URL of the static thumbnail for the result (jpeg or gif)
+  * @param thumbUrl            URL of the static (JPEG or GIF) or animated (MPEG4) thumbnail for the result
+  * @param thumbMimeType       MIME type of the thumbnail, must be one of “image/jpeg”, “image/gif”, or “video/mp4”. Defaults to “image/jpeg”
   * @param title               Title for the result
   * @param caption             Caption of the GIF file to be sent, 0-200 characters
   * @param parseMode           Parse mode of captured text (Markdown or HTML)
@@ -136,6 +137,7 @@ final case class InlineQueryResultGif(id: String,
                                       gifHeight: Option[Int] = None,
                                       gifDuration: Option[Int] = None,
                                       thumbUrl: String,
+                                      thumbMimeType: Option[String] = None,
                                       title: Option[String] = None,
                                       caption: Option[String] = None,
                                       parseMode: Option[ParseMode] = None,
@@ -156,7 +158,8 @@ final case class InlineQueryResultGif(id: String,
   * @param mpeg4Width          Video width
   * @param mpeg4Height         Video height
   * @param mpeg4Duration       Video duration
-  * @param thumbUrl            URL of the static thumbnail (jpeg or gif) for the result
+  * @param thumbUrl            URL of the static (JPEG or GIF) or animated (MPEG4) thumbnail for the result
+  * @param thumbMimeType       MIME type of the thumbnail, must be one of “image/jpeg”, “image/gif”, or “video/mp4”. Defaults to “image/jpeg”
   * @param title               Title for the result
   * @param caption             Caption of the MPEG-4 file to be sent, 0-200 characters
   * @param parseMode           Parse mode of captured text (Markdown or HTML)
@@ -169,6 +172,7 @@ final case class InlineQueryResultMpeg4Gif(id: String,
                                            mpeg4Height: Option[Int] = None,
                                            mpeg4Duration: Option[Int] = None,
                                            thumbUrl: String,
+                                           thumbMimeType: Option[String] = None,
                                            title: Option[String] = None,
                                            caption: Option[String] = None,
                                            parseMode: Option[ParseMode] = None,

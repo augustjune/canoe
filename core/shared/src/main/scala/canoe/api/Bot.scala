@@ -16,7 +16,7 @@ import scala.concurrent.duration.FiniteDuration
   * An instance which can communicate with Telegram service and
   * interact with other Telegram users in a certain predefined way
   */
-class Bot[F[_]: Concurrent] private[api] (val updates: Stream[F, Update]) {
+class Bot[F[_]: Concurrent: Timer] private[api] (val updates: Stream[F, Update]) {
 
   /**
     * Defines the behavior of the bot.
@@ -28,9 +28,9 @@ class Bot[F[_]: Concurrent] private[api] (val updates: Stream[F, Update]) {
     *
     * @example {{{
     *   val scenario = for {
-    *     chat <- Scenario.start(command("first").chat)
+    *     chat <- Scenario.expect(command("first").chat)
     *     _    <- Scenario.eval(chat.send("first message received"))
-    *     _    <- Scenario.next(command("second"))
+    *     _    <- Scenario.expect(command("second"))
     *     _    <- Scenario.eval(chat.send("second message received"))
     *   }
     *
@@ -97,16 +97,16 @@ class Bot[F[_]: Concurrent] private[api] (val updates: Stream[F, Update]) {
 object Bot {
 
   /**
-    * Creates a bot which operates on provided updates. 
+    * Creates a bot which operates on provided updates.
     */
-  def fromStream[F[_]: Concurrent](updates: Stream[F, Update]): Bot[F] = new Bot(updates)
-  
+  def fromStream[F[_]: Concurrent: Timer](updates: Stream[F, Update]): Bot[F] = new Bot(updates)
+
   /**
     * Creates a bot which receives incoming updates using long polling mechanism.
     *
     * See [[https://en.wikipedia.org/wiki/Push_technology#Long_polling wiki]].
     */
-  def polling[F[_]: Concurrent: TelegramClient]: Bot[F] =
+  def polling[F[_]: Concurrent: Timer: TelegramClient]: Bot[F] =
     new Bot[F](Polling.continual)
 
   /**
@@ -123,14 +123,16 @@ object Bot {
     * After the bot is used, the webhook is deleted even in case of interruptions or errors.
     *
     * @param url         HTTPS url to which updates will be sent
+    * @param host        Network interface to bind the server
     * @param port        Port which will be used for listening for the incoming updates.
     *                    Default is 8443.
     * @param certificate Public key of self-signed certificate (including BEGIN and END portions)
     */
   def hook[F[_]: TelegramClient: ConcurrentEffect: Timer](
     url: String,
+    host: String = "0.0.0.0",
     port: Int = 8443,
     certificate: Option[InputFile] = None
   ): Resource[F, Bot[F]] =
-    Hook.install(url, port, certificate).map(h => new Bot(h.updates))
+    Hook.install(url, host, port, certificate).map(h => new Bot(h.updates))
 }

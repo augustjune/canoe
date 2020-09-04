@@ -28,11 +28,11 @@ class BroadcastSpec extends AnyFreeSpec {
       "sees all elements after subscription" in {
         val res = broadcast[Int].flatMap { b =>
           val pop = Stream.sleep_(0.05.second) ++ input.through(b.publish)
-          val sub = b.subscribe(1).take(input.size())
+          val sub = b.subscribe(1).take(input.count())
           sub.concurrently(pop)
         }
 
-        assert(res.toList() == input.toList)
+        assert(res.toList() == input.toList())
       }
 
       "is deregistered after it is done pulling" in {
@@ -42,7 +42,7 @@ class BroadcastSpec extends AnyFreeSpec {
           pop.concurrently(consumer)
         }
 
-        assert(pulled.value() == input.toList.reverse)
+        assert(pulled.value() == input.toList().reverse)
       }
     }
 
@@ -54,7 +54,7 @@ class BroadcastSpec extends AnyFreeSpec {
           pop.concurrently(consumer)
         }
 
-        assert(pulled.value() == input.head.toList)
+        assert(pulled.value() == input.head.toList())
       }
 
       "maxQueued + 2 elements for non-empty blocking consumer" in {
@@ -64,7 +64,7 @@ class BroadcastSpec extends AnyFreeSpec {
           val consumer = b.subscribe(maxQueued).evalMap(_ => IO.never)
           pop.concurrently(consumer)
         }
-        assert(pulled.value() == input.take(maxQueued + 2).toList.reverse)
+        assert(pulled.value() == input.take(maxQueued + 2).toList().reverse)
       }
 
       "all elements" - {
@@ -74,14 +74,14 @@ class BroadcastSpec extends AnyFreeSpec {
             val consumer = b.subscribe(1)
             pop.concurrently(consumer)
           }
-          assert(pulled.value() == input.toList.reverse)
+          assert(pulled.value() == input.toList().reverse)
         }
 
         "for no consumer" in {
           val pulled = broadcast[Int].flatMap { b =>
             input.through(recordPulled(b, 0.2.second))
           }
-          assert(pulled.value() == input.toList.reverse)
+          assert(pulled.value() == input.toList().reverse)
         }
       }
     }

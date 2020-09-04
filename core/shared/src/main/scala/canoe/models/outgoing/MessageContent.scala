@@ -72,12 +72,25 @@ final case class TextContent(text: String,
 ) extends MessageContent[TextMessage] {
 
   /**
-    * @return Text content with markdown parse mode.
+    * Text content with markdown parse mode.
+    *
+    * Markdown formatting applied according to MarkdownV2 style.
+    * Examples and additional information can be found [[https://core.telegram.org/bots/api#markdownv2-style here]].
     */
-  def markdown: TextContent = copy(parseMode = Some(ParseMode.Markdown))
+  def markdown: TextContent = copy(parseMode = Some(ParseMode.MarkdownV2))
 
   /**
-    * @return Text content with HTML parse mode.
+    * Text content with legacy markdown parse mode.
+    *
+    * Markdown formatting applied according to Markdown style.
+    * Examples and additional information can be found [[https://core.telegram.org/bots/api#markdown-style here]].
+    */
+  def markdownOld: TextContent = copy(parseMode = Some(ParseMode.Markdown))
+
+  /**
+    * Text content with HTML parse mode.
+    *
+    * Examples and additional information can be found [[https://core.telegram.org/bots/api#html-style here]].
     */
   def html: TextContent = copy(parseMode = Some(ParseMode.HTML))
 }

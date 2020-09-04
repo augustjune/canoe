@@ -46,7 +46,7 @@ class ScenarioSpec extends AnyFreeSpec {
           s"2.$trigger"
         ).map(message)
 
-        assert(input.through(scenario.pipe).toList() == input.toList.take(1))
+        assert(input.through(scenario.pipe).toList() == input.toList().take(1))
       }
     }
 
@@ -55,7 +55,7 @@ class ScenarioSpec extends AnyFreeSpec {
         val scenario: Scenario[IO, Unit] = Scenario.eval(IO.unit)
         val input = Stream.empty
 
-        assert(input.through(scenario.pipe).size() == 1)
+        assert(input.through(scenario.pipe).count() == 1)
       }
 
       "evaluates value in the effect" in {
@@ -129,7 +129,7 @@ class ScenarioSpec extends AnyFreeSpec {
         val cancellable = scenario.stopOn(textMessage.matching(cancelMessage).isDefinedAt)
         val input = Stream("1.one", cancelMessage).map(message)
 
-        assert(input.through(cancellable.pipe).size() == 0)
+        assert(input.through(cancellable.pipe).count() == 0)
       }
 
       "evaluates cancellation effect" in {
@@ -242,7 +242,7 @@ class ScenarioSpec extends AnyFreeSpec {
           } yield ()
 
         val input = Stream("one", "two").map(message)
-        assert(input.through(scenario.pipe).size() == 1)
+        assert(input.through(scenario.pipe).count() == 1)
       }
     }
   }

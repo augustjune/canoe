@@ -93,15 +93,15 @@ lazy val compilerOptions =
   ) ++ (if (scalaBinaryVersion.value.startsWith("2.12")) List("-Ypartial-unification") else Nil)
 
 lazy val typeSystemEnhancements = Seq(
-    addCompilerPlugin("org.typelevel" %% "kind-projector" % kindProjectorVersion),
-    addCompilerPlugin("org.augustjune" %% "context-applied" % contextAppliedVersion)
-  )
+  addCompilerPlugin("org.typelevel"  %% "kind-projector"  % kindProjectorVersion),
+  addCompilerPlugin("org.augustjune" %% "context-applied" % contextAppliedVersion)
+)
 
 lazy val tests = {
   val dependencies =
     libraryDependencies ++= Seq(
       "org.scalatest"              %% "scalatest"                 % scalatestVersion,
-      "org.typelevel"              %% "cats-laws"                 % catsCoreVersion,
+      "org.typelevel"              %% "cats-laws"                 % catsLawsVersion,
       "org.typelevel"              %% "discipline-scalatest"      % disciplineVersion,
       "com.github.alexarchambault" %% "scalacheck-shapeless_1.14" % scalacheckShapelessVersion
     ).map(_ % Test)
@@ -118,6 +118,7 @@ val scala2_12 = "2.12.8"
 val fs2Version = "2.4.2"
 val catsCoreVersion = "2.1.1"
 val catsEffectVersion = "2.1.4"
+val catsLawsVersion = "2.2.0"
 val circeVersion = "0.13.0"
 val http4sVersion = "0.21.3"
 val log4catsVersion = "1.0.1"

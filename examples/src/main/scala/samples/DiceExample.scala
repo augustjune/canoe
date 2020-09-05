@@ -1,7 +1,7 @@
 package samples
 
 import canoe.api._
-import canoe.models.{Darts, Dice}
+import canoe.models.{Basketball, Darts, Dice}
 import canoe.syntax._
 import cats.effect.{ExitCode, IO, IOApp}
 import fs2.Stream
@@ -27,6 +27,7 @@ object DiceExample extends IOApp {
       msg <- Scenario.expect(any)
       _   <- Scenario.eval(msg.chat.send(Dice))
       _   <- Scenario.eval(msg.chat.send(Darts))
+      _   <- Scenario.eval(msg.chat.send(Basketball))
     } yield ()
 
 }

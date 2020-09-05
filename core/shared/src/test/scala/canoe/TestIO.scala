@@ -12,7 +12,7 @@ object TestIO {
 
     def value(): A = toList().head
 
-    def size(): Int = toList().size
+    def count(): Int = toList().size
 
     def run(): Unit = stream.compile.drain.unsafeRunSync()
   }

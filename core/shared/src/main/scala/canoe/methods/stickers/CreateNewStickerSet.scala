@@ -6,7 +6,6 @@ import canoe.models.{InputFile, MaskPosition}
 import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 import cats.syntax.all._
-import cats.instances.option._
 
 /**
   * Use this method to create new sticker set owned by a user.

@@ -7,7 +7,7 @@ import canoe.models.messages.{AnimationMessage, StickerMessage, TelegramMessage,
 import canoe.syntax._
 import cats.{Applicative, Monad}
 import cats.effect.{ExitCode, IO, IOApp}
-import cats.implicits._
+import cats.syntax.all._
 import fs2.{Pipe, Stream}
 
 /**

@@ -1,7 +1,6 @@
 package canoe.api
 
 import cats.syntax.all._
-import cats.instances.list._
 import cats.effect.{Concurrent}
 import cats.effect.concurrent.Ref
 import fs2.{Pipe, Stream}

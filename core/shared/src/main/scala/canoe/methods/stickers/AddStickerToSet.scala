@@ -5,7 +5,6 @@ import canoe.methods.Method
 import canoe.models.{InputFile, MaskPosition}
 import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
-import cats.instances.option._
 import cats.syntax.all._
 
 /**

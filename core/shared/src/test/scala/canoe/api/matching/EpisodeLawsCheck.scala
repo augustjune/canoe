@@ -2,7 +2,6 @@ package canoe.api.matching
 
 import canoe.api.matching.EpisodeCheckInstances._
 import cats.effect.IO
-import cats.implicits._
 import cats.laws.discipline._
 import org.scalatest.funsuite.AnyFunSuite
 import org.typelevel.discipline.scalatest.Discipline

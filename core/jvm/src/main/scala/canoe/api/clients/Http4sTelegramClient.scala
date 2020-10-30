@@ -64,7 +64,10 @@ private[api] class Http4sTelegramClient[F[_]: Sync: Logger](token: String, clien
         .map(
           _.toIterable
             .filterNot(kv => kv._2.isNull || kv._2.isObject)
-            .map { case (k, j) => k -> j.toString }
+            .map {
+              case (k, j) if j.isString => k -> j.asString.get
+              case (k, j) => k -> j.toString
+            }
             .toMap
         )
         .getOrElse(Map.empty)

@@ -17,7 +17,7 @@ import io.circe.{Decoder, Encoder}
   * @param photo               Photo to send.
   *                            Pass a file_id as String to send a photo that exists on the Telegram servers (recommended),
   *                            pass an HTTP URL as a String for Telegram to get a photo from the Internet, or upload a new photo using multipart/form-data.
-  * @param caption             Photo caption (may also be used when resending photos by file_id), 0-200 characters
+  * @param caption             Photo caption (may also be used when resending photos by file_id), 0-1024 characters
   * @param parseMode           Parse mode of captioned text (Markdown or HTML)
   * @param disableNotification Sends the message silently.
   *                            iOS users will not receive a notification,

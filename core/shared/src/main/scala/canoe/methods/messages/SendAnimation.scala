@@ -21,7 +21,7 @@ import io.circe.{Decoder, Encoder}
   * @param width               Animation width
   * @param height              Animation height
   * @param thumb               Thumbnail of the file sent
-  * @param caption             Video caption (may also be used when resending videos by file_id), 0-200 characters
+  * @param caption             Video caption (may also be used when resending videos by file_id), 0-1024 characters
   * @param parseMode           Parse mode of captured text (Markdown or HTML)
   * @param disableNotification Sends the message silently.
   *                            iOS users will not receive a notification,

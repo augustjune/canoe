@@ -9,7 +9,7 @@ import org.http4s.HttpApp
 import org.http4s.client.Client
 import org.http4s.dsl.io._
 import io.circe.Json
-import io.chrisdavenport.log4cats.slf4j.Slf4jLogger
+import org.typelevel.log4cats.slf4j.Slf4jLogger
 import org.scalatest.freespec.AnyFreeSpec
 
 class Http4sClientSpec extends AnyFreeSpec {

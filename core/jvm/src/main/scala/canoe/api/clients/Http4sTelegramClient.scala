@@ -6,7 +6,7 @@ import canoe.models.{InputFile, Response => TelegramResponse}
 import cats.effect.Sync
 import cats.syntax.all._
 import fs2.Stream
-import io.chrisdavenport.log4cats.Logger
+import org.typelevel.log4cats.Logger
 import org.http4s._
 import org.http4s.circe._
 import org.http4s.client.Client

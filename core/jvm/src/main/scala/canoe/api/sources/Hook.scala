@@ -9,8 +9,8 @@ import cats.effect.{ConcurrentEffect, Resource, Timer}
 import cats.syntax.all._
 import fs2.Stream
 import fs2.concurrent.Queue
-import io.chrisdavenport.log4cats.Logger
-import io.chrisdavenport.log4cats.slf4j.Slf4jLogger
+import org.typelevel.log4cats.Logger
+import org.typelevel.log4cats.slf4j.Slf4jLogger
 import org.http4s._
 import org.http4s.circe.jsonOf
 import org.http4s.dsl.Http4sDsl

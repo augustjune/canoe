@@ -112,7 +112,7 @@ lazy val tests = {
   Seq(dependencies, frameworks)
 }
 
-val scala2_13 = "2.13.3"
+val scala2_13 = "2.13.5"
 val scala2_12 = "2.12.8"
 
 val fs2Version = "2.4.6"

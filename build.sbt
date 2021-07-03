@@ -115,7 +115,7 @@ lazy val tests = {
 val scala2_13 = "2.13.3"
 val scala2_12 = "2.12.8"
 
-val fs2Version = "2.4.6"
+val fs2Version = "2.5.8"
 val catsCoreVersion = "2.2.0"
 val catsEffectVersion = "2.3.0"
 val catsLawsVersion = "2.2.0"

@@ -6,7 +6,7 @@ import canoe.models.{InputFile, Response => TelegramResponse}
 import cats.effect.Sync
 import cats.syntax.all._
 import fs2.Stream
-import io.chrisdavenport.log4cats.Logger
+import org.typelevel.log4cats.Logger
 import org.http4s._
 import org.http4s.circe._
 import org.http4s.client.Client
@@ -64,7 +64,10 @@ private[api] class Http4sTelegramClient[F[_]: Sync: Logger](token: String, clien
         .map(
           _.toIterable
             .filterNot(kv => kv._2.isNull || kv._2.isObject)
-            .map { case (k, j) => k -> j.toString }
+            .map {
+              case (k, j) if j.isString => k -> j.asString.get
+              case (k, j) => k -> j.toString
+            }
             .toMap
         )
         .getOrElse(Map.empty)

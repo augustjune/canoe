@@ -17,7 +17,7 @@ import io.circe.{Decoder, Encoder}
   * @param chatId              Unique identifier for the target chat or username of the target channel
   *                            (in the format @channelusername)
   * @param voice               Audio file to send
-  * @param caption             Video caption (may also be used when resending videos by file_id), 0-200 characters
+  * @param caption             Video caption (may also be used when resending videos by file_id), 0-1024 characters
   * @param parseMode           Parse mode of captured text (Markdown or HTML)
   * @param duration            Duration of sent audio in seconds
   * @param disableNotification Sends the message silently.

@@ -20,7 +20,7 @@ import io.circe.{Decoder, Encoder}
   * @param width               Video width
   * @param height              Video height
   * @param thumb               Thumbnail of the file sent
-  * @param caption             Video caption (may also be used when resending videos by file_id), 0-200 characters
+  * @param caption             Video caption (may also be used when resending videos by file_id), 0-1024 characters
   * @param parseMode           Parse mode of captured text (Markdown or HTML)
   * @param supportsStreaming   Pass True, if the uploaded video is suitable for streaming
   * @param disableNotification Sends the message silently.

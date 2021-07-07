@@ -3,11 +3,12 @@ package canoe.api
 import canoe.api.matching.Episode
 import canoe.models.messages.TelegramMessage
 import cats.arrow.FunctionK
-import cats.effect.{Bracket, Concurrent, ExitCase, Timer}
+import cats.effect.{Concurrent, ExitCase}
 import cats.{MonadError, StackSafeMonad, ~>}
 import fs2.Pipe
 
 import scala.concurrent.duration.FiniteDuration
+import cats.effect.{ MonadCancel, Temporal }
 
 /**
   * Description of an interaction between two parties,
@@ -25,7 +26,7 @@ final class Scenario[F[_], +A] private (private val ep: Episode[F, TelegramMessa
     * as a result of the successful interaction matching this description.
     * If an unhandled error result was encountered during the interaction, it will be raised here.
     */
-  def pipe(implicit C: Concurrent[F], T: Timer[F]): Pipe[F, TelegramMessage, A] =
+  def pipe(implicit C: Concurrent[F], T: Temporal[F]): Pipe[F, TelegramMessage, A] =
     ep.matching
 
   /**
@@ -163,7 +164,7 @@ object Scenario {
     new Scenario[F, Nothing](Episode.RaiseError(e))
 
   implicit def bracketInstance[F[_]]: MonadError[Scenario[F, *], Throwable] =
-    new Bracket[Scenario[F, *], Throwable] with StackSafeMonad[Scenario[F, *]] {
+    new MonadCancel[Scenario[F, *], Throwable] with StackSafeMonad[Scenario[F, *]] {
       def bracketCase[A, B](acquire: Scenario[F, A])(use: A => Scenario[F, B])(
         release: (A, ExitCase[Throwable]) => Scenario[F, Unit]
       ): Scenario[F, B] =

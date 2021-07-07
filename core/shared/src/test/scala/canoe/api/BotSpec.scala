@@ -5,11 +5,11 @@ import canoe.models.messages.TextMessage
 import canoe.models.{MessageReceived, PrivateChat, Update}
 import canoe.syntax._
 import cats.effect.IO
-import cats.effect.concurrent.Ref
 import fs2.Stream
 import org.scalatest.freespec.AnyFreeSpec
 
 import scala.concurrent.duration._
+import cats.effect.Ref
 
 class BotSpec extends AnyFreeSpec {
   type Message = String

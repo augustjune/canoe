@@ -2,9 +2,9 @@ package canoe.api
 
 import cats.syntax.all._
 import cats.effect.{Concurrent}
-import cats.effect.concurrent.Ref
 import fs2.{Pipe, Stream}
 import fs2.concurrent.{Queue, Topic}
+import cats.effect.Ref
 
 /**
   * Custom, more efficient implementation of fs2.concurrent.Topic.

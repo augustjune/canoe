@@ -2,10 +2,11 @@ package canoe.api.sources
 
 import canoe.api.TelegramClient
 import canoe.models.{InputFile, Update}
-import cats.effect.{ConcurrentEffect, Resource, Timer}
+import cats.effect.{ConcurrentEffect, Resource}
 import fs2.Stream
 import fs2.concurrent.Queue
 import javax.naming.OperationNotSupportedException
+import cats.effect.Temporal
 
 class Hook[F[_]](queue: Queue[F, Update]) {
   def updates: Stream[F, Update] = queue.dequeue
@@ -24,7 +25,7 @@ object Hook {
     * @param port        Port which will be used for listening for the incoming updates
     * @param certificate Public key of self-signed certificate (including BEGIN and END portions)
     */
-  def install[F[_]: TelegramClient: ConcurrentEffect: Timer](url: String,
+  def install[F[_]: TelegramClient: ConcurrentEffect: Temporal](url: String,
                                                              host: String,
                                                              port: Int,
                                                              certificate: Option[InputFile]

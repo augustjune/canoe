@@ -3,7 +3,7 @@ package canoe.api.clients
 import canoe.api.{FailedMethod, ResponseDecodingError, TelegramClient}
 import canoe.methods.Method
 import canoe.models.Response
-import cats.effect.{Async, ContextShift}
+import cats.effect.Async
 import cats.syntax.all._
 import io.circe.Decoder
 import io.circe.parser.decode

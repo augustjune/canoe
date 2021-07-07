@@ -3,8 +3,8 @@ package canoe.api
 import canoe.api.clients.Http4sTelegramClient
 import canoe.methods.Method
 import cats.effect.{ConcurrentEffect, Resource, Sync}
-import io.chrisdavenport.log4cats.Logger
-import io.chrisdavenport.log4cats.slf4j.Slf4jLogger
+import org.typelevel.log4cats.Logger
+import org.typelevel.log4cats.slf4j.Slf4jLogger
 import org.http4s.client.Client
 import org.http4s.client.blaze.BlazeClientBuilder
 

@@ -22,11 +22,11 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
   )
   .jvmSettings(
     libraryDependencies ++= Seq(
-      "org.http4s"        %% "http4s-dsl"          % http4sVersion,
-      "org.http4s"        %% "http4s-blaze-client" % http4sVersion,
-      "org.http4s"        %% "http4s-blaze-server" % http4sVersion,
-      "org.http4s"        %% "http4s-circe"        % http4sVersion,
-      "io.chrisdavenport" %% "log4cats-slf4j"      % log4catsVersion
+      "org.http4s"    %% "http4s-dsl"          % http4sVersion,
+      "org.http4s"    %% "http4s-blaze-client" % http4sVersion,
+      "org.http4s"    %% "http4s-blaze-server" % http4sVersion,
+      "org.http4s"    %% "http4s-circe"        % http4sVersion,
+      "org.typelevel" %% "log4cats-slf4j"      % log4catsVersion
     )
   )
   .jsSettings(
@@ -61,13 +61,13 @@ lazy val projectSettings = Seq(
 
 lazy val crossDependencies =
   libraryDependencies ++= Seq(
-    "co.fs2"            %%% "fs2-core"      % fs2Version,
-    "org.typelevel"     %%% "cats-core"     % catsCoreVersion,
-    "org.typelevel"     %%% "cats-effect"   % catsEffectVersion,
-    "io.circe"          %%% "circe-core"    % circeVersion,
-    "io.circe"          %%% "circe-generic" % circeVersion,
-    "io.circe"          %%% "circe-parser"  % circeVersion,
-    "io.chrisdavenport" %%% "log4cats-core" % log4catsVersion
+    "co.fs2"        %%% "fs2-core"      % fs2Version,
+    "org.typelevel" %%% "cats-core"     % catsCoreVersion,
+    "org.typelevel" %%% "cats-effect"   % catsEffectVersion,
+    "io.circe"      %%% "circe-core"    % circeVersion,
+    "io.circe"      %%% "circe-generic" % circeVersion,
+    "io.circe"      %%% "circe-parser"  % circeVersion,
+    "org.typelevel" %%% "log4cats-core" % log4catsVersion
   )
 
 lazy val mimaSettings = Seq(
@@ -115,13 +115,13 @@ lazy val tests = {
 val scala2_13 = "2.13.3"
 val scala2_12 = "2.12.8"
 
-val fs2Version = "2.4.6"
-val catsCoreVersion = "2.2.0"
-val catsEffectVersion = "2.3.0"
+val fs2Version = "2.5.8"
+val catsCoreVersion = "2.6.1"
+val catsEffectVersion = "2.5.1"
 val catsLawsVersion = "2.2.0"
-val circeVersion = "0.13.0"
-val http4sVersion = "0.21.3"
-val log4catsVersion = "1.1.1"
+val circeVersion = "0.14.1"
+val http4sVersion = "0.21.24"
+val log4catsVersion = "1.3.1"
 val scalatestVersion = "3.2.2"
 val disciplineVersion = "1.0.0-RC2"
 val scalacheckShapelessVersion = "1.2.5"

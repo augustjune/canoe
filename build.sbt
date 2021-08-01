@@ -83,7 +83,7 @@ lazy val compilerOptions =
     "-language:higherKinds", // Allow higher-kinded types
     "-language:postfixOps", // Allow higher-kinded types
     "-language:implicitConversions", // Allow definition of implicit functions called views
-    "-Ywarn-unused:implicits", // Warn if an implicit parameter is unused.
+    // "-Ywarn-unused:implicits", // Warn if an implicit parameter is unused.
     "-Ywarn-unused:imports", // Warn if an import selector is not referenced.
     "-Ywarn-unused:locals", // Warn if a local definition is unused.
     // "-Ywarn-unused:params", // Warn if a value parameter is unused.
@@ -115,12 +115,12 @@ lazy val tests = {
 val scala2_13 = "2.13.3"
 val scala2_12 = "2.12.8"
 
-val fs2Version = "2.5.8"
+val fs2Version = "3.0.6"
 val catsCoreVersion = "2.6.1"
-val catsEffectVersion = "2.5.1"
+val catsEffectVersion = "3.2.1"
 val catsLawsVersion = "2.2.0"
 val circeVersion = "0.14.1"
-val http4sVersion = "0.21.24"
+val http4sVersion = "1.0.0-M23"
 val log4catsVersion = "1.3.1"
 val scalatestVersion = "3.2.2"
 val disciplineVersion = "1.0.0-RC2"

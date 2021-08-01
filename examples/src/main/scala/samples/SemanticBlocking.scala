@@ -3,7 +3,7 @@ package samples
 import canoe.api._
 import canoe.models.Chat
 import canoe.syntax._
-import cats.effect.{ExitCode, IO, IOApp, Timer}
+import cats.effect.{ExitCode, IO, IOApp, Temporal}
 import cats.syntax.functor._
 import fs2.Stream
 
@@ -25,19 +25,19 @@ object SemanticBlocking extends IOApp {
       }
       .compile.drain.as(ExitCode.Success)
 
-  def count[F[_]: TelegramClient: Timer]: Scenario[F, Unit] =
+  def count[F[_]: TelegramClient: Temporal]: Scenario[F, Unit] =
     for {
       m <- Scenario.expect(command("count"))
       start = Try(m.text.split(" ")(1).toInt).getOrElse(10)
       _ <- repeat(m.chat, start)
     } yield ()
 
-  def repeat[F[_]: TelegramClient: Timer](chat: Chat, i: Int): Scenario[F, Unit] =
+  def repeat[F[_]: TelegramClient: Temporal](chat: Chat, i: Int): Scenario[F, Unit] =
     if (i <= 0) Scenario.eval(chat.send("Done.")).void
     else
       for {
         _ <- Scenario.eval(chat.send(s"$i.."))
-        _ <- Scenario.eval(Timer[F].sleep(1.second))
+        _ <- Scenario.eval(Temporal[F].sleep(1.second))
         _ <- repeat(chat, i - 1)
       } yield ()
 }

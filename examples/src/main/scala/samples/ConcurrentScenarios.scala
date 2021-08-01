@@ -2,7 +2,7 @@ package samples
 
 import canoe.api._
 import canoe.syntax._
-import cats.effect.concurrent.Semaphore
+import cats.effect.std.Semaphore
 import cats.effect.{ExitCode, IO, IOApp}
 import cats.syntax.all._
 import fs2.Stream

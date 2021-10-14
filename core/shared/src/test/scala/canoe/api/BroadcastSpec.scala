@@ -1,13 +1,14 @@
 package canoe.api
 
-import canoe.TestIO._
+import canoe.IOSpec
 import cats.effect.IO
 import fs2.{Pipe, Stream}
-import org.scalatest.freespec.AnyFreeSpec
-import cats.effect.concurrent.Ref
+import cats.effect.Ref
+import org.scalatest.freespec.AsyncFreeSpec
+
 import scala.concurrent.duration._
 
-class BroadcastSpec extends AnyFreeSpec {
+class BroadcastSpec extends AsyncFreeSpec with IOSpec {
   def broadcast[A]: Stream[IO, Broadcast[IO, A]] = Stream.eval(Broadcast[IO, A])
 
   def recordPulled[A](b: Broadcast[IO, A], duration: FiniteDuration): Pipe[IO, A, List[A]] =
@@ -27,7 +28,7 @@ class BroadcastSpec extends AnyFreeSpec {
     "subscriber" - {
       "sees all elements after subscription" in {
         val res = broadcast[Int].flatMap { b =>
-          val pop = Stream.sleep_(0.05.second) ++ input.through(b.publish)
+          val pop = Stream.sleep_[IO](0.05.second) ++ input.through(b.publish)
           val sub = b.subscribe(1).take(input.count())
           sub.concurrently(pop)
         }
@@ -37,7 +38,7 @@ class BroadcastSpec extends AnyFreeSpec {
 
       "is deregistered after it is done pulling" in {
         val pulled = broadcast[Int].flatMap { b =>
-          val pop = Stream.sleep_(0.1.second) ++ input.through(recordPulled(b, 1.second))
+          val pop = Stream.sleep_[IO](0.1.second) ++ input.through(recordPulled(b, 1.second))
           val consumer = b.subscribe(1).metered(0.1.second).take(5)
           pop.concurrently(consumer)
         }
@@ -49,7 +50,7 @@ class BroadcastSpec extends AnyFreeSpec {
     "pulls from publisher" - {
       "one element before it's blocked by the subscriber" in {
         val pulled = broadcast[Int].flatMap { b =>
-          val pop = Stream.sleep_(0.05.second) ++ input.through(recordPulled(b, 0.2.second))
+          val pop = Stream.sleep_[IO](0.05.second) ++ input.through(recordPulled(b, 0.2.second))
           val consumer = b.subscribe(0).evalMap(_ => IO.never)
           pop.concurrently(consumer)
         }
@@ -60,7 +61,7 @@ class BroadcastSpec extends AnyFreeSpec {
       "maxQueued + 2 elements for non-empty blocking consumer" in {
         val maxQueued = 3
         val pulled = broadcast[Int].flatMap { b =>
-          val pop = Stream.sleep_(0.05.second) ++ input.through(recordPulled(b, 0.2.second))
+          val pop = Stream.sleep_[IO](0.05.second) ++ input.through(recordPulled(b, 0.2.second))
           val consumer = b.subscribe(maxQueued).evalMap(_ => IO.never)
           pop.concurrently(consumer)
         }

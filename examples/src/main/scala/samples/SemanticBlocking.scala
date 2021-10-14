@@ -3,27 +3,27 @@ package samples
 import canoe.api._
 import canoe.models.Chat
 import canoe.syntax._
-import cats.effect.{ExitCode, IO, IOApp, Temporal}
+import cats.effect.{IO, IOApp, Temporal}
 import cats.syntax.functor._
 import fs2.Stream
 
 import scala.concurrent.duration._
 import scala.util.Try
 
-/**
-  * Example of execution semantic blocking within a scenario.
+/** Example of execution semantic blocking within a scenario.
   */
-object SemanticBlocking extends IOApp {
+object SemanticBlocking extends IOApp.Simple {
 
   val token: String = "<your telegram token>"
 
-  def run(args: List[String]): IO[ExitCode] =
+  def run: IO[Unit] =
     Stream
       .resource(TelegramClient.global[IO](token))
       .flatMap { implicit client =>
         Bot.polling[IO].follow(count)
       }
-      .compile.drain.as(ExitCode.Success)
+      .compile
+      .drain
 
   def count[F[_]: TelegramClient: Temporal]: Scenario[F, Unit] =
     for {

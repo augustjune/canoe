@@ -1,6 +1,6 @@
 package canoe.api
 
-import canoe.TestIO._
+import canoe.IOSpec
 import canoe.models.PrivateChat
 import canoe.models.messages.{TelegramMessage, TextMessage}
 import cats.Eq
@@ -8,7 +8,7 @@ import cats.effect.IO
 import fs2.Stream
 import org.scalacheck.{Arbitrary, Gen}
 
-object ScenarioCheckInstances {
+trait ScenarioCheckInstances { self: IOSpec =>
   // Basically the same instances as in EpisodeCheckInstances
 
   private def message(s: String): TextMessage =

@@ -1,5 +1,6 @@
 package canoe.api.clients
 
+import canoe.IOSpec
 import canoe.api._
 import canoe.methods.Method
 import canoe.models.InputFile
@@ -9,10 +10,11 @@ import org.http4s.HttpApp
 import org.http4s.client.Client
 import org.http4s.dsl.io._
 import io.circe.Json
+import org.scalatest.freespec.AsyncFreeSpec
+import org.typelevel.ci.CIStringSyntax
 import org.typelevel.log4cats.slf4j.Slf4jLogger
-import org.scalatest.freespec.AnyFreeSpec
 
-class Http4sClientSpec extends AnyFreeSpec {
+class Http4sClientSpec extends AsyncFreeSpec with IOSpec {
   private case class TestMethod(name: String = "test",
                                 encoder: Encoder[String] = Encoder.encodeString,
                                 decoder: Decoder[String] = Decoder.decodeString,
@@ -37,7 +39,7 @@ class Http4sClientSpec extends AnyFreeSpec {
       }
 
       val tgClient = new Http4sTelegramClient("", Client.fromHttpApp(HttpApp[IO] { r =>
-        Ok(response(r.headers.get(org.http4s.headers.`Content-Type`).map(_.value.replace("\"", "''")).getOrElse("")))
+        Ok(response(r.headers.get(ci"Content-Type").map(_.head.value.replace("\"", "''")).getOrElse("")))
       }))
 
       "json POST request if attachments contain file upload" in {

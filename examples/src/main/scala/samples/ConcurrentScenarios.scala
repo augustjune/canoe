@@ -3,21 +3,20 @@ package samples
 import canoe.api._
 import canoe.syntax._
 import cats.effect.std.Semaphore
-import cats.effect.{ExitCode, IO, IOApp}
+import cats.effect.{IO, IOApp}
 import cats.syntax.all._
 import fs2.Stream
 
-/**
-  * Example of concurrent execution of >1 scenarios.
+/** Example of concurrent execution of >1 scenarios.
   *
   * Each scenario is evaluated independently across different chats,
   * without blocking current chat from evaluating other scenarios.
   */
-object ConcurrentScenarios extends IOApp {
+object ConcurrentScenarios extends IOApp.Simple {
 
   val token: String = "<your telegram token>"
 
-  def run(args: List[String]): IO[ExitCode] =
+  def run: IO[Unit] =
     Stream
       .resource(TelegramClient.global[IO](token))
       .flatMap { implicit client =>
@@ -27,7 +26,8 @@ object ConcurrentScenarios extends IOApp {
           Bot.polling[IO].follow(pop(sem), push(sem))
         }
       }
-      .compile.drain.as(ExitCode.Success)
+      .compile
+      .drain
 
   def pop[F[_]: TelegramClient](semaphore: Semaphore[F]): Scenario[F, Unit] =
     for {

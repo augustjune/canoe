@@ -1,14 +1,14 @@
 package canoe.api
 
-import canoe.TestIO._
+import canoe.IOSpec
 import canoe.models.PrivateChat
 import canoe.models.messages.{TelegramMessage, TextMessage}
 import canoe.syntax._
 import cats.effect.IO
 import fs2.Stream
-import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.freespec.AsyncFreeSpec
 
-class ScenarioSpec extends AnyFreeSpec {
+class ScenarioSpec extends AsyncFreeSpec with IOSpec {
   private def message(s: String): TextMessage =
     TextMessage(-1, PrivateChat(-1, None, None, None), -1, s)
 
@@ -66,7 +66,7 @@ class ScenarioSpec extends AnyFreeSpec {
 
       "evaluates effect once" in {
         var counter = 0
-        val scenario: Scenario[IO, Unit] = Scenario.eval(IO { counter += 1 })
+        val scenario: Scenario[IO, Unit] = Scenario.eval(IO(counter += 1))
         Stream.empty.through(scenario.pipe).run()
 
         assert(counter == 1)
@@ -190,7 +190,7 @@ class ScenarioSpec extends AnyFreeSpec {
         val scenario: Scenario[IO, Unit] =
           for {
             _ <- Scenario.expect(any)
-            _ <- Scenario.expect(textMessage.endingWith("fire")).tolerateAll(_ => IO { counter += 1 })
+            _ <- Scenario.expect(textMessage.endingWith("fire")).tolerateAll(_ => IO(counter += 1))
           } yield ()
 
         val input = Stream("any", "1", "2", "fire").map(message)
@@ -229,7 +229,8 @@ class ScenarioSpec extends AnyFreeSpec {
             _ <- Scenario.expect(any)
           } yield ()
 
-        input.through(scenario.attempt.pipe).run()
+        input.through(scenario.attempt.pipe).run() // implicit assertion that program doesn't fail
+        succeed
       }
     }
 

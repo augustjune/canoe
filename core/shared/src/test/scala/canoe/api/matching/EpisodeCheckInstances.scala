@@ -1,13 +1,13 @@
 package canoe.api.matching
 
-import canoe.TestIO._
+import canoe.IOSpec
 import cats.Eq
 import cats.effect.IO
 import cats.syntax.applicativeError._
 import fs2.Stream
 import org.scalacheck.{Arbitrary, Gen}
 
-object EpisodeCheckInstances {
+trait EpisodeCheckInstances { self: IOSpec =>
 
   implicit def eqEpisode[I: Arbitrary, O]: Eq[Episode[IO, I, O]] = {
 

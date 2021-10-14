@@ -1,17 +1,17 @@
 package canoe.api.sources
 
-import canoe.TestIO._
+import canoe.IOSpec
 import canoe.api.TelegramClient
 import canoe.methods.Method
 import canoe.methods.updates.GetUpdates
 import canoe.models.messages.TextMessage
 import canoe.models.{MessageReceived, PrivateChat, Update}
 import cats.effect.IO
-import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.freespec.AsyncFreeSpec
 
 import scala.concurrent.duration.Duration
 
-class PollingSpec extends AnyFreeSpec {
+class PollingSpec extends AsyncFreeSpec with IOSpec {
   implicit val updatesClient: TelegramClient[IO] = new TelegramClient[IO] {
     def execute[Req, Res](request: Req)(implicit M: Method[Req, Res]): IO[Res] =
       if (M.name != GetUpdates.method.name) throw new UnsupportedOperationException

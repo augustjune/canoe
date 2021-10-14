@@ -1,24 +1,23 @@
 package canoe.api
 
-import canoe.TestIO._
+import canoe.IOSpec
 import canoe.models.messages.TextMessage
 import canoe.models.{MessageReceived, PrivateChat, Update}
 import canoe.syntax._
-import cats.effect.IO
-import cats.effect.concurrent.Ref
+import cats.effect.{IO, Ref}
 import fs2.Stream
-import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.freespec.AsyncFreeSpec
 
 import scala.concurrent.duration._
 
-class BotSpec extends AnyFreeSpec {
+class BotSpec extends AsyncFreeSpec with IOSpec {
   type Message = String
   type ChatId = Int
 
   def updates(messages: List[(Message, ChatId)]): Stream[IO, Update] =
     Stream
-      .emits(messages.zipWithIndex.map {
-        case ((m, id), i) => MessageReceived(i, TextMessage(i, PrivateChat(id, None, None, None), -1, m))
+      .emits(messages.zipWithIndex.map { case ((m, id), i) =>
+        MessageReceived(i, TextMessage(i, PrivateChat(id, None, None, None), -1, m))
       })
       .metered[IO](0.2.second)
 
@@ -32,8 +31,8 @@ class BotSpec extends AnyFreeSpec {
 
         val bot = new Bot[IO](updates(messages))
 
-        val texts = bot.updates.toList().collect {
-          case MessageReceived(_, m: TextMessage) => m.text
+        val texts = bot.updates.toList().collect { case MessageReceived(_, m: TextMessage) =>
+          m.text
         }
 
         assert(texts == messages.map(_._1))

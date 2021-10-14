@@ -6,28 +6,28 @@ import canoe.models.{CallbackButtonSelected, InlineKeyboardButton, InlineKeyboar
 import canoe.models.messages.{AnimationMessage, StickerMessage, TelegramMessage, TextMessage}
 import canoe.syntax._
 import cats.{Applicative, Monad}
-import cats.effect.{ExitCode, IO, IOApp}
+import cats.effect.{IO, IOApp}
 import cats.syntax.all._
 import fs2.{Pipe, Stream}
 
-/**
-  * Example of echos bot that will answer to you with
+/** Example of echos bot that will answer to you with
   * the callback data [[canoe.models.InlineKeyboardButton.callbackData]]
   * has been sent to him
   */
-object CallbackHandling extends IOApp {
+object CallbackHandling extends IOApp.Simple {
   val token: String = "<your telegram token>"
 
-  def run(args: List[String]): IO[ExitCode] =
+  def run: IO[Unit] =
     Stream
       .resource(TelegramClient.global[IO](token))
       .flatMap { implicit client =>
-        Bot.polling[IO].follow(echos)
+        Bot
+          .polling[IO]
+          .follow(echos)
           .through(answerCallbacks)
       }
       .compile
       .drain
-      .as(ExitCode.Success)
 
   val inlineBtn = InlineKeyboardButton.callbackData(text = "button", cbd = "callback data")
 

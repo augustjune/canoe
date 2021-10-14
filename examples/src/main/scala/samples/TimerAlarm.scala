@@ -3,25 +3,25 @@ package samples
 import canoe.api._
 import canoe.syntax._
 import canoe.models.messages.TextMessage
-import cats.effect.{ExitCode, IO, IOApp, Temporal}
+import cats.effect.{IO, IOApp, Temporal}
 import fs2.Stream
 
 import scala.util.Try
 import scala.concurrent.duration._
 
-/**
-  * Example of scheduling a job after user-defined delay.
-  * Each user can schedule any number of jobs and all of them 
+/** Example of scheduling a job after user-defined delay.
+  * Each user can schedule any number of jobs and all of them
   * will be executed concurrently without blocking each other.
   */
-object TimerAlarm extends IOApp {
+object TimerAlarm extends IOApp.Simple {
   val token: String = "<your telegram token>"
 
-  def run(args: List[String]): IO[ExitCode] =
+  def run: IO[Unit] =
     Stream
       .resource(TelegramClient.global[IO](token))
-      .flatMap { implicit client => Bot.polling[IO].follow(alarm) }
-      .compile.drain.as(ExitCode.Success)
+      .flatMap(implicit client => Bot.polling[IO].follow(alarm))
+      .compile
+      .drain
 
   def alarm[F[_]: TelegramClient: Temporal]: Scenario[F, Unit] =
     for {

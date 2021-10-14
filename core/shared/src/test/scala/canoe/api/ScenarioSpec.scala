@@ -18,14 +18,20 @@ class ScenarioSpec extends AsyncFreeSpec with IOSpec {
         val scenario: Scenario[IO, TextMessage] = Scenario.expect(command("fire"))
         val input = Stream.empty
 
-        assert(input.through(scenario.pipe).toList().isEmpty)
+        for {
+          res <- input.through(scenario.pipe).compile.toList
+          asr <- IO(assert(res.isEmpty))
+        } yield asr
       }
 
       "uses provided predicate to match the result" in {
         val scenario: Scenario[IO, TextMessage] = Scenario.expect(textMessage.endingWith("fire"))
         val input = Stream("").map(message)
 
-        assert(input.through(scenario.pipe).toList().isEmpty)
+        for {
+          res <- input.through(scenario.pipe).compile.toList
+          asr <- IO(assert(res.isEmpty))
+        } yield asr
       }
 
       "halts the stream if the first element was not matched" in {
@@ -34,7 +40,10 @@ class ScenarioSpec extends AsyncFreeSpec with IOSpec {
 
         val input = Stream("not_matched", trigger).map(message)
 
-        assert(input.through(scenario.pipe).toList().isEmpty)
+        for {
+          res <- input.through(scenario.pipe).compile.toList
+          asr <- IO(assert(res.isEmpty))
+        } yield asr
       }
 
       "checks only the first message" in {
@@ -46,7 +55,10 @@ class ScenarioSpec extends AsyncFreeSpec with IOSpec {
           s"2.$trigger"
         ).map(message)
 
-        assert(input.through(scenario.pipe).toList() == input.toList().take(1))
+        for {
+          res <- input.through(scenario.pipe).compile.toList
+          asr <- IO(assert(res == input.toList.take(1)))
+        } yield asr
       }
     }
 
@@ -55,37 +67,53 @@ class ScenarioSpec extends AsyncFreeSpec with IOSpec {
         val scenario: Scenario[IO, Unit] = Scenario.eval(IO.unit)
         val input = Stream.empty
 
-        assert(input.through(scenario.pipe).count() == 1)
+        for {
+          res <- input.through(scenario.pipe).compile.count
+          asr <- IO(assert(res == 1))
+        } yield asr
       }
 
       "evaluates value in the effect" in {
         val scenario: Scenario[IO, Int] = Scenario.eval(IO.pure(12))
 
-        assert(Stream.empty.through(scenario.pipe).value() == 12)
+        for {
+          res <- Stream.empty.through(scenario.pipe).head.compile.lastOrError
+          asr <- IO(assert(res == 12))
+        } yield asr
       }
 
       "evaluates effect once" in {
         var counter = 0
         val scenario: Scenario[IO, Unit] = Scenario.eval(IO(counter += 1))
-        Stream.empty.through(scenario.pipe).run()
 
-        assert(counter == 1)
+        for {
+          _   <- Stream.empty.through(scenario.pipe).compile.drain
+          asr <- IO(assert(counter == 1))
+        } yield asr
       }
 
       "propagates error raised in underlying value" in {
         case class Error(s: String) extends Throwable
+        val error = Error("test")
         val scenario: Scenario[IO, Unit] = Scenario.eval(IO.raiseError(Error("test")))
 
-        assertThrows[Error](Stream.empty.through(scenario.pipe).run())
+        for {
+          res <- Stream.empty.through(scenario.pipe).compile.drain.attempt
+          asr <- IO(assert(res == Left(error)))
+        } yield asr
       }
     }
 
     "raiseError" - {
       "interrupts the flow of the scenario" in {
         case class Error(s: String) extends Throwable
-        val scenario: Scenario[IO, Int] = Scenario.raiseError(Error("test")).map(_ => 12)
+        val error = Error("test")
+        val scenario: Scenario[IO, Int] = Scenario.raiseError(error).map(_ => 12)
 
-        assertThrows[Error](Stream.empty.through(scenario.pipe).value())
+        for {
+          res <- Stream.empty.through(scenario.pipe).compile.drain.attempt
+          asr <- IO(assert(res == Left(error)))
+        } yield asr
       }
     }
 
@@ -98,7 +126,10 @@ class ScenarioSpec extends AsyncFreeSpec with IOSpec {
             .flatMap(_ => Scenario.eval(IO.pure(-1)))
             .handleErrorWith(_ => Scenario.eval(IO.pure(12)))
 
-        assert(Stream.empty.through(scenario.pipe).value() == 12)
+        for {
+          res <- Stream.empty.through(scenario.pipe).head.compile.lastOrError
+          asr <- IO(assert(res == 12))
+        } yield asr
       }
     }
 
@@ -108,12 +139,19 @@ class ScenarioSpec extends AsyncFreeSpec with IOSpec {
         val error = Error("test")
 
         val scenario: Scenario[IO, Unit] = Scenario.raiseError(error)
-        assert(Stream.empty.through(scenario.attempt.pipe).value() == Left(error))
+
+        for {
+          res <- Stream.empty.through(scenario.attempt.pipe).head.compile.lastOrError
+          asr <- IO(assert(res == Left(error)))
+        } yield asr
       }
 
       "wraps result in right part of Either" in {
         val scenario: Scenario[IO, Int] = Scenario.eval(IO.pure(12))
-        assert(Stream.empty.through(scenario.attempt.pipe).value() == Right(12))
+        for {
+          res <- Stream.empty.through(scenario.attempt.pipe).head.compile.lastOrError
+          asr <- IO(assert(res == Right(12)))
+        } yield asr
       }
     }
 
@@ -129,7 +167,10 @@ class ScenarioSpec extends AsyncFreeSpec with IOSpec {
         val cancellable = scenario.stopOn(textMessage.matching(cancelMessage).isDefinedAt)
         val input = Stream("1.one", cancelMessage).map(message)
 
-        assert(input.through(cancellable.pipe).count() == 0)
+        for {
+          res <- input.through(cancellable.pipe).compile.count
+          asr <- IO(assert(res == 12))
+        } yield asr
       }
 
       "evaluates cancellation effect" in {
@@ -148,8 +189,10 @@ class ScenarioSpec extends AsyncFreeSpec with IOSpec {
 
         val input = Stream("1.one", cancelMessage).map(message)
 
-        input.through(cancellable.pipe).run()
-        assert(cancelled)
+        for {
+          _   <- input.through(cancellable.pipe).compile.drain
+          asr <- IO(assert(cancelled))
+        } yield asr
       }
     }
 
@@ -163,7 +206,10 @@ class ScenarioSpec extends AsyncFreeSpec with IOSpec {
           } yield s
         val input = Stream("any") ++ Stream("").repeatN(n) ++ Stream("2.fire")
 
-        assert(input.map(message).through(scenario.pipe).value().text.startsWith("2"))
+        for {
+          msg <- input.map(message).through(scenario.pipe).head.compile.lastOrError
+          asr <- IO(assert(msg.text.startsWith("2")))
+        } yield asr
       }
 
       "doesn't skip the element if it matches" in {
@@ -171,7 +217,10 @@ class ScenarioSpec extends AsyncFreeSpec with IOSpec {
           Scenario.expect(textMessage.endingWith("fire")).map(_.text).tolerate(_ => IO.unit)
         val input = Stream("1.fire", "2.fire").map(message)
 
-        assert(input.through(scenario.pipe).value().startsWith("1"))
+        for {
+          string <- input.through(scenario.pipe).head.compile.lastOrError
+          asr    <- IO(assert(string.startsWith("2")))
+        } yield asr
       }
 
       "can skip all unmatching elements" in {
@@ -182,7 +231,10 @@ class ScenarioSpec extends AsyncFreeSpec with IOSpec {
           } yield s
         val input = Stream("any") ++ Stream("").repeatN(1000) ++ Stream("2.fire")
 
-        assert(input.map(message).through(scenario.pipe).value().text.startsWith("2"))
+        for {
+          message <- input.map(message).through(scenario.pipe).head.compile.lastOrError
+          asr     <- IO(assert(message.text.startsWith("2")))
+        } yield asr
       }
 
       "evaluates provided effect each time it skips the element" in {
@@ -194,9 +246,11 @@ class ScenarioSpec extends AsyncFreeSpec with IOSpec {
           } yield ()
 
         val input = Stream("any", "1", "2", "fire").map(message)
-        input.through(scenario.pipe).run()
 
-        assert(counter == 2)
+        for {
+          _   <- input.through(scenario.pipe).compile.drain
+          asr <- IO(assert(counter == 2))
+        } yield asr
       }
     }
 
@@ -211,7 +265,11 @@ class ScenarioSpec extends AsyncFreeSpec with IOSpec {
         }
 
         val n = 100000L
-        assert(Stream.empty.through(stack[IO](n).pipe).value() == n)
+
+        for {
+          res <- Stream.empty.through(stack[IO](n).pipe).head.compile.lastOrError
+          asr <- IO(assert(res == n))
+        } yield asr
       }
 
       "propagates input stream failure in a safe way" in {
@@ -229,8 +287,9 @@ class ScenarioSpec extends AsyncFreeSpec with IOSpec {
             _ <- Scenario.expect(any)
           } yield ()
 
-        input.through(scenario.attempt.pipe).run() // implicit assertion that program doesn't fail
-        succeed
+        for {
+          _ <- input.through(scenario.attempt.pipe).compile.drain
+        } yield succeed // implicit assertion that program doesn't fail
       }
     }
 
@@ -243,7 +302,10 @@ class ScenarioSpec extends AsyncFreeSpec with IOSpec {
           } yield ()
 
         val input = Stream("one", "two").map(message)
-        assert(input.through(scenario.pipe).count() == 1)
+        for {
+          count <- input.through(scenario.pipe).compile.count
+          asr   <- IO(assert(count == 1))
+        } yield asr
       }
     }
   }

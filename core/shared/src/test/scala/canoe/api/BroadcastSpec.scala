@@ -29,11 +29,13 @@ class BroadcastSpec extends AsyncFreeSpec with IOSpec {
       "sees all elements after subscription" in {
         val res = broadcast[Int].flatMap { b =>
           val pop = Stream.sleep_[IO](0.05.second) ++ input.through(b.publish)
-          val sub = b.subscribe(1).take(input.count())
+          val sub = b.subscribe(1).take(input.compile.count)
           sub.concurrently(pop)
         }
 
-        assert(res.toList() == input.toList())
+        res.compile.toList.flatMap { list =>
+          IO(assert(list == input.toList))
+        }
       }
 
       "is deregistered after it is done pulling" in {
@@ -43,7 +45,9 @@ class BroadcastSpec extends AsyncFreeSpec with IOSpec {
           pop.concurrently(consumer)
         }
 
-        assert(pulled.value() == input.toList().reverse)
+        pulled.head.compile.lastOrError.flatMap { list =>
+          IO(assert(list == input.toList.reverse))
+        }
       }
     }
 
@@ -55,7 +59,9 @@ class BroadcastSpec extends AsyncFreeSpec with IOSpec {
           pop.concurrently(consumer)
         }
 
-        assert(pulled.value() == input.head.toList())
+        pulled.head.compile.lastOrError.flatMap { list =>
+          IO(assert(list == input.head.toList))
+        }
       }
 
       "maxQueued + 2 elements for non-empty blocking consumer" in {
@@ -65,7 +71,9 @@ class BroadcastSpec extends AsyncFreeSpec with IOSpec {
           val consumer = b.subscribe(maxQueued).evalMap(_ => IO.never)
           pop.concurrently(consumer)
         }
-        assert(pulled.value() == input.take(maxQueued + 2).toList().reverse)
+        pulled.head.compile.lastOrError.flatMap { list =>
+          IO(assert(list == input.take(maxQueued + 2).toList.reverse))
+        }
       }
 
       "all elements" - {
@@ -75,14 +83,20 @@ class BroadcastSpec extends AsyncFreeSpec with IOSpec {
             val consumer = b.subscribe(1)
             pop.concurrently(consumer)
           }
-          assert(pulled.value() == input.toList().reverse)
+
+          pulled.head.compile.lastOrError.flatMap { list =>
+            IO(assert(list == input.toList.reverse))
+          }
+
         }
 
         "for no consumer" in {
           val pulled = broadcast[Int].flatMap { b =>
             input.through(recordPulled(b, 0.2.second))
           }
-          assert(pulled.value() == input.toList().reverse)
+          pulled.head.compile.lastOrError.flatMap { list =>
+            IO(assert(list == input.toList.reverse))
+          }
         }
       }
     }

@@ -38,7 +38,7 @@ private[api] sealed trait Episode[F[_], -I, +O] {
     * Fails on the first unhandled error result.
     */
   def matching(implicit F: MonadThrow[F]): Pipe[F, I, O] =
-    open(this, _, Nil, true).flatMap {
+    open(this, _, Nil, first = true).flatMap {
       case (Matched(o), _) => Stream(o)
       case (Failed(e), _)  => Stream.raiseError[F](e)
       case _               => Stream.empty

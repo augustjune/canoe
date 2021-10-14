@@ -31,11 +31,11 @@ class BotSpec extends AsyncFreeSpec with IOSpec {
 
         val bot = new Bot[IO](updates(messages))
 
-        val texts = bot.updates.toList().collect { case MessageReceived(_, m: TextMessage) =>
-          m.text
-        }
-
-        assert(texts == messages.map(_._1))
+        for {
+          updates <- bot.updates.compile.toList
+          texts = updates.collect { case MessageReceived(_, m: TextMessage) => m.text }
+          asr <- IO(assert(texts == messages.map(_._1)))
+        } yield asr
       }
     }
 
@@ -59,8 +59,11 @@ class BotSpec extends AsyncFreeSpec with IOSpec {
           val counter = Stream
             .eval(Ref[IO].of(0))
             .flatMap(counter => bot.follow(scenario(counter)).drain ++ Stream.eval(counter.get))
+            .head
+            .compile
+            .lastOrError
 
-          assert(counter.value() == messages.size)
+          counter.flatMap(value => IO(assert(value == messages.size)))
         }
 
         "scenario for the messages from different chats" in {
@@ -85,8 +88,11 @@ class BotSpec extends AsyncFreeSpec with IOSpec {
           val counter = Stream
             .eval(Ref[IO].of(0))
             .flatMap(counter => bot.follow(scenario(counter)).drain ++ Stream.eval(counter.get))
+            .head
+            .compile
+            .lastOrError
 
-          assert(counter.value() == 2)
+          counter.flatMap(value => IO(assert(value == 2)))
         }
 
         "more than one scenario" in {
@@ -113,8 +119,11 @@ class BotSpec extends AsyncFreeSpec with IOSpec {
           val register = Stream
             .eval(Ref[IO].of(Set.empty[Int]))
             .flatMap(reg => bot.follow(scenario1(reg), scenario2(reg)).drain ++ Stream.eval(reg.get))
+            .head
+            .compile
+            .lastOrError
 
-          assert(register.value().size == 2)
+          register.flatMap(value => IO(assert(value.size == 2)))
         }
       }
 
@@ -145,8 +154,11 @@ class BotSpec extends AsyncFreeSpec with IOSpec {
           val register = Stream
             .eval(Ref[IO].of(Set.empty[Int]))
             .flatMap(reg => bot.follow(scenario1(reg), scenario2(reg)).drain ++ Stream.eval(reg.get))
+            .head
+            .compile
+            .lastOrError
 
-          assert(register.value().size == 2)
+          register.flatMap(set => IO(assert(set.size == 2)))
         }
 
         "by the same scenario in other chat" in {
@@ -167,8 +179,11 @@ class BotSpec extends AsyncFreeSpec with IOSpec {
           val register = Stream
             .eval(Ref[IO].of(Set.empty[Int]))
             .flatMap(reg => bot.follow(scenario1(reg)).drain ++ Stream.eval(reg.get))
+            .head
+            .compile
+            .lastOrError
 
-          assert(register.value().size == 2)
+          register.flatMap(set => IO(assert(set.size == 2)))
         }
 
         "by the same scenario in the same chat" in {
@@ -189,8 +204,11 @@ class BotSpec extends AsyncFreeSpec with IOSpec {
           val register = Stream
             .eval(Ref[IO].of(Set.empty[Int]))
             .flatMap(reg => bot.follow(scenario1(reg)).drain ++ Stream.eval(reg.get))
+            .head
+            .compile
+            .lastOrError
 
-          assert(register.value().size == 2)
+          register.flatMap(set => IO(assert(set.size == 2)))
         }
       }
     }

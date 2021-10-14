@@ -8,12 +8,16 @@ import org.scalatest.AsyncTestSuite
 trait IOSpec extends AsyncIOSpec { asyncTestSuite: AsyncTestSuite =>
 
   implicit class IOStreamOps[A](stream: Stream[IO, A]) {
-    def toList(): List[A] = stream.compile.toList.unsafeRunSync()
+    def value(stream: Stream[IO, A]) = new CompiledStream(stream)
+  }
 
-    def value(): A = toList().head
+  class CompiledStream[A](stream: Stream[IO, A]) {
+    def list: IO[List[A]] = stream.compile.toList
 
-    def count(): Int = toList().size
+    def head: IO[A] = stream.head.compile.lastOrError
 
-    def run(): Unit = stream.compile.drain.unsafeRunAndForget()
+    def count: IO[Long] = stream.compile.count
+
+    def drain: IO[Unit] = stream.compile.drain
   }
 }

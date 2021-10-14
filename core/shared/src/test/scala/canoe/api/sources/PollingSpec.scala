@@ -23,10 +23,12 @@ class PollingSpec extends AsyncFreeSpec with IOSpec {
       }
   }
 
-  val polling = new Polling(Duration.Zero)
+  val polling = new Polling[IO](Duration.Zero)
   "polling" - {
     "starts with given offset" in {
-      assert(polling.pollUpdates(0).take(1).value().head.updateId == 0)
+      polling.pollUpdates(0).head.compile.lastOrError.flatMap { updates =>
+        IO(assert(updates.head.updateId == 0))
+      }
     }
 
     "uses last offset increased by 1 for each new call" in {
@@ -35,9 +37,11 @@ class PollingSpec extends AsyncFreeSpec with IOSpec {
         .zipWithNext
         .collect { case (u1, Some(u2)) => u1.last -> u2.head }
         .take(5)
-        .toList()
+        .compile
+        .toList
 
-      assert(updates.forall { case (u1, u2) => u2.updateId == u1.updateId + 1 })
+      updates.flatMap(updates => IO(assert(updates.forall { case (u1, u2) => u2.updateId == u1.updateId + 1 })))
+
     }
   }
 }

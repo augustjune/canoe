@@ -15,7 +15,7 @@ class BroadcastSpec extends AsyncFreeSpec with IOSpec {
     input =>
       Stream.eval(Ref[IO].of(List.empty[A])).flatMap { ref =>
         input
-          .evalTap(i => ref.update(i :: _))
+          .evalTap(i => ref.update(_ :+ i))
           .through(b.publish)
           .drain
           .interruptAfter(duration)
@@ -46,25 +46,13 @@ class BroadcastSpec extends AsyncFreeSpec with IOSpec {
         }
 
         pulled.head.compile.lastOrError.flatMap { list =>
-          IO(assert(list == input.toList.reverse))
+          IO(assert(list == input.toList))
         }
       }
     }
 
     "pulls from publisher" - {
-      "one element before it's blocked by the subscriber" in {
-        val pulled = broadcast[Int].flatMap { b =>
-          val pop = Stream.sleep_[IO](0.05.second) ++ input.through(recordPulled(b, 0.2.second))
-          val consumer = b.subscribe(0).evalMap(_ => IO.never)
-          pop.concurrently(consumer)
-        }
-
-        pulled.head.compile.lastOrError.flatMap { list =>
-          IO(assert(list == input.head.toList))
-        }
-      }
-
-      "maxQueued + 2 elements for non-empty blocking consumer" in {
+      "maxQueued + 2 elements for blocking consumer" in {
         val maxQueued = 3
         val pulled = broadcast[Int].flatMap { b =>
           val pop = Stream.sleep_[IO](0.05.second) ++ input.through(recordPulled(b, 0.2.second))
@@ -72,7 +60,7 @@ class BroadcastSpec extends AsyncFreeSpec with IOSpec {
           pop.concurrently(consumer)
         }
         pulled.head.compile.lastOrError.flatMap { list =>
-          IO(assert(list == input.take(maxQueued + 2).toList.reverse))
+          IO(assert(list == input.take(maxQueued + 2).toList))
         }
       }
 
@@ -85,7 +73,7 @@ class BroadcastSpec extends AsyncFreeSpec with IOSpec {
           }
 
           pulled.head.compile.lastOrError.flatMap { list =>
-            IO(assert(list == input.toList.reverse))
+            IO(assert(list == input.toList))
           }
 
         }
@@ -95,7 +83,7 @@ class BroadcastSpec extends AsyncFreeSpec with IOSpec {
             input.through(recordPulled(b, 0.2.second))
           }
           pulled.head.compile.lastOrError.flatMap { list =>
-            IO(assert(list == input.toList.reverse))
+            IO(assert(list == input.toList))
           }
         }
       }

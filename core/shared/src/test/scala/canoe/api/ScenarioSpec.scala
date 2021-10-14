@@ -169,7 +169,7 @@ class ScenarioSpec extends AsyncFreeSpec with IOSpec {
 
         for {
           res <- input.through(cancellable.pipe).compile.count
-          asr <- IO(assert(res == 12))
+          asr <- IO(assert(res == 0))
         } yield asr
       }
 
@@ -219,7 +219,7 @@ class ScenarioSpec extends AsyncFreeSpec with IOSpec {
 
         for {
           string <- input.through(scenario.pipe).head.compile.lastOrError
-          asr    <- IO(assert(string.startsWith("2")))
+          asr    <- IO(assert(string.startsWith("1")))
         } yield asr
       }
 

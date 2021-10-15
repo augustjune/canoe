@@ -60,11 +60,11 @@ object Hook {
     certificate: Option[InputFile]
   ): Resource[F, Unit] =
     Resource.make(
-      F.info(
+      Logger[F].info(
         "Setting a webhook to the Telegram service. Don't forget to delete the webhook, since it blocks you from using polling methods."
       ) *> SetWebhook(url, certificate).call.void
     )(_ =>
-      F.info(
+      Logger[F].info(
         "Telegram webhook is deleted. Polling is available again."
       ) *> DeleteWebhook.call.void
     )
@@ -81,7 +81,7 @@ object Hook {
           req
             .decodeWith(jsonOf[F, Update], strict = true)(queue.offer(_) *> Ok())
             .recoverWith { case InvalidMessageBodyFailure(details, _) =>
-              F.error(s"Received unknown type of update. $details") *> Ok()
+              Logger[F].error(s"Received unknown type of update. $details") *> Ok()
             }
         }
         .orNotFound

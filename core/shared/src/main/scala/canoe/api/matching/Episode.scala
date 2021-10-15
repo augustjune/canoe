@@ -79,41 +79,6 @@ object Episode {
   private[api] final case class TimeLimited[F[_], I, O](episode: Episode[F, I, O], duration: FiniteDuration)
       extends Episode[F, I, O]
 
-  private[api] final case class BracketCase[F[_], I, A, B](acq: Episode[F, I, A],
-                                                           use: A => Episode[F, I, B]
-                                                           //  release: (A, ExitCase[Throwable]) => Episode[F, I, Unit]
-  ) extends Episode[F, I, B]
-
-  private[api] implicit def bracketInstance[F[_], I]: MonadError[Episode[F, I, *], Throwable] = ???
-  // new Bracket[Episode[F, I, *], Throwable] {
-  //   // Members declared in cats.Applicative
-  //   def pure[A](a: A): Episode[F, I, A] = Pure(a)
-
-  //   // Members declared in cats.ApplicativeError
-  //   def handleErrorWith[A](fa: Episode[F, I, A])(f: Throwable => Episode[F, I, A]): Episode[F, I, A] =
-  //     Protected(fa, f)
-
-  //   def raiseError[A](e: Throwable): Episode[F, I, A] =
-  //     RaiseError(e)
-
-  //   // Members declared in cats.effect.Bracket
-  //   def bracketCase[A, B](
-  //     acquire: Episode[F, I, A]
-  //   )(use: A => Episode[F, I, B])(release: (A, ExitCase[Throwable]) => Episode[F, I, Unit]): Episode[F, I, B] =
-  //     BracketCase(acquire, use, release)
-
-  //   // Members declared in cats.FlatMap
-  //   def flatMap[A, B](fa: Episode[F, I, A])(f: A => Episode[F, I, B]): Episode[F, I, B] =
-  //     fa.flatMap(f)
-
-  //   def tailRecM[A, B](a: A)(f: A => Episode[F, I, Either[A, B]]): Episode[F, I, B] =
-  //     f(a).flatMap {
-  //       case Left(a)  => tailRecM(a)(f)
-  //       case Right(b) => pure(b)
-  //     }
-
-  // }
-
   private sealed trait Result[+I, +O] {
     def castOutput[A]: Result[I, A] = mapOutput(_.asInstanceOf[A])
 
@@ -126,11 +91,11 @@ object Episode {
         case Interrupted     => Interrupted
       }
   }
-  private final case class Matched[O](o: O) extends Result[Nothing, O]
-  private final case class Missed[I](elem: I) extends Result[I, Nothing]
-  private final case class Cancelled[I](elem: I) extends Result[I, Nothing]
-  private final case class Failed(e: Throwable) extends Result[Nothing, Nothing]
-  private final case object Interrupted extends Result[Nothing, Nothing]
+  private case class Matched[O](o: O) extends Result[Nothing, O]
+  private case class Missed[I](elem: I) extends Result[I, Nothing]
+  private case class Cancelled[I](elem: I) extends Result[I, Nothing]
+  private case class Failed(e: Throwable) extends Result[Nothing, Nothing]
+  private case object Interrupted extends Result[Nothing, Nothing]
 
   private def open[F[_], I, O](
     episode: Episode[F, I, O],
@@ -139,33 +104,6 @@ object Episode {
     first: Boolean
   ): Stream[F, (Result[I, O], Stream[F, I])] =
     episode match {
-      case BracketCase(acq, use) =>
-        open(acq, input, cancelTokens, first).flatMap { case (result, rest) =>
-          result match {
-            case Matched(a) =>
-              open(use(a), rest, cancelTokens, first).flatMap { case (result2, rest2) =>
-                result2 match {
-                  case Matched(o) =>
-                    open(???, rest2, cancelTokens, first).map(Matched(o) -> _._2)
-
-                  case Missed(elem) =>
-                    open(???, rest2, cancelTokens, first).map(Missed(elem) -> _._2)
-
-                  case Cancelled(elem) =>
-                    open(???, rest2, cancelTokens, first).map(Cancelled(elem) -> _._2)
-
-                  case Failed(e) =>
-                    open(???, rest2, cancelTokens, first).map(Failed(e) -> _._2)
-
-                  case Interrupted =>
-                    open(???, rest2, cancelTokens, first).map(Interrupted -> _._2)
-                }
-              }
-
-            case other => Stream(other.castOutput[O] -> rest)
-          }
-        }
-
       case Next(p) =>
         def go(in: Stream[F, I]): Pull[F, (Result[I, O], Stream[F, I]), Unit] =
           in.pull.uncons1.attempt.flatMap {
@@ -254,8 +192,5 @@ object Episode {
       case Tolerate(ep, limit, fn)    => Tolerate(ep.mapK(f), limit, fn.andThen(f(_)))
       case Cancellable(ep, canc, fin) => Cancellable(ep.mapK(f), canc, fin.map(_.andThen(f(_))))
       case TimeLimited(ep, limit)     => TimeLimited(ep.mapK(f), limit)
-      case BracketCase(_, _)      => ???
-      // case BracketCase(acq, use, release) =>
-      // BracketCase(acq.mapK(f), use.andThen(_.mapK(f)), (a: Any, ec) => release(a, ec).mapK(f))
     }
 }

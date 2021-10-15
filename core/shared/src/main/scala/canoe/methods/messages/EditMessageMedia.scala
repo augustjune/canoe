@@ -4,7 +4,7 @@ import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InlineKeyboardMarkup, InputFile, InputMedia}
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -62,7 +62,7 @@ object EditMessageMedia {
       def name: String = "editMessageMedia"
 
       def encoder: Encoder[EditMessageMedia] =
-        deriveEncoder[EditMessageMedia].snakeCase
+        semiauto.deriveEncoder[EditMessageMedia].snakeCase
 
       def decoder: Decoder[Either[Boolean, TelegramMessage]] =
         Decoder.decodeBoolean.either(TelegramMessage.telegramMessageDecoder)

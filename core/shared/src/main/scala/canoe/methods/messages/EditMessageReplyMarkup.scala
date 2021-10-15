@@ -4,7 +4,7 @@ import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InlineKeyboardMarkup, InputFile}
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -49,7 +49,7 @@ object EditMessageReplyMarkup {
 
       def name: String = "editMessageReplyMarkup"
 
-      def encoder: Encoder[EditMessageReplyMarkup] = deriveEncoder[EditMessageReplyMarkup].snakeCase
+      def encoder: Encoder[EditMessageReplyMarkup] = semiauto.deriveEncoder[EditMessageReplyMarkup].snakeCase
 
       def decoder: Decoder[Either[Boolean, TelegramMessage]] =
         Decoder.decodeBoolean.either(TelegramMessage.telegramMessageDecoder)

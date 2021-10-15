@@ -4,7 +4,7 @@ import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.StickerMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -38,9 +38,9 @@ object SendSticker {
 
       def name: String = "sendSticker"
 
-      def encoder: Encoder[SendSticker] = deriveEncoder[SendSticker].snakeCase
+      def encoder: Encoder[SendSticker] = semiauto.deriveEncoder[SendSticker].snakeCase
 
-      def decoder: Decoder[StickerMessage] = deriveDecoder[StickerMessage]
+      def decoder: Decoder[StickerMessage] = semiauto.deriveDecoder[StickerMessage]
 
       def attachments(request: SendSticker): List[(String, InputFile)] =
         List("sticker" -> request.sticker)

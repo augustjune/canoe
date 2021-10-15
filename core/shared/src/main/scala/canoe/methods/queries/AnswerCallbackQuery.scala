@@ -3,7 +3,7 @@ package canoe.methods.queries
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.InputFile
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -71,7 +71,7 @@ object AnswerCallbackQuery {
 
       def name: String = "answerCallbackQuery"
 
-      def encoder: Encoder[AnswerCallbackQuery] = deriveEncoder[AnswerCallbackQuery].snakeCase
+      def encoder: Encoder[AnswerCallbackQuery] = semiauto.deriveEncoder[AnswerCallbackQuery].snakeCase
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 

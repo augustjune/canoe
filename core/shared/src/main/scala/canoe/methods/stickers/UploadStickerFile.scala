@@ -3,7 +3,7 @@ package canoe.methods.stickers
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.{File, InputFile}
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -26,9 +26,9 @@ object UploadStickerFile {
 
       def name: String = "uploadStickerFile"
 
-      def encoder: Encoder[UploadStickerFile] = deriveEncoder[UploadStickerFile].snakeCase
+      def encoder: Encoder[UploadStickerFile] = semiauto.deriveEncoder[UploadStickerFile].snakeCase
 
-      def decoder: Decoder[File] = deriveDecoder[File]
+      def decoder: Decoder[File] = semiauto.deriveDecoder[File]
 
       def attachments(request: UploadStickerFile): List[(String, InputFile)] =
         List("png_sticker" -> request.pngSticker)

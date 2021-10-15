@@ -5,7 +5,7 @@ import canoe.methods.Method
 import canoe.models.ParseMode.ParseMode
 import canoe.models.messages.PollMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -63,9 +63,9 @@ object SendPoll {
 
       def name: String = "sendPoll"
 
-      def encoder: Encoder[SendPoll] = deriveEncoder[SendPoll].snakeCase
+      def encoder: Encoder[SendPoll] = semiauto.deriveEncoder[SendPoll].snakeCase
 
-      def decoder: Decoder[PollMessage] = deriveDecoder[PollMessage]
+      def decoder: Decoder[PollMessage] = semiauto.deriveDecoder[PollMessage]
 
       def attachments(request: SendPoll): List[(String, InputFile)] = Nil
     }

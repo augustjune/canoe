@@ -1,7 +1,7 @@
 package canoe.models
 
 import io.circe.Decoder
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto
 
 /**
   * Represents one special entity in a text message.
@@ -19,21 +19,21 @@ object MessageEntity {
     cursor
       .get[String]("type")
       .map {
-        case "mention"       => deriveDecoder[Mention]
-        case "hashtag"       => deriveDecoder[Hashtag]
-        case "cashtag"       => deriveDecoder[Cashtag]
-        case "url"           => deriveDecoder[Url]
-        case "email"         => deriveDecoder[Email]
-        case "phone_number"  => deriveDecoder[PhoneNumber]
-        case "bold"          => deriveDecoder[Bold]
-        case "italic"        => deriveDecoder[Italic]
-        case "code"          => deriveDecoder[Code]
-        case "pre"           => deriveDecoder[Pre]
-        case "text_link"     => deriveDecoder[TextLink]
-        case "text_mention"  => deriveDecoder[TextMention]
-        case "underline"     => deriveDecoder[Underline]
-        case "strikethrough" => deriveDecoder[Strikethrough]
-        case _               => deriveDecoder[Unknown]
+        case "mention"       => semiauto.deriveDecoder[Mention]
+        case "hashtag"       => semiauto.deriveDecoder[Hashtag]
+        case "cashtag"       => semiauto.deriveDecoder[Cashtag]
+        case "url"           => semiauto.deriveDecoder[Url]
+        case "email"         => semiauto.deriveDecoder[Email]
+        case "phone_number"  => semiauto.deriveDecoder[PhoneNumber]
+        case "bold"          => semiauto.deriveDecoder[Bold]
+        case "italic"        => semiauto.deriveDecoder[Italic]
+        case "code"          => semiauto.deriveDecoder[Code]
+        case "pre"           => semiauto.deriveDecoder[Pre]
+        case "text_link"     => semiauto.deriveDecoder[TextLink]
+        case "text_mention"  => semiauto.deriveDecoder[TextMention]
+        case "underline"     => semiauto.deriveDecoder[Underline]
+        case "strikethrough" => semiauto.deriveDecoder[Strikethrough]
+        case _               => semiauto.deriveDecoder[Unknown]
       }
       .flatMap(_.tryDecode(cursor))
   }

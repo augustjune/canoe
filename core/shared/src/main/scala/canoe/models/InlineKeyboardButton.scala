@@ -2,7 +2,7 @@ package canoe.models
 
 import io.circe.Encoder
 import io.circe.generic.auto._
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto
 
 /**
   * Button of an inline keyboard.
@@ -97,5 +97,5 @@ object InlineKeyboardButton {
   def pay(text: String): InlineKeyboardButton =
     new InlineKeyboardButton(text, pay = Some(true))
 
-  implicit val encoderInstance: Encoder[InlineKeyboardButton] = deriveEncoder[InlineKeyboardButton]
+  implicit val encoderInstance: Encoder[InlineKeyboardButton] = semiauto.deriveEncoder[InlineKeyboardButton]
 }

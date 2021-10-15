@@ -4,7 +4,7 @@ import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.{ChatId, InputFile}
 import io.circe.{Decoder, Encoder}
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto
 
 final case class SetChatAdministratorCustomTitle(chatId: ChatId, userId: Int, customTitle: String)
 
@@ -16,7 +16,7 @@ object SetChatAdministratorCustomTitle {
       def name: String = "setChatAdministratorCustomTitle"
 
       def encoder: Encoder[SetChatAdministratorCustomTitle] =
-        deriveEncoder[SetChatAdministratorCustomTitle].snakeCase
+        semiauto.deriveEncoder[SetChatAdministratorCustomTitle].snakeCase
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 

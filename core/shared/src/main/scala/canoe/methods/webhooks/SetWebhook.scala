@@ -4,7 +4,7 @@ import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.InputFile
 import canoe.models.UpdateType.UpdateType
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -53,7 +53,7 @@ object SetWebhook {
 
       def name: String = "setWebhook"
 
-      def encoder: Encoder[SetWebhook] = deriveEncoder[SetWebhook].snakeCase
+      def encoder: Encoder[SetWebhook] = semiauto.deriveEncoder[SetWebhook].snakeCase
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 

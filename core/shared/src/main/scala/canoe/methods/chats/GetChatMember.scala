@@ -3,7 +3,7 @@ package canoe.methods.chats
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.{ChatId, ChatMember, InputFile}
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -24,7 +24,7 @@ object GetChatMember {
 
       def name: String = "getChatMember"
 
-      def encoder: Encoder[GetChatMember] = deriveEncoder[GetChatMember].snakeCase
+      def encoder: Encoder[GetChatMember] = semiauto.deriveEncoder[GetChatMember].snakeCase
 
       def decoder: Decoder[ChatMember] = ChatMember.chatMemberDecoder
 

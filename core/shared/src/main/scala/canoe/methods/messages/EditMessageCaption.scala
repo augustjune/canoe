@@ -6,7 +6,7 @@ import canoe.models.ParseMode.ParseMode
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
 import io.circe.generic.auto._
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -61,7 +61,7 @@ object EditMessageCaption {
     new Method[EditMessageCaption, Either[Boolean, TelegramMessage]] {
       def name: String = "editMessageCaption"
 
-      def encoder: Encoder[EditMessageCaption] = deriveEncoder[EditMessageCaption].snakeCase
+      def encoder: Encoder[EditMessageCaption] = semiauto.deriveEncoder[EditMessageCaption].snakeCase
 
       def decoder: Decoder[Either[Boolean, TelegramMessage]] =
         Decoder.decodeBoolean.either(TelegramMessage.telegramMessageDecoder)

@@ -1,7 +1,7 @@
 package canoe.models
 
 import io.circe.Encoder
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto
 import io.circe.generic.auto._
 
 /**
@@ -60,5 +60,5 @@ object KeyboardButton {
   def requestPoll(text: String, specificType: Option[String] = None): KeyboardButton =
     new KeyboardButton(text, requestPoll = Some(KeyboardButtonPollType(specificType)))
 
-  implicit val encoderInstance: Encoder[KeyboardButton] = deriveEncoder[KeyboardButton]
+  implicit val encoderInstance: Encoder[KeyboardButton] = semiauto.deriveEncoder[KeyboardButton]
 }

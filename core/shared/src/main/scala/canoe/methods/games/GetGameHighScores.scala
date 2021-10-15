@@ -3,7 +3,7 @@ package canoe.methods.games
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.{ChatId, GameHighScore, InputFile}
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -32,7 +32,6 @@ final class GetGameHighScores private (val userId: Int,
                                        val inlineMessageId: Option[String] = None)
 
 object GetGameHighScores {
-  import io.circe.generic.auto._
 
   /**
     * For the messages sent directly by the bot
@@ -52,10 +51,10 @@ object GetGameHighScores {
       def name: String = "getGameHighScores"
 
       def encoder: Encoder[GetGameHighScores] =
-        deriveEncoder[GetGameHighScores].snakeCase
+        semiauto.deriveEncoder[GetGameHighScores].snakeCase
 
       def decoder: Decoder[List[GameHighScore]] =
-        Decoder.decodeList(deriveDecoder[GameHighScore])
+        Decoder.decodeList(semiauto.deriveDecoder[GameHighScore])
 
       def attachments(request: GetGameHighScores): List[(String, InputFile)] = Nil
     }

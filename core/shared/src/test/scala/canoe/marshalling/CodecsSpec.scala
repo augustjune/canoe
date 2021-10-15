@@ -1,7 +1,7 @@
 package canoe.marshalling
 
 import canoe.marshalling.codecs._
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto
 import io.circe.generic.auto._
 import io.circe.{Codec, Json}
 import org.scalatest.freespec.AnyFreeSpec

@@ -4,7 +4,7 @@ import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InputFile}
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -63,7 +63,7 @@ object SetGameScore {
     new Method[SetGameScore, Either[Boolean, TelegramMessage]] {
       def name: String = "setGameScore"
 
-      def encoder: Encoder[SetGameScore] = deriveEncoder[SetGameScore].snakeCase
+      def encoder: Encoder[SetGameScore] = semiauto.deriveEncoder[SetGameScore].snakeCase
 
       def decoder: Decoder[Either[Boolean, TelegramMessage]] =
         Decoder.decodeBoolean.either(TelegramMessage.telegramMessageDecoder)

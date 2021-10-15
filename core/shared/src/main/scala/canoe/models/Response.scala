@@ -2,7 +2,7 @@ package canoe.models
 
 import canoe.marshalling.codecs._
 import io.circe.Decoder
-import io.circe.generic.semiauto.deriveDecoder
+import io.circe.generic.semiauto
 
 /**
   * Telegram Bot API Response object
@@ -27,5 +27,5 @@ object Response {
   import io.circe.generic.auto._
 
   implicit def decoder[A: Decoder]: Decoder[Response[A]] =
-    deriveDecoder[Response[A]].camelCase
+    semiauto.deriveDecoder[Response[A]].camelCase
 }

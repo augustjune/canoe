@@ -3,7 +3,7 @@ package canoe.methods.users
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.{InputFile, UserProfilePhotos}
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -25,9 +25,9 @@ object GetUserProfilePhotos {
 
       def name: String = "getUserProfilePhotos"
 
-      def encoder: Encoder[GetUserProfilePhotos] = deriveEncoder[GetUserProfilePhotos].snakeCase
+      def encoder: Encoder[GetUserProfilePhotos] = semiauto.deriveEncoder[GetUserProfilePhotos].snakeCase
 
-      def decoder: Decoder[UserProfilePhotos] = deriveDecoder[UserProfilePhotos]
+      def decoder: Decoder[UserProfilePhotos] = semiauto.deriveDecoder[UserProfilePhotos]
 
       def attachments(request: GetUserProfilePhotos): List[(String, InputFile)] = Nil
     }

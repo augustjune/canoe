@@ -3,7 +3,7 @@ package canoe.methods.commands
 import canoe.methods.Method
 import canoe.models.{BotCommand, InputFile}
 import io.circe.{Decoder, Encoder, Json}
-import io.circe.generic.semiauto.deriveDecoder
+import io.circe.generic.semiauto
 
 case object GetMyCommands {
   import io.circe.generic.auto._
@@ -14,7 +14,7 @@ case object GetMyCommands {
 
       def encoder: Encoder[GetMyCommands.type] = Encoder.instance(_ => Json.Null)
 
-      def decoder: Decoder[List[BotCommand]] = deriveDecoder[List[BotCommand]]
+      def decoder: Decoder[List[BotCommand]] = semiauto.deriveDecoder[List[BotCommand]]
 
       def attachments(request: GetMyCommands.type): List[(String, InputFile)] = Nil
     }

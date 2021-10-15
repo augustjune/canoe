@@ -3,7 +3,7 @@ package canoe.models
 import canoe.models.MemberStatus.MemberStatus
 import io.circe.Decoder
 import io.circe.generic.auto._
-import io.circe.generic.semiauto.deriveDecoder
+import io.circe.generic.semiauto
 
 sealed trait ChatMember {
   def user: User
@@ -15,12 +15,12 @@ object ChatMember {
     cursor
       .get[MemberStatus]("status")
       .map {
-        case MemberStatus.Creator       => deriveDecoder[ChatCreator]
-        case MemberStatus.Administrator => deriveDecoder[ChatAdministrator]
-        case MemberStatus.Member        => deriveDecoder[OrdinaryMember]
-        case MemberStatus.Restricted    => deriveDecoder[RestrictedMember]
-        case MemberStatus.Left          => deriveDecoder[LeftMember]
-        case MemberStatus.Kicked        => deriveDecoder[KickedMember]
+        case MemberStatus.Creator       => semiauto.deriveDecoder[ChatCreator]
+        case MemberStatus.Administrator => semiauto.deriveDecoder[ChatAdministrator]
+        case MemberStatus.Member        => semiauto.deriveDecoder[OrdinaryMember]
+        case MemberStatus.Restricted    => semiauto.deriveDecoder[RestrictedMember]
+        case MemberStatus.Left          => semiauto.deriveDecoder[LeftMember]
+        case MemberStatus.Kicked        => semiauto.deriveDecoder[KickedMember]
       }
       .flatMap(_.tryDecode(cursor))
   }

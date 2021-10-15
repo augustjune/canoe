@@ -3,7 +3,7 @@ package canoe.methods.stickers
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.{InputFile, MaskPosition}
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 import cats.syntax.all._
 
@@ -76,7 +76,7 @@ object CreateNewStickerSet {
 
       def name: String = "createNewStickerSet"
 
-      def encoder: Encoder[CreateNewStickerSet] = deriveEncoder[CreateNewStickerSet].snakeCase
+      def encoder: Encoder[CreateNewStickerSet] = semiauto.deriveEncoder[CreateNewStickerSet].snakeCase
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 

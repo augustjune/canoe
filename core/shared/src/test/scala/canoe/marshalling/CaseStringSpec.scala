@@ -1,8 +1,9 @@
 package canoe.marshalling
 
-import org.scalatest.freespec.AnyFreeSpec
+import canoe.IOSpec
+import org.scalatest.freespec.AsyncFreeSpec
 
-class CaseStringSpec extends AnyFreeSpec {
+class CaseStringSpec extends AsyncFreeSpec with IOSpec {
   val snake: String = "some_snake_case_string"
   val camel: String = "someSnakeCaseString"
   val pascal: String = camel.capitalize

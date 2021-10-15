@@ -5,7 +5,7 @@ import canoe.methods.updates.GetUpdates
 import canoe.models.Update
 import canoe.syntax.methodOps
 import cats.Functor
-import cats.effect.Timer
+import cats.effect.Temporal
 import cats.syntax.functor.toFunctorOps
 import fs2.Stream
 
@@ -51,8 +51,9 @@ object Polling {
   /**
     * Polls new batch of updates when consumer is ready and `interval` passed since the last polling
     */
-  private[api] def metered[F[_]: TelegramClient: Functor: Timer](
+  private[api] def metered[F[_]: TelegramClient: Temporal](
     interval: FiniteDuration
   ): Stream[F, Update] =
-    new Polling[F](longPollTimeout).pollUpdates(0).metered(interval).flatMap(Stream.emits)
+    ???
+    // new Polling[F](longPollTimeout).pollUpdates(0).metered(interval).flatMap(Stream.emits(_))
 }

@@ -2,22 +2,22 @@ package samples
 
 import canoe.api._
 import canoe.syntax._
-import cats.effect.{ExitCode, IO, IOApp}
+import cats.effect.{IO, IOApp}
 import cats.syntax.functor._
 import fs2.Stream
 
-/**
-  * Basic example of interaction between a user and the bot.
+/** Basic example of interaction between a user and the bot.
   */
-object Greetings extends IOApp {
+object Greetings extends IOApp.Simple {
 
   val token: String = "<your telegram token>"
 
-  def run(args: List[String]): IO[ExitCode] =
+  def run: IO[Unit] =
     Stream
       .resource(TelegramClient.global[IO](token))
-      .flatMap { implicit client => Bot.polling[IO].follow(greetings) }
-      .compile.drain.as(ExitCode.Success)
+      .flatMap(implicit client => Bot.polling[IO].follow(greetings))
+      .compile
+      .drain
 
   def greetings[F[_]: TelegramClient]: Scenario[F, Unit] =
     for {

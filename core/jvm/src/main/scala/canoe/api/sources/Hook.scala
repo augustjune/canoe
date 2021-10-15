@@ -5,10 +5,8 @@ import canoe.methods.webhooks.{DeleteWebhook, SetWebhook}
 import canoe.models.{InputFile, Update}
 import canoe.syntax.methodOps
 import cats.Monad
-import cats.effect.{ConcurrentEffect, Resource, Timer}
 import cats.syntax.all._
 import fs2.Stream
-import fs2.concurrent.Queue
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 import org.http4s._
@@ -16,11 +14,14 @@ import org.http4s.circe.jsonOf
 import org.http4s.dsl.Http4sDsl
 import org.http4s.implicits._
 import org.http4s.server.Server
-import org.http4s.server.blaze.BlazeServerBuilder
+import org.http4s.blaze.server.BlazeServerBuilder
 import scala.concurrent.ExecutionContext
+import cats.effect.Resource
+import cats.effect.std.Queue
+import cats.effect.kernel.Async
 
 class Hook[F[_]](queue: Queue[F, Update]) {
-  def updates: Stream[F, Update] = queue.dequeue
+  def updates: Stream[F, Update] = Stream.repeatEval(queue.take)
 }
 
 object Hook {
@@ -35,10 +36,11 @@ object Hook {
     * @param port        Port which will be used for listening for the incoming updates
     * @param certificate Public key of self-signed certificate (including BEGIN and END portions)
     */
-  def install[F[_]: TelegramClient: ConcurrentEffect: Timer](url: String,
-                                                             host: String,
-                                                             port: Int,
-                                                             certificate: Option[InputFile]
+  def install[F[_]: TelegramClient: Async](
+    url: String,
+    host: String,
+    port: Int,
+    certificate: Option[InputFile]
   ): Resource[F, Hook[F]] =
     Resource.suspend(Slf4jLogger.create.map { implicit logger =>
       for {
@@ -69,7 +71,7 @@ object Hook {
 
   /** Creates local server which listens for the incoming updates on provided `port`.
     */
-  private def listenServer[F[_]: ConcurrentEffect: Timer: Logger](host: String, port: Int): Resource[F, Hook[F]] = {
+  private def listenServer[F[_]: Logger: Async](host: String, port: Int): Resource[F, Hook[F]] = {
     val dsl = Http4sDsl[F]
     import dsl._
 
@@ -77,14 +79,14 @@ object Hook {
       HttpRoutes
         .of[F] { case req @ POST -> Root =>
           req
-            .decodeWith(jsonOf[F, Update], strict = true)(queue.enqueue1(_) *> Ok())
+            .decodeWith(jsonOf[F, Update], strict = true)(queue.offer(_) *> Ok())
             .recoverWith { case InvalidMessageBodyFailure(details, _) =>
               F.error(s"Received unknown type of update. $details") *> Ok()
             }
         }
         .orNotFound
 
-    def server(queue: Queue[F, Update]): Resource[F, Server[F]] =
+    def server(queue: Queue[F, Update]): Resource[F, Server] =
       BlazeServerBuilder[F](ExecutionContext.global).bindHttp(port, host).withHttpApp(app(queue)).resource
 
     Resource.suspend(Queue.unbounded[F, Update].map(q => server(q).map(_ => new Hook[F](q))))

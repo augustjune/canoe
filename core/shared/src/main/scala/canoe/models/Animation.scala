@@ -1,10 +1,9 @@
 package canoe.models
 
-/**
-  * Represents an animation file (GIF or H.264/MPEG-4 AVC video without sound).
+/** Represents an animation file (GIF or H.264/MPEG-4 AVC video without sound).
   *
   * @param fileId       Unique identifier for this file
-  * @param fileUniqueId Unique identifier for this file, which is supposed to be the same over time and for different bots. 
+  * @param fileUniqueId Unique identifier for this file, which is supposed to be the same over time and for different bots.
   *                     Can't be used to download or reuse the file.
   * @param width        Video width as defined by sender
   * @param height       Video height as defined by sender
@@ -22,4 +21,5 @@ final case class Animation(fileId: String,
                            thumb: Option[PhotoSize],
                            fileName: Option[String],
                            mimeType: Option[String],
-                           fileSize: Option[Int])
+                           fileSize: Option[Int]
+)

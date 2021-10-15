@@ -2,6 +2,9 @@ package canoe.models
 
 import canoe.models.ParseMode.ParseMode
 
+//import io.circe.{Decoder, Encoder}
+//import io.circe.generic.semiauto
+
 /** This object represents one result of an inline query.
   * Telegram clients currently support results of the following 19 types:
   *
@@ -30,6 +33,10 @@ sealed trait InlineQueryResult {
   def `type`: String
   def replyMarkup: Option[InlineKeyboardMarkup]
 }
+
+//object InlineQueryResult {
+//  implicit val InlineQueryResultEncoder: Encoder[InlineQueryResult] = semiauto.deriveEncoder
+//}
 
 /**
   * Link to an article or web page.

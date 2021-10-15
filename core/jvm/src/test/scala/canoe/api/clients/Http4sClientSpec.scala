@@ -22,7 +22,7 @@ class Http4sClientSpec extends AsyncFreeSpec with IOSpec {
     def attachments(request: String): List[(String, InputFile)] = files.map("" -> _)
   }
 
-  private implicit val testMethod = TestMethod()
+  private implicit val testMethod: TestMethod = TestMethod()
 
   private def response(s: String) = s"""{"ok" : true, "result" : "$s"}"""
 

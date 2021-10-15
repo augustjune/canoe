@@ -7,8 +7,7 @@ import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 import cats.syntax.all._
 
-/**
-  * Use this method to add a new sticker to a set created by the bot.
+/** Use this method to add a new sticker to a set created by the bot.
   * Returns True on success.
   *
   * Use methods in companion object in order to construct the value of this class.
@@ -21,17 +20,17 @@ import cats.syntax.all._
   * @param emojis       One or more emoji corresponding to the sticker
   * @param maskPosition Position where the mask should be placed on faces
   */
-final class AddStickerToSet private (val userId: Int,
-                                     val name: String,
-                                     val pngSticker: Option[InputFile],
-                                     val tgsSticker: Option[InputFile],
-                                     val emojis: String,
-                                     val maskPosition: Option[MaskPosition])
+final case class AddStickerToSet private (userId: Int,
+                                          name: String,
+                                          pngSticker: Option[InputFile],
+                                          tgsSticker: Option[InputFile],
+                                          emojis: String,
+                                          maskPosition: Option[MaskPosition]
+)
 
 object AddStickerToSet {
 
-  /**
-    * @param sticker PNG image with the sticker.
+  /** @param sticker PNG image with the sticker.
     */
   def static(userId: Int,
              name: String,
@@ -41,8 +40,7 @@ object AddStickerToSet {
   ): AddStickerToSet =
     new AddStickerToSet(userId, name, Some(sticker), None, emojis, maskPosition)
 
-  /**
-    * @param sticker TGS animation with the sticker.
+  /** @param sticker TGS animation with the sticker.
     * Animated stickers can be added to animated sticker sets and only to them.
     */
   def animated(userId: Int,

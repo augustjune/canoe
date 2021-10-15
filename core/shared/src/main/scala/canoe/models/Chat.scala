@@ -11,19 +11,17 @@ sealed trait Chat {
 
 object Chat {
 
-  /**
-    * Decodes chat based on the `type` value of the input Json
+  /** Decodes chat based on the `type` value of the input Json
     */
   implicit val chatDecoder: Decoder[Chat] = Decoder.instance[Chat] { cursor =>
     cursor
       .get[ChatType]("type")
-      .map {
-        case ChatType.Private    => semiauto.deriveDecoder[PrivateChat]
-        case ChatType.Group      => semiauto.deriveDecoder[Group]
-        case ChatType.Supergroup => semiauto.deriveDecoder[Supergroup]
-        case ChatType.Channel    => semiauto.deriveDecoder[Channel]
+      .flatMap {
+        case ChatType.Private    => semiauto.deriveDecoder[PrivateChat].tryDecode(cursor)
+        case ChatType.Group      => semiauto.deriveDecoder[Group].tryDecode(cursor)
+        case ChatType.Supergroup => semiauto.deriveDecoder[Supergroup].tryDecode(cursor)
+        case ChatType.Channel    => semiauto.deriveDecoder[Channel].tryDecode(cursor)
       }
-      .flatMap(_.tryDecode(cursor))
   }
 }
 

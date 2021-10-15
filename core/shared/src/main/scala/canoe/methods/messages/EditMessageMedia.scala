@@ -7,8 +7,7 @@ import canoe.models.{ChatId, InlineKeyboardMarkup, InputFile, InputMedia}
 import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
-/**
-  * Use this method to edit audio, document, photo, or video messages.
+/** Use this method to edit audio, document, photo, or video messages.
   *
   * If a message is a part of a message album, then it can be edited only to a photo or a video.
   * Otherwise, message type can be changed arbitrarily.
@@ -31,28 +30,30 @@ import io.circe.{Decoder, Encoder}
   * @param media           New media content of the message
   * @param replyMarkup     New inline keyboard.
   */
-final class EditMessageMedia private (val chatId: Option[ChatId],
-                                      val messageId: Option[Int],
-                                      val inlineMessageId: Option[String],
-                                      val media: InputMedia,
-                                      val replyMarkup: Option[InlineKeyboardMarkup])
+final case class EditMessageMedia private (chatId: Option[ChatId],
+                                           messageId: Option[Int],
+                                           inlineMessageId: Option[String],
+                                           media: InputMedia,
+                                           replyMarkup: Option[InlineKeyboardMarkup]
+)
 
 object EditMessageMedia {
-  /**
-    * For the messages sent directly by the bot.
+
+  /** For the messages sent directly by the bot.
     */
   def direct(chatId: ChatId,
              messageId: Int,
              media: InputMedia,
-             replyMarkup: Option[InlineKeyboardMarkup] = None): EditMessageMedia =
+             replyMarkup: Option[InlineKeyboardMarkup] = None
+  ): EditMessageMedia =
     new EditMessageMedia(Some(chatId), Some(messageId), None, media, replyMarkup)
 
-  /**
-    * For the inlined messages sent via the bot.
+  /** For the inlined messages sent via the bot.
     */
   def inlined(inlineMessageId: String,
               media: InputMedia,
-              replyMarkup: Option[InlineKeyboardMarkup] = None): EditMessageMedia =
+              replyMarkup: Option[InlineKeyboardMarkup] = None
+  ): EditMessageMedia =
     new EditMessageMedia(None, None, Some(inlineMessageId), media, replyMarkup)
 
   implicit val method: Method[EditMessageMedia, Either[Boolean, TelegramMessage]] =

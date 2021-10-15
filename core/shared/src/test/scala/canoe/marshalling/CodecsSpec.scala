@@ -10,7 +10,7 @@ class CodecsSpec extends AnyFreeSpec {
   case class Inner(longName: String)
   case class Outer(longInt: Int, inner: Inner)
 
-  val codec: Codec[Outer] = deriveCodec
+  val codec: Codec[Outer] = semiauto.deriveCodec
 
   val instance: Outer = Outer(12, Inner("name"))
 

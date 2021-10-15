@@ -14,15 +14,14 @@ object ChatMember {
   implicit val chatMemberDecoder: Decoder[ChatMember] = Decoder.instance[ChatMember] { cursor =>
     cursor
       .get[MemberStatus]("status")
-      .map {
-        case MemberStatus.Creator       => semiauto.deriveDecoder[ChatCreator]
-        case MemberStatus.Administrator => semiauto.deriveDecoder[ChatAdministrator]
-        case MemberStatus.Member        => semiauto.deriveDecoder[OrdinaryMember]
-        case MemberStatus.Restricted    => semiauto.deriveDecoder[RestrictedMember]
-        case MemberStatus.Left          => semiauto.deriveDecoder[LeftMember]
-        case MemberStatus.Kicked        => semiauto.deriveDecoder[KickedMember]
+      .flatMap {
+        case MemberStatus.Creator       => semiauto.deriveDecoder[ChatCreator].tryDecode(cursor)
+        case MemberStatus.Administrator => semiauto.deriveDecoder[ChatAdministrator].tryDecode(cursor)
+        case MemberStatus.Member        => semiauto.deriveDecoder[OrdinaryMember].tryDecode(cursor)
+        case MemberStatus.Restricted    => semiauto.deriveDecoder[RestrictedMember].tryDecode(cursor)
+        case MemberStatus.Left          => semiauto.deriveDecoder[LeftMember].tryDecode(cursor)
+        case MemberStatus.Kicked        => semiauto.deriveDecoder[KickedMember].tryDecode(cursor)
       }
-      .flatMap(_.tryDecode(cursor))
   }
 }
 

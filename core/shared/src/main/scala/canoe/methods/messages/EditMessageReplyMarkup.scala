@@ -7,8 +7,7 @@ import canoe.models.{ChatId, InlineKeyboardMarkup, InputFile}
 import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
-/**
-  * Use this method to edit only the reply markup of messages sent by the bot
+/** Use this method to edit only the reply markup of messages sent by the bot
   * or via the bot (for inline bots).
   *
   * On success, if edited message is sent by the bot, the edited Message is returned,
@@ -25,20 +24,20 @@ import io.circe.{Decoder, Encoder}
   *                        Required if 'chatId' and 'messageId' are not specified.
   * @param replyMarkup     New inline keyboard.
   */
-final class EditMessageReplyMarkup private (val chatId: Option[ChatId],
-                                            val messageId: Option[Int],
-                                            val inlineMessageId: Option[String],
-                                            val replyMarkup: Option[InlineKeyboardMarkup])
+final case class EditMessageReplyMarkup private (chatId: Option[ChatId],
+                                                 messageId: Option[Int],
+                                                 inlineMessageId: Option[String],
+                                                 replyMarkup: Option[InlineKeyboardMarkup]
+)
 
 object EditMessageReplyMarkup {
-  /**
-    * For the messages sent directly by the bot
+
+  /** For the messages sent directly by the bot
     */
   def direct(chatId: ChatId, messageId: Int, replyMarkup: Option[InlineKeyboardMarkup] = None): EditMessageReplyMarkup =
     new EditMessageReplyMarkup(Some(chatId), Some(messageId), None, replyMarkup)
 
-  /**
-    * For the inlined messages sent via the bot
+  /** For the inlined messages sent via the bot
     */
   def inlined(inlineMessageId: String, replyMarkup: Option[InlineKeyboardMarkup] = None): EditMessageReplyMarkup =
     new EditMessageReplyMarkup(None, None, Some(inlineMessageId), replyMarkup)

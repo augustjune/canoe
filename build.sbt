@@ -30,7 +30,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
   )
   .jsSettings(
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % scalaJsDomVersion
+      ("org.scala-js" %%% "scalajs-dom" % scalaJsDomVersion).cross(CrossVersion.for3Use2_13)
     )
   )
 
@@ -82,13 +82,14 @@ lazy val mimaSettings = Seq(
 
 lazy val compilerOptions =
   scalacOptions ++= Seq(
-    "-Xfatal-warnings", // Fail the compilation if there are any warnings.
     "-deprecation", // Emit warning and location for usages of deprecated APIs.
     "-feature", // Emit warning and location for usages of features that should be imported explicitly.
     "-language:higherKinds", // Allow higher-kinded types
     "-language:postfixOps", // Allow higher-kinded types
     "-language:implicitConversions" // Allow definition of implicit functions called views
-  ) ++ (if (scalaBinaryVersion.value.startsWith("2.12")) List("-Ypartial-unification") else Nil)
+  ) ++ (if (scalaBinaryVersion.value.startsWith("2.12")) List("-Ypartial-unification", "-Xfatal-warnings")
+        else if (scalaBinaryVersion.value.startsWith("3")) List("-Xmax-inlines", "128")
+        else Nil)
 
 lazy val tests = {
   val dependencies =

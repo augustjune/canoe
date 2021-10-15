@@ -8,8 +8,7 @@ import canoe.models.{ChatId, InputFile, ReplyMarkup}
 import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
-/**
-  * Use this method to edit text messages sent by the bot or via the bot (for inline bots).
+/** Use this method to edit text messages sent by the bot or via the bot (for inline bots).
   *
   * On success, if edited message is sent by the bot, the edited Message is returned,
   * otherwise True is returned.
@@ -30,34 +29,36 @@ import io.circe.{Decoder, Encoder}
   *                              A JSON-serialized object for an inline keyboard, custom reply keyboard,
   *                              instructions to hide reply keyboard or to force a reply from the user.
   */
-final class EditMessageText private (val chatId: Option[ChatId],
-                                     val messageId: Option[Int],
-                                     val inlineMessageId: Option[String],
-                                     val text: String,
-                                     val parseMode: Option[ParseMode],
-                                     val disableWebPagePreview: Option[Boolean],
-                                     val replyMarkup: Option[ReplyMarkup])
+final case class EditMessageText private (chatId: Option[ChatId],
+                                          messageId: Option[Int],
+                                          inlineMessageId: Option[String],
+                                          text: String,
+                                          parseMode: Option[ParseMode],
+                                          disableWebPagePreview: Option[Boolean],
+                                          replyMarkup: Option[ReplyMarkup]
+)
 
 object EditMessageText {
-  /**
-    * For the messages sent directly by the bot
+
+  /** For the messages sent directly by the bot
     */
   def direct(chatId: ChatId,
              messageId: Int,
              text: String,
              parseMode: Option[ParseMode] = None,
              disableWebPagePreview: Option[Boolean] = None,
-             replyMarkup: Option[ReplyMarkup] = None): EditMessageText =
+             replyMarkup: Option[ReplyMarkup] = None
+  ): EditMessageText =
     new EditMessageText(Some(chatId), Some(messageId), None, text, parseMode, disableWebPagePreview, replyMarkup)
 
-  /**
-    * For the inlined messages sent via the bot
+  /** For the inlined messages sent via the bot
     */
   def inlined(inlineMessageId: String,
               text: String,
               parseMode: Option[ParseMode] = None,
               disableWebPagePreview: Option[Boolean] = None,
-              replyMarkup: Option[ReplyMarkup] = None): EditMessageText =
+              replyMarkup: Option[ReplyMarkup] = None
+  ): EditMessageText =
     new EditMessageText(None, None, Some(inlineMessageId), text, parseMode, disableWebPagePreview, replyMarkup)
 
   implicit val method: Method[EditMessageText, Either[Boolean, TelegramMessage]] =

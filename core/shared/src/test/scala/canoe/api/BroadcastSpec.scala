@@ -80,7 +80,7 @@ class BroadcastSpec extends AsyncFreeSpec with IOSpec {
 
         "for no consumer" in {
           val pulled = broadcast[Int].flatMap { b =>
-            input.through(recordPulled(b, 0.2.second))
+            input.through(recordPulled(b, 0.5.second))
           }
           pulled.head.compile.lastOrError.flatMap { list =>
             IO(assert(list == input.toList))

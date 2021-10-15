@@ -6,8 +6,7 @@ import canoe.models.{InputFile, ShippingOption}
 import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
-/**
-  * If you sent an invoice requesting a shipping address and the parameter is_flexible was specified,
+/** If you sent an invoice requesting a shipping address and the parameter is_flexible was specified,
   * the Bot API will send an Update with a shipping_query field to the bot.
   * Use this method to reply to shipping queries.
   *
@@ -25,10 +24,11 @@ import io.circe.{Decoder, Encoder}
   *                        Telegram will display this message to the user.
   *                        Required if ok is False.
   */
-final class AnswerShippingQuery private (val shippingQueryId: String,
-                                         val ok: Boolean,
-                                         val shippingOptions: Option[List[ShippingOption]] = None,
-                                         val errorMessage: Option[String] = None)
+final case class AnswerShippingQuery private (shippingQueryId: String,
+                                              ok: Boolean,
+                                              shippingOptions: Option[List[ShippingOption]] = None,
+                                              errorMessage: Option[String] = None
+)
 
 object AnswerShippingQuery {
 

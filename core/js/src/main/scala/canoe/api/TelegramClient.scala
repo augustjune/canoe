@@ -1,7 +1,8 @@
 package canoe.api
 
+import canoe.api.clients.AjaxClient
 import canoe.methods.Method
-import cats.effect.{Async}
+import cats.effect.Async
 
 /** Client which is able to execute Telegram Bot API methods in effect `F`.
   */
@@ -19,5 +20,5 @@ object TelegramClient {
     * @param token Bot token
     */
   def apply[F[_]: Async](token: String): TelegramClient[F] =
-    ???
+    new AjaxClient[F](token)
 }

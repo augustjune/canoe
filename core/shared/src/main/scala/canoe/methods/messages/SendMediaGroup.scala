@@ -39,14 +39,12 @@ object SendMediaGroup {
         Decoder.decodeList(TelegramMessage.telegramMessageDecoder)
 
       def attachments(request: SendMediaGroup): List[(String, InputFile)] = {
-        request.media.flatMap {
-          case x: InputMediaPhoto =>
+        request.media.map { x =>
             val name = x.media match {
               case InputFile.Upload(filename, _) => filename
               case _ => x.`type`
             }
-            List(name -> x.media)
-          case x => x.files
+            name -> x.media
         }
       }
     }

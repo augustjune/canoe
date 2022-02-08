@@ -3,7 +3,7 @@ package canoe.methods.messages
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
-import canoe.models.{ChatId, InputFile, InputMedia, InputMediaPhoto}
+import canoe.models.{ChatId, InputFile, InputMedia}
 import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 

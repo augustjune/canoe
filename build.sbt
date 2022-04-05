@@ -112,6 +112,18 @@ lazy val tests = {
   Seq(dependencies, frameworks)
 }
 
+ThisBuild / githubWorkflowTargetTags ++= Seq("v*")
+ThisBuild / githubWorkflowPublishTargetBranches ++= Seq(RefPredicate.Equals(Ref.Branch("master")),
+                                                        RefPredicate.StartsWith(Ref.Tag("v"))
+)
+ThisBuild / githubWorkflowPublish := Seq(WorkflowStep.Sbt(List("ci-release")))
+ThisBuild / githubWorkflowEnv ++= List(
+  "PGP_PASSPHRASE",
+  "PGP_SECRET",
+  "SONATYPE_PASSWORD",
+  "SONATYPE_USERNAME"
+).map(envKey => envKey -> s"$${{ secrets.$envKey }}").toMap
+
 val scala2_13 = "2.13.3"
 val scala2_12 = "2.12.8"
 

@@ -31,7 +31,8 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
   )
   .jsSettings(
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % scalaJsDomVersion
+      "org.scala-js" %%% "scalajs-dom"                 % scalaJsDomVersion,
+      "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0"
     )
   )
 

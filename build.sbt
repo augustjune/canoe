@@ -7,7 +7,7 @@ lazy val canoe = project
   .settings(
     projectSettings,
     crossScalaVersions := Nil,
-    skip / publish := true
+    publish / skip := true
   )
 
 lazy val core = crossProject(JVMPlatform, JSPlatform)
@@ -44,7 +44,7 @@ lazy val examples = project
   .disablePlugins(MimaPlugin)
   .settings(
     name := "canoe-examples",
-    skip / publish := true,
+    publish / skip := true,
     projectSettings,
     crossScalaVersions := Seq(scalaVersion.value)
   )

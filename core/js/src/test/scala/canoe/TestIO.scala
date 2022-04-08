@@ -1,9 +1,10 @@
 package canoe
 
-import cats.effect.{ContextShift, IO, Timer}
+import cats.effect.IO
 import fs2.Stream
 
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor
+import cats.effect.Temporal
 
 object TestIO {
 
@@ -18,5 +19,5 @@ object TestIO {
   }
 
   implicit val globalContext: ContextShift[IO] = IO.contextShift(MacrotaskExecutor)
-  implicit val globalTimer: Timer[IO] = IO.timer(MacrotaskExecutor)
+  implicit val globalTimer: Temporal[IO] = IO.timer(MacrotaskExecutor)
 }

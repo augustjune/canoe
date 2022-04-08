@@ -7,7 +7,7 @@ lazy val canoe = project
   .settings(
     projectSettings,
     crossScalaVersions := Nil,
-    skip.in(publish) := true
+    skip / publish := true
   )
 
 lazy val core = crossProject(JVMPlatform, JSPlatform)
@@ -32,7 +32,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
   .jsSettings(
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom"                 % scalaJsDomVersion,
-      "org.scala-js" %%% "scala-js-macrotask-executor" % "1.0.0"
+      "org.scala-js" %%% "scala-js-macrotask-executor" % scalaJsMacroTaskExecutor
     )
   )
 
@@ -44,7 +44,7 @@ lazy val examples = project
   .disablePlugins(MimaPlugin)
   .settings(
     name := "canoe-examples",
-    skip.in(publish) := true,
+    skip / publish := true,
     projectSettings,
     crossScalaVersions := Seq(scalaVersion.value)
   )
@@ -57,7 +57,7 @@ lazy val projectSettings = Seq(
     Developer("augustjune", "Yura Slinkin", "jurij.jurich@gmail.com", url("https://github.com/augustjune"))
   ),
   scalaVersion := scala2_13,
-  crossScalaVersions := Seq(scala2_12, scalaVersion.value)
+  crossScalaVersions := Seq(scala2_12, scala2_13)
 )
 
 lazy val crossDependencies =
@@ -114,7 +114,6 @@ lazy val tests = {
 }
 
 ThisBuild / scalaVersion := scala2_13
-ThisBuild / crossScalaVersions := Seq(scala2_12, scala2_13)
 ThisBuild / githubWorkflowTargetTags ++= Seq("v*")
 ThisBuild / githubWorkflowPublishTargetBranches ++= Seq(RefPredicate.Equals(Ref.Branch("master")),
                                                         RefPredicate.StartsWith(Ref.Tag("v"))
@@ -141,5 +140,6 @@ val scalatestVersion = "3.2.2"
 val disciplineVersion = "1.0.0-RC2"
 val scalacheckShapelessVersion = "1.2.5"
 val scalaJsDomVersion = "1.1.0"
+val scalaJsMacroTaskExecutor = "1.0.0"
 val kindProjectorVersion = "0.10.3"
 val contextAppliedVersion = "0.1.4"

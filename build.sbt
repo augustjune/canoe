@@ -129,7 +129,7 @@ ThisBuild / githubWorkflowEnv ++= List(
 val scala2_13 = "2.13.8"
 val scala2_12 = "2.12.15"
 
-val fs2Version = "2.5.9"
+val fs2Version = "2.5.10"
 val catsCoreVersion = "2.7.0"
 val catsEffectVersion = "2.5.4"
 val catsLawsVersion = "2.2.0"

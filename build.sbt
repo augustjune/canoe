@@ -113,7 +113,7 @@ lazy val tests = {
   Seq(dependencies, frameworks)
 }
 
-ThisBuild / scalaVersion := scala2_12
+ThisBuild / scalaVersion := scala2_13
 ThisBuild / crossScalaVersions := Seq(scala2_12, scala2_13)
 ThisBuild / githubWorkflowTargetTags ++= Seq("v*")
 ThisBuild / githubWorkflowPublishTargetBranches ++= Seq(RefPredicate.Equals(Ref.Branch("master")),
@@ -127,15 +127,15 @@ ThisBuild / githubWorkflowEnv ++= List(
   "SONATYPE_USERNAME"
 ).map(envKey => envKey -> s"$${{ secrets.$envKey }}").toMap
 
-val scala2_13 = "2.13.3"
-val scala2_12 = "2.12.4"
+val scala2_13 = "2.13.8"
+val scala2_12 = "2.12.15"
 
-val fs2Version = "2.5.8"
-val catsCoreVersion = "2.6.1"
-val catsEffectVersion = "2.5.1"
+val fs2Version = "2.5.9"
+val catsCoreVersion = "2.7.0"
+val catsEffectVersion = "2.5.4"
 val catsLawsVersion = "2.2.0"
 val circeVersion = "0.14.1"
-val http4sVersion = "0.21.24"
+val http4sVersion = "0.21.33"
 val log4catsVersion = "1.3.1"
 val scalatestVersion = "3.2.2"
 val disciplineVersion = "1.0.0-RC2"

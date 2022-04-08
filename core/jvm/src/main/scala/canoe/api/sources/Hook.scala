@@ -16,7 +16,7 @@ import org.http4s.circe.jsonOf
 import org.http4s.dsl.Http4sDsl
 import org.http4s.implicits._
 import org.http4s.server.Server
-import org.http4s.server.blaze.BlazeServerBuilder
+import org.http4s.blaze.server.BlazeServerBuilder
 import scala.concurrent.ExecutionContext
 
 class Hook[F[_]](queue: Queue[F, Update]) {

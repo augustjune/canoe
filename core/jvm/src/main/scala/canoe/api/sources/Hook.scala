@@ -9,14 +9,15 @@ import cats.effect.{ConcurrentEffect, Resource, Timer}
 import cats.syntax.all._
 import fs2.Stream
 import fs2.concurrent.Queue
-import io.chrisdavenport.log4cats.Logger
-import io.chrisdavenport.log4cats.slf4j.Slf4jLogger
+import org.typelevel.log4cats.Logger
+import org.typelevel.log4cats.slf4j.Slf4jLogger
 import org.http4s._
 import org.http4s.circe.jsonOf
 import org.http4s.dsl.Http4sDsl
 import org.http4s.implicits._
 import org.http4s.server.Server
 import org.http4s.server.blaze.BlazeServerBuilder
+import scala.concurrent.ExecutionContext
 
 class Hook[F[_]](queue: Queue[F, Update]) {
   def updates: Stream[F, Update] = queue.dequeue
@@ -24,8 +25,7 @@ class Hook[F[_]](queue: Queue[F, Update]) {
 
 object Hook {
 
-  /**
-    * Installs a webhook for Telegram updates to be sent to the specified `url`
+  /** Installs a webhook for Telegram updates to be sent to the specified `url`
     * and starts a local server which listen to incoming updates on specified `port`.
     *
     * After the hook is used, local server and Telegram webhook are cleaned up.
@@ -47,8 +47,7 @@ object Hook {
       } yield hook
     })
 
-  /**
-    * Sets updates webhook to provided `url` for Telegram service.
+  /** Sets updates webhook to provided `url` for Telegram service.
     * After the resource is used, webhook will be automatically deleted.
     *
     * @param url         URL to which updates will be sent
@@ -68,8 +67,7 @@ object Hook {
       ) *> DeleteWebhook.call.void
     )
 
-  /**
-    * Creates local server which listens for the incoming updates on provided `port`.
+  /** Creates local server which listens for the incoming updates on provided `port`.
     */
   private def listenServer[F[_]: ConcurrentEffect: Timer: Logger](host: String, port: Int): Resource[F, Hook[F]] = {
     val dsl = Http4sDsl[F]
@@ -77,19 +75,17 @@ object Hook {
 
     def app(queue: Queue[F, Update]): HttpApp[F] =
       HttpRoutes
-        .of[F] {
-          case req @ POST -> Root =>
-            req
-              .decodeWith(jsonOf[F, Update], strict = true)(queue.enqueue1(_) *> Ok())
-              .recoverWith {
-                case InvalidMessageBodyFailure(details, _) =>
-                  F.error(s"Received unknown type of update. $details") *> Ok()
-              }
+        .of[F] { case req @ POST -> Root =>
+          req
+            .decodeWith(jsonOf[F, Update], strict = true)(queue.enqueue1(_) *> Ok())
+            .recoverWith { case InvalidMessageBodyFailure(details, _) =>
+              F.error(s"Received unknown type of update. $details") *> Ok()
+            }
         }
         .orNotFound
 
     def server(queue: Queue[F, Update]): Resource[F, Server[F]] =
-      BlazeServerBuilder[F].bindHttp(port, host).withHttpApp(app(queue)).resource
+      BlazeServerBuilder[F](ExecutionContext.global).bindHttp(port, host).withHttpApp(app(queue)).resource
 
     Resource.suspend(Queue.unbounded[F, Update].map(q => server(q).map(_ => new Hook[F](q))))
   }

@@ -6,7 +6,7 @@ import canoe.models.{ChatId, InputFile}
 import io.circe.{Decoder, Encoder}
 import io.circe.generic.semiauto.deriveEncoder
 
-final case class SetChatAdministratorCustomTitle(chatId: ChatId, userId: Int, customTitle: String)
+final case class SetChatAdministratorCustomTitle(chatId: ChatId, userId: Long, customTitle: String)
 
 object SetChatAdministratorCustomTitle {
 

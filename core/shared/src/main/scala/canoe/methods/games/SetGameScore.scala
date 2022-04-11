@@ -29,7 +29,7 @@ import io.circe.{Decoder, Encoder}
   * @param inlineMessageId    Identifier of the inline message.
   *                           Required if 'chatId' and 'messageId' are not specified.
   */
-final class SetGameScore private (val userId: Int,
+final class SetGameScore private (val userId: Long,
                                   val score: Long,
                                   val force: Option[Boolean],
                                   val disableEditMessage: Option[Boolean],
@@ -43,7 +43,7 @@ object SetGameScore {
     */
   def direct(chatId: ChatId,
              messageId: Int,
-             userId: Int,
+             userId: Long,
              score: Long,
              force: Option[Boolean] = None,
              disableEditMessage: Option[Boolean] = None): SetGameScore =
@@ -53,7 +53,7 @@ object SetGameScore {
     * For the inlined messages sent via the bot
     */
   def inlined(inlineMessageId: String,
-              userId: Int,
+              userId: Long,
               score: Long,
               force: Option[Boolean] = None,
               disableEditMessage: Option[Boolean] = None): SetGameScore =

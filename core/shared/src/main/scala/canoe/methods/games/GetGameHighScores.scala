@@ -26,7 +26,7 @@ import io.circe.{Decoder, Encoder}
   * @param inlineMessageId Identifier of the inline message.
   *                        Required if 'chatId' and 'messageId' are not specified.
   */
-final class GetGameHighScores private (val userId: Int,
+final class GetGameHighScores private (val userId: Long,
                                        val chatId: Option[ChatId] = None,
                                        val messageId: Option[Int] = None,
                                        val inlineMessageId: Option[String] = None)
@@ -37,13 +37,13 @@ object GetGameHighScores {
   /**
     * For the messages sent directly by the bot
     */
-  def direct(chatId: ChatId, messageId: Int, userId: Int): GetGameHighScores =
+  def direct(chatId: ChatId, messageId: Int, userId: Long): GetGameHighScores =
     new GetGameHighScores(userId, Some(chatId), Some(messageId))
 
   /**
     * For the inlined messages sent via the bot
     */
-  def inlined(inlineMessageId: String, userId: Int): GetGameHighScores =
+  def inlined(inlineMessageId: String, userId: Long): GetGameHighScores =
     new GetGameHighScores(userId, inlineMessageId = Some(inlineMessageId))
 
   implicit val method: Method[GetGameHighScores, List[GameHighScore]] =

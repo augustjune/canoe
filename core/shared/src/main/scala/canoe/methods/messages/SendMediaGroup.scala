@@ -25,7 +25,6 @@ final case class SendMediaGroup(chatId: ChatId,
                                 replyToMessageId: Option[Int] = None)
 
 object SendMediaGroup {
-  import io.circe.generic.auto._
 
   implicit val method: Method[SendMediaGroup, List[TelegramMessage]] =
     new Method[SendMediaGroup, List[TelegramMessage]] {
@@ -34,19 +33,19 @@ object SendMediaGroup {
 
       def encoder: Encoder[SendMediaGroup] =
         deriveEncoder[SendMediaGroup]
-          .contramap[SendMediaGroup](
-            s =>
-              s.copy(media = s.media.filter(_.media match {
-                case InputFile.Upload(_, _) => false
-                case InputFile.Existing(_)  => true
-              }))
-          )
           .snakeCase
 
       def decoder: Decoder[List[TelegramMessage]] =
         Decoder.decodeList(TelegramMessage.telegramMessageDecoder)
 
-      def attachments(request: SendMediaGroup): List[(String, InputFile)] =
-        request.media.flatMap(_.files)
+      def attachments(request: SendMediaGroup): List[(String, InputFile)] = {
+        request.media.map { x =>
+            val name = x.media match {
+              case InputFile.Upload(filename, _) => filename
+              case _ => x.`type`
+            }
+            name -> x.media
+        }
+      }
     }
 }

@@ -35,7 +35,7 @@ object InputFile {
   def fromBytes(name: String, bytes: Array[Byte]) = Upload(name, bytes)
 
   implicit def inputFileEncoder: Encoder[InputFile] = Encoder.instance[InputFile] {
-    case InputFile.Upload(_, _)     => Json.Null
+    case InputFile.Upload(n, _)     => Json.fromString(s"attach://$n")
     case InputFile.Existing(handle) => Json.fromString(handle)
   }
 }

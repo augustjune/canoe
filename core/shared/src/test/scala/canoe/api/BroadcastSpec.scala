@@ -4,8 +4,8 @@ import canoe.TestIO._
 import cats.effect.IO
 import fs2.{Pipe, Stream}
 import org.scalatest.freespec.AnyFreeSpec
+import cats.effect.concurrent.Ref
 import scala.concurrent.duration._
-import cats.effect.Ref
 
 class BroadcastSpec extends AnyFreeSpec {
   def broadcast[A]: Stream[IO, Broadcast[IO, A]] = Stream.eval(Broadcast[IO, A])

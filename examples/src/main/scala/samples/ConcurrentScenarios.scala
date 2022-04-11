@@ -2,10 +2,10 @@ package samples
 
 import canoe.api._
 import canoe.syntax._
+import cats.effect.concurrent.Semaphore
 import cats.effect.{ExitCode, IO, IOApp}
 import cats.syntax.all._
 import fs2.Stream
-import cats.effect.std.Semaphore
 
 /**
   * Example of concurrent execution of >1 scenarios.

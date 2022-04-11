@@ -1,10 +1,9 @@
 package canoe
 
-import cats.effect.IO
+import cats.effect.{ContextShift, IO, Timer}
 import fs2.Stream
 
 import scala.concurrent.ExecutionContext
-import cats.effect.Temporal
 
 object TestIO {
 
@@ -19,5 +18,5 @@ object TestIO {
   }
 
   implicit val globalContext: ContextShift[IO] = IO.contextShift(ExecutionContext.global)
-  implicit val globalTimer: Temporal[IO] = IO.timer(ExecutionContext.global)
+  implicit val globalTimer: Timer[IO] = IO.timer(ExecutionContext.global)
 }

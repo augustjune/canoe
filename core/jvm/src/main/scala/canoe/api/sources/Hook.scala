@@ -5,7 +5,7 @@ import canoe.methods.webhooks.{DeleteWebhook, SetWebhook}
 import canoe.models.{InputFile, Update}
 import canoe.syntax.methodOps
 import cats.Monad
-import cats.effect.{ConcurrentEffect, Resource}
+import cats.effect.{ConcurrentEffect, Resource, Timer}
 import cats.syntax.all._
 import fs2.Stream
 import fs2.concurrent.Queue
@@ -18,7 +18,6 @@ import org.http4s.implicits._
 import org.http4s.server.Server
 import org.http4s.server.blaze.BlazeServerBuilder
 import scala.concurrent.ExecutionContext
-import cats.effect.Temporal
 
 class Hook[F[_]](queue: Queue[F, Update]) {
   def updates: Stream[F, Update] = queue.dequeue
@@ -36,7 +35,7 @@ object Hook {
     * @param port        Port which will be used for listening for the incoming updates
     * @param certificate Public key of self-signed certificate (including BEGIN and END portions)
     */
-  def install[F[_]: TelegramClient: ConcurrentEffect: Temporal](url: String,
+  def install[F[_]: TelegramClient: ConcurrentEffect: Timer](url: String,
                                                              host: String,
                                                              port: Int,
                                                              certificate: Option[InputFile]
@@ -70,7 +69,7 @@ object Hook {
 
   /** Creates local server which listens for the incoming updates on provided `port`.
     */
-  private def listenServer[F[_]: ConcurrentEffect: Temporal: Logger](host: String, port: Int): Resource[F, Hook[F]] = {
+  private def listenServer[F[_]: ConcurrentEffect: Timer: Logger](host: String, port: Int): Resource[F, Hook[F]] = {
     val dsl = Http4sDsl[F]
     import dsl._
 

@@ -3,19 +3,19 @@ package canoe.api
 import canoe.api.sources.{Hook, Polling}
 import canoe.models.messages.TelegramMessage
 import canoe.models.{InputFile, Update}
-import cats.effect.{Concurrent, ConcurrentEffect, Resource}
+import cats.effect.concurrent.{Deferred, Ref}
+import cats.effect.{Concurrent, ConcurrentEffect, Resource, Timer}
 import cats.syntax.all._
 import fs2.concurrent.Topic
 import fs2.{Pipe, Stream}
 
 import scala.concurrent.duration.FiniteDuration
-import cats.effect.{ Deferred, Ref, Temporal }
 
 /**
   * An instance which can communicate with Telegram service and
   * interact with other Telegram users in a certain predefined way
   */
-class Bot[F[_]: Concurrent: Temporal] private[api] (val updates: Stream[F, Update]) {
+class Bot[F[_]: Concurrent: Timer] private[api] (val updates: Stream[F, Update]) {
 
   /**
     * Defines the behavior of the bot.
@@ -98,14 +98,14 @@ object Bot {
   /**
     * Creates a bot which operates on provided updates.
     */
-  def fromStream[F[_]: Concurrent: Temporal](updates: Stream[F, Update]): Bot[F] = new Bot(updates)
+  def fromStream[F[_]: Concurrent: Timer](updates: Stream[F, Update]): Bot[F] = new Bot(updates)
 
   /**
     * Creates a bot which receives incoming updates using long polling mechanism.
     *
     * See [[https://en.wikipedia.org/wiki/Push_technology#Long_polling wiki]].
     */
-  def polling[F[_]: Concurrent: Temporal: TelegramClient]: Bot[F] =
+  def polling[F[_]: Concurrent: Timer: TelegramClient]: Bot[F] =
     new Bot[F](Polling.continual)
 
   /**
@@ -114,7 +114,7 @@ object Bot {
     *
     * See [[https://en.wikipedia.org/wiki/Push_technology#Long_polling wiki]].
     */
-  def polling[F[_]: Concurrent: Temporal: TelegramClient](interval: FiniteDuration): Bot[F] =
+  def polling[F[_]: Concurrent: Timer: TelegramClient](interval: FiniteDuration): Bot[F] =
     new Bot[F](Polling.metered(interval))
 
   /**
@@ -127,7 +127,7 @@ object Bot {
     *                    Default is 8443.
     * @param certificate Public key of self-signed certificate (including BEGIN and END portions)
     */
-  def hook[F[_]: TelegramClient: ConcurrentEffect: Temporal](
+  def hook[F[_]: TelegramClient: ConcurrentEffect: Timer](
     url: String,
     host: String = "0.0.0.0",
     port: Int = 8443,

@@ -1,13 +1,12 @@
 package canoe.api.matching
 
 import canoe.api.matching.Episode._
-import cats.effect.{Concurrent, ExitCase}
+import cats.effect.{Bracket, Concurrent, ExitCase, Timer}
 import cats.syntax.all._
 import cats.~>
 import fs2.{Pipe, Pull, Stream}
 
 import scala.concurrent.duration.FiniteDuration
-import cats.effect.{ MonadCancel, Temporal }
 
 /**
   * Type which represents a description of sequence of elements.
@@ -39,7 +38,7 @@ private[api] sealed trait Episode[F[_], -I, +O] {
     * match the description of this episode and empty stream otherwise.
     * Fails on the first unhandled error result.
     */
-  def matching(implicit C: Concurrent[F], T: Temporal[F]): Pipe[F, I, O] =
+  def matching(implicit C: Concurrent[F], T: Timer[F]): Pipe[F, I, O] =
     open(this, _, Nil, true).flatMap {
       case (Matched(o), _) => Stream(o)
       case (Failed(e), _)  => Stream.raiseError[F](e)
@@ -86,8 +85,8 @@ object Episode {
                                                            release: (A, ExitCase[Throwable]) => Episode[F, I, Unit]
   ) extends Episode[F, I, B]
 
-  private[api] implicit def bracketInstance[F[_], I]: MonadCancel[Episode[F, I, *], Throwable] =
-    new MonadCancel[Episode[F, I, *], Throwable] {
+  private[api] implicit def bracketInstance[F[_], I]: Bracket[Episode[F, I, *], Throwable] =
+    new Bracket[Episode[F, I, *], Throwable] {
       // Members declared in cats.Applicative
       def pure[A](a: A): Episode[F, I, A] = Pure(a)
 
@@ -134,7 +133,7 @@ object Episode {
   private final case class Failed(e: Throwable) extends Result[Nothing, Nothing]
   private final case object Interrupted extends Result[Nothing, Nothing]
 
-  private def open[F[_]: Concurrent: Temporal, I, O](
+  private def open[F[_]: Concurrent: Timer, I, O](
     episode: Episode[F, I, O],
     input: Stream[F, I],
     cancelTokens: List[(I => Boolean, Option[I => F[Unit]])],

@@ -87,7 +87,7 @@ object Hook {
         .orNotFound
 
     def server(queue: Queue[F, Update]): Resource[F, Server] =
-      BlazeServerBuilder[F](ExecutionContext.global).bindHttp(port, host).withHttpApp(app(queue)).resource
+      BlazeServerBuilder[F].bindHttp(port, host).withHttpApp(app(queue)).resource
 
     Resource.suspend(Queue.unbounded[F, Update].map(q => server(q).map(_ => new Hook[F](q))))
   }

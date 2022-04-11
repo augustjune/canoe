@@ -49,12 +49,13 @@ private[api] class Http4sTelegramClient[F[_]: Concurrent: Logger](token: String,
   }
 
   private def jsonRequest[Req, Res](url: Uri, method: Method[Req, Res], action: Req): Request[F] =
-    Method.POST(action, url)(jsonEncoderOf[F, Req](method.encoder))
+    Method.POST(action, url)(jsonEncoderOf(method.encoder))
 
   private def multipartRequest[Req, Res](url: Uri,
                                          method: Method[Req, Res],
                                          action: Req,
-                                         parts: List[Part[F]]): F[Request[F]] = {
+                                         parts: List[Part[F]]
+  ): Request[F] = {
     val params =
       method
         .encoder(action)
@@ -73,7 +74,7 @@ private[api] class Http4sTelegramClient[F[_]: Concurrent: Logger](token: String,
 
     val multipart = Multipart[F](parts.toVector ++ params.toVector)
 
-    Method.POST(multipart, url).map(_.withHeaders(multipart.headers))
+    Method.POST(multipart, url).withHeaders(multipart.headers)
   }
 
   private def handleTelegramResponse[A, I, C](m: Method[I, A], input: I)(response: TelegramResponse[A]): F[A] =
@@ -81,7 +82,9 @@ private[api] class Http4sTelegramClient[F[_]: Concurrent: Logger](token: String,
       case TelegramResponse(true, Some(result), _, _, _) => result.pure[F]
 
       case failed =>
-        Logger[F].error(s"Received failed response from Telegram: $failed. Method name: ${m.name}, input data: $input") *>
+        Logger[F].error(
+          s"Received failed response from Telegram: $failed. Method name: ${m.name}, input data: $input"
+        ) *>
           FailedMethod(m, input, failed).raiseError[F, A]
     }
 }

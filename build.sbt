@@ -31,7 +31,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
   .jsSettings(
     libraryDependencies ++= Seq(
       ("org.scala-js" %%% "scalajs-dom"                 % scalaJsDomVersion).cross(CrossVersion.for3Use2_13),
-      ("org.scala-js" %%% "scala-js-macrotask-executor" % scalaJsMacroTaskExecutor).cross(CrossVersion.for3Use2_13)
+      "org.scala-js" %%% "scala-js-macrotask-executor" % scalaJsMacroTaskExecutor
     )
   )
 
@@ -56,10 +56,7 @@ lazy val projectSettings = Seq(
     Developer("augustjune", "Yura Slinkin", "jurij.jurich@gmail.com", url("https://github.com/augustjune"))
   ),
   scalaVersion := scala2_13,
-  <<<<<<<.HEAD(crossScalaVersions) := Seq(scala2_12, scala2_13, scala3)
-    =======
-      crossScalaVersions := Seq(scala2_12, scala2_13)
-    >>>>>>> master
+  crossScalaVersions := Seq(scala2_13, scala3)
 )
 
 lazy val crossDependencies =
@@ -110,28 +107,7 @@ lazy val tests = {
   Seq(dependencies, frameworks)
 }
 
-<<<<<<< HEAD
-val scala3 = "3.0.0"
-val scala2_13 = "2.13.3"
-val scala2_12 = "2.12.8"
-
-val scala2Only = Seq(scala2_12, scala2_13)
-val scala2And3 = scala2Only :+ scala3
-
-val fs2Version = "3.0.6"
-val catsCoreVersion = "2.6.1"
-val catsEffectVersion = "3.2.9"
-val catsLawsVersion = "2.6.1"
-val circeVersion = "0.14.1"
-val http4sVersion = "1.0.0-M23"
-val log4catsVersion = "2.1.1"
-val scalatestVersion = "3.2.10"
-val disciplineVersion = "2.1.5"
-val scalacheckShapelessVersion = "1.2.5"
-val scalaJsDomVersion = "1.1.0"
-val kindProjectorVersion = "0.13.0"
-=======
-ThisBuild / scalaVersion := scala2_13
+ThisBuild / scalaVersion := scala3
 ThisBuild / githubWorkflowTargetTags ++= Seq("v*")
 ThisBuild / githubWorkflowPublishTargetBranches ++= Seq(RefPredicate.Equals(Ref.Branch("master")),
                                                         RefPredicate.StartsWith(Ref.Tag("v"))
@@ -144,21 +120,24 @@ ThisBuild / githubWorkflowEnv ++= List(
   "SONATYPE_USERNAME"
 ).map(envKey => envKey -> s"$${{ secrets.$envKey }}").toMap
 
-val scala2_13 = "2.13.8"
-val scala2_12 = "2.12.15"
+lazy val scala3 = "3.1.1"
+lazy val scala2_13 = "2.13.8"
+// lazy val scala2_12 = "2.12.15"
 
-val fs2Version = "2.5.10"
-val catsCoreVersion = "2.7.0"
-val catsEffectVersion = "2.5.4"
-val catsLawsVersion = "2.7.0"
-val circeVersion = "0.14.1"
-val http4sVersion = "0.21.33"
-val log4catsVersion = "1.5.1"
-val scalatestVersion = "3.2.11"
-val disciplineVersion = "1.0.0-RC2"
-val scalacheckShapelessVersion = "1.2.5"
-val scalaJsDomVersion = "1.2.0"
-val scalaJsMacroTaskExecutor = "1.0.0"
-val kindProjectorVersion = "0.10.3"
->>>>>>> master
-val contextAppliedVersion = "0.1.4"
+lazy val scala2Only = Seq(scala2_13)
+lazy val scala2And3 = scala2Only :+ scala3
+
+lazy val fs2Version = "3.2.7"
+lazy val catsCoreVersion = "2.7.0"
+lazy val catsEffectVersion = "3.3.11"
+lazy val catsLawsVersion = "2.7.0"
+lazy val circeVersion = "0.14.1"
+lazy val http4sVersion = "0.23.11"
+lazy val log4catsVersion = "2.2.0"
+lazy val scalatestVersion = "3.2.11"
+lazy val disciplineVersion = "2.1.5"
+lazy val scalacheckShapelessVersion = "1.2.5"
+lazy val scalaJsDomVersion = "1.2.0"
+lazy val scalaJsMacroTaskExecutor = "1.0.0"
+lazy val kindProjectorVersion = "0.13.2"
+lazy val contextAppliedVersion = "0.1.4"

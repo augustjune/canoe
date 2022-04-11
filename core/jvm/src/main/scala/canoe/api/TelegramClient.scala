@@ -27,10 +27,18 @@ object TelegramClient {
     * After it is used, client is going to be released.
     *
     * @param token Telegram bot token
+    */
+  def apply[F[_]: Async](token: String): Resource[F, TelegramClient[F]] =
+    BlazeClientBuilder[F].resource.map(new Http4sTelegramClient[F](token, _))
+
+  /** Creates an authorized asynchronous Telegram Bot API client wrapped in Resource.
+    * After it is used, client is going to be released.
+    *
+    * @param token Telegram bot token
     * @param ec    Dedicated ExecutionContext
     */
   def apply[F[_]: Async](token: String, ec: ExecutionContext): Resource[F, TelegramClient[F]] =
-    BlazeClientBuilder[F](ec).resource.map(new Http4sTelegramClient[F](token, _))
+    BlazeClientBuilder[F].withExecutionContext(ec).resource.map(new Http4sTelegramClient[F](token, _))
 
   /** Creates an authorized asynchronous Telegram Bot API client wrapped in Resource,
     * which works on `global` ExecutionContext.

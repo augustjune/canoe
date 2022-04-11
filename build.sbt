@@ -104,7 +104,7 @@ lazy val tests = {
       "org.scalatest"              %% "scalatest"                 % scalatestVersion,
       "org.typelevel"              %% "cats-laws"                 % catsLawsVersion,
       "org.typelevel"              %% "discipline-scalatest"      % disciplineVersion,
-      "com.github.alexarchambault" %% "scalacheck-shapeless_1.14" % scalacheckShapelessVersion
+      "com.github.alexarchambault" %% "scalacheck-shapeless_1.15" % scalacheckShapelessVersion
     ).map(_ % Test)
 
   val frameworks =
@@ -138,7 +138,7 @@ val http4sVersion = "0.21.33"
 val log4catsVersion = "1.5.1"
 val scalatestVersion = "3.2.11"
 val disciplineVersion = "1.0.0-RC2"
-val scalacheckShapelessVersion = "1.2.5"
+val scalacheckShapelessVersion = "1.3.0"
 val scalaJsDomVersion = "1.2.0"
 val scalaJsMacroTaskExecutor = "1.0.0"
 val kindProjectorVersion = "0.10.3"

@@ -5,7 +5,7 @@ import canoe.methods.Method
 import canoe.models.Currency.Currency
 import canoe.models.messages.InvoiceMessage
 import canoe.models.{InputFile, LabeledPrice, ReplyMarkup}
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -69,9 +69,9 @@ object SendInvoice {
 
       def name: String = "sendInvoice"
 
-      def encoder: Encoder[SendInvoice] = deriveEncoder[SendInvoice].snakeCase
+      def encoder: Encoder[SendInvoice] = semiauto.deriveEncoder[SendInvoice].snakeCase
 
-      def decoder: Decoder[InvoiceMessage] = deriveDecoder[InvoiceMessage]
+      def decoder: Decoder[InvoiceMessage] = semiauto.deriveDecoder[InvoiceMessage]
 
       def attachments(request: SendInvoice): List[(String, InputFile)] = Nil
     }

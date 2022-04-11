@@ -3,19 +3,18 @@ package canoe.api.clients
 import canoe.api.{FailedMethod, ResponseDecodingError, TelegramClient}
 import canoe.methods.Method
 import canoe.models.Response
-import cats.effect.{Async, ContextShift}
+import cats.effect.{Async, Sync}
 import cats.syntax.all._
 import io.circe.Decoder
 import io.circe.parser.decode
 import org.scalajs.dom.console
 import org.scalajs.dom.ext.Ajax
 
-private[api] class AjaxClient[F[_]: Async: ContextShift](token: String) extends TelegramClient[F] {
+private[api] class AjaxClient[F[_]: Async](token: String) extends TelegramClient[F] {
 
   private val botApiUri: String = s"https://api.telegram.org/bot$token"
 
-  /**
-    * Transforms request into result using implicit method definition as a contract.
+  /** Transforms request into result using implicit method definition as a contract.
     */
   def execute[Req, Res](request: Req)(implicit M: Method[Req, Res]): F[Res] = {
     implicit val responseDecoder: Decoder[Response[Res]] = Response.decoder[Res](M.decoder)
@@ -46,8 +45,8 @@ private[api] class AjaxClient[F[_]: Async: ContextShift](token: String) extends 
     val url = s"$botApiUri/${method.name}"
     val json = method.encoder.apply(request).toString
 
-    Async
-      .fromFuture(F.delay(Ajax.post(url, json, headers = Map("Content-Type" -> "application/json"))))
+    Async[F]
+      .fromFuture(Sync[F].delay(Ajax.post(url, json, headers = Map("Content-Type" -> "application/json"))))
       .map(_.responseText)
   }
 }

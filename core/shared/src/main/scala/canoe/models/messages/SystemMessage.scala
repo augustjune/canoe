@@ -4,7 +4,7 @@ import canoe.models.{Chat, DiceResult, PhotoSize, SuccessfulPayment, User}
 import cats.syntax.functor._
 import io.circe.Decoder
 import io.circe.generic.auto._
-import io.circe.generic.semiauto.deriveDecoder
+import io.circe.generic.semiauto
 
 sealed trait SystemMessage extends TelegramMessage with Product
 
@@ -12,20 +12,20 @@ object SystemMessage {
 
   implicit val systemMessageDecoder: Decoder[SystemMessage] =
     List[Decoder[SystemMessage]](
-      deriveDecoder[MessagePinned].widen,
-      deriveDecoder[ChatMemberAdded].widen,
-      deriveDecoder[ChannelCreated].widen,
-      deriveDecoder[ChatMemberLeft].widen,
-      deriveDecoder[ChatPhotoChanged].widen,
-      deriveDecoder[ChatPhotoDeleted].widen,
-      deriveDecoder[ChatTitleChanged].widen,
-      deriveDecoder[MigratedFromGroup].widen,
-      deriveDecoder[MigratedToSupergroup].widen,
-      deriveDecoder[SuccessfulPaymentMessage].widen,
-      deriveDecoder[GroupChatCreated].widen,
-      deriveDecoder[SupergroupCreated].widen,
-      deriveDecoder[WebsiteConnected].widen,
-      deriveDecoder[DiceThrownMessage].widen
+      semiauto.deriveDecoder[MessagePinned].widen,
+      semiauto.deriveDecoder[ChatMemberAdded].widen,
+      semiauto.deriveDecoder[ChannelCreated].widen,
+      semiauto.deriveDecoder[ChatMemberLeft].widen,
+      semiauto.deriveDecoder[ChatPhotoChanged].widen,
+      semiauto.deriveDecoder[ChatPhotoDeleted].widen,
+      semiauto.deriveDecoder[ChatTitleChanged].widen,
+      semiauto.deriveDecoder[MigratedFromGroup].widen,
+      semiauto.deriveDecoder[MigratedToSupergroup].widen,
+      semiauto.deriveDecoder[SuccessfulPaymentMessage].widen,
+      semiauto.deriveDecoder[GroupChatCreated].widen,
+      semiauto.deriveDecoder[SupergroupCreated].widen,
+      semiauto.deriveDecoder[WebsiteConnected].widen,
+      semiauto.deriveDecoder[DiceThrownMessage].widen
     ).reduceLeft(_.or(_))
 }
 

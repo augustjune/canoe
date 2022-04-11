@@ -5,7 +5,7 @@ import canoe.methods.Method
 import canoe.models.ParseMode.ParseMode
 import canoe.models.messages.DocumentMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -45,9 +45,9 @@ object SendDocument {
 
       def name: String = "sendDocument"
 
-      def encoder: Encoder[SendDocument] = deriveEncoder[SendDocument].snakeCase
+      def encoder: Encoder[SendDocument] = semiauto.deriveEncoder[SendDocument].snakeCase
 
-      def decoder: Decoder[DocumentMessage] = deriveDecoder[DocumentMessage]
+      def decoder: Decoder[DocumentMessage] = semiauto.deriveDecoder[DocumentMessage]
 
       def attachments(request: SendDocument): List[(String, InputFile)] =
         List("document" -> request.document)

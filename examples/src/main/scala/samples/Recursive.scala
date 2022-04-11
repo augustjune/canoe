@@ -3,23 +3,23 @@ package samples
 import canoe.api._
 import canoe.models.Chat
 import canoe.syntax._
-import cats.effect.{ExitCode, IO, IOApp}
+import cats.effect.{IO, IOApp}
 import cats.syntax.functor._
 import fs2.Stream
 
-/**
-  * Example of stack safe infinite self recursive scenario.
+/** Example of stack safe infinite self recursive scenario.
   */
-object Recursive extends IOApp {
+object Recursive extends IOApp.Simple {
   val token: String = "<your telegram token>"
 
-  def run(args: List[String]): IO[ExitCode] =
+  def run: IO[Unit] =
     Stream
-      .resource(TelegramClient.global[IO](token))
+      .resource(TelegramClient[IO](token))
       .flatMap { implicit client =>
         Bot.polling[IO].follow(learnNaturals)
       }
-      .compile.drain.as(ExitCode.Success)
+      .compile
+      .drain
 
   final val FIRST_NATURAL_NUMBER = 0
 
@@ -34,7 +34,8 @@ object Recursive extends IOApp {
     for {
       _ <- Scenario.eval(chat.send(s"Repeat after me: $i"))
       m <- Scenario.expect(text)
-      _ <- if (m == i.toString) Scenario.eval(chat.send("Well done. Let's go to the next one!")) >> repeat(chat, i + 1)
-      else Scenario.eval(chat.send("Not even close. You should try again")) >> repeat(chat, i)
+      _ <-
+        if (m == i.toString) Scenario.eval(chat.send("Well done. Let's go to the next one!")) >> repeat(chat, i + 1)
+        else Scenario.eval(chat.send("Not even close. You should try again")) >> repeat(chat, i)
     } yield ()
 }

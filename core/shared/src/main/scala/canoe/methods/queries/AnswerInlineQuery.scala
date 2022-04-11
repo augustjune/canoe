@@ -3,7 +3,7 @@ package canoe.methods.queries
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.{InlineQueryResult, InputFile}
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 /** Use this method to send answers to an inline query.
@@ -48,7 +48,7 @@ object AnswerInlineQuery {
 
       def name: String = "answerInlineQuery"
 
-      def encoder: Encoder[AnswerInlineQuery] = deriveEncoder[AnswerInlineQuery].snakeCase
+      def encoder: Encoder[AnswerInlineQuery] = semiauto.deriveEncoder[AnswerInlineQuery].snakeCase
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 

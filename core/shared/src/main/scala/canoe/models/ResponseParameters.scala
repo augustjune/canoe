@@ -2,7 +2,7 @@ package canoe.models
 
 import cats.syntax.functor._
 import io.circe.Decoder
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto
 
 /**
   * Contains information about why a request was unsuccessful.
@@ -13,8 +13,8 @@ object ResponseParameters {
 
   implicit val updateDecoder: Decoder[ResponseParameters] =
     List[Decoder[ResponseParameters]](
-      deriveDecoder[ChatMigration].widen,
-      deriveDecoder[ExceededFloodControl].widen
+      semiauto.deriveDecoder[ChatMigration].widen,
+      semiauto.deriveDecoder[ExceededFloodControl].widen
     ).reduceLeft(_.or(_))
 }
 

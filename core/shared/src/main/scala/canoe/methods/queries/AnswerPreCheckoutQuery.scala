@@ -3,7 +3,7 @@ package canoe.methods.queries
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.InputFile
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -29,9 +29,9 @@ import io.circe.{Decoder, Encoder}
   *                            Telegram will display this message to the user.
   *                            Required if ok is False.
   */
-final class AnswerPreCheckoutQuery private (val preCheckoutQueryId: String,
-                                            val ok: Boolean,
-                                            val errorMessage: Option[String] = None)
+final case class AnswerPreCheckoutQuery private (preCheckoutQueryId: String,
+                                                 ok: Boolean,
+                                                 errorMessage: Option[String] = None)
 
 object AnswerPreCheckoutQuery {
 
@@ -45,7 +45,7 @@ object AnswerPreCheckoutQuery {
 
       def name: String = "answerPreCheckoutQuery"
 
-      def encoder: Encoder[AnswerPreCheckoutQuery] = deriveEncoder[AnswerPreCheckoutQuery].snakeCase
+      def encoder: Encoder[AnswerPreCheckoutQuery] = semiauto.deriveEncoder[AnswerPreCheckoutQuery].snakeCase
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 

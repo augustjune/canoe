@@ -4,7 +4,7 @@ import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.GameMessage
 import canoe.models.{InputFile, ReplyMarkup}
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -36,9 +36,9 @@ object SendGame {
 
       def name: String = "sendGame"
 
-      def encoder: Encoder[SendGame] = deriveEncoder[SendGame].snakeCase
+      def encoder: Encoder[SendGame] = semiauto.deriveEncoder[SendGame].snakeCase
 
-      def decoder: Decoder[GameMessage] = deriveDecoder[GameMessage]
+      def decoder: Decoder[GameMessage] = semiauto.deriveDecoder[GameMessage]
 
       def attachments(request: SendGame): List[(String, InputFile)] = Nil
     }

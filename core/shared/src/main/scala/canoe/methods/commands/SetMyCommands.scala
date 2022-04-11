@@ -3,7 +3,7 @@ package canoe.methods.commands
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.{BotCommand, InputFile}
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -22,7 +22,7 @@ object SetMyCommands {
     new Method[SetMyCommands, Boolean] {
       def name: String = "setMyCommands"
 
-      def encoder: Encoder[SetMyCommands] = deriveEncoder[SetMyCommands].snakeCase
+      def encoder: Encoder[SetMyCommands] = semiauto.deriveEncoder[SetMyCommands].snakeCase
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 

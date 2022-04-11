@@ -3,7 +3,7 @@ package canoe.methods.messages
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.{ChatId, InlineKeyboardMarkup, InputFile, Poll}
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -26,9 +26,9 @@ object StopPoll {
 
       def name: String = "stopPoll"
 
-      def encoder: Encoder[StopPoll] = deriveEncoder[StopPoll].snakeCase
+      def encoder: Encoder[StopPoll] = semiauto.deriveEncoder[StopPoll].snakeCase
 
-      def decoder: Decoder[Poll] = deriveDecoder[Poll]
+      def decoder: Decoder[Poll] = semiauto.deriveDecoder[Poll]
 
       def attachments(request: StopPoll): List[(String, InputFile)] = Nil
     }

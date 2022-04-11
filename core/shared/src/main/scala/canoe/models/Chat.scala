@@ -3,7 +3,7 @@ package canoe.models
 import canoe.models.ChatType.ChatType
 import io.circe.Decoder
 import io.circe.generic.auto._
-import io.circe.generic.semiauto.deriveDecoder
+import io.circe.generic.semiauto
 
 sealed trait Chat {
   def id: Long
@@ -11,19 +11,17 @@ sealed trait Chat {
 
 object Chat {
 
-  /**
-    * Decodes chat based on the `type` value of the input Json
+  /** Decodes chat based on the `type` value of the input Json
     */
   implicit val chatDecoder: Decoder[Chat] = Decoder.instance[Chat] { cursor =>
     cursor
       .get[ChatType]("type")
-      .map {
-        case ChatType.Private    => deriveDecoder[PrivateChat]
-        case ChatType.Group      => deriveDecoder[Group]
-        case ChatType.Supergroup => deriveDecoder[Supergroup]
-        case ChatType.Channel    => deriveDecoder[Channel]
+      .flatMap {
+        case ChatType.Private    => semiauto.deriveDecoder[PrivateChat].tryDecode(cursor)
+        case ChatType.Group      => semiauto.deriveDecoder[Group].tryDecode(cursor)
+        case ChatType.Supergroup => semiauto.deriveDecoder[Supergroup].tryDecode(cursor)
+        case ChatType.Channel    => semiauto.deriveDecoder[Channel].tryDecode(cursor)
       }
-      .flatMap(_.tryDecode(cursor))
   }
 }
 

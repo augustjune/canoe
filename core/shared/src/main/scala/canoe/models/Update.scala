@@ -5,7 +5,7 @@ import canoe.models.messages.TelegramMessage
 import cats.syntax.functor._
 import io.circe.Decoder
 import io.circe.generic.auto._
-import io.circe.generic.semiauto.deriveDecoder
+import io.circe.generic.semiauto
 
 sealed trait Update {
   def updateId: Long
@@ -17,18 +17,18 @@ object Update {
 
   implicit val updateDecoder: Decoder[Update] =
     List[Decoder[Update]](
-      deriveDecoder[MessageReceived].widen,
-      deriveDecoder[MessageEdited].widen,
-      deriveDecoder[ChannelPost].widen,
-      deriveDecoder[ChannelPostEdited].widen,
-      deriveDecoder[PollUpdated].widen,
-      deriveDecoder[InlineQueryReceived].widen,
-      deriveDecoder[InlineResultSelected].widen,
-      deriveDecoder[CallbackButtonSelected].widen,
-      deriveDecoder[ShippingQueryReceived].widen,
-      deriveDecoder[PreCheckoutQueryReceived].widen,
-      deriveDecoder[PollAnswerReceived].widen,
-      deriveDecoder[Unknown].widen
+      semiauto.deriveDecoder[MessageReceived].widen,
+      semiauto.deriveDecoder[MessageEdited].widen,
+      semiauto.deriveDecoder[ChannelPost].widen,
+      semiauto.deriveDecoder[ChannelPostEdited].widen,
+      semiauto.deriveDecoder[PollUpdated].widen,
+      semiauto.deriveDecoder[InlineQueryReceived].widen,
+      semiauto.deriveDecoder[InlineResultSelected].widen,
+      semiauto.deriveDecoder[CallbackButtonSelected].widen,
+      semiauto.deriveDecoder[ShippingQueryReceived].widen,
+      semiauto.deriveDecoder[PreCheckoutQueryReceived].widen,
+      semiauto.deriveDecoder[PollAnswerReceived].widen,
+      semiauto.deriveDecoder[Unknown].widen
     ).reduceLeft(_.or(_)).camelCase
 }
 

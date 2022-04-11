@@ -5,7 +5,7 @@ import canoe.methods.Method
 import canoe.models.ParseMode.ParseMode
 import canoe.models.messages.PhotoMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -43,9 +43,9 @@ object SendPhoto {
 
       def name: String = "sendPhoto"
 
-      def encoder: Encoder[SendPhoto] = deriveEncoder[SendPhoto].snakeCase
+      def encoder: Encoder[SendPhoto] = semiauto.deriveEncoder[SendPhoto].snakeCase
 
-      def decoder: Decoder[PhotoMessage] = deriveDecoder[PhotoMessage]
+      def decoder: Decoder[PhotoMessage] = semiauto.deriveDecoder[PhotoMessage]
 
       def attachments(request: SendPhoto): List[(String, InputFile)] = {
         val name = request.photo match {

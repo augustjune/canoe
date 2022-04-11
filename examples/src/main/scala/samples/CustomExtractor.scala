@@ -3,23 +3,22 @@ package samples
 import canoe.api._
 import canoe.models.messages.UserMessage
 import canoe.syntax._
-import cats.effect.{ExitCode, IO, IOApp}
+import cats.effect.{IO, IOApp}
 import cats.syntax.functor._
 import fs2.Stream
 
-object CustomExtractor extends IOApp {
+object CustomExtractor extends IOApp.Simple {
   val token: String = "<your telegram token>"
   val userIdToGreet: Int = -1
 
-  def run(args: List[String]): IO[ExitCode] =
+  def run: IO[Unit] =
     Stream
-      .resource(TelegramClient.global[IO](token))
+      .resource(TelegramClient[IO](token))
       .flatMap { implicit client =>
         Bot.polling[IO].follow(greetParticularUser(userIdToGreet))
       }
       .compile
       .drain
-      .as(ExitCode.Success)
 
   def greetParticularUser[F[_]: TelegramClient](userId: Long): Scenario[F, Unit] =
     for {

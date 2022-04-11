@@ -4,11 +4,10 @@ import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InlineKeyboardMarkup, InputFile}
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
-/**
-  * Use this method to edit live location messages sent by the bot or via the bot (for inline bots).
+/** Use this method to edit live location messages sent by the bot or via the bot (for inline bots).
   * A location can be edited until its live_period expires or editing is explicitly disabled by a call to stopMessageLiveLocation.
   *
   * Use methods in companion object in order to construct the value of this class.
@@ -26,32 +25,33 @@ import io.circe.{Decoder, Encoder}
   *                        A JSON-serialized object for an inline keyboard, custom reply keyboard,
   *                        instructions to hide reply keyboard or to force a reply from the user.
   */
-final class EditMessageLiveLocation private (val chatId: Option[ChatId],
-                                             val messageId: Option[Int],
-                                             val inlineMessageId: Option[Int],
-                                             val latitude: Double,
-                                             val longitude: Double,
-                                             val replyMarkup: Option[InlineKeyboardMarkup])
+final case class EditMessageLiveLocation private (chatId: Option[ChatId],
+                                                  messageId: Option[Int],
+                                                  inlineMessageId: Option[Int],
+                                                  latitude: Double,
+                                                  longitude: Double,
+                                                  replyMarkup: Option[InlineKeyboardMarkup]
+)
 
 object EditMessageLiveLocation {
 
-  /**
-    * For the messages sent directly by the bot
+  /** For the messages sent directly by the bot
     */
   def direct(chatId: ChatId,
              messageId: Int,
              lat: Double,
              long: Double,
-             replyMarkup: Option[InlineKeyboardMarkup] = None): EditMessageLiveLocation =
+             replyMarkup: Option[InlineKeyboardMarkup] = None
+  ): EditMessageLiveLocation =
     new EditMessageLiveLocation(Some(chatId), Some(messageId), None, lat, long, replyMarkup)
 
-  /**
-    * For the inlined messages sent via the bot
+  /** For the inlined messages sent via the bot
     */
   def inlined(inlineMessageId: Int,
               lat: Double,
               long: Double,
-              replyMarkup: Option[InlineKeyboardMarkup] = None): EditMessageLiveLocation =
+              replyMarkup: Option[InlineKeyboardMarkup] = None
+  ): EditMessageLiveLocation =
     new EditMessageLiveLocation(None, None, Some(inlineMessageId), lat, long, replyMarkup)
 
   implicit val method: Method[EditMessageLiveLocation, Either[Boolean, TelegramMessage]] =
@@ -60,7 +60,7 @@ object EditMessageLiveLocation {
 
       def name: String = "editMessageLiveLocation"
 
-      def encoder: Encoder[EditMessageLiveLocation] = deriveEncoder[EditMessageLiveLocation].snakeCase
+      def encoder: Encoder[EditMessageLiveLocation] = semiauto.deriveEncoder[EditMessageLiveLocation].snakeCase
 
       def decoder: Decoder[Either[Boolean, TelegramMessage]] =
         Decoder.decodeBoolean.either(TelegramMessage.telegramMessageDecoder)

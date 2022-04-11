@@ -4,7 +4,7 @@ import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.ContactMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -43,9 +43,9 @@ object SendContact {
 
       def name: String = "sendContact"
 
-      def encoder: Encoder[SendContact] = deriveEncoder[SendContact].snakeCase
+      def encoder: Encoder[SendContact] = semiauto.deriveEncoder[SendContact].snakeCase
 
-      def decoder: Decoder[ContactMessage] = deriveDecoder[ContactMessage]
+      def decoder: Decoder[ContactMessage] = semiauto.deriveDecoder[ContactMessage]
 
       def attachments(request: SendContact): List[(String, InputFile)] = Nil
     }

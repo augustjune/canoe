@@ -4,7 +4,7 @@ import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.DiceThrownMessage
 import canoe.models.{ChatId, DiceEmoji, InputFile, ReplyMarkup}
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 final case class SendDice(chatId: ChatId,
@@ -21,9 +21,9 @@ object SendDice {
 
       def name: String = "sendDice"
 
-      def encoder: Encoder[SendDice] = deriveEncoder[SendDice].snakeCase
+      def encoder: Encoder[SendDice] = semiauto.deriveEncoder[SendDice].snakeCase
 
-      def decoder: Decoder[DiceThrownMessage] = deriveDecoder[DiceThrownMessage]
+      def decoder: Decoder[DiceThrownMessage] = semiauto.deriveDecoder[DiceThrownMessage]
 
       def attachments(request: SendDice): List[(String, InputFile)] = Nil
     }

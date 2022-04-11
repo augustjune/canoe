@@ -15,7 +15,7 @@ import io.circe.{Decoder, Encoder}
   * @param limit  Limits the number of photos to be retrieved.
   *               Values between 1-100 are accepted. Defaults to 100.
   */
-final case class GetUserProfilePhotos(userId: Int, offset: Option[Int] = None, limit: Option[Int] = None)
+final case class GetUserProfilePhotos(userId: Long, offset: Option[Int] = None, limit: Option[Int] = None)
 
 object GetUserProfilePhotos {
   import io.circe.generic.auto._

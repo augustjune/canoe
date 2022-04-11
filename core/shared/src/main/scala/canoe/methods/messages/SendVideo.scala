@@ -55,7 +55,12 @@ object SendVideo {
 
       def decoder: Decoder[VideoMessage] = semiauto.deriveDecoder[VideoMessage]
 
-      def attachments(request: SendVideo): List[(String, InputFile)] =
-        List("video" -> request.video)
+      def attachments(request: SendVideo): List[(String, InputFile)] = {
+        val name = request.video match {
+          case InputFile.Upload(filename, _) => filename
+          case InputFile.Existing(_) => "video"
+        }
+        List(name -> request.video)
+      }
     }
 }

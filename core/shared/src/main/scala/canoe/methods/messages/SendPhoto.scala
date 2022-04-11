@@ -47,7 +47,12 @@ object SendPhoto {
 
       def decoder: Decoder[PhotoMessage] = semiauto.deriveDecoder[PhotoMessage]
 
-      def attachments(request: SendPhoto): List[(String, InputFile)] =
-        List("photo" -> request.photo)
+      def attachments(request: SendPhoto): List[(String, InputFile)] = {
+        val name = request.photo match {
+          case InputFile.Upload(filename, _) => filename
+          case InputFile.Existing(_) => "photo"
+        }
+        List(name -> request.photo)
+      }
     }
 }

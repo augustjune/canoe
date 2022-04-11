@@ -19,7 +19,7 @@ import io.circe.{Decoder, Encoder}
   *                    they are considered to be banned forever
   */
 final case class RestrictChatMember(chatId: ChatId,
-                                    userId: Int,
+                                    userId: Long,
                                     permissions: ChatPermissions,
                                     untilDate: Option[Int] = None)
 

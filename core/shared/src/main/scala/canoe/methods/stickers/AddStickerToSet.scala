@@ -20,7 +20,7 @@ import cats.syntax.all._
   * @param emojis       One or more emoji corresponding to the sticker
   * @param maskPosition Position where the mask should be placed on faces
   */
-final case class AddStickerToSet private (userId: Int,
+final case class AddStickerToSet private (userId: Long,
                                           name: String,
                                           pngSticker: Option[InputFile],
                                           tgsSticker: Option[InputFile],
@@ -32,7 +32,7 @@ object AddStickerToSet {
 
   /** @param sticker PNG image with the sticker.
     */
-  def static(userId: Int,
+  def static(userId: Long,
              name: String,
              sticker: InputFile,
              emojis: String,
@@ -43,7 +43,7 @@ object AddStickerToSet {
   /** @param sticker TGS animation with the sticker.
     * Animated stickers can be added to animated sticker sets and only to them.
     */
-  def animated(userId: Int,
+  def animated(userId: Long,
                name: String,
                sticker: InputFile,
                emojis: String,

@@ -22,7 +22,7 @@ import io.circe.{Decoder, Encoder}
   *                  If user is banned for more than 366 days or less than 30 seconds from the current time
   *                  they are considered to be banned forever
   */
-final case class KickChatMember(chatId: ChatId, userId: Int, untilDate: Option[Int] = None)
+final case class KickChatMember(chatId: ChatId, userId: Long, untilDate: Option[Int] = None)
 
 object KickChatMember {
 

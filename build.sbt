@@ -7,7 +7,7 @@ lazy val canoe = project
   .settings(
     projectSettings,
     crossScalaVersions := Nil,
-    skip.in(publish) := true
+    publish / skip := true
   )
 
 lazy val core = crossProject(JVMPlatform, JSPlatform)
@@ -30,7 +30,8 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
   )
   .jsSettings(
     libraryDependencies ++= Seq(
-      ("org.scala-js" %%% "scalajs-dom" % scalaJsDomVersion).cross(CrossVersion.for3Use2_13)
+      ("org.scala-js" %%% "scalajs-dom"                 % scalaJsDomVersion).cross(CrossVersion.for3Use2_13),
+      ("org.scala-js" %%% "scala-js-macrotask-executor" % scalaJsMacroTaskExecutor).cross(CrossVersion.for3Use2_13)
     )
   )
 
@@ -42,7 +43,7 @@ lazy val examples = project
   .disablePlugins(MimaPlugin)
   .settings(
     name := "canoe-examples",
-    skip.in(publish) := true,
+    publish / skip := true,
     projectSettings,
     crossScalaVersions := Seq(scalaVersion.value)
   )
@@ -55,7 +56,10 @@ lazy val projectSettings = Seq(
     Developer("augustjune", "Yura Slinkin", "jurij.jurich@gmail.com", url("https://github.com/augustjune"))
   ),
   scalaVersion := scala2_13,
-  crossScalaVersions := Seq(scala2_12, scala2_13, scala3)
+  <<<<<<<.HEAD(crossScalaVersions) := Seq(scala2_12, scala2_13, scala3)
+    =======
+      crossScalaVersions := Seq(scala2_12, scala2_13)
+    >>>>>>> master
 )
 
 lazy val crossDependencies =
@@ -106,6 +110,7 @@ lazy val tests = {
   Seq(dependencies, frameworks)
 }
 
+<<<<<<< HEAD
 val scala3 = "3.0.0"
 val scala2_13 = "2.13.3"
 val scala2_12 = "2.12.8"
@@ -125,4 +130,35 @@ val disciplineVersion = "2.1.5"
 val scalacheckShapelessVersion = "1.2.5"
 val scalaJsDomVersion = "1.1.0"
 val kindProjectorVersion = "0.13.0"
+=======
+ThisBuild / scalaVersion := scala2_13
+ThisBuild / githubWorkflowTargetTags ++= Seq("v*")
+ThisBuild / githubWorkflowPublishTargetBranches ++= Seq(RefPredicate.Equals(Ref.Branch("master")),
+                                                        RefPredicate.StartsWith(Ref.Tag("v"))
+)
+ThisBuild / githubWorkflowPublish := Seq(WorkflowStep.Sbt(List("ci-release")))
+ThisBuild / githubWorkflowEnv ++= List(
+  "PGP_PASSPHRASE",
+  "PGP_SECRET",
+  "SONATYPE_PASSWORD",
+  "SONATYPE_USERNAME"
+).map(envKey => envKey -> s"$${{ secrets.$envKey }}").toMap
+
+val scala2_13 = "2.13.8"
+val scala2_12 = "2.12.15"
+
+val fs2Version = "2.5.10"
+val catsCoreVersion = "2.7.0"
+val catsEffectVersion = "2.5.4"
+val catsLawsVersion = "2.7.0"
+val circeVersion = "0.14.1"
+val http4sVersion = "0.21.33"
+val log4catsVersion = "1.5.1"
+val scalatestVersion = "3.2.11"
+val disciplineVersion = "1.0.0-RC2"
+val scalacheckShapelessVersion = "1.2.5"
+val scalaJsDomVersion = "1.2.0"
+val scalaJsMacroTaskExecutor = "1.0.0"
+val kindProjectorVersion = "0.10.3"
+>>>>>>> master
 val contextAppliedVersion = "0.1.4"

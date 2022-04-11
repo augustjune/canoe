@@ -7,8 +7,7 @@ import canoe.models.{ChatId, InputFile, InputMedia}
 import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
-/**
-  * Use this method to send a group of photos or videos as an album.
+/** Use this method to send a group of photos or videos as an album.
   * On success, an array of the sent Messages is returned.
   *
   * @param chatId              Unique identifier for the target chat or username of the target channel
@@ -22,10 +21,10 @@ import io.circe.{Decoder, Encoder}
 final case class SendMediaGroup(chatId: ChatId,
                                 media: List[InputMedia],
                                 disableNotification: Option[Boolean] = None,
-                                replyToMessageId: Option[Int] = None)
+                                replyToMessageId: Option[Int] = None
+)
 
 object SendMediaGroup {
-  import io.circe.generic.auto._
 
   implicit val method: Method[SendMediaGroup, List[TelegramMessage]] =
     new Method[SendMediaGroup, List[TelegramMessage]] {
@@ -33,13 +32,13 @@ object SendMediaGroup {
       def name: String = "sendMediaGroup"
 
       def encoder: Encoder[SendMediaGroup] =
-        semiauto.deriveEncoder[SendMediaGroup]
-          .contramap[SendMediaGroup](
-            s =>
-              s.copy(media = s.media.filter(_.media match {
-                case InputFile.Upload(_, _) => false
-                case InputFile.Existing(_)  => true
-              }))
+        semiauto
+          .deriveEncoder[SendMediaGroup]
+          .contramap[SendMediaGroup](s =>
+            s.copy(media = s.media.filter(_.media match {
+              case InputFile.Upload(_, _) => false
+              case InputFile.Existing(_)  => true
+            }))
           )
           .snakeCase
 
@@ -47,6 +46,12 @@ object SendMediaGroup {
         Decoder.decodeList(TelegramMessage.telegramMessageDecoder)
 
       def attachments(request: SendMediaGroup): List[(String, InputFile)] =
-        request.media.flatMap(_.files)
+        request.media.map { x =>
+          val name = x.media match {
+            case InputFile.Upload(filename, _) => filename
+            case _                             => x.`type`
+          }
+          name -> x.media
+        }
     }
 }

@@ -49,7 +49,12 @@ object SendVoice {
 
       def decoder: Decoder[VoiceMessage] = semiauto.deriveDecoder[VoiceMessage]
 
-      def attachments(request: SendVoice): List[(String, InputFile)] =
-        List("voice" -> request.voice)
+      def attachments(request: SendVoice): List[(String, InputFile)] = {
+        val name = request.voice match {
+          case InputFile.Upload(filename, _) => filename
+          case InputFile.Existing(_) => "voice"
+        }
+        List(name -> request.voice)
+      }
     }
 }

@@ -16,7 +16,7 @@ import io.circe.{Decoder, Encoder}
   *                    dimensions must not exceed 512px, and either width or height must be exactly 512px.
   *                    [[https://core.telegram.org/bots/api#sending-files More info on Sending Files]]
   */
-final case class UploadStickerFile(userId: Int, pngSticker: InputFile)
+final case class UploadStickerFile(userId: Long, pngSticker: InputFile)
 
 object UploadStickerFile {
   import io.circe.generic.auto._

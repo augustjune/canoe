@@ -59,7 +59,12 @@ object SendAudio {
 
       def decoder: Decoder[AudioMessage] = deriveDecoder[AudioMessage]
 
-      def attachments(request: SendAudio): List[(String, InputFile)] =
-        List("audio" -> request.audio)
+      def attachments(request: SendAudio): List[(String, InputFile)] = {
+        val name = request.audio match {
+          case InputFile.Upload(filename, _) => filename
+          case InputFile.Existing(_) => "audio"
+        }
+        List(name -> request.audio)
+      }
     }
 }

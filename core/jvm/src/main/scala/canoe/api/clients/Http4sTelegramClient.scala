@@ -55,8 +55,6 @@ private[api] class Http4sTelegramClient[F[_]: Sync: Logger](token: String, clien
                                          method: Method[Req, Res],
                                          action: Req,
                                          parts: List[Part[F]]): F[Request[F]] = {
-    val multipart = Multipart[F](parts.toVector)
-
     val params =
       method
         .encoder(action)
@@ -71,12 +69,11 @@ private[api] class Http4sTelegramClient[F[_]: Sync: Logger](token: String, clien
             .toMap
         )
         .getOrElse(Map.empty)
+        .map(x => Part.formData[F](x._1, x._2))
 
-    val urlWithQueryParams = params.foldLeft(url) {
-      case (url, (key, value)) => url.withQueryParam(key, value)
-    }
+    val multipart = Multipart[F](parts.toVector ++ params.toVector)
 
-    Method.POST(multipart, urlWithQueryParams).map(_.withHeaders(multipart.headers))
+    Method.POST(multipart, url).map(_.withHeaders(multipart.headers))
   }
 
   private def handleTelegramResponse[A, I, C](m: Method[I, A], input: I)(response: TelegramResponse[A]): F[A] =

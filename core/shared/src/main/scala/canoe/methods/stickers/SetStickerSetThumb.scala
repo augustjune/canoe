@@ -15,7 +15,7 @@ import canoe.marshalling.codecs._
   * @param thumb  A PNG image with the thumbnail, must be up to 128 kilobytes in size and have width and height exactly 100px,
   *               or a TGS animation with the thumbnail up to 32 kilobytes in size;
   */
-final case class SetStickerSetThumb(name: String, userId: Int, thumb: InputFile)
+final case class SetStickerSetThumb(name: String, userId: Long, thumb: InputFile)
 
 object SetStickerSetThumb {
   implicit val method: Method[SetStickerSetThumb, Boolean] =

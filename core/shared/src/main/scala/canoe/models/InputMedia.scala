@@ -1,6 +1,9 @@
 package canoe.models
 
 import canoe.models.ParseMode.ParseMode
+import io.circe.Encoder
+import io.circe.generic.auto._
+import io.circe.syntax._
 
 /**
   * Represents the content of a media message to be sent.
@@ -11,6 +14,19 @@ sealed trait InputMedia extends Product {
   def media: InputFile
 
   def `type`: String
+}
+
+object InputMedia {
+  /**
+    * Encoder for telegram api.
+    */
+  implicit val encodeInputMedia: Encoder[InputMedia] = Encoder.instance {
+    case foo@InputMediaPhoto(_,_,_,_)             => foo.asJson
+    case foo@InputMediaVideo(_,_,_,_,_,_,_,_)     => foo.asJson
+    case foo@InputMediaAnimation(_,_,_,_,_,_,_,_) => foo.asJson
+    case foo@InputMediaAudio(_,_,_,_,_,_,_,_)     => foo.asJson
+    case foo@InputMediaDocument(_,_,_,_,_)        => foo.asJson
+  }
 }
 
 /**

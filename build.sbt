@@ -7,7 +7,7 @@ lazy val canoe = project
   .settings(
     projectSettings,
     crossScalaVersions := Nil,
-    skip.in(publish) := true
+    publish / skip := true
   )
 
 lazy val core = crossProject(JVMPlatform, JSPlatform)
@@ -22,16 +22,17 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
   )
   .jvmSettings(
     libraryDependencies ++= Seq(
-      "org.http4s"        %% "http4s-dsl"          % http4sVersion,
-      "org.http4s"        %% "http4s-blaze-client" % http4sVersion,
-      "org.http4s"        %% "http4s-blaze-server" % http4sVersion,
-      "org.http4s"        %% "http4s-circe"        % http4sVersion,
-      "io.chrisdavenport" %% "log4cats-slf4j"      % log4catsVersion
+      "org.http4s"    %% "http4s-dsl"          % http4sVersion,
+      "org.http4s"    %% "http4s-blaze-client" % http4sVersion,
+      "org.http4s"    %% "http4s-blaze-server" % http4sVersion,
+      "org.http4s"    %% "http4s-circe"        % http4sVersion,
+      "org.typelevel" %% "log4cats-slf4j"      % log4catsVersion
     )
   )
   .jsSettings(
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % scalaJsDomVersion
+      "org.scala-js" %%% "scalajs-dom"                 % scalaJsDomVersion,
+      "org.scala-js" %%% "scala-js-macrotask-executor" % scalaJsMacroTaskExecutor
     )
   )
 
@@ -43,7 +44,7 @@ lazy val examples = project
   .disablePlugins(MimaPlugin)
   .settings(
     name := "canoe-examples",
-    skip.in(publish) := true,
+    publish / skip := true,
     projectSettings,
     crossScalaVersions := Seq(scalaVersion.value)
   )
@@ -56,18 +57,18 @@ lazy val projectSettings = Seq(
     Developer("augustjune", "Yura Slinkin", "jurij.jurich@gmail.com", url("https://github.com/augustjune"))
   ),
   scalaVersion := scala2_13,
-  crossScalaVersions := Seq(scala2_12, scalaVersion.value)
+  crossScalaVersions := Seq(scala2_12, scala2_13)
 )
 
 lazy val crossDependencies =
   libraryDependencies ++= Seq(
-    "co.fs2"            %%% "fs2-core"      % fs2Version,
-    "org.typelevel"     %%% "cats-core"     % catsCoreVersion,
-    "org.typelevel"     %%% "cats-effect"   % catsEffectVersion,
-    "io.circe"          %%% "circe-core"    % circeVersion,
-    "io.circe"          %%% "circe-generic" % circeVersion,
-    "io.circe"          %%% "circe-parser"  % circeVersion,
-    "io.chrisdavenport" %%% "log4cats-core" % log4catsVersion
+    "co.fs2"        %%% "fs2-core"      % fs2Version,
+    "org.typelevel" %%% "cats-core"     % catsCoreVersion,
+    "org.typelevel" %%% "cats-effect"   % catsEffectVersion,
+    "io.circe"      %%% "circe-core"    % circeVersion,
+    "io.circe"      %%% "circe-generic" % circeVersion,
+    "io.circe"      %%% "circe-parser"  % circeVersion,
+    "org.typelevel" %%% "log4cats-core" % log4catsVersion
   )
 
 lazy val mimaSettings = Seq(
@@ -112,19 +113,33 @@ lazy val tests = {
   Seq(dependencies, frameworks)
 }
 
-val scala2_13 = "2.13.3"
-val scala2_12 = "2.12.8"
+ThisBuild / scalaVersion := scala2_13
+ThisBuild / githubWorkflowTargetTags ++= Seq("v*")
+ThisBuild / githubWorkflowPublishTargetBranches ++= Seq(RefPredicate.Equals(Ref.Branch("master")),
+                                                        RefPredicate.StartsWith(Ref.Tag("v"))
+)
+ThisBuild / githubWorkflowPublish := Seq(WorkflowStep.Sbt(List("ci-release")))
+ThisBuild / githubWorkflowEnv ++= List(
+  "PGP_PASSPHRASE",
+  "PGP_SECRET",
+  "SONATYPE_PASSWORD",
+  "SONATYPE_USERNAME"
+).map(envKey => envKey -> s"$${{ secrets.$envKey }}").toMap
 
-val fs2Version = "2.4.6"
-val catsCoreVersion = "2.2.0"
-val catsEffectVersion = "2.3.0"
-val catsLawsVersion = "2.2.0"
-val circeVersion = "0.13.0"
-val http4sVersion = "0.21.3"
-val log4catsVersion = "1.1.1"
-val scalatestVersion = "3.2.2"
+val scala2_13 = "2.13.8"
+val scala2_12 = "2.12.15"
+
+val fs2Version = "2.5.10"
+val catsCoreVersion = "2.7.0"
+val catsEffectVersion = "2.5.4"
+val catsLawsVersion = "2.7.0"
+val circeVersion = "0.14.1"
+val http4sVersion = "0.21.33"
+val log4catsVersion = "1.5.1"
+val scalatestVersion = "3.2.11"
 val disciplineVersion = "1.0.0-RC2"
 val scalacheckShapelessVersion = "1.2.5"
-val scalaJsDomVersion = "1.1.0"
+val scalaJsDomVersion = "1.2.0"
+val scalaJsMacroTaskExecutor = "1.0.0"
 val kindProjectorVersion = "0.10.3"
 val contextAppliedVersion = "0.1.4"

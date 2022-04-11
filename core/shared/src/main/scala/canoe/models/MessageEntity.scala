@@ -1,7 +1,7 @@
 package canoe.models
 
 import io.circe.Decoder
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto
 
 /**
   * Represents one special entity in a text message.
@@ -18,24 +18,23 @@ object MessageEntity {
   implicit val chatDecoder: Decoder[MessageEntity] = Decoder.instance[MessageEntity] { cursor =>
     cursor
       .get[String]("type")
-      .map {
-        case "mention"       => deriveDecoder[Mention]
-        case "hashtag"       => deriveDecoder[Hashtag]
-        case "cashtag"       => deriveDecoder[Cashtag]
-        case "url"           => deriveDecoder[Url]
-        case "email"         => deriveDecoder[Email]
-        case "phone_number"  => deriveDecoder[PhoneNumber]
-        case "bold"          => deriveDecoder[Bold]
-        case "italic"        => deriveDecoder[Italic]
-        case "code"          => deriveDecoder[Code]
-        case "pre"           => deriveDecoder[Pre]
-        case "text_link"     => deriveDecoder[TextLink]
-        case "text_mention"  => deriveDecoder[TextMention]
-        case "underline"     => deriveDecoder[Underline]
-        case "strikethrough" => deriveDecoder[Strikethrough]
-        case _               => deriveDecoder[Unknown]
+      .flatMap {
+        case "mention"       => semiauto.deriveDecoder[Mention].tryDecode(cursor)
+        case "hashtag"       => semiauto.deriveDecoder[Hashtag].tryDecode(cursor)
+        case "cashtag"       => semiauto.deriveDecoder[Cashtag].tryDecode(cursor)
+        case "url"           => semiauto.deriveDecoder[Url].tryDecode(cursor)
+        case "email"         => semiauto.deriveDecoder[Email].tryDecode(cursor)
+        case "phone_number"  => semiauto.deriveDecoder[PhoneNumber].tryDecode(cursor)
+        case "bold"          => semiauto.deriveDecoder[Bold].tryDecode(cursor)
+        case "italic"        => semiauto.deriveDecoder[Italic].tryDecode(cursor)
+        case "code"          => semiauto.deriveDecoder[Code].tryDecode(cursor)
+        case "pre"           => semiauto.deriveDecoder[Pre].tryDecode(cursor)
+        case "text_link"     => semiauto.deriveDecoder[TextLink].tryDecode(cursor)
+        case "text_mention"  => semiauto.deriveDecoder[TextMention].tryDecode(cursor)
+        case "underline"     => semiauto.deriveDecoder[Underline].tryDecode(cursor)
+        case "strikethrough" => semiauto.deriveDecoder[Strikethrough].tryDecode(cursor)
+        case _               => semiauto.deriveDecoder[Unknown].tryDecode(cursor)
       }
-      .flatMap(_.tryDecode(cursor))
   }
 
   /** '@username' */

@@ -4,7 +4,7 @@ import canoe.models.{Chat, User}
 import cats.syntax.functor._
 import io.circe.Decoder
 import io.circe.generic.auto._
-import io.circe.generic.semiauto.deriveDecoder
+import io.circe.generic.semiauto
 
 trait UserMessage extends TelegramMessage {
 
@@ -35,20 +35,20 @@ object UserMessage {
 
   implicit val userMessageDecoder: Decoder[UserMessage] =
     List[Decoder[UserMessage]](
-      deriveDecoder[AnimationMessage].widen,
-      deriveDecoder[AudioMessage].widen,
-      deriveDecoder[ContactMessage].widen,
-      deriveDecoder[DocumentMessage].widen,
-      deriveDecoder[GameMessage].widen,
-      deriveDecoder[InvoiceMessage].widen,
-      deriveDecoder[LocationMessage].widen,
-      deriveDecoder[PhotoMessage].widen,
-      deriveDecoder[PollMessage].widen,
-      deriveDecoder[StickerMessage].widen,
-      deriveDecoder[TextMessage].widen,
-      deriveDecoder[VenueMessage].widen,
-      deriveDecoder[VideoMessage].widen,
-      deriveDecoder[VideoNoteMessage].widen,
-      deriveDecoder[VoiceMessage].widen
+      semiauto.deriveDecoder[AnimationMessage].widen,
+      semiauto.deriveDecoder[AudioMessage].widen,
+      semiauto.deriveDecoder[ContactMessage].widen,
+      semiauto.deriveDecoder[DocumentMessage].widen,
+      semiauto.deriveDecoder[GameMessage].widen,
+      semiauto.deriveDecoder[InvoiceMessage].widen,
+      semiauto.deriveDecoder[LocationMessage].widen,
+      semiauto.deriveDecoder[PhotoMessage].widen,
+      semiauto.deriveDecoder[PollMessage].widen,
+      semiauto.deriveDecoder[StickerMessage].widen,
+      semiauto.deriveDecoder[TextMessage].widen,
+      semiauto.deriveDecoder[VenueMessage].widen,
+      semiauto.deriveDecoder[VideoMessage].widen,
+      semiauto.deriveDecoder[VideoNoteMessage].widen,
+      semiauto.deriveDecoder[VoiceMessage].widen
     ).reduceLeft(_.or(_))
 }

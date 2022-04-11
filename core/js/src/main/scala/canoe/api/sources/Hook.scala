@@ -2,19 +2,18 @@ package canoe.api.sources
 
 import canoe.api.TelegramClient
 import canoe.models.{InputFile, Update}
-import cats.effect.{ConcurrentEffect, Resource, Timer}
+import cats.effect.Resource
+import cats.effect.std.Queue
 import fs2.Stream
-import fs2.concurrent.Queue
 import javax.naming.OperationNotSupportedException
 
 class Hook[F[_]](queue: Queue[F, Update]) {
-  def updates: Stream[F, Update] = queue.dequeue
+  def updates: Stream[F, Update] = Stream.repeatEval(queue.take)
 }
 
 object Hook {
 
-  /**
-    * Installs a webhook for Telegram updates to be sent to the specified `url`
+  /** Installs a webhook for Telegram updates to be sent to the specified `url`
     * and starts a local server which listen to incoming updates on specified `port`.
     *
     * After the hook is used, local server and Telegram webhook are cleaned up.
@@ -24,10 +23,11 @@ object Hook {
     * @param port        Port which will be used for listening for the incoming updates
     * @param certificate Public key of self-signed certificate (including BEGIN and END portions)
     */
-  def install[F[_]: TelegramClient: ConcurrentEffect: Timer](url: String,
-                                                             host: String,
-                                                             port: Int,
-                                                             certificate: Option[InputFile]
+  def install[F[_]: TelegramClient](
+    url: String,
+    host: String,
+    port: Int,
+    certificate: Option[InputFile]
   ): Resource[F, Hook[F]] =
     throw new OperationNotSupportedException("Webhook is not supported for JS version.")
 }

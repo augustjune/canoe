@@ -4,7 +4,7 @@ import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.LocationMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -41,9 +41,9 @@ object SendLocation {
 
       def name: String = "sendLocation"
 
-      def encoder: Encoder[SendLocation] = deriveEncoder[SendLocation].snakeCase
+      def encoder: Encoder[SendLocation] = semiauto.deriveEncoder[SendLocation].snakeCase
 
-      def decoder: Decoder[LocationMessage] = deriveDecoder[LocationMessage]
+      def decoder: Decoder[LocationMessage] = semiauto.deriveDecoder[LocationMessage]
 
       def attachments(request: SendLocation): List[(String, InputFile)] = Nil
     }

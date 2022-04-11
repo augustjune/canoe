@@ -1,7 +1,7 @@
 package canoe.marshalling
 
 import canoe.marshalling.codecs._
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto
 import io.circe.generic.auto._
 import io.circe.{Codec, Json}
 import org.scalatest.freespec.AnyFreeSpec
@@ -10,7 +10,7 @@ class CodecsSpec extends AnyFreeSpec {
   case class Inner(longName: String)
   case class Outer(longInt: Int, inner: Inner)
 
-  val codec: Codec[Outer] = deriveCodec
+  val codec: Codec[Outer] = semiauto.deriveCodec
 
   val instance: Outer = Outer(12, Inner("name"))
 

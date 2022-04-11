@@ -16,7 +16,6 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
     name := "canoe",
     projectSettings,
     compilerOptions,
-    typeSystemEnhancements,
     crossDependencies,
     tests
   )
@@ -31,7 +30,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
   )
   .jsSettings(
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom"                 % scalaJsDomVersion,
+      ("org.scala-js" %%% "scalajs-dom"                 % scalaJsDomVersion).cross(CrossVersion.for3Use2_13),
       "org.scala-js" %%% "scala-js-macrotask-executor" % scalaJsMacroTaskExecutor
     )
   )
@@ -46,7 +45,7 @@ lazy val examples = project
     name := "canoe-examples",
     publish / skip := true,
     projectSettings,
-    crossScalaVersions := Seq(scalaVersion.value)
+    crossScalaVersions := Seq(scala2_12, scala2_13, scala3)
   )
 
 lazy val projectSettings = Seq(
@@ -57,7 +56,7 @@ lazy val projectSettings = Seq(
     Developer("augustjune", "Yura Slinkin", "jurij.jurich@gmail.com", url("https://github.com/augustjune"))
   ),
   scalaVersion := scala2_13,
-  crossScalaVersions := Seq(scala2_12, scala2_13)
+  crossScalaVersions := Seq(scala2_12, scala2_13, scala3)
 )
 
 lazy val crossDependencies =
@@ -69,7 +68,14 @@ lazy val crossDependencies =
     "io.circe"      %%% "circe-generic" % circeVersion,
     "io.circe"      %%% "circe-parser"  % circeVersion,
     "org.typelevel" %%% "log4cats-core" % log4catsVersion
-  )
+  ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((2, _)) =>
+      Seq(
+        compilerPlugin(("org.typelevel" % "kind-projector" % kindProjectorVersion).cross(CrossVersion.full)),
+        compilerPlugin("org.augustjune" %% "context-applied" % contextAppliedVersion)
+      )
+    case _ => Seq.empty
+  })
 
 lazy val mimaSettings = Seq(
   mimaPreviousArtifacts := Set(organization.value %% name.value % "0.4.0")
@@ -77,34 +83,22 @@ lazy val mimaSettings = Seq(
 
 lazy val compilerOptions =
   scalacOptions ++= Seq(
-    "-Xfatal-warnings", // Fail the compilation if there are any warnings.
     "-deprecation", // Emit warning and location for usages of deprecated APIs.
-    "-explaintypes", // Explain type errors in more detail.
     "-feature", // Emit warning and location for usages of features that should be imported explicitly.
     "-language:higherKinds", // Allow higher-kinded types
     "-language:postfixOps", // Allow higher-kinded types
-    "-language:implicitConversions", // Allow definition of implicit functions called views
-    "-Ywarn-unused:implicits", // Warn if an implicit parameter is unused.
-    "-Ywarn-unused:imports", // Warn if an import selector is not referenced.
-    "-Ywarn-unused:locals", // Warn if a local definition is unused.
-    // "-Ywarn-unused:params", // Warn if a value parameter is unused.
-    "-Ywarn-unused:patvars", // Warn if a variable bound in a pattern is unused.
-    "-Ywarn-unused:privates", // Warn if a private member is unused.
-    "-Ywarn-value-discard" // Warn when non-Unit expression results are unused.
-  ) ++ (if (scalaBinaryVersion.value.startsWith("2.12")) List("-Ypartial-unification") else Nil)
-
-lazy val typeSystemEnhancements = Seq(
-  addCompilerPlugin("org.typelevel"  %% "kind-projector"  % kindProjectorVersion),
-  addCompilerPlugin("org.augustjune" %% "context-applied" % contextAppliedVersion)
-)
+    "-language:implicitConversions" // Allow definition of implicit functions called views
+  ) ++ (if (scalaBinaryVersion.value.startsWith("2.12")) List("-Ypartial-unification", "-Xfatal-warnings")
+        else if (scalaBinaryVersion.value.startsWith("3")) List("-Xmax-inlines", "128")
+        else Nil)
 
 lazy val tests = {
   val dependencies =
     libraryDependencies ++= Seq(
-      "org.scalatest"              %% "scalatest"                 % scalatestVersion,
-      "org.typelevel"              %% "cats-laws"                 % catsLawsVersion,
-      "org.typelevel"              %% "discipline-scalatest"      % disciplineVersion,
-      "com.github.alexarchambault" %% "scalacheck-shapeless_1.14" % scalacheckShapelessVersion
+      "org.scalatest" %% "scalatest"                     % scalatestVersion,
+      "org.typelevel" %% "cats-laws"                     % catsLawsVersion,
+      "org.typelevel" %% "discipline-scalatest"          % disciplineVersion,
+      "org.typelevel" %% "cats-effect-testing-scalatest" % "1.3.0"
     ).map(_ % Test)
 
   val frameworks =
@@ -113,7 +107,8 @@ lazy val tests = {
   Seq(dependencies, frameworks)
 }
 
-ThisBuild / scalaVersion := scala2_13
+ThisBuild / scalaVersion := scala3
+ThisBuild / crossScalaVersions := Seq(scala2_13, scala3)
 ThisBuild / githubWorkflowTargetTags ++= Seq("v*")
 ThisBuild / githubWorkflowPublishTargetBranches ++= Seq(RefPredicate.Equals(Ref.Branch("master")),
                                                         RefPredicate.StartsWith(Ref.Tag("v"))
@@ -126,20 +121,24 @@ ThisBuild / githubWorkflowEnv ++= List(
   "SONATYPE_USERNAME"
 ).map(envKey => envKey -> s"$${{ secrets.$envKey }}").toMap
 
-val scala2_13 = "2.13.8"
-val scala2_12 = "2.12.15"
+lazy val scala3 = "3.1.1"
+lazy val scala2_13 = "2.13.8"
+lazy val scala2_12 = "2.12.15"
 
-val fs2Version = "2.5.10"
-val catsCoreVersion = "2.7.0"
-val catsEffectVersion = "2.5.4"
-val catsLawsVersion = "2.7.0"
-val circeVersion = "0.14.1"
-val http4sVersion = "0.21.33"
-val log4catsVersion = "1.5.1"
-val scalatestVersion = "3.2.11"
-val disciplineVersion = "1.0.0-RC2"
-val scalacheckShapelessVersion = "1.2.5"
-val scalaJsDomVersion = "1.2.0"
-val scalaJsMacroTaskExecutor = "1.0.0"
-val kindProjectorVersion = "0.10.3"
-val contextAppliedVersion = "0.1.4"
+lazy val scala2Only = Seq(scala2_12, scala2_13)
+lazy val scala2And3 = scala2Only :+ scala3
+
+lazy val fs2Version = "3.2.7"
+lazy val catsCoreVersion = "2.7.0"
+lazy val catsEffectVersion = "3.3.11"
+lazy val catsLawsVersion = "2.7.0"
+lazy val circeVersion = "0.14.1"
+lazy val http4sVersion = "0.23.11"
+lazy val log4catsVersion = "2.2.0"
+lazy val scalatestVersion = "3.2.11"
+lazy val disciplineVersion = "2.1.5"
+lazy val scalacheckShapelessVersion = "1.2.5"
+lazy val scalaJsDomVersion = "1.2.0"
+lazy val scalaJsMacroTaskExecutor = "1.0.0"
+lazy val kindProjectorVersion = "0.13.2"
+lazy val contextAppliedVersion = "0.1.4"

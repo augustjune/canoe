@@ -4,11 +4,10 @@ import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InlineKeyboardMarkup, InputFile}
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
-/**
-  * Use this method to stop updating a live location message
+/** Use this method to stop updating a live location message
   * sent by the bot or via the bot (for inline bots) before live_period expires.
   *
   * Use methods in companion object in order to construct the value of this class.
@@ -24,22 +23,23 @@ import io.circe.{Decoder, Encoder}
   *                        A JSON-serialized object for an inline keyboard, custom reply keyboard,
   *                        instructions to hide reply keyboard or to force a reply from the user.
   */
-final class StopMessageLiveLocation private (val chatId: Option[ChatId],
-                                             val messageId: Option[Int],
-                                             val inlineMessageId: Option[Int],
-                                             val replyMarkup: Option[InlineKeyboardMarkup])
+final case class StopMessageLiveLocation private (chatId: Option[ChatId],
+                                                  messageId: Option[Int],
+                                                  inlineMessageId: Option[Int],
+                                                  replyMarkup: Option[InlineKeyboardMarkup]
+)
 
 object StopMessageLiveLocation {
-  /**
-    * For the messages sent directly by the bot
+
+  /** For the messages sent directly by the bot
     */
   def direct(chatId: ChatId,
              messageId: Int,
-             replyMarkup: Option[InlineKeyboardMarkup] = None): StopMessageLiveLocation =
+             replyMarkup: Option[InlineKeyboardMarkup] = None
+  ): StopMessageLiveLocation =
     new StopMessageLiveLocation(Some(chatId), Some(messageId), None, replyMarkup)
 
-  /**
-    * For the inlined messages sent via the bot
+  /** For the inlined messages sent via the bot
     */
   def inlined(inlineMessageId: Int, replyMarkup: Option[InlineKeyboardMarkup] = None): StopMessageLiveLocation =
     new StopMessageLiveLocation(None, None, Some(inlineMessageId), replyMarkup)
@@ -50,7 +50,7 @@ object StopMessageLiveLocation {
 
       def name: String = "stopMessageLiveLocation"
 
-      def encoder: Encoder[StopMessageLiveLocation] = deriveEncoder[StopMessageLiveLocation].snakeCase
+      def encoder: Encoder[StopMessageLiveLocation] = semiauto.deriveEncoder[StopMessageLiveLocation].snakeCase
 
       def decoder: Decoder[Either[Boolean, TelegramMessage]] =
         Decoder.decodeBoolean.either(TelegramMessage.telegramMessageDecoder)

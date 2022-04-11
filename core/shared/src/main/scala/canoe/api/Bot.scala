@@ -3,22 +3,18 @@ package canoe.api
 import canoe.api.sources.{Hook, Polling}
 import canoe.models.messages.TelegramMessage
 import canoe.models.{InputFile, Update}
-import cats.effect.concurrent.{Deferred, Ref}
-import cats.effect.{Concurrent, ConcurrentEffect, Resource, Timer}
 import cats.syntax.all._
-import fs2.concurrent.Topic
 import fs2.{Pipe, Stream}
+import cats.effect.{Async, Concurrent, Deferred, Ref, Resource, Temporal}
 
 import scala.concurrent.duration.FiniteDuration
 
-/**
-  * An instance which can communicate with Telegram service and
+/** An instance which can communicate with Telegram service and
   * interact with other Telegram users in a certain predefined way
   */
-class Bot[F[_]: Concurrent: Timer] private[api] (val updates: Stream[F, Update]) {
+class Bot[F[_]: Concurrent] private[api] (val updates: Stream[F, Update]) {
 
-  /**
-    * Defines the behavior of the bot.
+  /** Defines the behavior of the bot.
     *
     * Bot is reacting to the incoming messages following provided scenarios.
     * When the user input is not matching/stops matching particular scenario
@@ -54,14 +50,14 @@ class Bot[F[_]: Concurrent: Timer] private[api] (val updates: Stream[F, Update])
     * @return Stream of all updates which your bot receives from Telegram service
     */
   def follow(scenarios: Scenario[F, Unit]*): Stream[F, Update] = {
-    def runScenarios(updates: Topic[F, Update]): Stream[F, Nothing] =
+    def runScenarios(updates: Broadcast[F, Update]): Stream[F, Nothing] =
       updates
         .subscribe(1)
         .through(pipes.messages)
         .map(m => Stream.emits(scenarios).map(sc => fork(updates, m).through(sc.pipe)).parJoinUnbounded.drain)
         .parJoinUnbounded
 
-    def fork(updates: Topic[F, Update], m: TelegramMessage): Stream[F, TelegramMessage] =
+    def fork(updates: Broadcast[F, Update], m: TelegramMessage): Stream[F, TelegramMessage] =
       updates
         .subscribe(1)
         .through(filterMessages(m.chat.id))
@@ -95,30 +91,26 @@ class Bot[F[_]: Concurrent: Timer] private[api] (val updates: Stream[F, Update])
 
 object Bot {
 
-  /**
-    * Creates a bot which operates on provided updates.
+  /** Creates a bot which operates on provided updates.
     */
-  def fromStream[F[_]: Concurrent: Timer](updates: Stream[F, Update]): Bot[F] = new Bot(updates)
+  def fromStream[F[_]: Concurrent](updates: Stream[F, Update]): Bot[F] = new Bot(updates)
 
-  /**
-    * Creates a bot which receives incoming updates using long polling mechanism.
+  /** Creates a bot which receives incoming updates using long polling mechanism.
     *
     * See [[https://en.wikipedia.org/wiki/Push_technology#Long_polling wiki]].
     */
-  def polling[F[_]: Concurrent: Timer: TelegramClient]: Bot[F] =
+  def polling[F[_]: Concurrent: TelegramClient]: Bot[F] =
     new Bot[F](Polling.continual)
 
-  /**
-    * Creates a bot which receives incoming updates using long polling mechanism
+  /** Creates a bot which receives incoming updates using long polling mechanism
     * with custom polling interval.
     *
     * See [[https://en.wikipedia.org/wiki/Push_technology#Long_polling wiki]].
     */
-  def polling[F[_]: Concurrent: Timer: TelegramClient](interval: FiniteDuration): Bot[F] =
+  def polling[F[_]: Temporal: TelegramClient](interval: FiniteDuration): Bot[F] =
     new Bot[F](Polling.metered(interval))
 
-  /**
-    * Creates a bot which receives incoming updates by setting a webhook.
+  /** Creates a bot which receives incoming updates by setting a webhook.
     * After the bot is used, the webhook is deleted even in case of interruptions or errors.
     *
     * @param url         HTTPS url to which updates will be sent
@@ -127,11 +119,13 @@ object Bot {
     *                    Default is 8443.
     * @param certificate Public key of self-signed certificate (including BEGIN and END portions)
     */
-  def hook[F[_]: TelegramClient: ConcurrentEffect: Timer](
+  def hook[F[_]: TelegramClient: Async](
     url: String,
     host: String = "0.0.0.0",
     port: Int = 8443,
     certificate: Option[InputFile] = None
   ): Resource[F, Bot[F]] =
     Hook.install(url, host, port, certificate).map(h => new Bot(h.updates))
+
+  
 }

@@ -2,12 +2,11 @@ package samples
 
 import canoe.api._
 import canoe.syntax._
-import cats.effect.{ExitCode, IO, IOApp}
+import cats.effect.{IO, IOApp}
 import cats.syntax.all._
 import fs2.Stream
 
-/**
-  * Example of defining a bot using webhook.
+/** Example of defining a bot using webhook.
   *
   * The webhook is released when you exit the application or it encounters error or cancellation.
   * It is important to always delete the webhook afterwards,
@@ -18,26 +17,26 @@ import fs2.Stream
   *
   * The webhook can also be deleted manually using [[canoe.methods.webhooks.DeleteWebhook]] method.
   */
-object Webhook extends IOApp {
+object Webhook extends IOApp.Simple {
 
-  /**
-   * URL to which Telegram updates will be sent.
-   * This address must be reachable for the Telegram, so in case you're using local environment 
-   * you'd have to expose your local host to the Internet. 
-   * It can be achieved using ngrok simply following 
-   * this [[https://developer.github.com/webhooks/configuring/#using-ngrok comprehensive guide]]. 
-   */
+  /** URL to which Telegram updates will be sent.
+    * This address must be reachable for the Telegram, so in case you're using local environment
+    * you'd have to expose your local host to the Internet.
+    * It can be achieved using ngrok simply following
+    * this [[https://developer.github.com/webhooks/configuring/#using-ngrok comprehensive guide]].
+    */
   val url: String = "<your server url>"
 
   val token: String = "<your telegram token>"
 
-  def run(args: List[String]): IO[ExitCode] =
+  def run: IO[Unit] =
     Stream
-      .resource(TelegramClient.global[IO](token))
+      .resource(TelegramClient[IO](token))
       .flatMap { implicit client =>
         Stream.resource(Bot.hook[IO](url)).flatMap(_.follow(greetings))
       }
-      .compile.drain.as(ExitCode.Success)
+      .compile
+      .drain
 
   def greetings[F[_]: TelegramClient]: Scenario[F, Unit] =
     for {

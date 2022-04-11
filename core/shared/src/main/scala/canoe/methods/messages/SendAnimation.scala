@@ -5,7 +5,7 @@ import canoe.methods.Method
 import canoe.models.ParseMode.ParseMode
 import canoe.models.messages.AnimationMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -51,9 +51,9 @@ object SendAnimation {
 
       def name: String = "sendAnimation"
 
-      def encoder: Encoder[SendAnimation] = deriveEncoder[SendAnimation].snakeCase
+      def encoder: Encoder[SendAnimation] = semiauto.deriveEncoder[SendAnimation].snakeCase
 
-      def decoder: Decoder[AnimationMessage] = deriveDecoder[AnimationMessage]
+      def decoder: Decoder[AnimationMessage] = semiauto.deriveDecoder[AnimationMessage]
 
       def attachments(request: SendAnimation): List[(String, InputFile)] =
         List("animation" -> request.animation) ++ request.thumb.map(t => "thumb" -> t).toList

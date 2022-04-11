@@ -5,7 +5,7 @@ import canoe.methods.Method
 import canoe.models.ParseMode.ParseMode
 import canoe.models.messages.VideoMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -51,9 +51,9 @@ object SendVideo {
 
       def name: String = "sendVideo"
 
-      def encoder: Encoder[SendVideo] = deriveEncoder[SendVideo].snakeCase
+      def encoder: Encoder[SendVideo] = semiauto.deriveEncoder[SendVideo].snakeCase
 
-      def decoder: Decoder[VideoMessage] = deriveDecoder[VideoMessage]
+      def decoder: Decoder[VideoMessage] = semiauto.deriveDecoder[VideoMessage]
 
       def attachments(request: SendVideo): List[(String, InputFile)] = {
         val name = request.video match {

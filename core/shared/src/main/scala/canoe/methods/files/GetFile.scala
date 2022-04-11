@@ -3,7 +3,7 @@ package canoe.methods.files
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.{File, InputFile}
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -28,9 +28,9 @@ object GetFile {
 
       def name: String = "getFile"
 
-      def encoder: Encoder[GetFile] = deriveEncoder[GetFile].snakeCase
+      def encoder: Encoder[GetFile] = semiauto.deriveEncoder[GetFile].snakeCase
 
-      def decoder: Decoder[File] = deriveDecoder[File]
+      def decoder: Decoder[File] = semiauto.deriveDecoder[File]
 
       def attachments(request: GetFile): List[(String, InputFile)] = Nil
     }

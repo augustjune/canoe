@@ -3,15 +3,14 @@ package samples
 import canoe.api._
 import canoe.models.Chat
 import canoe.syntax._
-import cats.effect.{ExitCode, IO, IOApp}
+import cats.effect.{IO, IOApp}
 import cats.syntax.functor._
 import fs2.Stream
 
-/**
-  * Example using compositional property of scenarios
+/** Example using compositional property of scenarios
   * by combining them into more complex registration process
   */
-object Registration extends IOApp {
+object Registration extends IOApp.Simple {
 
   val token: String = "<your telegram token>"
 
@@ -27,13 +26,14 @@ object Registration extends IOApp {
 
   val service: Service[IO] = ???
 
-  def run(args: List[String]): IO[ExitCode] =
+  def run: IO[Unit] =
     Stream
-      .resource(TelegramClient.global[IO](token))
+      .resource(TelegramClient[IO](token))
       .flatMap { implicit client =>
         Bot.polling[IO].follow(signup(service))
       }
-      .compile.drain.as(ExitCode.Success)
+      .compile
+      .drain
 
   def signup[F[_]: TelegramClient](service: Service[F]): Scenario[F, Unit] =
     for {
@@ -68,7 +68,7 @@ object Registration extends IOApp {
       _         <- Scenario.eval(chat.send("Repeat your password"))
       reentered <- enterPass(chat)
       r <-
-        if (pass == reentered) Scenario.eval(chat.send("Your password is stored.")).as(pass)
+        if (pass == reentered) Scenario.eval(chat.send("Your password is stored.")) >> Scenario.pure(pass)
         else Scenario.eval(chat.send("Provided passwords don't match. Try again")) >> providePass(chat)
     } yield r
 

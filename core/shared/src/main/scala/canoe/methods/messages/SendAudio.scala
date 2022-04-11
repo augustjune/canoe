@@ -5,7 +5,7 @@ import canoe.methods.Method
 import canoe.models.ParseMode.ParseMode
 import canoe.models.messages.AudioMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -55,9 +55,9 @@ object SendAudio {
 
       def name: String = "sendAudio"
 
-      def encoder: Encoder[SendAudio] = deriveEncoder[SendAudio].snakeCase
+      def encoder: Encoder[SendAudio] = semiauto.deriveEncoder[SendAudio].snakeCase
 
-      def decoder: Decoder[AudioMessage] = deriveDecoder[AudioMessage]
+      def decoder: Decoder[AudioMessage] = semiauto.deriveDecoder[AudioMessage]
 
       def attachments(request: SendAudio): List[(String, InputFile)] = {
         val name = request.audio match {

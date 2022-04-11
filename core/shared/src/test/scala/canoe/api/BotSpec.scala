@@ -1,24 +1,23 @@
 package canoe.api
 
-import canoe.TestIO._
+import canoe.IOSpec
 import canoe.models.messages.TextMessage
 import canoe.models.{MessageReceived, PrivateChat, Update}
 import canoe.syntax._
-import cats.effect.IO
-import cats.effect.concurrent.Ref
+import cats.effect.{IO, Ref}
 import fs2.Stream
-import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.freespec.AsyncFreeSpec
 
 import scala.concurrent.duration._
 
-class BotSpec extends AnyFreeSpec {
+class BotSpec extends AsyncFreeSpec with IOSpec {
   type Message = String
   type ChatId = Int
 
   def updates(messages: List[(Message, ChatId)]): Stream[IO, Update] =
     Stream
-      .emits(messages.zipWithIndex.map {
-        case ((m, id), i) => MessageReceived(i, TextMessage(i, PrivateChat(id, None, None, None), -1, m))
+      .emits(messages.zipWithIndex.map { case ((m, id), i) =>
+        MessageReceived(i, TextMessage(i, PrivateChat(id, None, None, None), -1, m))
       })
       .metered[IO](0.2.second)
 
@@ -32,11 +31,11 @@ class BotSpec extends AnyFreeSpec {
 
         val bot = new Bot[IO](updates(messages))
 
-        val texts = bot.updates.toList().collect {
-          case MessageReceived(_, m: TextMessage) => m.text
-        }
-
-        assert(texts == messages.map(_._1))
+        for {
+          updates <- bot.updates.compile.toList
+          texts = updates.collect { case MessageReceived(_, m: TextMessage) => m.text }
+          asr <- IO(assert(texts == messages.map(_._1)))
+        } yield asr
       }
     }
 
@@ -60,8 +59,11 @@ class BotSpec extends AnyFreeSpec {
           val counter = Stream
             .eval(Ref[IO].of(0))
             .flatMap(counter => bot.follow(scenario(counter)).drain ++ Stream.eval(counter.get))
+            .head
+            .compile
+            .lastOrError
 
-          assert(counter.value() == messages.size)
+          counter.flatMap(value => IO(assert(value == messages.size)))
         }
 
         "scenario for the messages from different chats" in {
@@ -86,8 +88,11 @@ class BotSpec extends AnyFreeSpec {
           val counter = Stream
             .eval(Ref[IO].of(0))
             .flatMap(counter => bot.follow(scenario(counter)).drain ++ Stream.eval(counter.get))
+            .head
+            .compile
+            .lastOrError
 
-          assert(counter.value() == 2)
+          counter.flatMap(value => IO(assert(value == 2)))
         }
 
         "more than one scenario" in {
@@ -114,8 +119,11 @@ class BotSpec extends AnyFreeSpec {
           val register = Stream
             .eval(Ref[IO].of(Set.empty[Int]))
             .flatMap(reg => bot.follow(scenario1(reg), scenario2(reg)).drain ++ Stream.eval(reg.get))
+            .head
+            .compile
+            .lastOrError
 
-          assert(register.value().size == 2)
+          register.flatMap(value => IO(assert(value.size == 2)))
         }
       }
 
@@ -146,8 +154,11 @@ class BotSpec extends AnyFreeSpec {
           val register = Stream
             .eval(Ref[IO].of(Set.empty[Int]))
             .flatMap(reg => bot.follow(scenario1(reg), scenario2(reg)).drain ++ Stream.eval(reg.get))
+            .head
+            .compile
+            .lastOrError
 
-          assert(register.value().size == 2)
+          register.flatMap(set => IO(assert(set.size == 2)))
         }
 
         "by the same scenario in other chat" in {
@@ -168,8 +179,11 @@ class BotSpec extends AnyFreeSpec {
           val register = Stream
             .eval(Ref[IO].of(Set.empty[Int]))
             .flatMap(reg => bot.follow(scenario1(reg)).drain ++ Stream.eval(reg.get))
+            .head
+            .compile
+            .lastOrError
 
-          assert(register.value().size == 2)
+          register.flatMap(set => IO(assert(set.size == 2)))
         }
 
         "by the same scenario in the same chat" in {
@@ -190,8 +204,11 @@ class BotSpec extends AnyFreeSpec {
           val register = Stream
             .eval(Ref[IO].of(Set.empty[Int]))
             .flatMap(reg => bot.follow(scenario1(reg)).drain ++ Stream.eval(reg.get))
+            .head
+            .compile
+            .lastOrError
 
-          assert(register.value().size == 2)
+          register.flatMap(set => IO(assert(set.size == 2)))
         }
       }
     }

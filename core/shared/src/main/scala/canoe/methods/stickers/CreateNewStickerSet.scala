@@ -6,7 +6,6 @@ import canoe.models.{InputFile, MaskPosition}
 import io.circe.generic.semiauto.deriveEncoder
 import io.circe.{Decoder, Encoder}
 import cats.syntax.all._
-import cats.instances.option._
 
 /**
   * Use this method to create new sticker set owned by a user.
@@ -31,7 +30,7 @@ import cats.instances.option._
   * @param containsMasks Pass True, if a set of mask stickers should be created
   * @param maskPosition  Position where the mask should be placed on faces
   */
-final class CreateNewStickerSet private (val userId: Int,
+final class CreateNewStickerSet private (val userId: Long,
                                          val name: String,
                                          val title: String,
                                          val pngSticker: Option[InputFile],
@@ -47,7 +46,7 @@ object CreateNewStickerSet {
     * Static sticker sets can have up to 120 stickers.
     * Note: Animated stickers can be added to animated sticker sets and only to them.
     */
-  def static(userId: Int,
+  def static(userId: Long,
              name: String,
              title: String,
              sticker: InputFile,
@@ -60,7 +59,7 @@ object CreateNewStickerSet {
   /**
     * Animated sticker sets can have up to 50 stickers.
     */
-  def animated(userId: Int,
+  def animated(userId: Long,
                name: String,
                title: String,
                sticker: InputFile,

@@ -2,7 +2,6 @@ package canoe.api.matching
 
 import canoe.api.matching.Episode._
 import cats.effect.{Bracket, Concurrent, ExitCase, Timer}
-import cats.instances.list._
 import cats.syntax.all._
 import cats.~>
 import fs2.{Pipe, Pull, Stream}

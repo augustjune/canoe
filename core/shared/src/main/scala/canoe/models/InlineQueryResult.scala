@@ -73,7 +73,7 @@ final case class InlineQueryResultArticle(id: String,
   * @param photoHeight         Height of the photo
   * @param title               Title for the result
   * @param description         Short description of the result
-  * @param caption             Caption of the photo to be sent, 0-200 characters
+  * @param caption             Caption of the photo to be sent, 0-1024 characters
   * @param parseMode           Parse mode of captured text (Markdown or HTML)
   * @param replyMarkup         Inline keyboard attached to the message
   * @param inputMessageContent Content of the message to be sent instead of the photo
@@ -126,7 +126,7 @@ final case class InlineQueryResultGame(id: String,
   * @param thumbUrl            URL of the static (JPEG or GIF) or animated (MPEG4) thumbnail for the result
   * @param thumbMimeType       MIME type of the thumbnail, must be one of “image/jpeg”, “image/gif”, or “video/mp4”. Defaults to “image/jpeg”
   * @param title               Title for the result
-  * @param caption             Caption of the GIF file to be sent, 0-200 characters
+  * @param caption             Caption of the GIF file to be sent, 0-1024 characters
   * @param parseMode           Parse mode of captured text (Markdown or HTML)
   * @param replyMarkup         Inline keyboard attached to the message
   * @param inputMessageContent Content of the message to be sent instead of the GIF animation
@@ -161,7 +161,7 @@ final case class InlineQueryResultGif(id: String,
   * @param thumbUrl            URL of the static (JPEG or GIF) or animated (MPEG4) thumbnail for the result
   * @param thumbMimeType       MIME type of the thumbnail, must be one of “image/jpeg”, “image/gif”, or “video/mp4”. Defaults to “image/jpeg”
   * @param title               Title for the result
-  * @param caption             Caption of the MPEG-4 file to be sent, 0-200 characters
+  * @param caption             Caption of the MPEG-4 file to be sent, 0-1024 characters
   * @param parseMode           Parse mode of captured text (Markdown or HTML)
   * @param replyMarkup         Inline keyboard attached to the message
   * @param inputMessageContent Content of the message to be sent instead of the video animation
@@ -193,7 +193,7 @@ final case class InlineQueryResultMpeg4Gif(id: String,
   * @param mimeType            Mime type of the content of video url, "text/html" or "video/mp4"
   * @param thumbUrl            URL of the thumbnail (jpeg only) for the video
   * @param title               Title for the result
-  * @param caption             Caption of the video to be sent, 0-200 characters
+  * @param caption             Caption of the video to be sent, 0-1024 characters
   * @param parseMode           Parse mode of captured text (Markdown or HTML)
   * @param videoWidth          Video width
   * @param videoHeight         Video height
@@ -227,7 +227,7 @@ final case class InlineQueryResultVideo(id: String,
   * @param id                  Unique identifier for this result, 1-64 bytes
   * @param audioUrl            A valid URL for the audio file
   * @param title               Title
-  * @param caption             Caption, 0-200 characters
+  * @param caption             Caption, 0-1024 characters
   * @param parseMode           Parse mode of captured text (Markdown or HTML)
   * @param performer           Performer
   * @param audioDuration       Audio duration in seconds
@@ -259,7 +259,7 @@ final case class InlineQueryResultAudio(id: String,
   * @param id                  Unique identifier for this result, 1-64 bytes
   * @param voiceUrl            A valid URL for the voice recording
   * @param title               Recording title
-  * @param caption             Caption, 0-200 characters
+  * @param caption             Caption, 0-1024 characters
   * @param parseMode           Parse mode of captured text (Markdown or HTML)
   * @param voiceDuration       Recording duration in seconds
   * @param replyMarkup         Inline keyboard attached to the message
@@ -286,7 +286,7 @@ final case class InlineQueryResultVoice(id: String,
   * @param type                Type of the result, must be document
   * @param id                  Unique identifier for this result, 1-64 bytes
   * @param title               Title for the result
-  * @param caption             Caption of the document to be sent, 0-200 characters
+  * @param caption             Caption of the document to be sent, 0-1024 characters
   * @param parseMode           Parse mode of captured text (Markdown or HTML)
   * @param documentUrl         A valid URL for the file
   * @param mimeType            Mime type of the content of the file, either "application/pdf" or "application/zip"
@@ -427,7 +427,7 @@ final case class InlineQueryResultContact(id: String,
   * @param photoFileId         A valid file identifier of the photo
   * @param title               Title for the result
   * @param description         Short description of the result
-  * @param caption             Caption of the photo to be sent, 0-200 characters
+  * @param caption             Caption of the photo to be sent, 0-1024 characters
   * @param parseMode           Parse mode of captured text (Markdown or HTML)
   * @param replyMarkup         Inline keyboard attached to the message
   * @param inputMessageContent Content of the message to be sent instead of the photo
@@ -453,7 +453,7 @@ final case class InlineQueryResultCachedPhoto(id: String,
   * @param id                  String            Unique identifier for this result, 1-64 bytes
   * @param gifFileId           A valid file identifier for the GIF file
   * @param title               Title for the result
-  * @param caption             Caption of the GIF file to be sent, 0-200 characters
+  * @param caption             Caption of the GIF file to be sent, 0-1024 characters
   * @param parseMode           Parse mode of captured text (Markdown or HTML)
   * @param replyMarkup         An Inline keyboard attached to the message
   * @param inputMessageContent Content of the message to be sent instead of the GIF animation
@@ -478,7 +478,7 @@ final case class InlineQueryResultCachedGif(id: String,
   * @param id                  Unique identifier for this result, 1-64 bytes
   * @param mpeg4FileId         A valid file identifier for the MP4 file
   * @param title               Title for the result
-  * @param caption             Caption of the MPEG-4 file to be sent, 0-200 characters
+  * @param caption             Caption of the MPEG-4 file to be sent, 0-1024 characters
   * @param parseMode           Parse mode of captured text (Markdown or HTML)
   * @param replyMarkup         An Inline keyboard attached to the message
   * @param inputMessageContent Content of the message to be sent instead of the video animation
@@ -528,7 +528,7 @@ final case class InlineQueryResultCachedSticker(id: String,
   * @param title               Title for the result
   * @param documentFileId      A valid file identifier for the file
   * @param description         Short description of the result
-  * @param caption             Caption of the document to be sent, 0-200 characters
+  * @param caption             Caption of the document to be sent, 0-1024 characters
   * @param parseMode           Parse mode of captured text (Markdown or HTML)
   * @param replyMarkup         An Inline keyboard attached to the message
   * @param inputMessageContent Content of the message to be sent instead of the file
@@ -555,7 +555,7 @@ final case class InlineQueryResultCachedDocument(id: String,
   * @param videoFileId         A valid file identifier for the video file
   * @param title               Title for the result
   * @param description         Short description of the result
-  * @param caption             Caption of the video to be sent, 0-200 characters
+  * @param caption             Caption of the video to be sent, 0-1024 characters
   * @param parseMode           Parse mode of captured text (Markdown or HTML)
   * @param replyMarkup         An Inline keyboard attached to the message
   * @param inputMessageContent Content of the message to be sent instead of the video
@@ -583,7 +583,7 @@ final case class InlineQueryResultCachedVideo(id: String,
   * @param id                  Unique identifier for this result, 1-64 bytes
   * @param voiceFileId         A valid file identifier for the voice message
   * @param title               Voice message title
-  * @param caption             Caption, 0-200 characters
+  * @param caption             Caption, 0-1024 characters
   * @param parseMode           Parse mode of captured text (Markdown or HTML)
   * @param replyMarkup         An Inline keyboard attached to the message
   * @param inputMessageContent Content of the message to be sent instead of the voice message
@@ -609,7 +609,7 @@ final case class InlineQueryResultCachedVoice(id: String,
   * @param type                Type of the result, must be audio
   * @param id                  Unique identifier for this result, 1-64 bytes
   * @param audioFileId         A valid file identifier for the audio file
-  * @param caption             Caption, 0-200 characters
+  * @param caption             Caption, 0-1024 characters
   * @param parseMode           Parse mode of captured text (Markdown or HTML)
   * @param replyMarkup         An Inline keyboard attached to the message
   * @param inputMessageContent Content of the message to be sent instead of the audio

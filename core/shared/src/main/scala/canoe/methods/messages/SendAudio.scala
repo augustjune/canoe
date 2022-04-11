@@ -21,7 +21,7 @@ import io.circe.{Decoder, Encoder}
   * @param audio               Audio file to send.
   *                            Pass a file_id as String to send an audio file that exists on the Telegram servers (recommended),
   *                            pass an HTTP URL as a String for Telegram to get an audio file from the Internet, or upload a new one using multipart/form-data.
-  * @param caption             Audio caption, 0-200 characters
+  * @param caption             Audio caption, 0-1024 characters
   * @param parseMode           Parse mode of captioned text (Markdown or HTML)
   * @param duration            Duration of the audio in seconds
   * @param performer           Track performer
@@ -59,7 +59,12 @@ object SendAudio {
 
       def decoder: Decoder[AudioMessage] = deriveDecoder[AudioMessage]
 
-      def attachments(request: SendAudio): List[(String, InputFile)] =
-        List("audio" -> request.audio)
+      def attachments(request: SendAudio): List[(String, InputFile)] = {
+        val name = request.audio match {
+          case InputFile.Upload(filename, _) => filename
+          case InputFile.Existing(_) => "audio"
+        }
+        List(name -> request.audio)
+      }
     }
 }

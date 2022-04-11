@@ -6,7 +6,7 @@ import canoe.models.{InputFile, Response => TelegramResponse}
 import cats.effect.Sync
 import cats.syntax.all._
 import fs2.Stream
-import io.chrisdavenport.log4cats.Logger
+import org.typelevel.log4cats.Logger
 import org.http4s._
 import org.http4s.circe._
 import org.http4s.client.Client
@@ -55,8 +55,6 @@ private[api] class Http4sTelegramClient[F[_]: Sync: Logger](token: String, clien
                                          method: Method[Req, Res],
                                          action: Req,
                                          parts: List[Part[F]]): F[Request[F]] = {
-    val multipart = Multipart[F](parts.toVector)
-
     val params =
       method
         .encoder(action)
@@ -64,16 +62,18 @@ private[api] class Http4sTelegramClient[F[_]: Sync: Logger](token: String, clien
         .map(
           _.toIterable
             .filterNot(kv => kv._2.isNull || kv._2.isObject)
-            .map { case (k, j) => k -> j.toString }
+            .map {
+              case (k, j) if j.isString => k -> j.asString.get
+              case (k, j) => k -> j.toString
+            }
             .toMap
         )
         .getOrElse(Map.empty)
+        .map(x => Part.formData[F](x._1, x._2))
 
-    val urlWithQueryParams = params.foldLeft(url) {
-      case (url, (key, value)) => url.withQueryParam(key, value)
-    }
+    val multipart = Multipart[F](parts.toVector ++ params.toVector)
 
-    Method.POST(multipart, urlWithQueryParams).map(_.withHeaders(multipart.headers))
+    Method.POST(multipart, url).map(_.withHeaders(multipart.headers))
   }
 
   private def handleTelegramResponse[A, I, C](m: Method[I, A], input: I)(response: TelegramResponse[A]): F[A] =

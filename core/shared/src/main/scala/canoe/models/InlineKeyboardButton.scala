@@ -57,6 +57,13 @@ object InlineKeyboardButton {
     new InlineKeyboardButton(text, url = Some(url))
 
   /**
+    * Pressing the button will automatically authorize a user.
+    * All the user needs to do is tap/click a button and confirm that they want to log in.
+    */
+  def loginUrl(text: String, loginUrl: LoginUrl): InlineKeyboardButton =
+    new InlineKeyboardButton(text, loginUrl = Some(loginUrl))
+
+  /**
     * '''Note:'''
     * This type of button must always be the first button in the first row.
     */

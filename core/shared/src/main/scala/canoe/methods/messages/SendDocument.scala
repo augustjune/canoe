@@ -18,7 +18,7 @@ import io.circe.{Decoder, Encoder}
   *                            Pass a file_id as String to send a file that exists on the Telegram servers (recommended),
   *                            pass an HTTP URL as a String for Telegram to get a file from the Internet, or upload a new one using multipart/form-data.
   * @param thumb               Thumbnail of the file sent
-  * @param caption             Audio caption, 0-200 characters
+  * @param caption             Audio caption, 0-1024 characters
   * @param parseMode           Parse mode of captioned text (Markdown or HTML)
   * @param disableNotification Sends the message silently.
   *                            iOS users will not receive a notification,

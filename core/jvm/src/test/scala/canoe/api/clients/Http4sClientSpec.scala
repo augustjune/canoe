@@ -9,7 +9,7 @@ import org.http4s.HttpApp
 import org.http4s.client.Client
 import org.http4s.dsl.io._
 import io.circe.Json
-import io.chrisdavenport.log4cats.slf4j.Slf4jLogger
+import org.typelevel.log4cats.slf4j.Slf4jLogger
 import org.scalatest.freespec.AnyFreeSpec
 
 class Http4sClientSpec extends AnyFreeSpec {
@@ -54,7 +54,7 @@ class Http4sClientSpec extends AnyFreeSpec {
       "request entity with method encoder" in {
         val tgClient = new Http4sTelegramClient(
           "",
-          Client.fromHttpApp(HttpApp[IO](_.bodyAsText.compile.string.flatMap(s => Ok(response(s.replace("\"", "'"))))))
+          Client.fromHttpApp(HttpApp[IO](_.bodyText.compile.string.flatMap(s => Ok(response(s.replace("\"", "'"))))))
         )
         val res = tgClient.execute("")(testMethod.copy(encoder = Encoder.instance(_ => Json.fromString("encoded"))))
 

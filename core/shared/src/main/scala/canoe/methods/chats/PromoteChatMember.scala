@@ -28,7 +28,7 @@ import io.circe.{Decoder, Encoder}
   *                           directly or indirectly (promoted by administrators that were appointed by him)
   */
 final case class PromoteChatMember(chatId: ChatId,
-                                   userId: Int,
+                                   userId: Long,
                                    canChangeInfo: Option[Boolean] = None,
                                    canPostMessages: Option[Boolean] = None,
                                    canEditMessages: Option[Boolean] = None,

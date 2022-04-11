@@ -17,7 +17,7 @@ import io.circe.{Decoder, Encoder}
   *               (in the format @channelusername)
   * @param userId Unique identifier of the target user
   */
-final case class UnbanChatMember(chatId: ChatId, userId: Int)
+final case class UnbanChatMember(chatId: ChatId, userId: Long)
 
 object UnbanChatMember {
 

@@ -62,7 +62,7 @@ final class ChatApi(private val chat: Chat) extends AnyVal {
   /**
     * @return Detailed information about the member of this chat.
     */
-  def getMember[F[_]: TelegramClient](userId: Int): F[ChatMember] =
+  def getMember[F[_]: TelegramClient](userId: Long): F[ChatMember] =
     GetChatMember(chat.id, userId).call
 
   /**
@@ -74,7 +74,7 @@ final class ChatApi(private val chat: Chat) extends AnyVal {
   /**
     * Kicks a user from this chat.
     */
-  def kickUser[F[_]: TelegramClient: Applicative](userId: Int, untilDate: Option[Int] = None): F[Boolean] =
+  def kickUser[F[_]: TelegramClient: Applicative](userId: Long, untilDate: Option[Int] = None): F[Boolean] =
     chat match {
       case _: PrivateChat => false.pure[F]
       case _              => KickChatMember(chat.id, userId, untilDate).call
@@ -105,7 +105,7 @@ final class ChatApi(private val chat: Chat) extends AnyVal {
   /**
     * Promotes or demotes a user in this chat.
     */
-  def promoteMember[F[_]: TelegramClient: Applicative](userId: Int,
+  def promoteMember[F[_]: TelegramClient: Applicative](userId: Long,
                                                        canChangeInfo: Option[Boolean] = None,
                                                        canPostMessages: Option[Boolean] = None,
                                                        canEditMessages: Option[Boolean] = None,
@@ -138,7 +138,7 @@ final class ChatApi(private val chat: Chat) extends AnyVal {
     * The bot must be an administrator in the supergroup
     * and must have the appropriate admin rights.
     */
-  def restrictMember[F[_]: TelegramClient: Applicative](userId: Int,
+  def restrictMember[F[_]: TelegramClient: Applicative](userId: Long,
                                                         permissions: ChatPermissions,
                                                         until: Option[Int] = None
   ): F[Boolean] =
@@ -181,7 +181,7 @@ final class ChatApi(private val chat: Chat) extends AnyVal {
   /**
     * Unbans previously kicked user.
     */
-  def unbanMember[F[_]: TelegramClient](userId: Int): F[Boolean] =
+  def unbanMember[F[_]: TelegramClient](userId: Long): F[Boolean] =
     UnbanChatMember(chat.id, userId).call
 
   /**

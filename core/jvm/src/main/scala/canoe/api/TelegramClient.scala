@@ -6,7 +6,7 @@ import cats.effect.{ConcurrentEffect, Resource, Sync}
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 import org.http4s.client.Client
-import org.http4s.blaze.client.BlazeClientBuilder
+import org.http4s.client.blaze.BlazeClientBuilder
 
 import scala.concurrent.ExecutionContext
 

@@ -11,8 +11,7 @@ import fs2.Stream
 
 import scala.concurrent.duration._
 
-/**
-  * Polling method of getting Telegram updates.
+/** Polling method of getting Telegram updates.
   *
   * @param timeout Determines how long the Telegram service will wait
   *                before it sends the response when there's no updates.
@@ -37,23 +36,20 @@ private[api] class Polling[F[_]: TelegramClient: Functor](timeout: FiniteDuratio
 }
 
 object Polling {
-  /**
-    * Default timeout duration for long polling
+
+  /** Default timeout duration for long polling
     */
   private val longPollTimeout: FiniteDuration = 30 seconds
 
-  /**
-    * Polls new batch of updates whenever consumer is ready
+  /** Polls new batch of updates whenever consumer is ready
     */
   private[api] def continual[F[_]: TelegramClient: Functor]: Stream[F, Update] =
     new Polling[F](longPollTimeout).pollUpdates(0).flatMap(Stream.emits)
 
-  /**
-    * Polls new batch of updates when consumer is ready and `interval` passed since the last polling
+  /** Polls new batch of updates when consumer is ready and `interval` passed since the last polling
     */
   private[api] def metered[F[_]: TelegramClient: Temporal](
     interval: FiniteDuration
   ): Stream[F, Update] =
-    ???
-    // new Polling[F](longPollTimeout).pollUpdates(0).metered(interval).flatMap(Stream.emits(_))
+    new Polling[F](longPollTimeout).pollUpdates(0).metered(interval).flatMap(Stream.emits(_))
 }

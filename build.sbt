@@ -56,7 +56,7 @@ lazy val projectSettings = Seq(
     Developer("augustjune", "Yura Slinkin", "jurij.jurich@gmail.com", url("https://github.com/augustjune"))
   ),
   scalaVersion := scala2_13,
-  crossScalaVersions := Seq(scala2_13, scala3)
+  crossScalaVersions := Seq(scala2_12, scala2_13, scala3)
 )
 
 lazy val crossDependencies =
@@ -122,9 +122,9 @@ ThisBuild / githubWorkflowEnv ++= List(
 
 lazy val scala3 = "3.1.1"
 lazy val scala2_13 = "2.13.8"
-// lazy val scala2_12 = "2.12.15"
+lazy val scala2_12 = "2.12.15"
 
-lazy val scala2Only = Seq(scala2_13)
+lazy val scala2Only = Seq(scala2_12, scala2_13)
 lazy val scala2And3 = scala2Only :+ scala3
 
 lazy val fs2Version = "3.2.7"

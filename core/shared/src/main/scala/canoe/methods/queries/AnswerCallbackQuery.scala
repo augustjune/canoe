@@ -3,11 +3,10 @@ package canoe.methods.queries
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.InputFile
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
-/**
-  * Use this method to send answers to callback queries sent from inline keyboards.
+/** Use this method to send answers to callback queries sent from inline keyboards.
   *
   * The answer will be displayed to the user as a notification at the top of the chat screen or as an alert.
   *
@@ -31,36 +30,32 @@ import io.circe.{Decoder, Encoder}
   * @param cacheTime       The maximum amount of time in seconds that the result of the callback query may be cached client-side.
   *                        Telegram apps will support caching starting in version 3.14.
   *                        Defaults to 0.
-  *
   */
-final class AnswerCallbackQuery private (val callbackQueryId: String,
-                                         val text: Option[String] = None,
-                                         val showAlert: Option[Boolean] = None,
-                                         val url: Option[String] = None,
-                                         val cacheTime: Option[Int] = None)
+final case class AnswerCallbackQuery private (callbackQueryId: String,
+                                              text: Option[String] = None,
+                                              showAlert: Option[Boolean] = None,
+                                              url: Option[String] = None,
+                                              cacheTime: Option[Int] = None
+)
 
 object AnswerCallbackQuery {
 
-  /**
-    * Notification answer which shows provided text at the top of the chat screen
+  /** Notification answer which shows provided text at the top of the chat screen
     */
   def notification(queryId: String, text: String): AnswerCallbackQuery =
     new AnswerCallbackQuery(queryId, text = Some(text))
 
-  /**
-    * Alert answer which shows provided text in a pop-up form
+  /** Alert answer which shows provided text in a pop-up form
     */
   def alert(queryId: String, text: String): AnswerCallbackQuery =
     new AnswerCallbackQuery(queryId, text = Some(text), showAlert = Some(true))
 
-  /**
-    * React without notification to stop a progress bar
+  /** React without notification to stop a progress bar
     */
   def finish(queryId: String): AnswerCallbackQuery =
     new AnswerCallbackQuery(queryId)
 
-  /**
-    * Answer which redirects the user to the provided address.
+  /** Answer which redirects the user to the provided address.
     * Example: you can redirect a user to your bot using `telegram.me/your_bot?start=XXXX`
     */
   def redirect(queryId: String, url: String): AnswerCallbackQuery =
@@ -71,7 +66,7 @@ object AnswerCallbackQuery {
 
       def name: String = "answerCallbackQuery"
 
-      def encoder: Encoder[AnswerCallbackQuery] = deriveEncoder[AnswerCallbackQuery].snakeCase
+      def encoder: Encoder[AnswerCallbackQuery] = semiauto.deriveEncoder[AnswerCallbackQuery].snakeCase
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 

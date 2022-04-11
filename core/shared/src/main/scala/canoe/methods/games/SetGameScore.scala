@@ -4,11 +4,10 @@ import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InputFile}
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
-/**
-  * Use this method to set the score of the specified user in a game.
+/** Use this method to set the score of the specified user in a game.
   *
   * On success, if the message was sent by the bot, returns the edited Message,
   * otherwise returns True.
@@ -29,41 +28,43 @@ import io.circe.{Decoder, Encoder}
   * @param inlineMessageId    Identifier of the inline message.
   *                           Required if 'chatId' and 'messageId' are not specified.
   */
-final class SetGameScore private (val userId: Int,
-                                  val score: Long,
-                                  val force: Option[Boolean],
-                                  val disableEditMessage: Option[Boolean],
-                                  val chatId: Option[ChatId] = None,
-                                  val messageId: Option[Int] = None,
-                                  val inlineMessageId: Option[String] = None)
+final case class SetGameScore private (userId: Int,
+                                       score: Long,
+                                       force: Option[Boolean],
+                                       disableEditMessage: Option[Boolean],
+                                       chatId: Option[ChatId] = None,
+                                       messageId: Option[Int] = None,
+                                       inlineMessageId: Option[String] = None
+)
 
 object SetGameScore {
-  /**
-    * For the messages sent directly by the bot
+
+  /** For the messages sent directly by the bot
     */
   def direct(chatId: ChatId,
              messageId: Int,
              userId: Int,
              score: Long,
              force: Option[Boolean] = None,
-             disableEditMessage: Option[Boolean] = None): SetGameScore =
+             disableEditMessage: Option[Boolean] = None
+  ): SetGameScore =
     new SetGameScore(userId, score, force, disableEditMessage, Some(chatId), Some(messageId))
 
-  /**
-    * For the inlined messages sent via the bot
+  /** For the inlined messages sent via the bot
     */
   def inlined(inlineMessageId: String,
               userId: Int,
               score: Long,
               force: Option[Boolean] = None,
-              disableEditMessage: Option[Boolean] = None): SetGameScore =
+              disableEditMessage: Option[Boolean] = None
+  ): SetGameScore =
     new SetGameScore(userId, score, force, disableEditMessage, inlineMessageId = Some(inlineMessageId))
 
   implicit val method: Method[SetGameScore, Either[Boolean, TelegramMessage]] =
     new Method[SetGameScore, Either[Boolean, TelegramMessage]] {
       def name: String = "setGameScore"
 
-      def encoder: Encoder[SetGameScore] = deriveEncoder[SetGameScore].snakeCase
+      def encoder: Encoder[SetGameScore] = semiauto.deriveEncoder[SetGameScore].snakeCase
 
       def decoder: Decoder[Either[Boolean, TelegramMessage]] =
         Decoder.decodeBoolean.either(TelegramMessage.telegramMessageDecoder)

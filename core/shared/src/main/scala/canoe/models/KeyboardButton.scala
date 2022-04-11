@@ -1,11 +1,10 @@
 package canoe.models
 
 import io.circe.Encoder
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto
 import io.circe.generic.auto._
 
-/**
-  * Button of the reply keyboard.
+/** Button of the reply keyboard.
   * For simple text buttons String can be used instead of this object to specify text of the button.
   * Optional fields are mutually exclusive.
   *
@@ -16,23 +15,22 @@ import io.circe.generic.auto._
   * @param requestLocation If True, the user's current location will be sent when the button is pressed.
   *                        Available in private chats only
   */
-final class KeyboardButton private (val text: String,
-                                    val requestContact: Option[Boolean] = None,
-                                    val requestLocation: Option[Boolean] = None,
-                                    val requestPoll: Option[KeyboardButtonPollType] = None)
+final case class KeyboardButton private (text: String,
+                                         requestContact: Option[Boolean] = None,
+                                         requestLocation: Option[Boolean] = None,
+                                         requestPoll: Option[KeyboardButtonPollType] = None
+)
 
 case class KeyboardButtonPollType(`type`: Option[String])
 object KeyboardButton {
 
-  /**
-    * `text` will be sent to the bot as a message when the button is pressed.
+  /** `text` will be sent to the bot as a message when the button is pressed.
     *
     * @param text Text of the button
     */
   def text(text: String): KeyboardButton = new KeyboardButton(text)
 
-  /**
-    * The user's phone number will be sent as a contact when the button is pressed.
+  /** The user's phone number will be sent as a contact when the button is pressed.
     * Available in private chats only.
     *
     * @param text Text of the button
@@ -40,8 +38,7 @@ object KeyboardButton {
   def requestLocation(text: String): KeyboardButton =
     new KeyboardButton(text, requestLocation = Some(true))
 
-  /**
-    * The user's current location will be sent when the button is pressed.
+  /** The user's current location will be sent when the button is pressed.
     * Available in private chats only.
     *
     * @param text Text of the button.
@@ -49,8 +46,7 @@ object KeyboardButton {
   def requestContact(text: String): KeyboardButton =
     new KeyboardButton(text, requestContact = Some(true))
 
-  /**
-    * The user will be asked to create a poll and send it to the bot when the button is pressed.
+  /** The user will be asked to create a poll and send it to the bot when the button is pressed.
     * Available in private chats only.
     *
     * @param specificType If 'quiz' is passed, the user will be allowed to create only polls in the quiz mode.
@@ -60,5 +56,5 @@ object KeyboardButton {
   def requestPoll(text: String, specificType: Option[String] = None): KeyboardButton =
     new KeyboardButton(text, requestPoll = Some(KeyboardButtonPollType(specificType)))
 
-  implicit val encoderInstance: Encoder[KeyboardButton] = deriveEncoder[KeyboardButton]
+  implicit val encoderInstance: Encoder[KeyboardButton] = semiauto.deriveEncoder[KeyboardButton]
 }

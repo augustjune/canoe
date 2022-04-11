@@ -3,12 +3,11 @@ package canoe.methods.stickers
 import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.{InputFile, MaskPosition}
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 import cats.syntax.all._
 
-/**
-  * Use this method to create new sticker set owned by a user.
+/** Use this method to create new sticker set owned by a user.
   * The bot will be able to edit the created sticker set.
   *
   * Returns True on success.
@@ -30,20 +29,19 @@ import cats.syntax.all._
   * @param containsMasks Pass True, if a set of mask stickers should be created
   * @param maskPosition  Position where the mask should be placed on faces
   */
-final class CreateNewStickerSet private (val userId: Int,
-                                         val name: String,
-                                         val title: String,
-                                         val pngSticker: Option[InputFile],
-                                         val tgsSticker: Option[InputFile],
-                                         val emojis: String,
-                                         val containsMasks: Option[Boolean],
-                                         val maskPosition: Option[MaskPosition]
+final case class CreateNewStickerSet private (userId: Int,
+                                              name: String,
+                                              title: String,
+                                              pngSticker: Option[InputFile],
+                                              tgsSticker: Option[InputFile],
+                                              emojis: String,
+                                              containsMasks: Option[Boolean],
+                                              maskPosition: Option[MaskPosition]
 )
 
 object CreateNewStickerSet {
 
-  /**
-    * Static sticker sets can have up to 120 stickers.
+  /** Static sticker sets can have up to 120 stickers.
     * Note: Animated stickers can be added to animated sticker sets and only to them.
     */
   def static(userId: Int,
@@ -56,8 +54,7 @@ object CreateNewStickerSet {
   ): CreateNewStickerSet =
     new CreateNewStickerSet(userId, name, title, Some(sticker), None, emojis, containsMasks, maskPosition)
 
-  /**
-    * Animated sticker sets can have up to 50 stickers.
+  /** Animated sticker sets can have up to 50 stickers.
     */
   def animated(userId: Int,
                name: String,
@@ -76,7 +73,7 @@ object CreateNewStickerSet {
 
       def name: String = "createNewStickerSet"
 
-      def encoder: Encoder[CreateNewStickerSet] = deriveEncoder[CreateNewStickerSet].snakeCase
+      def encoder: Encoder[CreateNewStickerSet] = semiauto.deriveEncoder[CreateNewStickerSet].snakeCase
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 

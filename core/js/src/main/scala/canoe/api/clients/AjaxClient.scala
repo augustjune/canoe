@@ -3,7 +3,7 @@ package canoe.api.clients
 import canoe.api.{FailedMethod, ResponseDecodingError, TelegramClient}
 import canoe.methods.Method
 import canoe.models.Response
-import cats.effect.Async
+import cats.effect.{Async, Sync}
 import cats.syntax.all._
 import io.circe.Decoder
 import io.circe.parser.decode
@@ -46,7 +46,7 @@ private[api] class AjaxClient[F[_]: Async](token: String) extends TelegramClient
     val json = method.encoder.apply(request).toString
 
     Async[F]
-      .fromFuture(F.delay(Ajax.post(url, json, headers = Map("Content-Type" -> "application/json"))))
+      .fromFuture(Sync[F].delay(Ajax.post(url, json, headers = Map("Content-Type" -> "application/json"))))
       .map(_.responseText)
   }
 }

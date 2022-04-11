@@ -4,7 +4,7 @@ import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.InputFile
 import canoe.models.passport.PassportElementError
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -24,7 +24,7 @@ object SetPassportDataErrors {
 
       def name: String = "setPassportDataErrors"
 
-      def encoder: Encoder[SetPassportDataErrors] = deriveEncoder[SetPassportDataErrors].snakeCase
+      def encoder: Encoder[SetPassportDataErrors] = semiauto.deriveEncoder[SetPassportDataErrors].snakeCase
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 

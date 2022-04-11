@@ -4,7 +4,7 @@ import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InputFile}
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -31,7 +31,7 @@ object ForwardMessage {
 
       def name: String = "forwardMessage"
 
-      def encoder: Encoder[ForwardMessage] = deriveEncoder[ForwardMessage].snakeCase
+      def encoder: Encoder[ForwardMessage] = semiauto.deriveEncoder[ForwardMessage].snakeCase
 
       def decoder: Decoder[TelegramMessage] = TelegramMessage.telegramMessageDecoder
 

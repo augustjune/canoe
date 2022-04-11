@@ -3,7 +3,7 @@ package canoe.methods.stickers
 import canoe.methods.Method
 import canoe.models.InputFile
 import io.circe.{Decoder, Encoder}
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto
 import canoe.marshalling.codecs._
 
 /**
@@ -22,7 +22,7 @@ object SetStickerSetThumb {
     new Method[SetStickerSetThumb, Boolean] {
       def name: String = "setStickerSetThumb"
 
-      def encoder: Encoder[SetStickerSetThumb] = deriveEncoder[SetStickerSetThumb].snakeCase
+      def encoder: Encoder[SetStickerSetThumb] = semiauto.deriveEncoder[SetStickerSetThumb].snakeCase
 
       def decoder: Decoder[Boolean] = Decoder.decodeBoolean
 

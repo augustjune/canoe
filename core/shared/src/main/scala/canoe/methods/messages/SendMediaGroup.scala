@@ -4,7 +4,7 @@ import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.TelegramMessage
 import canoe.models.{ChatId, InputFile, InputMedia}
-import io.circe.generic.semiauto.deriveEncoder
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -33,7 +33,7 @@ object SendMediaGroup {
       def name: String = "sendMediaGroup"
 
       def encoder: Encoder[SendMediaGroup] =
-        deriveEncoder[SendMediaGroup]
+        semiauto.deriveEncoder[SendMediaGroup]
           .contramap[SendMediaGroup](
             s =>
               s.copy(media = s.media.filter(_.media match {

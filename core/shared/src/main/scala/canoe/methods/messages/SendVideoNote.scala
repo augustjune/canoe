@@ -4,7 +4,7 @@ import canoe.marshalling.codecs._
 import canoe.methods.Method
 import canoe.models.messages.VideoNoteMessage
 import canoe.models.{ChatId, InputFile, ReplyMarkup}
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto
 import io.circe.{Decoder, Encoder}
 
 /**
@@ -41,9 +41,9 @@ object SendVideoNote {
 
       def name: String = "sendVideoNote"
 
-      def encoder: Encoder[SendVideoNote] = deriveEncoder[SendVideoNote].snakeCase
+      def encoder: Encoder[SendVideoNote] = semiauto.deriveEncoder[SendVideoNote].snakeCase
 
-      def decoder: Decoder[VideoNoteMessage] = deriveDecoder[VideoNoteMessage]
+      def decoder: Decoder[VideoNoteMessage] = semiauto.deriveDecoder[VideoNoteMessage]
 
       def attachments(request: SendVideoNote): List[(String, InputFile)] =
         List("videoNote" -> request.videoNote)

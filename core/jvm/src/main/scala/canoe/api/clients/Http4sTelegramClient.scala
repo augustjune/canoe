@@ -26,7 +26,7 @@ private[api] class Http4sTelegramClient[F[_]: Concurrent: Logger](token: String,
     implicit val decoder: EntityDecoder[F, TelegramResponse[Res]] =
       jsonOf(Concurrent[F], TelegramResponse.decoder(M.decoder))
 
-    F.debug(s"Executing '${M.name}' Telegram method.") *>
+    Logger[F].debug(s"Executing '${M.name}' Telegram method.") *>
       client
         .expect[TelegramResponse[Res]](req)
         .recoverWith { case error: InvalidMessageBodyFailure => handleUnknownEntity(M.name, request, error) }
@@ -34,7 +34,7 @@ private[api] class Http4sTelegramClient[F[_]: Concurrent: Logger](token: String,
   }
 
   private def handleUnknownEntity[I, A](method: String, input: I, error: InvalidMessageBodyFailure): F[A] =
-    F.error(
+    Logger[F].error(
       s"Received unknown Telegram entity during execution of '$method' method. \nInput data: $input. \n${error.details}"
     ) *>
       ResponseDecodingError(error.details.dropWhile(_ != '{')).raiseError[F, A]
@@ -85,7 +85,7 @@ private[api] class Http4sTelegramClient[F[_]: Concurrent: Logger](token: String,
       case TelegramResponse(true, Some(result), _, _, _) => result.pure[F]
 
       case failed =>
-        F.error(s"Received failed response from Telegram: $failed. Method name: ${m.name}, input data: $input") *>
+        Logger[F].error(s"Received failed response from Telegram: $failed. Method name: ${m.name}, input data: $input") *>
           FailedMethod(m, input, failed).raiseError[F, A]
     }
 }

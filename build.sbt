@@ -45,7 +45,7 @@ lazy val examples = project
     name := "canoe-examples",
     publish / skip := true,
     projectSettings,
-    crossScalaVersions := Seq(scalaVersion.value)
+    crossScalaVersions := Seq(scala2_12, scala2_13, scala3)
   )
 
 lazy val projectSettings = Seq(
@@ -108,6 +108,7 @@ lazy val tests = {
 }
 
 ThisBuild / scalaVersion := scala3
+ThisBuild / crossScalaVersions := Seq(scala2_13, scala3)
 ThisBuild / githubWorkflowTargetTags ++= Seq("v*")
 ThisBuild / githubWorkflowPublishTargetBranches ++= Seq(RefPredicate.Equals(Ref.Branch("master")),
                                                         RefPredicate.StartsWith(Ref.Tag("v"))

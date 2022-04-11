@@ -28,7 +28,7 @@ object Registration extends IOApp.Simple {
 
   def run: IO[Unit] =
     Stream
-      .resource(TelegramClient.global[IO](token))
+      .resource(TelegramClient[IO](token))
       .flatMap { implicit client =>
         Bot.polling[IO].follow(signup(service))
       }
@@ -68,7 +68,7 @@ object Registration extends IOApp.Simple {
       _         <- Scenario.eval(chat.send("Repeat your password"))
       reentered <- enterPass(chat)
       r <-
-        if (pass == reentered) Scenario.eval(chat.send("Your password is stored.")).as(pass)
+        if (pass == reentered) Scenario.eval(chat.send("Your password is stored.")) >> Scenario.pure(pass)
         else Scenario.eval(chat.send("Provided passwords don't match. Try again")) >> providePass(chat)
     } yield r
 

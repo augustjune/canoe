@@ -4,7 +4,7 @@ import canoe.api._
 import canoe.models.Chat
 import canoe.syntax._
 import cats.effect.{IO, IOApp, Temporal}
-import cats.syntax.functor._
+import cats.syntax.all._
 import fs2.Stream
 
 import scala.concurrent.duration._
@@ -18,7 +18,7 @@ object SemanticBlocking extends IOApp.Simple {
 
   def run: IO[Unit] =
     Stream
-      .resource(TelegramClient.global[IO](token))
+      .resource(TelegramClient[IO](token))
       .flatMap { implicit client =>
         Bot.polling[IO].follow(count)
       }
@@ -33,7 +33,7 @@ object SemanticBlocking extends IOApp.Simple {
     } yield ()
 
   def repeat[F[_]: TelegramClient: Temporal](chat: Chat, i: Int): Scenario[F, Unit] =
-    if (i <= 0) Scenario.eval(chat.send("Done.")).void
+    if (i <= 0) Scenario.eval(chat.send("Done.")) >> Scenario.done
     else
       for {
         _ <- Scenario.eval(chat.send(s"$i.."))

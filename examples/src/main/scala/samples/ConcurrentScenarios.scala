@@ -18,7 +18,7 @@ object ConcurrentScenarios extends IOApp.Simple {
 
   def run: IO[Unit] =
     Stream
-      .resource(TelegramClient.global[IO](token))
+      .resource(TelegramClient[IO](token))
       .flatMap { implicit client =>
         Stream.eval(Semaphore[IO](0)).flatMap { sem =>
           // Both scenarios use shared semaphore

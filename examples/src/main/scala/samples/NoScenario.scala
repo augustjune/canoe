@@ -16,7 +16,7 @@ object NoScenario extends IOApp.Simple {
 
   def run: IO[Unit] =
     Stream
-      .resource(TelegramClient.global[IO](token))
+      .resource(TelegramClient[IO](token))
       .flatMap { implicit client =>
         Bot.polling[IO].updates.through(pipes.inlineQueries).evalTap(answerInlineQuery(_).void)
       }

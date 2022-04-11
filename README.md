@@ -1,7 +1,8 @@
 canoe
 =============
 
-[![Build Status](https://travis-ci.org/augustjune/canoe.svg?branch=master)](https://travis-ci.org/augustjune/canoe)
+[![Continuous Integration](https://github.com/augustjune/canoe/actions/workflows/ci.yml/badge.svg)](https://github.com/augustjune/canoe/actions/workflows/ci.yml)
+
 [![Gitter](https://badges.gitter.im/augustjune-canoe/community.svg)](https://gitter.im/augustjune-canoe/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.augustjune/canoe_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.augustjune/canoe_2.12)

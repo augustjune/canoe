@@ -4,15 +4,16 @@ import canoe.TestIO._
 import cats.effect.IO
 import fs2.{Pipe, Stream}
 import org.scalatest.freespec.AnyFreeSpec
-import cats.effect.concurrent.Ref
 import scala.concurrent.duration._
+import cats.effect.Ref
+import cats.effect.Ref
 
 class BroadcastSpec extends AnyFreeSpec {
   def broadcast[A]: Stream[IO, Broadcast[IO, A]] = Stream.eval(Broadcast[IO, A])
 
   def recordPulled[A](b: Broadcast[IO, A], duration: FiniteDuration): Pipe[IO, A, List[A]] =
     input =>
-      Stream.eval(Ref[IO].of(List.empty[A])).flatMap { ref =>
+      Stream.eval(Ref[IO].of(Ref.empty[A])).flatMap { ref =>
         input
           .evalTap(i => ref.update(i :: _))
           .through(b.publish)

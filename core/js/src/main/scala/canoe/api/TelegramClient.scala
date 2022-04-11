@@ -2,7 +2,7 @@ package canoe.api
 
 import canoe.api.clients.AjaxClient
 import canoe.methods.Method
-import cats.effect.{Async, ContextShift}
+import cats.effect.Async
 
 /**
   * Client which is able to execute Telegram Bot API methods in effect `F`.

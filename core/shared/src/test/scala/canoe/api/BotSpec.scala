@@ -5,11 +5,12 @@ import canoe.models.messages.TextMessage
 import canoe.models.{MessageReceived, PrivateChat, Update}
 import canoe.syntax._
 import cats.effect.IO
-import cats.effect.concurrent.Ref
 import fs2.Stream
 import org.scalatest.freespec.AnyFreeSpec
 
 import scala.concurrent.duration._
+import cats.effect.Ref
+import cats.effect.Ref
 
 class BotSpec extends AnyFreeSpec {
   type Message = String
@@ -112,7 +113,7 @@ class BotSpec extends AnyFreeSpec {
           val bot = new Bot[IO](updates(messages))
 
           val register = Stream
-            .eval(Ref[IO].of(Set.empty[Int]))
+            .eval(Ref[IO].of(Ref.empty[Int]))
             .flatMap(reg => bot.follow(scenario1(reg), scenario2(reg)).drain ++ Stream.eval(reg.get))
 
           assert(register.value().size == 2)
@@ -144,7 +145,7 @@ class BotSpec extends AnyFreeSpec {
           val bot = new Bot[IO](updates(messages))
 
           val register = Stream
-            .eval(Ref[IO].of(Set.empty[Int]))
+            .eval(Ref[IO].of(Ref.empty[Int]))
             .flatMap(reg => bot.follow(scenario1(reg), scenario2(reg)).drain ++ Stream.eval(reg.get))
 
           assert(register.value().size == 2)
@@ -166,7 +167,7 @@ class BotSpec extends AnyFreeSpec {
           val bot = new Bot[IO](updates(messages))
 
           val register = Stream
-            .eval(Ref[IO].of(Set.empty[Int]))
+            .eval(Ref[IO].of(Ref.empty[Int]))
             .flatMap(reg => bot.follow(scenario1(reg)).drain ++ Stream.eval(reg.get))
 
           assert(register.value().size == 2)
@@ -188,7 +189,7 @@ class BotSpec extends AnyFreeSpec {
           val bot = new Bot[IO](updates(messages))
 
           val register = Stream
-            .eval(Ref[IO].of(Set.empty[Int]))
+            .eval(Ref[IO].of(Ref.empty[Int]))
             .flatMap(reg => bot.follow(scenario1(reg)).drain ++ Stream.eval(reg.get))
 
           assert(register.value().size == 2)

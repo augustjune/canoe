@@ -14,7 +14,7 @@ import io.circe.{Decoder, Encoder}
   *
   * Returns True on success.
   */
-final case class SetPassportDataErrors(userId: Int, errors: List[PassportElementError])
+final case class SetPassportDataErrors(userId: Long, errors: List[PassportElementError])
 
 object SetPassportDataErrors {
   import io.circe.generic.auto._

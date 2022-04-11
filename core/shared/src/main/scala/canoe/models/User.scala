@@ -13,7 +13,7 @@ package canoe.models
   * @param canReadAllGroupMessages True, if privacy mode is disabled for the bot. Returned only in getMe.
   * @param supportsInlineQueries   True, if the bot supports inline queries. Returned only in getMe.
   */
-final case class User(id: Int,
+final case class User(id: Long,
                       isBot: Boolean,
                       firstName: String,
                       lastName: Option[String],

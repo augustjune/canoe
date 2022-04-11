@@ -31,7 +31,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
   .jsSettings(
     libraryDependencies ++= Seq(
       ("org.scala-js" %%% "scalajs-dom"                 % scalaJsDomVersion).cross(CrossVersion.for3Use2_13),
-      "org.scala-js" %%% "scala-js-macrotask-executor" % scalaJsMacroTaskExecutor
+      "org.scala-js"  %%% "scala-js-macrotask-executor" % scalaJsMacroTaskExecutor
     )
   )
 
@@ -138,7 +138,7 @@ lazy val log4catsVersion = "2.2.0"
 lazy val scalatestVersion = "3.2.11"
 lazy val disciplineVersion = "2.1.5"
 lazy val scalacheckShapelessVersion = "1.2.5"
-lazy val scalaJsDomVersion = "1.2.0"
+lazy val scalaJsDomVersion = "2.1.0"
 lazy val scalaJsMacroTaskExecutor = "1.0.0"
 lazy val kindProjectorVersion = "0.13.2"
 lazy val contextAppliedVersion = "0.1.4"

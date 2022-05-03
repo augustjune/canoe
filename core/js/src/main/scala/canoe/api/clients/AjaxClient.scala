@@ -8,7 +8,11 @@ import cats.syntax.all._
 import io.circe.Decoder
 import io.circe.parser.decode
 import org.scalajs.dom.console
-import org.scalajs.dom.ext.Ajax
+import scala.scalajs.js
+import org.scalajs.dom.fetch
+import org.scalajs.dom.RequestInit
+import org.scalajs.dom.HttpMethod
+import org.scalajs.dom.Headers
 
 private[api] class AjaxClient[F[_]: Async](token: String) extends TelegramClient[F] {
 
@@ -43,10 +47,19 @@ private[api] class AjaxClient[F[_]: Async](token: String) extends TelegramClient
 
   private def sendJsonRequest[Req, Res](request: Req, method: Method[Req, Res]): F[String] = {
     val url = s"$botApiUri/${method.name}"
-    val json = method.encoder.apply(request).toString
+    val bodyString = method.encoder.apply(request).toString
+    val requestInit = new RequestInit {
+      this.method = HttpMethod.POST
+      this.body = bodyString
+      this.headers = new Headers {
+        js.Array(
+          js.Array("Content-Type", "application/json")
+        )
+      }
+    }
 
     Async[F]
-      .fromFuture(Sync[F].delay(Ajax.post(url, json, headers = Map("Content-Type" -> "application/json"))))
-      .map(_.responseText)
+      .fromFuture(Sync[F].delay(fetch(url, requestInit).toFuture))
+      .flatMap(x => Async[F].fromFuture(Sync[F].delay(x.text().toFuture)))
   }
 }

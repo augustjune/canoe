@@ -19,9 +19,7 @@ object SemanticBlocking extends IOApp.Simple {
   def run: IO[Unit] =
     Stream
       .resource(TelegramClient[IO](token))
-      .flatMap { implicit client =>
-        Bot.polling[IO].follow(count)
-      }
+      .flatMap(implicit client => Bot.polling[IO].follow(count))
       .compile
       .drain
 

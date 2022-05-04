@@ -29,9 +29,7 @@ object Registration extends IOApp.Simple {
   def run: IO[Unit] =
     Stream
       .resource(TelegramClient[IO](token))
-      .flatMap { implicit client =>
-        Bot.polling[IO].follow(signup(service))
-      }
+      .flatMap(implicit client => Bot.polling[IO].follow(signup(service)))
       .compile
       .drain
 

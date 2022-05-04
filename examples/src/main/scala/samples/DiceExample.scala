@@ -6,8 +6,7 @@ import canoe.syntax._
 import cats.effect.{IO, IOApp}
 import fs2.Stream
 
-/**
-  * Example of echos bot that will send both possible dice messages in response
+/** Example of echos bot that will send both possible dice messages in response
   */
 object DiceExample extends IOApp.Simple {
   val token: String = "<your telegram token>"
@@ -15,9 +14,7 @@ object DiceExample extends IOApp.Simple {
   def run: IO[Unit] =
     Stream
       .resource(TelegramClient[IO](token))
-      .flatMap { implicit client =>
-        Bot.polling[IO].follow(echos)
-      }
+      .flatMap(implicit client => Bot.polling[IO].follow(echos))
       .compile
       .drain
 

@@ -15,9 +15,7 @@ object Recursive extends IOApp.Simple {
   def run: IO[Unit] =
     Stream
       .resource(TelegramClient[IO](token))
-      .flatMap { implicit client =>
-        Bot.polling[IO].follow(learnNaturals)
-      }
+      .flatMap(implicit client => Bot.polling[IO].follow(learnNaturals))
       .compile
       .drain
 

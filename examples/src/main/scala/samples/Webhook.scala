@@ -32,9 +32,7 @@ object Webhook extends IOApp.Simple {
   def run: IO[Unit] =
     Stream
       .resource(TelegramClient[IO](token))
-      .flatMap { implicit client =>
-        Stream.resource(Bot.hook[IO](url)).flatMap(_.follow(greetings))
-      }
+      .flatMap(implicit client => Stream.resource(Bot.hook[IO](url)).flatMap(_.follow(greetings)))
       .compile
       .drain
 

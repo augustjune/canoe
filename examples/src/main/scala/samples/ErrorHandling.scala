@@ -31,9 +31,7 @@ object ErrorHandling extends IOApp.Simple {
   def run: IO[Unit] =
     Stream
       .resource(TelegramClient[IO](token))
-      .flatMap { implicit client =>
-        Bot.polling[IO].follow(order(amazon))
-      }
+      .flatMap(implicit client => Bot.polling[IO].follow(order(amazon)))
       .compile
       .drain
 

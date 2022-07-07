@@ -129,9 +129,9 @@ lazy val scala2Only = Seq(scala2_12, scala2_13)
 lazy val scala2And3 = scala2Only :+ scala3
 
 lazy val fs2Version = "3.2.7"
-lazy val catsCoreVersion = "2.7.0"
+lazy val catsCoreVersion = "2.8.0"
 lazy val catsEffectVersion = "3.3.11"
-lazy val catsLawsVersion = "2.7.0"
+lazy val catsLawsVersion = "2.8.0"
 lazy val circeVersion = "0.14.1"
 lazy val http4sVersion = "0.23.11"
 lazy val log4catsVersion = "2.3.1"

@@ -130,7 +130,7 @@ lazy val scala2And3 = scala2Only :+ scala3
 
 lazy val fs2Version = "3.2.7"
 lazy val catsCoreVersion = "2.7.0"
-lazy val catsEffectVersion = "3.3.11"
+lazy val catsEffectVersion = "3.3.13"
 lazy val catsLawsVersion = "2.7.0"
 lazy val circeVersion = "0.14.1"
 lazy val http4sVersion = "0.23.11"

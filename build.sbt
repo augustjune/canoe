@@ -121,16 +121,16 @@ ThisBuild / githubWorkflowEnv ++= List(
   "SONATYPE_USERNAME"
 ).map(envKey => envKey -> s"$${{ secrets.$envKey }}").toMap
 
-lazy val scala3 = "3.1.2"
+lazy val scala3 = "3.1.3"
 lazy val scala2_13 = "2.13.8"
 lazy val scala2_12 = "2.12.15"
 
 lazy val scala2Only = Seq(scala2_12, scala2_13)
 lazy val scala2And3 = scala2Only :+ scala3
 
-lazy val fs2Version = "3.2.7"
-lazy val catsCoreVersion = "2.8.0"
-lazy val catsEffectVersion = "3.3.11"
+lazy val fs2Version = "3.2.10"
+lazy val catsCoreVersion = "2.7.0"
+lazy val catsEffectVersion = "3.3.13"
 lazy val catsLawsVersion = "2.8.0"
 lazy val circeVersion = "0.14.1"
 lazy val http4sVersion = "0.23.11"
@@ -139,6 +139,6 @@ lazy val scalatestVersion = "3.2.12"
 lazy val disciplineVersion = "2.1.5"
 lazy val scalacheckShapelessVersion = "1.2.5"
 lazy val scalaJsDomVersion = "2.1.0"
-lazy val scalaJsMacroTaskExecutor = "1.0.0"
+lazy val scalaJsMacroTaskExecutor = "1.1.0"
 lazy val kindProjectorVersion = "0.13.2"
 lazy val contextAppliedVersion = "0.1.4"

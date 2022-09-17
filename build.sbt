@@ -123,7 +123,7 @@ ThisBuild / githubWorkflowEnv ++= List(
 
 lazy val scala3 = "3.1.3"
 lazy val scala2_13 = "2.13.8"
-lazy val scala2_12 = "2.12.16"
+lazy val scala2_12 = "2.12.17"
 
 lazy val scala2Only = Seq(scala2_12, scala2_13)
 lazy val scala2And3 = scala2Only :+ scala3

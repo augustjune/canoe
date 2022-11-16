@@ -98,7 +98,7 @@ lazy val tests = {
       "org.scalatest" %% "scalatest"                     % scalatestVersion,
       "org.typelevel" %% "cats-laws"                     % catsLawsVersion,
       "org.typelevel" %% "discipline-scalatest"          % disciplineVersion,
-      "org.typelevel" %% "cats-effect-testing-scalatest" % "1.4.0"
+      "org.typelevel" %% "cats-effect-testing-scalatest" % "1.5.0"
     ).map(_ % Test)
 
   val frameworks =

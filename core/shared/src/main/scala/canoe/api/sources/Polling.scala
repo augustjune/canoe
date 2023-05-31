@@ -29,10 +29,7 @@ private[api] class Polling[F[_]: TelegramClient: Functor](timeout: FiniteDuratio
       .map(updates => (lastId(updates).map(_ + 1).getOrElse(offset), updates))
 
   private def lastId(updates: List[Update]): Option[Long] =
-    updates match {
-      case Nil      => None
-      case nonEmpty => Some(nonEmpty.map(_.updateId).max)
-    }
+    updates.map(_.updateId).maxOption
 }
 
 object Polling {

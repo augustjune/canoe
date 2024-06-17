@@ -28,6 +28,7 @@ object Update {
       semiauto.deriveDecoder[ShippingQueryReceived].widen,
       semiauto.deriveDecoder[PreCheckoutQueryReceived].widen,
       semiauto.deriveDecoder[PollAnswerReceived].widen,
+      semiauto.deriveDecoder[ChatMemberUpdated].widen,
       semiauto.deriveDecoder[Unknown].widen
     ).reduceLeft(_.or(_)).camelCase
 }
@@ -64,3 +65,7 @@ final case class PollAnswerReceived(updateId: Long, pollAnswer: PollAnswer) exte
 
 /** New poll state. Bots receive only updates about stopped polls and polls, which are sent by the bot. */
 final case class PollUpdated(updateId: Long, poll: Poll) extends Update
+
+/** A user changed state in the chat: blocked the bot or left. */
+final case class ChatMemberUpdated(updateId: Long, chat: Chat, from: User, date: Int, oldChatMember: ChatMember, newChatMember: ChatMember) extends Update
+

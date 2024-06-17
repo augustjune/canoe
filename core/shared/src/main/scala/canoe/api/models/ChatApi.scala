@@ -90,13 +90,10 @@ final class ChatApi(private val chat: Chat) extends AnyVal {
     }
 
   /**
-    * Pins message in this chat, unless it's private chat.
+    * Pins message in this chat.
     */
   def pinMessage[F[_]: TelegramClient: Applicative](messageId: Int, silent: Boolean = true): F[Boolean] =
-    chat match {
-      case _: PrivateChat => false.pure[F]
-      case _              => PinChatMessage(chat.id, messageId, notFalse(silent)).call
-    }
+    PinChatMessage(chat.id, messageId, notFalse(silent)).call
 
   private def notFalse(b: Boolean): Option[Boolean] =
     if (b) Some(true)
@@ -188,10 +185,7 @@ final class ChatApi(private val chat: Chat) extends AnyVal {
     * Unpins pinned chat message.
     */
   def unpinMessage[F[_]: TelegramClient: Applicative]: F[Boolean] =
-    chat match {
-      case _: PrivateChat => false.pure[F]
-      case _              => UnpinChatMessage(chat.id).call
-    }
+    UnpinChatMessage(chat.id).call
 
   /**
     * @return Detailed information about this chat
